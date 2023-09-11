@@ -3,7 +3,6 @@ package net.pie;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
-import java.sql.ClientInfoStatus;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class Start {
     public String decode(BufferedImage toBeDecrypted) {
         Color c = null;
         int count = 0;
-        int[] message = new int[(toBeDecrypted.getHeight() * toBeDecrypted.getWidth()) * 3];
+        int[] message = new int[(toBeDecrypted.getHeight() * toBeDecrypted.getWidth() * 3)];
         for (int y = 0; y < toBeDecrypted.getHeight(); y++) {
             for (int x = 0; x < toBeDecrypted.getWidth(); x++) {
                 c = new Color(toBeDecrypted.getRGB(x, y));
