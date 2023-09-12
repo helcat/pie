@@ -39,6 +39,7 @@ public class Pie_Encode {
         Integer r = null;
         Integer g = null;
         Integer b = null;
+        Integer a = null;
         List<Color> list = new ArrayList<Color>();
         for (int i : originalArray) {
             if (r == null) {
@@ -47,18 +48,29 @@ public class Pie_Encode {
                 g = i;
             } else if (b == null) {
                 b = i;
-                list.add(createColor(r,g,b));
-                r = null;
-                g = null;
-                b = null;
+                if (getConfig().getUse() == Pie_Use.RGB) {
+                    list.add(createColor(r, g, b));
+                    r = null;
+                    g = null;
+                    b = null;
+                }
+            } else if (a == null && getConfig().getUse() == Pie_Use.RGBA) {
+                a = i;
+                if (getConfig().getUse() == Pie_Use.RGB) {
+                    list.add(createColor(r, g, b, a));
+                    r = null;
+                    g = null;
+                    b = null;
+                    a = null;
+                }
             }
         }
 
         BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        Integer count = 0;
+        int count = 0;
         for (int y = 0; y < dimension; y++) {
             for (int x = 0; x < dimension; x++)
-                buffImg.setRGB(x, y, (list.size() > count) ? list.get(count ++).getRGB() : getConfig().getSpace());
+                buffImg.setRGB(x, y, (list.size() > count) ? list.get(count ++).getRGB() : getConfig().getPadding());
         }
         setEncoded_image(buffImg);
     }
@@ -67,9 +79,11 @@ public class Pie_Encode {
      * Create Color
      *************************************************/
     private Color createColor(Integer r, Integer g, Integer b) {
-        return new Color(r, g, b, 0);
+        return new Color(r, g, b, getConfig().getAlpha());
     }
-
+    private Color createColor(Integer r, Integer g, Integer b, Integer a) {
+        return new Color(r, g, b, a);
+    }
     /*************************************************
      * getters and setters
      *************************************************/
