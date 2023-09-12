@@ -6,7 +6,7 @@ public class Pie_Config {
 
     private int alpha = 0;
     private boolean suppress_errors = false;
-    private int space = ("".getBytes(StandardCharsets.UTF_8)[0]);
+    private int space = (" ".getBytes(StandardCharsets.UTF_8)[0]);
     private Pie_Use use = Pie_Use.RGB;
 
     public  Pie_Config() {

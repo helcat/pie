@@ -33,7 +33,8 @@ public class Pie_Encode {
         StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getUse().getNumber()));
         byte[] originalArray = Objects.requireNonNull(append.toString()).getBytes(StandardCharsets.UTF_8);
 
-        double dimension = (int) Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
+        double dimension = Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
+        int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
 
         Integer r = null;
         Integer g = null;
@@ -53,11 +54,11 @@ public class Pie_Encode {
             }
         }
 
-        BufferedImage buffImg = new BufferedImage((int) dimension, (int) dimension, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Integer count = 0;
         for (int y = 0; y < dimension; y++) {
             for (int x = 0; x < dimension; x++)
-                buffImg.setRGB(x, y, list.get(count ++).getRGB());
+                buffImg.setRGB(x, y, (list.size() > count) ? list.get(count ++).getRGB() : getConfig().getSpace());
         }
         setEncoded_image(buffImg);
     }
