@@ -40,7 +40,7 @@ public class Pie_Encode {
         Integer g = null;
         Integer b = null;
         Integer a = null;
-        List<Color> list = new ArrayList<Color>();
+        List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
                 r = i;
