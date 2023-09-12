@@ -37,12 +37,7 @@ public class Pie_Decode {
             }
         }
 
-        byte[] byteArray = new byte[message.length];
-
-        for (int i = 0; i < message.length; i++)
-            byteArray[i] = (byte) message[i];
-
-        setDecoded_Message(new String(byteArray, StandardCharsets.UTF_8).trim());
+        setDecoded_Message(new String(Pie_Utils.convert_Array(message), StandardCharsets.UTF_8).trim());
     }
 
     /*************************************************
