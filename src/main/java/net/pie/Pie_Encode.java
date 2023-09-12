@@ -24,11 +24,10 @@ public class Pie_Encode {
     /*************************************************
      * encode
      *************************************************/
-    public BufferedImage encode(String toBeEncrypted) {
-        for (int i = 0; i < ((toBeEncrypted == null) ? "" : toBeEncrypted).length() % getConfig().getUse().getNumber(); i++)
-            toBeEncrypted = toBeEncrypted + " ";
-
-        byte[] originalArray = Objects.requireNonNull(toBeEncrypted).getBytes(StandardCharsets.UTF_8);
+    public void encode(String toBeEncrypted) {
+        StringBuilder toBeEncryptedBuilder = new StringBuilder(toBeEncrypted);
+        StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getUse().getNumber()));
+        byte[] originalArray = Objects.requireNonNull(append.toString()).getBytes(StandardCharsets.UTF_8);
 
         double dimension = (int) Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
 
@@ -57,7 +56,6 @@ public class Pie_Encode {
                 buffImg.setRGB(x, y, list.get(count ++).getRGB());
         }
 
-        return buffImg;
     }
 
     /*************************************************
