@@ -2,6 +2,7 @@ package net.pie;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
@@ -10,7 +11,7 @@ public class Pie_Decode {
     private Pie_Config config;
 
     /*************************************************
-     * Start
+     * Pie_Decode
      *************************************************/
     public Pie_Decode(BufferedImage toBeDecrypted) {
         setConfig(new Pie_Config());
@@ -37,7 +38,12 @@ public class Pie_Decode {
             }
         }
 
-        setDecoded_Message(new String(Pie_Utils.convert_Array(message), StandardCharsets.UTF_8).trim());
+        String base64_text = new String(Pie_Utils.convert_Array(message), StandardCharsets.UTF_8).trim();
+        try {
+            setDecoded_Message(Pie_Utils.decompress(Pie_Base64.decode(base64_text)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /*************************************************

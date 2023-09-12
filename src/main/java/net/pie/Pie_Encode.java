@@ -31,7 +31,10 @@ public class Pie_Encode {
         setEncoded_image(null);
         StringBuilder toBeEncryptedBuilder = new StringBuilder(toBeEncrypted);
         StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getUse().getNumber()));
-        byte[] originalArray = Objects.requireNonNull(append.toString()).getBytes(StandardCharsets.UTF_8);
+
+        byte[] bytes = Pie_Utils.compress(append.toString());
+        String text = Pie_Base64.encodeBytes(bytes);
+        byte[] originalArray = text.getBytes(StandardCharsets.UTF_8);
 
         double dimension = Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
