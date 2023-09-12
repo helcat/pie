@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class Pie_Encode {

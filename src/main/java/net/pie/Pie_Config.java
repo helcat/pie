@@ -9,8 +9,11 @@ public class Pie_Config {
     private int padding = (" ".getBytes(StandardCharsets.UTF_8)[0]);
     private Pie_Use use = Pie_Use.RGB;
 
-    public  Pie_Config() {
-
+    public Pie_Config() {
+        setAlpha(0);
+        setPadding((" ".getBytes(StandardCharsets.UTF_8)[0]));
+        setUse(Pie_Use.RGB);
+        setSuppress_errors(false);
     }
 
     /*************************************

@@ -1,12 +1,5 @@
 package net.pie;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class Start {
     /*************************************************
      * Main Start -> Runnable Jar
@@ -27,7 +20,7 @@ public class Start {
      * Start
      *************************************************/
     public Start(String toBeEncrypted) {
-        Pie_Encode encode = new Pie_Encode("Hello");
+        Pie_Encode encode = new Pie_Encode(toBeEncrypted);
 
         Pie_Decode decode = new Pie_Decode(encode.getEncoded_image());
 

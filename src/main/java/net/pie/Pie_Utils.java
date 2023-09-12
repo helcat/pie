@@ -1,8 +1,8 @@
 package net.pie;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
 import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
@@ -30,7 +30,7 @@ public class Pie_Utils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             OutputStream out = new DeflaterOutputStream(baos);
-            out.write(text.getBytes("UTF-8"));
+            out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
             throw new AssertionError(e);
@@ -47,7 +47,7 @@ public class Pie_Utils {
             OutputStream out = new InflaterOutputStream(baos);
             out.write(bytes);
             out.close();
-            return new String(baos.toByteArray(), "UTF-8");
+            return baos.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
