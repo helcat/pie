@@ -47,6 +47,9 @@ public class Pie_Encode {
         double dimension = Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
 
+        int width = getConfig().getMinimum_width() > size ? getConfig().getMinimum_width() : size;
+        int height = getConfig().getMinimum_height() > size ? getConfig().getMinimum_width() : size;;
+
         Integer r = null;
         Integer g = null;
         Integer b = null;
@@ -72,22 +75,22 @@ public class Pie_Encode {
                     r = null;
                     g = null;
                     b = null;
-                    a = null;
+                    a = null; /* Alpha component (0 for fully transparent, 255 for fully opaque) */
                 }
             }
         }
 
-        createImage(size, list);
+        createImage(width, height, list);
     }
     /*************************************************
      * Create Image
      *************************************************/
-    private void createImage(Integer size, List<Color> list) {
-        if (!isError() && (size > 0) && (list != null) && !list.isEmpty()) {
-            BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    private void createImage(int width, int height, List<Color> list) {
+        if (!isError() && width > 0 && height > 0 && list != null && !list.isEmpty()) {
+            BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             int count = 0;
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++)
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++)
                     buffImg.setRGB(x, y, (list.size() > count) ? list.get(count++).getRGB() : getConfig().getPadding());
             }
             setEncoded_image(buffImg);

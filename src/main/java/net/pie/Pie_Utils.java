@@ -3,6 +3,7 @@ package net.pie;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -150,7 +151,7 @@ public class Pie_Utils {
 
     public void saveImage_to_file(BufferedImage buffer, File file) {
         try {
-            ImageIO.write(buffer, "PNG", file);
+            ImageIO.write(buffer, "png", file);
         } catch (IOException e) {
             if (!getConfig().isSuppress_errors())
                 getConfig().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
@@ -196,6 +197,15 @@ public class Pie_Utils {
      */
 
     /************************************************
+     * get the desktop path
+     ************************************************/
+    public String getDesktopPath() {
+        FileSystemView view = FileSystemView.getFileSystemView();
+        File file = view.getHomeDirectory();
+        return file.getPath();
+    }
+
+    /************************************************
      * getters and setters
      ************************************************/
     public Pie_Config getConfig() {
@@ -204,6 +214,8 @@ public class Pie_Utils {
     public void setConfig(Pie_Config config) {
         this.config = config;
     }
+
+
 }
 
 
