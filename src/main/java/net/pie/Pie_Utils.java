@@ -7,14 +7,21 @@ import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
 
-    public Pie_Utils() {
-
+    private Pie_Config config = null;
+    public Pie_Utils(Pie_Config config) {
+        setConfig(config);
     }
 
     /************************************************
      * Convert int array to byte array
      ************************************************/
-    public static byte[] convert_Array(int[] list) {
+    public byte[] convert_Array(int[] list) {
+        if (list == null || list.length == 0) {
+            if (!getConfig().isSuppress_errors())
+                getConfig().addError("ERROR convert_Array - Nothing in array");
+            return new byte[0];
+        }
+
         byte[] byteArray = new byte[list.length];
 
         for (int i = 0; i < list.length; i++)
@@ -26,14 +33,15 @@ public class Pie_Utils {
     /************************************************
      * compress String
      ************************************************/
-    public static byte[] compress(String text) {
+    public byte[] compress(String text) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             OutputStream out = new DeflaterOutputStream(baos);
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
-            throw new AssertionError(e);
+            if (!getConfig().isSuppress_errors())
+                getConfig().addError("ERROR compress - " + e.getMessage());
         }
         return baos.toByteArray();
     }
@@ -41,17 +49,28 @@ public class Pie_Utils {
     /************************************************
      * decompress String
      ************************************************/
-    public static String decompress(byte[] bytes) {
+    public String decompress(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             OutputStream out = new InflaterOutputStream(baos);
             out.write(bytes);
             out.close();
-            return baos.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new AssertionError(e);
+            if (!getConfig().isSuppress_errors())
+                getConfig().addError("ERROR decompress - " + e.getMessage());
         }
+        return baos.toString(StandardCharsets.UTF_8);
+    }
 
+    /************************************************
+     * getters and setters
+     ************************************************/
+    public Pie_Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Pie_Config config) {
+        this.config = config;
     }
 }
 

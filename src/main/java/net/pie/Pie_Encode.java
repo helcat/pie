@@ -10,28 +10,31 @@ import java.util.List;
 public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
+    private Pie_Utils utils = null;
 
     /*************************************************
      * Start
      *************************************************/
     public Pie_Encode(Pie_Config config, String toBeEncrypted) {
         setConfig(config);
+        setUtils(new Pie_Utils(getConfig()));
         encode(toBeEncrypted);
     }
     public Pie_Encode(String toBeEncrypted) {
         setConfig(new Pie_Config());
+        setUtils(new Pie_Utils(getConfig()));
         encode(toBeEncrypted);
     }
 
     /*************************************************
      * encode
      *************************************************/
-    public void encode(String toBeEncrypted) {
+    private void encode(String toBeEncrypted) {
         setEncoded_image(null);
         StringBuilder toBeEncryptedBuilder = new StringBuilder(toBeEncrypted);
         StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getUse().getNumber()));
 
-        byte[] bytes = Pie_Utils.compress(append.toString());
+        byte[] bytes = getUtils().compress(append.toString());
         String text = Pie_Base64.encodeBytes(bytes);
         byte[] originalArray = text.getBytes(StandardCharsets.UTF_8);
 
@@ -50,15 +53,15 @@ public class Pie_Encode {
                 g = i;
             } else if (b == null) {
                 b = i;
-                if (getConfig().getUse() == Pie_Use.RGB) {
+                if (getConfig().getUse() == Pie_Use.BLOCK3) {
                     list.add(createColor(r, g, b));
                     r = null;
                     g = null;
                     b = null;
                 }
-            } else if (a == null && getConfig().getUse() == Pie_Use.RGBA) {
+            } else if (a == null && getConfig().getUse() == Pie_Use.BLOCK4) {
                 a = i;
-                if (getConfig().getUse() == Pie_Use.RGB) {
+                if (getConfig().getUse() == Pie_Use.BLOCK3) {
                     list.add(createColor(r, g, b, a));
                     r = null;
                     g = null;
@@ -68,13 +71,21 @@ public class Pie_Encode {
             }
         }
 
-        BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        int count = 0;
-        for (int y = 0; y < dimension; y++) {
-            for (int x = 0; x < dimension; x++)
-                buffImg.setRGB(x, y, (list.size() > count) ? list.get(count ++).getRGB() : getConfig().getPadding());
+        createImage(size, list);
+    }
+    /*************************************************
+     * Create Image
+     *************************************************/
+    private void createImage(Integer size, List<Color> list) {
+        if (size > 0 && list != null && !list.isEmpty()) {
+            BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            int count = 0;
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++)
+                    buffImg.setRGB(x, y, (list.size() > count) ? list.get(count++).getRGB() : getConfig().getPadding());
+            }
+            setEncoded_image(buffImg);
         }
-        setEncoded_image(buffImg);
     }
 
     /*************************************************
@@ -86,13 +97,14 @@ public class Pie_Encode {
     private Color createColor(Integer r, Integer g, Integer b, Integer a) {
         return new Color(r, g, b, a);
     }
+
     /*************************************************
      * getters and setters
      *************************************************/
-    public void setConfig(Pie_Config config) {
+    private void setConfig(Pie_Config config) {
         this.config = config;
     }
-    public Pie_Config getConfig() {
+    private Pie_Config getConfig() {
         return config;
     }
 
@@ -100,7 +112,15 @@ public class Pie_Encode {
         return encoded_image;
     }
 
-    public void setEncoded_image(BufferedImage encoded_image) {
+    private void setEncoded_image(BufferedImage encoded_image) {
         this.encoded_image = encoded_image;
+    }
+
+    private Pie_Utils getUtils() {
+        return utils;
+    }
+
+    private void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }

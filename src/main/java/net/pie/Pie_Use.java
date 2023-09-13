@@ -3,8 +3,8 @@ package net.pie;
 import java.nio.charset.StandardCharsets;
 
 public enum Pie_Use {
-    RGB (3),
-    RGBA (4);
+    BLOCK3 (3),
+    BLOCK4 (4);
 
     private int number ;
 

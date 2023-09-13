@@ -9,23 +9,26 @@ import java.nio.charset.StandardCharsets;
 public class Pie_Decode {
     private String decoded_Message;
     private Pie_Config config;
+    private Pie_Utils utils = null;
 
     /*************************************************
      * Pie_Decode
      *************************************************/
     public Pie_Decode(BufferedImage toBeDecrypted) {
         setConfig(new Pie_Config());
+        setUtils(new Pie_Utils(getConfig()));
         decode(toBeDecrypted);
     }
     public Pie_Decode(Pie_Config config, BufferedImage toBeDecrypted) {
         setConfig(config);
+        setUtils(new Pie_Utils(getConfig()));
         decode(toBeDecrypted);
     }
 
     /*************************************************
      * decode
      *************************************************/
-    public void decode(BufferedImage toBeDecrypted) {
+    private void decode(BufferedImage toBeDecrypted) {
         Color c = null;
         int count = 0;
         int[] message = new int[(toBeDecrypted.getHeight() * toBeDecrypted.getWidth() * getConfig().getUse().getNumber())];
@@ -38,9 +41,9 @@ public class Pie_Decode {
             }
         }
 
-        String base64_text = new String(Pie_Utils.convert_Array(message), StandardCharsets.UTF_8).trim();
+        String base64_text = new String(getUtils().convert_Array(message), StandardCharsets.UTF_8).trim();
         try {
-            setDecoded_Message(Pie_Utils.decompress(Pie_Base64.decode(base64_text)));
+            setDecoded_Message(getUtils().decompress(Pie_Base64.decode(base64_text)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -49,10 +52,10 @@ public class Pie_Decode {
     /*************************************************
      * getters and setters
      *************************************************/
-    public void setConfig(Pie_Config config) {
+    private void setConfig(Pie_Config config) {
         this.config = config;
     }
-    public Pie_Config getConfig() {
+    private Pie_Config getConfig() {
         return config;
     }
 
@@ -60,7 +63,15 @@ public class Pie_Decode {
         return decoded_Message;
     }
 
-    public void setDecoded_Message(String decoded_Message) {
+    private void setDecoded_Message(String decoded_Message) {
         this.decoded_Message = decoded_Message;
+    }
+
+    private Pie_Utils getUtils() {
+        return utils;
+    }
+
+    private void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }

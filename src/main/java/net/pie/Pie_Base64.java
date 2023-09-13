@@ -1,5 +1,9 @@
 package net.pie;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 /**
  * <p>Encodes and decodes to and from Base64 notation.</p>
  * <p>Homepage: <a href="http://iharder.net/base64">http://iharder.net/base64</a>.</p>
@@ -409,7 +413,7 @@ public class Pie_Base64
      * in which case one of them will be picked, though there is
      * no guarantee as to which one will be picked.
      */
-    private final static byte[] getAlphabet( int options ) {
+    private static byte[] getAlphabet(int options) {
         if ((options & URL_SAFE) == URL_SAFE) {
             return _URL_SAFE_ALPHABET;
         } else if ((options & ORDERED) == ORDERED) {
@@ -427,7 +431,7 @@ public class Pie_Base64
      * in which case one of them will be picked, though there is
      * no guarantee as to which one will be picked.
      */
-    private final static byte[] getDecodabet( int options ) {
+    private static byte[] getDecodabet(int options) {
         if( (options & URL_SAFE) == URL_SAFE) {
             return _URL_SAFE_DECODABET;
         } else if ((options & ORDERED) == ORDERED) {
@@ -481,18 +485,17 @@ public class Pie_Base64
      * the <var>destination</var> array.
      * The actual number of significant bytes in your array is
      * given by <var>numSigBytes</var>.</p>
-	 * <p>This is the lowest level of the encoding methods with
-	 * all possible parameters.</p>
+     * <p>This is the lowest level of the encoding methods with
+     * all possible parameters.</p>
      *
-     * @param source the array to convert
-     * @param srcOffset the index where conversion begins
+     * @param source      the array to convert
+     * @param srcOffset   the index where conversion begins
      * @param numSigBytes the number of significant bytes in your array
      * @param destination the array to hold the conversion
-     * @param destOffset the index where output will be put
-     * @return the <var>destination</var> array
+     * @param destOffset  the index where output will be put
      * @since 1.3
      */
-    private static byte[] encode3to4(
+    private static void encode3to4(
     byte[] source, int srcOffset, int numSigBytes,
     byte[] destination, int destOffset, int options ) {
 
@@ -513,193 +516,32 @@ public class Pie_Base64
                      | ( numSigBytes > 1 ? ((source[ srcOffset + 1 ] << 24) >>> 16) : 0 )
                      | ( numSigBytes > 2 ? ((source[ srcOffset + 2 ] << 24) >>> 24) : 0 );
 
-        switch( numSigBytes )
-        {
-            case 3:
-                destination[ destOffset     ] = ALPHABET[ (inBuff >>> 18)        ];
-                destination[ destOffset + 1 ] = ALPHABET[ (inBuff >>> 12) & 0x3f ];
-                destination[ destOffset + 2 ] = ALPHABET[ (inBuff >>>  6) & 0x3f ];
-                destination[ destOffset + 3 ] = ALPHABET[ (inBuff       ) & 0x3f ];
-                return destination;
-
-            case 2:
-                destination[ destOffset     ] = ALPHABET[ (inBuff >>> 18)        ];
-                destination[ destOffset + 1 ] = ALPHABET[ (inBuff >>> 12) & 0x3f ];
-                destination[ destOffset + 2 ] = ALPHABET[ (inBuff >>>  6) & 0x3f ];
-                destination[ destOffset + 3 ] = EQUALS_SIGN;
-                return destination;
-
-            case 1:
-                destination[ destOffset     ] = ALPHABET[ (inBuff >>> 18)        ];
-                destination[ destOffset + 1 ] = ALPHABET[ (inBuff >>> 12) & 0x3f ];
-                destination[ destOffset + 2 ] = EQUALS_SIGN;
-                destination[ destOffset + 3 ] = EQUALS_SIGN;
-                return destination;
-
-            default:
-                return destination;
+        switch (numSigBytes) {
+            case 3 -> {
+                destination[destOffset] = ALPHABET[(inBuff >>> 18)];
+                destination[destOffset + 1] = ALPHABET[(inBuff >>> 12) & 0x3f];
+                destination[destOffset + 2] = ALPHABET[(inBuff >>> 6) & 0x3f];
+                destination[destOffset + 3] = ALPHABET[(inBuff) & 0x3f];
+                return;
+            }
+            case 2 -> {
+                destination[destOffset] = ALPHABET[(inBuff >>> 18)];
+                destination[destOffset + 1] = ALPHABET[(inBuff >>> 12) & 0x3f];
+                destination[destOffset + 2] = ALPHABET[(inBuff >>> 6) & 0x3f];
+                destination[destOffset + 3] = EQUALS_SIGN;
+                return;
+            }
+            case 1 -> {
+                destination[destOffset] = ALPHABET[(inBuff >>> 18)];
+                destination[destOffset + 1] = ALPHABET[(inBuff >>> 12) & 0x3f];
+                destination[destOffset + 2] = EQUALS_SIGN;
+                destination[destOffset + 3] = EQUALS_SIGN;
+                return;
+            }
+            default -> {
+            }
         }   // end switch
     }   // end encode3to4
-
-
-
-    /**
-     * Performs Base64 encoding on the <code>raw</code> ByteBuffer,
-     * writing it to the <code>encoded</code> ByteBuffer.
-     * This is an experimental feature. Currently it does not
-     * pass along any options (such as {@link #DO_BREAK_LINES}
-     * or {@link #GZIP}.
-     *
-     * @param raw input buffer
-     * @param encoded output buffer
-     * @since 2.3
-     */
-    public static void encode( java.nio.ByteBuffer raw, java.nio.ByteBuffer encoded ){
-        byte[] raw3 = new byte[3];
-        byte[] enc4 = new byte[4];
-
-        while( raw.hasRemaining() ){
-            int rem = Math.min(3,raw.remaining());
-            raw.get(raw3,0,rem);
-            Pie_Base64.encode3to4(enc4, raw3, rem, Pie_Base64.NO_OPTIONS );
-            encoded.put(enc4);
-        }   // end input remaining
-    }
-
-
-    /**
-     * Performs Base64 encoding on the <code>raw</code> ByteBuffer,
-     * writing it to the <code>encoded</code> CharBuffer.
-     * This is an experimental feature. Currently it does not
-     * pass along any options (such as {@link #DO_BREAK_LINES}
-     * or {@link #GZIP}.
-     *
-     * @param raw input buffer
-     * @param encoded output buffer
-     * @since 2.3
-     */
-    public static void encode( java.nio.ByteBuffer raw, java.nio.CharBuffer encoded ){
-        byte[] raw3 = new byte[3];
-        byte[] enc4 = new byte[4];
-
-        while( raw.hasRemaining() ){
-            int rem = Math.min(3,raw.remaining());
-            raw.get(raw3,0,rem);
-            Pie_Base64.encode3to4(enc4, raw3, rem, Pie_Base64.NO_OPTIONS );
-            for( int i = 0; i < 4; i++ ){
-                encoded.put( (char)(enc4[i] & 0xFF) );
-            }
-        }   // end input remaining
-    }
-
-
-
-
-    /**
-     * Serializes an object and returns the Base64-encoded
-     * version of that serialized object.
-     *
-     * <p>As of v 2.3, if the object
-     * cannot be serialized or there is another error,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
-     *
-     * The object is not GZip-compressed before being encoded.
-     *
-     * @param serializableObject The object to encode
-     * @return The Base64-encoded object
-     * @throws java.io.IOException if there is an error
-     * @throws NullPointerException if serializedObject is null
-     * @since 1.4
-     */
-    public static String encodeObject( java.io.Serializable serializableObject )
-    throws java.io.IOException {
-        return encodeObject( serializableObject, NO_OPTIONS );
-    }   // end encodeObject
-
-
-
-    /**
-     * Serializes an object and returns the Base64-encoded
-     * version of that serialized object.
-     *
-     * <p>As of v 2.3, if the object
-     * cannot be serialized or there is another error,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
-     *
-     * The object is not GZip-compressed before being encoded.
-     * <p>
-     * Example options:<pre>
-     *   GZIP: gzip-compresses object before encoding it.
-     *   DO_BREAK_LINES: break lines at 76 characters
-     * </pre>
-     * <p>
-     * Example: <code>encodeObject( myObj, Base64.GZIP )</code> or
-     * <p>
-     * Example: <code>encodeObject( myObj, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
-     * @param serializableObject The object to encode
-     * @param options Specified options
-     * @return The Base64-encoded object
-     * @see Pie_Base64#GZIP
-     * @see Pie_Base64#DO_BREAK_LINES
-     * @throws java.io.IOException if there is an error
-     * @since 2.0
-     */
-    public static String encodeObject( java.io.Serializable serializableObject, int options )
-    throws java.io.IOException {
-
-        if( serializableObject == null ){
-            throw new NullPointerException( "Cannot serialize a null object." );
-        }   // end if: null
-
-        // Streams
-        java.io.ByteArrayOutputStream  baos  = null;
-        java.io.OutputStream           b64os = null;
-        java.util.zip.GZIPOutputStream gzos  = null;
-        java.io.ObjectOutputStream     oos   = null;
-
-
-        try {
-            // ObjectOutputStream -> (GZIP) -> Base64 -> ByteArrayOutputStream
-            baos  = new java.io.ByteArrayOutputStream();
-            b64os = new Pie_Base64.OutputStream( baos, ENCODE | options );
-            if( (options & GZIP) != 0 ){
-                // Gzip
-                gzos = new java.util.zip.GZIPOutputStream(b64os);
-                oos = new java.io.ObjectOutputStream( gzos );
-            } else {
-                // Not gzipped
-                oos = new java.io.ObjectOutputStream( b64os );
-            }
-            oos.writeObject( serializableObject );
-        }   // end try
-        catch( java.io.IOException e ) {
-            // Catch it and then throw it immediately so that
-            // the finally{} block is called for cleanup.
-            throw e;
-        }   // end catch
-        finally {
-            try{ oos.close();   } catch( Exception e ){}
-            try{ gzos.close();  } catch( Exception e ){}
-            try{ b64os.close(); } catch( Exception e ){}
-            try{ baos.close();  } catch( Exception e ){}
-        }   // end finally
-
-        // Return value according to relevant encoding.
-        try {
-            return new String( baos.toByteArray(), PREFERRED_ENCODING );
-        }   // end try
-        catch (java.io.UnsupportedEncodingException uue){
-            // Fall back to some Java default
-            return new String( baos.toByteArray() );
-        }   // end catch
-
-    }   // end encode
-
 
 
     /**
@@ -721,78 +563,8 @@ public class Pie_Base64
         } catch (java.io.IOException ex) {
             assert false : ex.getMessage();
         }   // end catch
-        assert encoded != null;
         return encoded;
     }   // end encodeBytes
-
-
-
-    /**
-     * Encodes a byte array into Base64 notation.
-     * <p>
-     * Example options:<pre>
-     *   GZIP: gzip-compresses object before encoding it.
-     *   DO_BREAK_LINES: break lines at 76 characters
-     *     <i>Note: Technically, this makes your encoding non-compliant.</i>
-     * </pre>
-     * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
-     * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
-     *
-     * <p>As of v 2.3, if there is an error with the GZIP stream,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
-     *
-     *
-     * @param source The data to convert
-     * @param options Specified options
-     * @return The Base64-encoded data as a String
-     * @see Pie_Base64#GZIP
-     * @see Pie_Base64#DO_BREAK_LINES
-     * @throws java.io.IOException if there is an error
-     * @throws NullPointerException if source array is null
-     * @since 2.0
-     */
-    public static String encodeBytes( byte[] source, int options ) throws java.io.IOException {
-        return encodeBytes( source, 0, source.length, options );
-    }   // end encodeBytes
-
-
-    /**
-     * Encodes a byte array into Base64 notation.
-     * Does not GZip-compress data.
-     *
-     * <p>As of v 2.3, if there is an error,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
-     *
-     *
-     * @param source The data to convert
-     * @param off Offset in array where conversion should begin
-     * @param len Length of data to convert
-     * @return The Base64-encoded data as a String
-     * @throws NullPointerException if source array is null
-     * @throws IllegalArgumentException if source array, offset, or length are invalid
-     * @since 1.4
-     */
-    public static String encodeBytes( byte[] source, int off, int len ) {
-        // Since we're not going to have the GZIP encoding turned on,
-        // we're not going to have an java.io.IOException thrown, so
-        // we should not force the user to have to catch it.
-        String encoded = null;
-        try {
-            encoded = encodeBytes( source, off, len, NO_OPTIONS );
-        } catch (java.io.IOException ex) {
-            assert false : ex.getMessage();
-        }   // end catch
-        assert encoded != null;
-        return encoded;
-    }   // end encodeBytes
-
 
 
     /**
@@ -919,15 +691,11 @@ public class Pie_Base64
                 gzos.write( source, off, len );
                 gzos.close();
             }   // end try
-            catch( java.io.IOException e ) {
-                // Catch it and then throw it immediately so that
-                // the finally{} block is called for cleanup.
-                throw e;
-            }   // end catch
+            // end catch
             finally {
-                try{ gzos.close();  } catch( Exception e ){}
-                try{ b64os.close(); } catch( Exception e ){}
-                try{ baos.close();  } catch( Exception e ){}
+                try{ Objects.requireNonNull(gzos).close();  } catch(Exception ignored){}
+                try{ Objects.requireNonNull(b64os).close(); } catch(Exception ignored){}
+                try{ Objects.requireNonNull(baos).close();  } catch(Exception ignored){}
             }   // end finally
 
             return baos.toByteArray();
@@ -937,13 +705,15 @@ public class Pie_Base64
         else {
             boolean breakLines = (options & DO_BREAK_LINES) != 0;
 
-            //int    len43   = len * 4 / 3;
-            //byte[] outBuff = new byte[   ( len43 )                      // Main 4:3
-            //                           + ( (len % 3) > 0 ? 4 : 0 )      // Account for padding
-            //                           + (breakLines ? ( len43 / MAX_LINE_LENGTH ) : 0) ]; // New lines
-            // Try to determine more precisely how big the array needs to be.
-            // If we get it right, we don't have to do an array copy, and
-            // we save a bunch of memory.
+            /*
+            int    len43   = len * 4 / 3;
+            byte[] outBuff = new byte[   ( len43 )                      // Main 4:3
+                                       + ( (len % 3) > 0 ? 4 : 0 )      // Account for padding
+                                       + (breakLines ? ( len43 / MAX_LINE_LENGTH ) : 0) ]; // New lines
+             Try to determine more precisely how big the array needs to be.
+             If we get it right, we don't have to do an array copy, and
+             we save a bunch of memory.
+            */
             int encLen = ( len / 3 ) * 4 + ( len % 3 > 0 ? 4 : 0 ); // Bytes needed for actual encoding
             if( breakLines ){
                 encLen += encLen / MAX_LINE_LENGTH; // Plus extra newline characters
@@ -1258,38 +1028,26 @@ public class Pie_Base64
         // Check to see if it's gzip-compressed
         // GZIP Magic Two-Byte Number: 0x8b1f (35615)
         boolean dontGunzip = (options & DONT_GUNZIP) != 0;
-        if( (bytes != null) && (bytes.length >= 4) && (!dontGunzip) ) {
+        if(bytes.length >= 4 && !dontGunzip) {
 
             int head = ((int)bytes[0] & 0xff) | ((bytes[1] << 8) & 0xff00);
             if( java.util.zip.GZIPInputStream.GZIP_MAGIC == head )  {
-                java.io.ByteArrayInputStream  bais = null;
-                java.util.zip.GZIPInputStream gzis = null;
-                java.io.ByteArrayOutputStream baos = null;
                 byte[] buffer = new byte[2048];
                 int    length = 0;
 
-                try {
-                    baos = new java.io.ByteArrayOutputStream();
-                    bais = new java.io.ByteArrayInputStream( bytes );
-                    gzis = new java.util.zip.GZIPInputStream( bais );
+                try (java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(); java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(bytes); java.util.zip.GZIPInputStream gzis = new java.util.zip.GZIPInputStream(bais)) {
 
-                    while( ( length = gzis.read( buffer ) ) >= 0 ) {
-                        baos.write(buffer,0,length);
+                    while ((length = gzis.read(buffer)) >= 0) {
+                        baos.write(buffer, 0, length);
                     }   // end while: reading input
 
                     // No error? Get new bytes.
                     bytes = baos.toByteArray();
 
-                }   // end try
-                catch( java.io.IOException e ) {
+                } catch (java.io.IOException e) {
                     e.printStackTrace();
                     // Just return originally-decoded bytes
-                }   // end catch
-                finally {
-                    try{ baos.close(); } catch( Exception e ){}
-                    try{ gzis.close(); } catch( Exception e ){}
-                    try{ bais.close(); } catch( Exception e ){}
-                }   // end finally
+                }
 
             }   // end if: gzipped
         }   // end if: bytes.length >= 2
@@ -1361,26 +1119,20 @@ public class Pie_Base64
                     public Class<?> resolveClass(java.io.ObjectStreamClass streamClass)
                     throws java.io.IOException, ClassNotFoundException {
                         Class c = Class.forName(streamClass.getName(), false, loader);
-                        if( c == null ){
-                            return super.resolveClass(streamClass);
-                        } else {
-                            return c;   // Class loader knows of this class.
-                        }   // end else: not null
+                        return c;   // Class loader knows of this class.
                     }   // end resolveClass
                 };  // end ois
             }   // end else: no custom class loader
 
             obj = ois.readObject();
         }   // end try
-        catch( java.io.IOException e ) {
+        catch(IOException | ClassNotFoundException e ) {
             throw e;    // Catch and throw in order to execute finally{}
         }   // end catch
-        catch( java.lang.ClassNotFoundException e ) {
-            throw e;    // Catch and throw in order to execute finally{}
-        }   // end catch
+        // end catch
         finally {
-            try{ bais.close(); } catch( Exception e ){}
-            try{ ois.close();  } catch( Exception e ){}
+            try{ Objects.requireNonNull(bais).close(); } catch(Exception ignored){}
+            try{ Objects.requireNonNull(ois).close();  } catch(Exception ignored){}
         }   // end finally
 
         return obj;
@@ -1409,18 +1161,10 @@ public class Pie_Base64
             throw new NullPointerException( "Data to encode was null." );
         }   // end iff
 
-        Pie_Base64.OutputStream bos = null;
-        try {
-            bos = new Pie_Base64.OutputStream(
-                  new java.io.FileOutputStream( filename ), Pie_Base64.ENCODE );
-            bos.write( dataToEncode );
-        }   // end try
-        catch( java.io.IOException e ) {
-            throw e; // Catch and throw to execute finally{} block
-        }   // end catch: java.io.IOException
-        finally {
-            try{ bos.close(); } catch( Exception e ){}
-        }   // end finally
+        try (OutputStream bos = new OutputStream(
+                new java.io.FileOutputStream(filename), Pie_Base64.ENCODE)) {
+            bos.write(dataToEncode);
+        }
 
     }   // end encodeToFile
 
@@ -1441,18 +1185,10 @@ public class Pie_Base64
     public static void decodeToFile( String dataToDecode, String filename )
     throws java.io.IOException {
 
-        Pie_Base64.OutputStream bos = null;
-        try{
-            bos = new Pie_Base64.OutputStream(
-                      new java.io.FileOutputStream( filename ), Pie_Base64.DECODE );
-            bos.write( dataToDecode.getBytes( PREFERRED_ENCODING ) );
-        }   // end try
-        catch( java.io.IOException e ) {
-            throw e; // Catch and throw to execute finally{} block
-        }   // end catch: java.io.IOException
-        finally {
-                try{ bos.close(); } catch( Exception e ){}
-        }   // end finally
+        try (OutputStream bos = new OutputStream(
+                new java.io.FileOutputStream(filename), Pie_Base64.DECODE)) {
+            bos.write(dataToDecode.getBytes(PREFERRED_ENCODING));
+        }
 
     }   // end decodeToFile
 
@@ -1512,7 +1248,7 @@ public class Pie_Base64
             throw e; // Catch and release to execute finally{}
         }   // end catch: java.io.IOException
         finally {
-            try{ bis.close(); } catch( Exception e) {}
+            try{ Objects.requireNonNull(bis).close(); } catch(Exception ignored) {}
         }   // end finally
 
         return decodedData;
@@ -1565,7 +1301,7 @@ public class Pie_Base64
             throw e; // Catch and release to execute finally{}
         }   // end catch: java.io.IOException
         finally {
-            try{ bis.close(); } catch( Exception e) {}
+            try{ Objects.requireNonNull(bis).close(); } catch(Exception ignored) {}
         }   // end finally
 
         return encodedData;
@@ -1583,48 +1319,13 @@ public class Pie_Base64
     throws java.io.IOException {
 
         String encoded = Pie_Base64.encodeFromFile( infile );
-        java.io.OutputStream out = null;
-        try{
-            out = new java.io.BufferedOutputStream(
-                  new java.io.FileOutputStream( outfile ) );
-            out.write( encoded.getBytes("US-ASCII") ); // Strict, 7-bit output.
-        }   // end try
-        catch( java.io.IOException e ) {
+        try (java.io.OutputStream out = new java.io.BufferedOutputStream(
+                new java.io.FileOutputStream(outfile))) {
+            out.write(encoded.getBytes(StandardCharsets.US_ASCII)); // Strict, 7-bit output.
+        } catch (IOException e) {
             throw e; // Catch and release to execute finally{}
-        }   // end catch
-        finally {
-            try { out.close(); }
-            catch( Exception ex ){}
-        }   // end finally
+        }
     }   // end encodeFileToFile
-
-
-    /**
-     * Reads <tt>infile</tt> and decodes it to <tt>outfile</tt>.
-     *
-     * @param infile Input file
-     * @param outfile Output file
-     * @throws java.io.IOException if there is an error
-     * @since 2.2
-     */
-    public static void decodeFileToFile( String infile, String outfile )
-    throws java.io.IOException {
-
-        byte[] decoded = Pie_Base64.decodeFromFile( infile );
-        java.io.OutputStream out = null;
-        try{
-            out = new java.io.BufferedOutputStream(
-                  new java.io.FileOutputStream( outfile ) );
-            out.write( decoded );
-        }   // end try
-        catch( java.io.IOException e ) {
-            throw e; // Catch and release to execute finally{}
-        }   // end catch
-        finally {
-            try { out.close(); }
-            catch( Exception ex ){}
-        }   // end finally
-    }   // end decodeFileToFile
 
 
     /* ********  I N N E R   C L A S S   I N P U T S T R E A M  ******** */
@@ -1641,26 +1342,15 @@ public class Pie_Base64
      */
     public static class InputStream extends java.io.FilterInputStream {
 
-        private boolean encode;         // Encoding or decoding
+        private final boolean encode;         // Encoding or decoding
         private int     position;       // Current position in the buffer
-        private byte[]  buffer;         // Small buffer holding converted data
-        private int     bufferLength;   // Length of buffer (3 or 4)
+        private final byte[]  buffer;         // Small buffer holding converted data
+        private final int     bufferLength;   // Length of buffer (3 or 4)
         private int     numSigBytes;    // Number of meaningful bytes in the buffer
         private int     lineLength;
-        private boolean breakLines;     // Break lines at less than 80 characters
-        private int     options;        // Record options used to create the stream.
-        private byte[]  decodabet;      // Local copies to avoid extra method calls
-
-
-        /**
-         * Constructs a {@link Pie_Base64.InputStream} in DECODE mode.
-         *
-         * @param in the <tt>java.io.InputStream</tt> from which to read data.
-         * @since 1.3
-         */
-        public InputStream( java.io.InputStream in ) {
-            this( in, DECODE );
-        }   // end constructor
+        private final boolean breakLines;     // Break lines at less than 80 characters
+        private final int     options;        // Record options used to create the stream.
+        private final byte[]  decodabet;      // Local copies to avoid extra method calls
 
 
         /**
@@ -1766,37 +1456,33 @@ public class Pie_Base64
                 }   // end else: decode
             }   // end else: get data
 
-            // Got data?
-            if( position >= 0 ) {
-                // End of relevant data?
-                if( /*!encode &&*/ position >= numSigBytes ){
-                    return -1;
-                }   // end if: got data
-
-                if( encode && breakLines && lineLength >= MAX_LINE_LENGTH ) {
+            /*
+             Got data?
+             End of relevant data?
+            */
+            if ( /*!encode &&*/ position < numSigBytes) {
+                if (encode && breakLines && lineLength >= MAX_LINE_LENGTH) {
                     lineLength = 0;
                     return '\n';
                 }   // end if
                 else {
                     lineLength++;   // This isn't important when decoding
-                                    // but throwing an extra "if" seems
-                                    // just as wasteful.
+                    // but throwing an extra "if" seems
+                    // just as wasteful.
 
-                    int b = buffer[ position++ ];
+                    int b = buffer[position++];
 
-                    if( position >= bufferLength ) {
+                    if (position >= bufferLength) {
                         position = -1;
                     }   // end if: end
 
                     return b & 0xFF; // This is how you "cast" a byte that's
-                                     // intended to be unsigned.
+                    // intended to be unsigned.
                 }   // end else
-            }   // end if: position >= 0
+            } else {
+                return -1;
+            }   // end if: got data
 
-            // Else error
-            else {
-                throw new java.io.IOException( "Error in Base64 code reading stream." );
-            }   // end else
         }   // end read
 
 
@@ -1854,26 +1540,16 @@ public class Pie_Base64
      */
     public static class OutputStream extends java.io.FilterOutputStream {
 
-        private boolean encode;
+        private final boolean encode;
         private int     position;
         private byte[]  buffer;
-        private int     bufferLength;
+        private final int     bufferLength;
         private int     lineLength;
-        private boolean breakLines;
-        private byte[]  b4;         // Scratch used in a few places
-        private boolean suspendEncoding;
-        private int     options;    // Record for later
-        private byte[]  decodabet;  // Local copies to avoid extra method calls
-
-        /**
-         * Constructs a {@link Pie_Base64.OutputStream} in ENCODE mode.
-         *
-         * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
-         * @since 1.3
-         */
-        public OutputStream( java.io.OutputStream out ) {
-            this( out, ENCODE );
-        }   // end constructor
+        private final boolean breakLines;
+        private final byte[]  b4;         // Scratch used in a few places
+        private final boolean suspendEncoding;
+        private final int     options;    // Record for later
+        private final byte[]  decodabet;  // Local copies to avoid extra method calls
 
 
         /**
@@ -1925,7 +1601,7 @@ public class Pie_Base64
         @Override
         public void write(int theByte)
         throws java.io.IOException {
-            // Encoding suspended?
+            /* Encoding suspended? */
             if( suspendEncoding ) {
                 this.out.write( theByte );
                 return;
@@ -2030,34 +1706,6 @@ public class Pie_Base64
             buffer = null;
             out    = null;
         }   // end close
-
-
-
-        /**
-         * Suspends encoding of the stream.
-         * May be helpful if you need to embed a piece of
-         * base64-encoded data in a stream.
-         *
-         * @throws java.io.IOException  if there's an error flushing
-         * @since 1.5.1
-         */
-        public void suspendEncoding() throws java.io.IOException  {
-            flushBase64();
-            this.suspendEncoding = true;
-        }   // end suspendEncoding
-
-
-        /**
-         * Resumes encoding of the stream.
-         * May be helpful if you need to embed a piece of
-         * base64-encoded data in a stream.
-         *
-         * @since 1.5.1
-         */
-        public void resumeEncoding() {
-            this.suspendEncoding = false;
-        }   // end resumeEncoding
-
 
 
     }   // end inner class OutputStream

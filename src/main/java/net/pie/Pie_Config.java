@@ -1,19 +1,31 @@
 package net.pie;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pie_Config {
 
     private int alpha = 0;
     private boolean suppress_errors = false;
     private int padding = (" ".getBytes(StandardCharsets.UTF_8)[0]);
-    private Pie_Use use = Pie_Use.RGB;
+    private Pie_Use use = Pie_Use.BLOCK3;
+    private List<String> errors = null;
 
     public Pie_Config() {
         setAlpha(0);
         setPadding((" ".getBytes(StandardCharsets.UTF_8)[0]));
-        setUse(Pie_Use.RGB);
+        setUse(Pie_Use.BLOCK3);
         setSuppress_errors(false);
+    }
+
+    /*************************************
+     * Add Error
+     *************************************/
+    public void addError(String message) {
+        if (getErrors() == null)
+            setErrors(new ArrayList<>());
+        getErrors().add(message);
     }
 
     /*************************************
@@ -48,6 +60,14 @@ public class Pie_Config {
 
     public void setPadding(int padding) {
         this.padding = padding;
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 }
 
