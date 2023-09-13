@@ -20,12 +20,18 @@ public class Pie_Config {
     }
 
     /*************************************
-     * Add Error
+     * Errors
      *************************************/
     public void addError(String message) {
         if (getErrors() == null)
             setErrors(new ArrayList<>());
         getErrors().add(message);
+    }
+
+    public boolean isError() {
+        if (getErrors() == null || getErrors().isEmpty())
+            return false;
+        return true;
     }
 
     /*************************************
@@ -66,7 +72,7 @@ public class Pie_Config {
         return errors;
     }
 
-    public void setErrors(List<String> errors) {
+    private void setErrors(List<String> errors) {
         this.errors = errors;
     }
 }

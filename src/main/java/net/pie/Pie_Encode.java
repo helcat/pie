@@ -27,6 +27,12 @@ public class Pie_Encode {
     }
 
     /*************************************************
+     * Has Error
+     *************************************************/
+    public boolean isError() {
+        return getConfig().isError();
+    }
+    /*************************************************
      * encode
      *************************************************/
     private void encode(String toBeEncrypted) {
@@ -77,7 +83,7 @@ public class Pie_Encode {
      * Create Image
      *************************************************/
     private void createImage(Integer size, List<Color> list) {
-        if (size > 0 && list != null && !list.isEmpty()) {
+        if (!isError() && (size > 0) && (list != null) && !list.isEmpty()) {
             BufferedImage buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
             int count = 0;
             for (int y = 0; y < size; y++) {
@@ -91,11 +97,15 @@ public class Pie_Encode {
     /*************************************************
      * Create Color
      *************************************************/
-    private Color createColor(Integer r, Integer g, Integer b) {
-        return new Color(r, g, b, getConfig().getAlpha());
+    private Color createColor(int r, int g, int b) {
+        return new Color(checker(r), checker(g), checker(b), checker(getConfig().getAlpha()));
     }
-    private Color createColor(Integer r, Integer g, Integer b, Integer a) {
-        return new Color(r, g, b, a);
+    private Color createColor(int r, Integer g, Integer b, Integer a) {
+        return new Color(checker(r), checker(g), checker(b),  checker(a));
+    }
+
+    private int checker(int check) {
+        return Math.max(check, 0);
     }
 
     /*************************************************
