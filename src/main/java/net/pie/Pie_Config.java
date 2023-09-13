@@ -11,6 +11,8 @@ public class Pie_Config {
     private int padding = (" ".getBytes(StandardCharsets.UTF_8)[0]);
     private Pie_Use use = Pie_Use.BLOCK3;
     private List<String> errors = null;
+    private int minimum_width = 10;
+    private int minimum_height = 10;
 
     public Pie_Config() {
         setAlpha(0);
@@ -74,6 +76,14 @@ public class Pie_Config {
 
     private void setErrors(List<String> errors) {
         this.errors = errors;
+    }
+
+    public int getMinimum_width() {
+        return minimum_width;
+    }
+
+    public void setMinimum_width(int minimum_width) {
+        this.minimum_width = minimum_width;
     }
 }
 
