@@ -30,12 +30,12 @@ public class Start {
      *************************************************/
     public Start(String toBeEncrypted) {
         Pie_Config config = new Pie_Config();
-        config.setUse(Pie_Use.BLOCK3);
+        config.getMinimum().setDimension(20, 20);
         Pie_Utils utils = new Pie_Utils(config);
 
-        Pie_Encode encode = new Pie_Encode(toBeEncrypted);
+        Pie_Encode encode = new Pie_Encode(config, toBeEncrypted);
         utils.saveImage_to_file(encode.getEncoded_image(), new File(utils.getDesktopPath() + File.separator + "myImage.png"));
-        Pie_Decode decode = new Pie_Decode(encode.getEncoded_image());
+        Pie_Decode decode = new Pie_Decode(config, encode.getEncoded_image());
 
         System.out.println(decode.getDecoded_Message());
     }

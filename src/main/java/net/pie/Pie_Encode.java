@@ -2,7 +2,6 @@ package net.pie;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,6 @@ public class Pie_Encode {
         Integer r = null;
         Integer g = null;
         Integer b = null;
-        Integer a = null;
         List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
@@ -60,21 +58,10 @@ public class Pie_Encode {
                 g = i;
             } else if (b == null) {
                 b = i;
-                if (getConfig().getUse() == Pie_Use.BLOCK3) {
-                    list.add(createColor(r, g, b));
-                    r = null;
-                    g = null;
-                    b = null;
-                }
-            } else if (a == null && getConfig().getUse() == Pie_Use.BLOCK4) {
-                a = i;
-                if (getConfig().getUse() == Pie_Use.BLOCK3) {
-                    list.add(createColor(r, g, b, a));
-                    r = null;
-                    g = null;
-                    b = null;
-                    a = null; /* Alpha component (0 for fully transparent, 255 for fully opaque) */
-                }
+                list.add(createColor(r, g, b));
+                r = null;
+                g = null;
+                b = null;
             }
         }
 
@@ -86,12 +73,12 @@ public class Pie_Encode {
 
     private void createImage(int size, List<Color> list) {
         BufferedImage dataimage = createDataImage(size, list);
-        int width = Math.max(getConfig().getMinimum_width(), size);
-        int height = Math.max(getConfig().getMinimum_height(), size);
+        int width = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getWidth() : 0, size);
+        int height = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getHeight() : 0, size);
         if (dataimage != null && (width > size || height > size)) {
             BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = buffImg.createGraphics();
-            g.drawImage(dataimage, null,dataImageOffsetX(size, width),dataImageOffsetY(size, height));
+            g.drawImage(dataimage, null,dataImageOffset(size, width), dataImageOffset(size, height));
             g.dispose();
             setEncoded_image(buffImg);
         }else {
@@ -100,21 +87,21 @@ public class Pie_Encode {
     }
 
     /*************************************************
-     * Create Data Image - Offset X
+     * Create Data Image - Offset
      *************************************************/
-    private int dataImageOffsetX(int size, int width) {
-        switch (getConfig().getPosition()) {
-            case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> { return 0; }
-            case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> { return width - size; }
-            case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> { return (width / 2) - (size / 2); }
-        }
-        return 0;
-    }
-    private int dataImageOffsetY(int size, int height) {
-        switch (getConfig().getPosition()) {
-            case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> { return 0; }
-            case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> { return height - size; }
-            case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> { return (height / 2) - (size / 2); }
+    private int dataImageOffset(int size, int dim) {
+        if (getConfig().getMinimum() != null && getConfig().getMinimum().getPosition() != null) {
+            switch (getConfig().getMinimum().getPosition()) {
+                case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> {
+                    return 0;
+                }
+                case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> {
+                    return dim - size;
+                }
+                case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> {
+                    return (dim / 2) - (size / 2);
+                }
+            }
         }
         return 0;
     }
@@ -145,10 +132,7 @@ public class Pie_Encode {
      * Create Color
      *************************************************/
     private Color createColor(int r, int g, int b) {
-        return new Color(checker(r), checker(g), checker(b)); //, checker(getConfig().getAlpha()));
-    }
-    private Color createColor(int r, Integer g, Integer b, Integer a) {
-        return new Color(checker(r), checker(g), checker(b),  checker(a));
+        return new Color(checker(r), checker(g), checker(b), 1);
     }
 
     private int checker(int check) {

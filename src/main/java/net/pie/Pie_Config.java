@@ -1,25 +1,22 @@
 package net.pie;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pie_Config {
 
-    private int alpha = 0;
+    private int alpha = 1;
     private boolean suppress_errors = false;
-    private int padding = (" ".getBytes(StandardCharsets.UTF_8)[0]);
     private Pie_Use use = Pie_Use.BLOCK3;
     private List<String> errors = null;
-    private int minimum_width = 50;
-    private int minimum_height = 50;
-    private Pie_Position position = Pie_Position.MIDDLE_CENTER;
+    private Pie_Minimum minimum = null;
 
     public Pie_Config() {
-        setAlpha(0);
-        setPadding((" ".getBytes(StandardCharsets.UTF_8)[0]));
+        setAlpha(1);
         setUse(Pie_Use.BLOCK3);
         setSuppress_errors(false);
+        setMinimum(new Pie_Minimum());
+
     }
 
     /*************************************
@@ -45,7 +42,8 @@ public class Pie_Config {
     }
 
     public void setAlpha(int alpha) {
-        this.alpha = alpha;
+        boolean isInRange = (alpha >= 1) && (alpha <= 255);
+        this.alpha = isInRange ? alpha : 1;
     }
 
     public boolean isSuppress_errors() {
@@ -63,14 +61,6 @@ public class Pie_Config {
         this.use = use;
     }
 
-    public int getPadding() {
-        return padding;
-    }
-
-    public void setPadding(int padding) {
-        this.padding = padding;
-    }
-
     public List<String> getErrors() {
         return errors;
     }
@@ -79,28 +69,12 @@ public class Pie_Config {
         this.errors = errors;
     }
 
-    public int getMinimum_width() {
-        return minimum_width;
+    public Pie_Minimum getMinimum() {
+        return minimum;
     }
 
-    public void setMinimum_width(int minimum_width) {
-        this.minimum_width = minimum_width;
-    }
-
-    public int getMinimum_height() {
-        return minimum_height;
-    }
-
-    public void setMinimum_height(int minimum_height) {
-        this.minimum_height = minimum_height;
-    }
-
-    public Pie_Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Pie_Position position) {
-        this.position = position;
+    public void setMinimum(Pie_Minimum minimum) {
+        this.minimum = minimum;
     }
 }
 

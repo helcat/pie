@@ -29,18 +29,29 @@ public class Pie_Decode {
      * decode
      *************************************************/
     private void decode(BufferedImage toBeDecrypted) {
-        Color c = null;
+        int pixelColor = 0;
         int count = 0;
+        // int retrievedAlpha = (pixelColor >> 24) & 0xFF;
+        int retrievedRed = 0;
+        int retrievedGreen = 0;
+        int retrievedBlue = 0;
+
         int[] message = new int[((toBeDecrypted.getHeight() * toBeDecrypted.getWidth()) * getConfig().getUse().getNumber())];
         for (int y = 0; y < toBeDecrypted.getHeight(); y++) {
             for (int x = 0; x < toBeDecrypted.getWidth(); x++) {
-                c = new Color(toBeDecrypted.getRGB(x, y));
-                if (c.getRed() > 0)
-                    message[count++] = c.getRed();
-                if (c.getGreen() > 0)
-                    message[count++] = c.getGreen();
-                if (c.getBlue() > 0)
-                    message[count++] = c.getBlue();
+                pixelColor = toBeDecrypted.getRGB(x, y);
+                retrievedRed = (pixelColor >> 16) & 0xFF;
+                retrievedGreen = (pixelColor >> 8) & 0xFF;
+                retrievedBlue = pixelColor & 0xFF;
+                if (retrievedRed == 0 && retrievedGreen == 0 && retrievedBlue == 0)
+                    continue;
+
+                if (retrievedRed > 0)
+                    message[count++] = retrievedRed;
+                if (retrievedGreen > 0)
+                    message[count++] = retrievedGreen;
+                if (retrievedBlue > 0)
+                    message[count++] = retrievedBlue;
             }
         }
 

@@ -15,6 +15,9 @@ import java.util.zip.InflaterOutputStream;
 public class Pie_Utils {
 
     private Pie_Config config = null;
+    public Pie_Utils() {
+        setConfig(new Pie_Config());
+    }
     public Pie_Utils(Pie_Config config) {
         setConfig(config);
     }
