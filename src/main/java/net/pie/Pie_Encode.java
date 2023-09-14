@@ -10,20 +10,15 @@ import java.util.List;
 public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
-    private Pie_Utils utils = null;
+    private Pie_Source source;
 
     /*************************************************
      * Start
      *************************************************/
-    public Pie_Encode(Pie_Config config, String toBeEncrypted) {
+    public Pie_Encode(Pie_Config config, Pie_Source source) {
         setConfig(config);
-        setUtils(new Pie_Utils(getConfig()));
-        encode(toBeEncrypted);
-    }
-    public Pie_Encode(String toBeEncrypted) {
-        setConfig(new Pie_Config());
-        setUtils(new Pie_Utils(getConfig()));
-        encode(toBeEncrypted);
+        setSource(source);
+        encode();
     }
 
     /*************************************************
@@ -32,19 +27,17 @@ public class Pie_Encode {
     public boolean isError() {
         return getConfig().isError();
     }
+
     /*************************************************
      * encode
      *************************************************/
-    private void encode(String toBeEncrypted) {
+    private void encode() {
         setEncoded_image(null);
-        StringBuilder toBeEncryptedBuilder = new StringBuilder(toBeEncrypted);
-        StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getUse().getNumber()));
+        byte[] originalArray = getSource().process(getConfig());
+        if (originalArray == null)
+            return;
 
-        byte[] bytes = getUtils().compress(append.toString());
-        String text = Pie_Base64.encodeBytes(bytes);
-        byte[] originalArray = text.getBytes(StandardCharsets.UTF_8);
-
-        double dimension = Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
+        double dimension = Math.sqrt((double) originalArray.length / getConfig().getRgbCount());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
 
         Integer r = null;
@@ -132,7 +125,7 @@ public class Pie_Encode {
      * Create Color
      *************************************************/
     private Color createColor(int r, int g, int b) {
-        return new Color(checker(r), checker(g), checker(b), 1);
+        return new Color(checker(r), checker(g), checker(b));
     }
 
     private int checker(int check) {
@@ -157,11 +150,11 @@ public class Pie_Encode {
         this.encoded_image = encoded_image;
     }
 
-    private Pie_Utils getUtils() {
-        return utils;
+    public Pie_Source getSource() {
+        return source;
     }
 
-    private void setUtils(Pie_Utils utils) {
-        this.utils = utils;
+    public void setSource(Pie_Source source) {
+        this.source = source;
     }
 }

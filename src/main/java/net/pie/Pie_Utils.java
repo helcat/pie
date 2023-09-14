@@ -110,20 +110,6 @@ public class Pie_Utils {
                 ((InputStream) stream).close();
             }
 
-            else if (stream instanceof String) {
-                if (!((String) stream).isEmpty()) {
-                    String text = (String) stream;
-                    if (text.trim().toLowerCase().startsWith("http")) {
-                        InputStream is =  new URL(text).openStream();
-                        image = ImageIO.read((ImageInputStream) is);
-                        is.close();
-                    }else{
-                        File file = new File(text);
-                        image = ImageIO.read(file);
-                    }
-                }
-            }
-
             else if (stream instanceof URL) {
                 InputStream is =  ((URL) stream).openStream();
                 image = ImageIO.read((ImageInputStream) is);
@@ -209,6 +195,15 @@ public class Pie_Utils {
     }
 
     /************************************************
+     * load to encrypt
+     ************************************************/
+    public byte[] load_Object(Object object) {
+        byte[] bytes = null;
+
+        return bytes;
+    }
+
+    /************************************************
      * getters and setters
      ************************************************/
     public Pie_Config getConfig() {
@@ -217,7 +212,6 @@ public class Pie_Utils {
     public void setConfig(Pie_Config config) {
         this.config = config;
     }
-
 
 }
 

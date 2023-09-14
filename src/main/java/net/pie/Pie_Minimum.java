@@ -22,6 +22,11 @@ public class Pie_Minimum {
         setHeight(Math.max(height, 0));
     }
 
+    public void setDimension(int width, int height, Pie_Position position) {
+        setWidth(Math.max(width, 0));
+        setHeight(Math.max(height, 0));
+        setPosition(position == null ? Pie_Position.MIDDLE_CENTER : position);
+    }
     /*************************************
      * getters and setters
      *************************************/

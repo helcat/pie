@@ -5,18 +5,16 @@ import java.util.List;
 
 public class Pie_Config {
 
-    private int alpha = 1;
     private boolean suppress_errors = false;
-    private Pie_Use use = Pie_Use.BLOCK3;
+    private final int rgbCount = 3;
     private List<String> errors = null;
     private Pie_Minimum minimum = null;
+    private Pie_Utils utils = null;
 
     public Pie_Config() {
-        setAlpha(1);
-        setUse(Pie_Use.BLOCK3);
         setSuppress_errors(false);
         setMinimum(new Pie_Minimum());
-
+        setUtils(new Pie_Utils(this));
     }
 
     /*************************************
@@ -37,28 +35,12 @@ public class Pie_Config {
     /*************************************
      * getters and setters
      *************************************/
-    public int getAlpha() {
-        return alpha;
-    }
-
-    public void setAlpha(int alpha) {
-        boolean isInRange = (alpha >= 1) && (alpha <= 255);
-        this.alpha = isInRange ? alpha : 1;
-    }
-
     public boolean isSuppress_errors() {
         return suppress_errors;
     }
 
     public void setSuppress_errors(boolean suppress_errors) {
         this.suppress_errors = suppress_errors;
-    }
-    public Pie_Use getUse() {
-        return use;
-    }
-
-    public void setUse(Pie_Use use) {
-        this.use = use;
     }
 
     public List<String> getErrors() {
@@ -75,6 +57,18 @@ public class Pie_Config {
 
     public void setMinimum(Pie_Minimum minimum) {
         this.minimum = minimum;
+    }
+
+    public int getRgbCount() {
+        return rgbCount;
+    }
+
+    public Pie_Utils getUtils() {
+        return utils;
+    }
+
+    public void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }
 
