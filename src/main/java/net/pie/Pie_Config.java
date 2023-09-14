@@ -13,6 +13,7 @@ public class Pie_Config {
     private List<String> errors = null;
     private int minimum_width = 50;
     private int minimum_height = 50;
+    private Pie_Position position = Pie_Position.MIDDLE_CENTER;
 
     public Pie_Config() {
         setAlpha(0);
@@ -92,6 +93,14 @@ public class Pie_Config {
 
     public void setMinimum_height(int minimum_height) {
         this.minimum_height = minimum_height;
+    }
+
+    public Pie_Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Pie_Position position) {
+        this.position = position;
     }
 }
 

@@ -2,6 +2,7 @@ package net.pie;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +48,6 @@ public class Pie_Encode {
         double dimension = Math.sqrt((double) originalArray.length / getConfig().getUse().getNumber());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
 
-        int width = getConfig().getMinimum_width() > size ? getConfig().getMinimum_width() : size;
-        int height = getConfig().getMinimum_height() > size ? getConfig().getMinimum_width() : size;;
-
         Integer r = null;
         Integer g = null;
         Integer b = null;
@@ -80,28 +78,74 @@ public class Pie_Encode {
             }
         }
 
-        createImage(width, height, list);
+        createImage(size, list);
     }
     /*************************************************
      * Create Image
      *************************************************/
-    private void createImage(int width, int height, List<Color> list) {
-        if (!isError() && width > 0 && height > 0 && list != null && !list.isEmpty()) {
+
+    private void createImage(int size, List<Color> list) {
+        BufferedImage dataimage = createDataImage(size, list);
+        int width = Math.max(getConfig().getMinimum_width(), size);
+        int height = Math.max(getConfig().getMinimum_height(), size);
+        if (dataimage != null && (width > size || height > size)) {
             BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            int count = 0;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++)
-                    buffImg.setRGB(x, y, (list.size() > count) ? list.get(count++).getRGB() : getConfig().getPadding());
-            }
+            Graphics2D g = buffImg.createGraphics();
+            g.drawImage(dataimage, null,dataImageOffsetX(size, width),dataImageOffsetY(size, height));
+            g.dispose();
             setEncoded_image(buffImg);
+        }else {
+            setEncoded_image(dataimage);
         }
+    }
+
+    /*************************************************
+     * Create Data Image - Offset X
+     *************************************************/
+    private int dataImageOffsetX(int size, int width) {
+        switch (getConfig().getPosition()) {
+            case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> { return 0; }
+            case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> { return width - size; }
+            case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> { return (width / 2) - (size / 2); }
+        }
+        return 0;
+    }
+    private int dataImageOffsetY(int size, int height) {
+        switch (getConfig().getPosition()) {
+            case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> { return 0; }
+            case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> { return height - size; }
+            case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> { return (height / 2) - (size / 2); }
+        }
+        return 0;
+    }
+
+    /*************************************************
+     * Create Data Image
+     *************************************************/
+    private BufferedImage createDataImage(int size, List<Color> list) {
+        BufferedImage buffImg = null;
+        if (!isError() && size > 0 && list != null && !list.isEmpty()) {
+            buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            int count = 0;
+            for (int y = 0; y < buffImg.getHeight(); y++) {
+                for (int x = 0; x < buffImg.getWidth(); x++) {
+                    buffImg.setRGB(x, y, list.get(count++).getRGB());
+                    if (count >= list.size()) {
+                        //utils.saveImage_to_file(buffImg, new File(utils.getDesktopPath() + File.separator + "encoded_Image.png"));
+                        return buffImg;
+                    }
+                }
+            }
+        }
+       //utils.saveImage_to_file(buffImg, new File(utils.getDesktopPath() + File.separator + "encoded_Image.png"));
+        return buffImg;
     }
 
     /*************************************************
      * Create Color
      *************************************************/
     private Color createColor(int r, int g, int b) {
-        return new Color(checker(r), checker(g), checker(b), checker(getConfig().getAlpha()));
+        return new Color(checker(r), checker(g), checker(b)); //, checker(getConfig().getAlpha()));
     }
     private Color createColor(int r, Integer g, Integer b, Integer a) {
         return new Color(checker(r), checker(g), checker(b),  checker(a));

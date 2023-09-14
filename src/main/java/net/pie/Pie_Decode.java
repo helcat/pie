@@ -31,13 +31,16 @@ public class Pie_Decode {
     private void decode(BufferedImage toBeDecrypted) {
         Color c = null;
         int count = 0;
-        int[] message = new int[(toBeDecrypted.getHeight() * toBeDecrypted.getWidth() * getConfig().getUse().getNumber())];
+        int[] message = new int[((toBeDecrypted.getHeight() * toBeDecrypted.getWidth()) * getConfig().getUse().getNumber())];
         for (int y = 0; y < toBeDecrypted.getHeight(); y++) {
             for (int x = 0; x < toBeDecrypted.getWidth(); x++) {
                 c = new Color(toBeDecrypted.getRGB(x, y));
-                message[count++] = c.getRed();
-                message[count++] = c.getGreen();
-                message[count++] = c.getBlue();
+                if (c.getRed() > 0)
+                    message[count++] = c.getRed();
+                if (c.getGreen() > 0)
+                    message[count++] = c.getGreen();
+                if (c.getBlue() > 0)
+                    message[count++] = c.getBlue();
             }
         }
 
