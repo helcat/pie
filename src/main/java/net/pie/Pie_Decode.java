@@ -26,7 +26,7 @@ public class Pie_Decode {
      * decode
      *************************************************/
     private void decode(BufferedImage toBeDecrypted) {
-        if (toBeDecrypted == null && !getConfig().isSuppress_errors())
+        if (toBeDecrypted == null)
             getConfig().addError("ERROR Cannot decode null image");
         if (getConfig().isError())
             return;

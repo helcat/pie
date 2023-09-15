@@ -25,7 +25,7 @@ public class Pie_Encode {
      * Has Error
      *************************************************/
     public boolean isError() {
-        return getConfig().isError();
+        return getConfig().getLog().isError();
     }
 
     /*************************************************
