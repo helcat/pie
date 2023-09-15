@@ -2,6 +2,11 @@ package net.pie;
 
 import java.nio.charset.StandardCharsets;
 
+/** *******************************************************<br>
+ * <b>Pie_Source</b><br>
+ * Sets the source for the encoded image.<br>
+ * This is used to collect the data to build the encoded image.
+ **/
 public class Pie_Source {
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
@@ -10,34 +15,36 @@ public class Pie_Source {
         setConfig(config);
     }
 
-    /*************************************
-     * Text Only
-     *************************************/
+    /** *******************************************************<br>
+     * <b>encrypt_Text</b><br>
+     * Sets text to be used in the encoded image.
+     **/
     public void encrypt_Text(String text) {
         setContent(text);
         setType(Pie_Source_Type.TEXT);
     }
 
-    /*************************************
-     * Process Text
-     *************************************/
+    /** *******************************************************<br>
+     * <b>encode processing</b><br>
+     * builds the process for encoding by selecting the right component.<br>
+     * it can use direct text, use a file or download one.
+     **/
     public byte[] encode_process() {
         switch (getType()) {
             case TEXT -> { return processText(); }
         }
 
-        if (!getConfig().isSuppress_errors())
-            getConfig().addError("Warning encoding process - invalid type");
+        getConfig().getLog().addError("encoding process - invalid type");
         return null;
     }
 
-    /*************************************
-     * Text only processing
-     *************************************/
+    /** *******************************************************<br>
+     * <b>Text processing</b><br>
+     * The process for encoding direct text.
+     **/
     private byte[] processText() {
         if (getContent().isEmpty()) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError("Warning Text processing - No text - nothing to process");
+            getConfig().getLog().addError("Text processing - No text - nothing to process");
             return null;
         }
         StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
@@ -47,9 +54,10 @@ public class Pie_Source {
         return text.getBytes(StandardCharsets.UTF_8);
     }
 
-    /*************************************
-     * getters and setters
-     *************************************/
+    /** *******************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     private Pie_Source_Type getType() {
         return type;
     }

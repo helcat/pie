@@ -6,31 +6,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
     private Pie_Source source;
 
-    /*************************************************
-     * Start
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>Pie_Encode</b>
+     * @param source
+     * @see Pie_Source Pie_Source to load in the content.
+     **/
     public Pie_Encode(Pie_Source source) {
         setSource(source);
         setConfig(source.getConfig());
         encode();
     }
 
-    /*************************************************
-     * Has Error
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>Has Error</b><br>
+     * Checks to see if an error has been registered with in the configuration.<br>
+     * @return boolean
+     **/
     public boolean isError() {
         return getConfig().getLog().isError();
     }
 
-    /*************************************************
-     * encode
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>encode</b><br>
+     * Encodes the data as the image pixel by pixel.<br>
+     * @see Pie_Source Uses Pie_Source to collect the data to be used as pixels.
+     **/
     private void encode() {
         setEncoded_image(null);
         byte[] originalArray = getSource().encode_process();
@@ -59,9 +64,13 @@ public class Pie_Encode {
 
         createImage(size, list);
     }
-    /*************************************************
-     * Create Image
-     *************************************************/
+
+    /** ******************************************************<br>
+     * <b>Create Image</b><br>
+     * Creates the encoded bufferedimage : Stage 2 - Image within image.<br>
+     * @param size uses a calculation to determin the size of the original image.
+     * @param list A list of already encoded colors which will be placed in to the BufferedImage.
+     **/
     private void createImage(int size, List<Color> list) {
         BufferedImage data_image = createDataImage(size, list);
         if (isError())
@@ -79,9 +88,13 @@ public class Pie_Encode {
         }
     }
 
-    /*************************************************
-     * Create Data Image - Offset
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>Create Data Image - Offset</b><br>
+     * Calculates the offset (Position) of the frst image within the second image. Used in createImage<br>
+     * @param size uses a calculation to determin the size of the original image.
+     * @param dim reusable Parameter (Width and Height)
+     * @return offset (int)
+     **/
     private int dataImageOffset(int size, int dim) {
         if (getConfig().getMinimum() != null && getConfig().getMinimum().getPosition() != null) {
             switch (getConfig().getMinimum().getPosition()) {
@@ -99,9 +112,13 @@ public class Pie_Encode {
         return 0;
     }
 
-    /*************************************************
-     * Create Data Image
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>Create Data Image</b><br>
+     * Creates the encoded bufferedimage : Stage 1 - Original Image<br>
+     * @param size uses a calculation to determin the size of the original image.
+     * @param list A list of already encoded colors which will be placed in to the BufferedImage.
+     * @return bufferedimage - the real encoded image.
+     **/
     private BufferedImage createDataImage(int size, List<Color> list) {
         BufferedImage buffImg = null;
         if (!isError() && size > 0 && list != null && !list.isEmpty()) {
@@ -110,31 +127,39 @@ public class Pie_Encode {
             for (int y = 0; y < buffImg.getHeight(); y++) {
                 for (int x = 0; x < buffImg.getWidth(); x++) {
                     buffImg.setRGB(x, y, list.get(count++).getRGB());
-                    if (count >= list.size()) {
-                        //utils.saveImage_to_file(buffImg, new File(utils.getDesktopPath() + File.separator + "encoded_Image.png"));
+                    if (count >= list.size())
                         return buffImg;
-                    }
                 }
             }
         }
-       //utils.saveImage_to_file(buffImg, new File(utils.getDesktopPath() + File.separator + "encoded_Image.png"));
         return buffImg;
     }
 
-    /*************************************************
-     * Create Color
-     *************************************************/
+    /** ******************************************************<br>
+     * <b>Create Color</b><br>
+     * Creates a color with encoded numbers<br>
+     * @param r encoded byte.
+     * @param g encoded byte.
+     * @param b encoded byte.
+     * @return Encoded Color
+     **/
     private Color createColor(int r, int g, int b) {
         return new Color(checker(r), checker(g), checker(b));
     }
 
+    /** ******************************************************<br>
+     * <b>Checks the number to make sure its above zero.</b><br>
+     * @param check
+     * @return int
+     **/
     private int checker(int check) {
         return Math.max(check, 0);
     }
 
-    /*************************************************
-     * getters and setters
-     *************************************************/
+    /** *******************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     private void setConfig(Pie_Config config) {
         this.config = config;
     }

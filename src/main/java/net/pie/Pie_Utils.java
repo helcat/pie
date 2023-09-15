@@ -22,13 +22,14 @@ public class Pie_Utils {
         setConfig(config);
     }
 
-    /************************************************
-     * Convert int array to byte array
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>convert Array</b><br>
+     * Convert int array to byte array.<br>
+     * @param list (int[])
+     **/
     public byte[] convert_Array(int[] list) {
         if (list == null || list.length == 0) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError("ERROR convert_Array - Nothing in array");
+                getConfig().getLog().addError("ERROR convert_Array - Nothing in array");
             return new byte[0];
         }
 
@@ -40,9 +41,11 @@ public class Pie_Utils {
         return byteArray;
     }
 
-    /************************************************
-     * compress String
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>compress</b><br>
+     * Main functon for compressing.<br>
+     * @param text (String)
+     **/
     public byte[] compress(String text) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -50,15 +53,16 @@ public class Pie_Utils {
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+            getConfig().getLog().addError(MessageFormat.format("ERROR compress - {0}", e.getMessage()));
         }
         return baos.toByteArray();
     }
 
-    /************************************************
-     * decompress String
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>decompress</b><br>
+     * Main functon for decompressing.<br>
+     * @param bytes (byte[])
+     **/
     public String decompress(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -66,15 +70,16 @@ public class Pie_Utils {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
+            getConfig().getLog().addError(MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
         }
         return baos.toString(StandardCharsets.UTF_8);
     }
 
-    /************************************************
-     * Load Image
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>load image</b><br>
+     * Loads an image from the given parameter.<br>
+     * @param stream send in a File, ByteArrayOutputStream, ImageInputStream, FileInputStream, FileImageInputStream, InputStream or URL
+     **/
     public BufferedImage load_image(Object stream) {
         BufferedImage image = null;
         if (stream == null)
@@ -117,39 +122,49 @@ public class Pie_Utils {
             }
 
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR load_image File - {0}", e.getMessage()));
+                getConfig().getLog().addError(MessageFormat.format("load_image File - {0}", e.getMessage()));
         }
 
         return image;
     }
 
-    /************************************************
-     * Save Image
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>saveImage_to_baos</b><br>
+     * Saves a bufferedimage to a ByteArrayOutputStream
+     * @param buffer - the encoded BufferedImage
+     **/
     public ByteArrayOutputStream saveImage_to_baos(BufferedImage buffer) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ImageIO.write(buffer, "PNG", baos);
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
+                getConfig().getLog().addError(MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
         }
         return baos;
     }
 
+    /** *******************************************************<br>
+     * <b>saveImage_to_file</b><br>
+     * Saves a bufferedimage to a given file
+     * @param buffer - the encoded BufferedImage
+     * @param file - send in a file and the BufferedImage will be saved to it.
+     **/
     public void saveImage_to_file(BufferedImage buffer, File file) {
-        if (buffer == null && !getConfig().isSuppress_errors())
-            getConfig().addError("ERROR Image was not created");
+        if (buffer == null)
+            getConfig().getLog().addError("Image was not created");
         try {
-            if (!getConfig().isError())
+            if (! getConfig().getLog().isError())
                 ImageIO.write(buffer, "png", file);
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
+            getConfig().getLog().addError(MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
         }
     }
 
+    /** *******************************************************<br>
+     * <b>saveImage_to_is</b><br>
+     * Saves a bufferedimage to an inputstream
+     * @param buffer - the encoded BufferedImage
+     **/
     public InputStream saveImage_to_is(BufferedImage buffer) {
         InputStream is = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -163,8 +178,7 @@ public class Pie_Utils {
                 baos.close();
             }
         } catch (IOException e) {
-            if (!getConfig().isSuppress_errors())
-                getConfig().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
+            getConfig().getLog().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
         }
         return is;
     }
@@ -188,27 +202,20 @@ public class Pie_Utils {
      *     System.out.println(data2.toString());
      */
 
-    /************************************************
-     * get the desktop path
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>get path to desktop</b><br>
+     * Simple function that gets the path to the desktop. Can be used when saving files.
+     **/
     public String getDesktopPath() {
         FileSystemView view = FileSystemView.getFileSystemView();
         File file = view.getHomeDirectory();
         return file.getPath();
     }
 
-    /************************************************
-     * load to encrypt
-     ************************************************/
-    public byte[] load_Object(Object object) {
-        byte[] bytes = null;
-
-        return bytes;
-    }
-
-    /************************************************
-     * getters and setters
-     ************************************************/
+    /** *******************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     public Pie_Config getConfig() {
         return config;
     }

@@ -9,22 +9,27 @@ public class Pie_Config {
     private Pie_Minimum minimum = null;
     private Pie_Utils utils = null;
 
+    /** *******************************************************************<br>
+     * <b>Pie_Config - Configuration</b><br>
+     * Holds all the optional data, Utils and encoding / decoding defaults
+     **/
     public Pie_Config() {
         setLog(new Pie_Log());
         setMinimum(new Pie_Minimum());
         setUtils(new Pie_Utils(this));
     }
 
-    /*************************************
+    /**
      * Save encoded image to
-     *************************************/
+     **/
     public void save_encoded_image_to(String message) {
 
     }
 
-    /*************************************
-     * getters and setters
-     *************************************/
+    /** *******************************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     public Pie_Minimum getMinimum() {
         return minimum;
     }

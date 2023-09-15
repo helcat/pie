@@ -14,9 +14,10 @@ public class Pie_Destination {
         }
     }
 
-    /*************************************
-     * getters and setters
-     *************************************/
+    /** *******************************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     public File getLocal_file() {
         return local_file;
     }

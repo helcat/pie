@@ -10,25 +10,36 @@ public class Pie_Decode {
     private String decoded_Message;
     private Pie_Config config;
 
-    /*************************************************
-     * Pie_Decode
-     *************************************************/
+    /** *********************************************************<br>
+     * <b>Pie_Decode</b><br>
+     * Processing for decoding the image back to source.<br>
+     * A new default configuration will be created.<br>
+     * @param toBeDecrypted     Image to be decrypted
+     **/
     public Pie_Decode(BufferedImage toBeDecrypted) {
         setConfig(new Pie_Config());
         decode(toBeDecrypted);
     }
+    /** *********************************************************<br>
+     * <b>Pie_Decode</b><br>
+     * Processing for decoding the image back to source.<br>
+     * @param config A Custom configuration to be supplied.
+     * @param toBeDecrypted BufferedImage Image to be decrypted. Use Pie_Utils to load image if required.
+     **/
     public Pie_Decode(Pie_Config config, BufferedImage toBeDecrypted) {
         setConfig(config);
         decode(toBeDecrypted);
     }
 
-    /*************************************************
-     * decode
-     *************************************************/
+    /** *********************************************************<br>
+     * <b>decode</b><br>
+     * @param toBeDecrypted BufferedImage Image to be decrypted. Private function. Used in constructor.
+     * @see Pie_Decode Use in the constructor Pie_Decode.
+     **/
     private void decode(BufferedImage toBeDecrypted) {
         if (toBeDecrypted == null)
-            getConfig().addError("ERROR Cannot decode null image");
-        if (getConfig().isError())
+            getConfig().getLog().addError("Cannot decode null image");
+        if (getConfig().getLog().isError())
             return;
 
         int pixelColor = 0;
@@ -65,9 +76,10 @@ public class Pie_Decode {
         }
     }
 
-    /*************************************************
-     * getters and setters
-     *************************************************/
+    /** *******************************************************************<br>
+     * <b>getters and setters</b><br>
+     * General Getters and Setters
+     **/
     private void setConfig(Pie_Config config) {
         this.config = config;
     }

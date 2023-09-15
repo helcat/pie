@@ -32,8 +32,8 @@ public class Pie_Test {
 
         Pie_Decode decode = new Pie_Decode(config, encode.getEncoded_image());
 
-        if (config.isError())
-            config.display_Errors();
+        if (config.getLog().isError())
+            config.getLog().display_Errors();
         else
             System.out.println(decode.getDecoded_Message());
     }
