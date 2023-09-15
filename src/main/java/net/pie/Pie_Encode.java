@@ -15,9 +15,9 @@ public class Pie_Encode {
     /*************************************************
      * Start
      *************************************************/
-    public Pie_Encode(Pie_Config config, Pie_Source source) {
-        setConfig(config);
+    public Pie_Encode(Pie_Source source) {
         setSource(source);
+        setConfig(source.getConfig());
         encode();
     }
 
@@ -33,8 +33,8 @@ public class Pie_Encode {
      *************************************************/
     private void encode() {
         setEncoded_image(null);
-        byte[] originalArray = getSource().process(getConfig());
-        if (originalArray == null)
+        byte[] originalArray = getSource().encode_process();
+        if (isError() || originalArray == null)
             return;
 
         double dimension = Math.sqrt((double) originalArray.length / getConfig().getRgbCount());
@@ -49,12 +49,11 @@ public class Pie_Encode {
                 r = i;
             } else if (g == null) {
                 g = i;
-            } else if (b == null) {
+            } else {
                 b = i;
                 list.add(createColor(r, g, b));
                 r = null;
                 g = null;
-                b = null;
             }
         }
 
@@ -63,19 +62,20 @@ public class Pie_Encode {
     /*************************************************
      * Create Image
      *************************************************/
-
     private void createImage(int size, List<Color> list) {
-        BufferedImage dataimage = createDataImage(size, list);
+        BufferedImage data_image = createDataImage(size, list);
+        if (isError())
+            return;
         int width = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getWidth() : 0, size);
         int height = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getHeight() : 0, size);
-        if (dataimage != null && (width > size || height > size)) {
+        if (data_image != null && (width > size || height > size)) {
             BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = buffImg.createGraphics();
-            g.drawImage(dataimage, null,dataImageOffset(size, width), dataImageOffset(size, height));
+            g.drawImage(data_image, null,dataImageOffset(size, width), dataImageOffset(size, height));
             g.dispose();
             setEncoded_image(buffImg);
         }else {
-            setEncoded_image(dataimage);
+            setEncoded_image(data_image);
         }
     }
 

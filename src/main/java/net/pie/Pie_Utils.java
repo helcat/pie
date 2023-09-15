@@ -139,8 +139,11 @@ public class Pie_Utils {
     }
 
     public void saveImage_to_file(BufferedImage buffer, File file) {
+        if (buffer == null && !getConfig().isSuppress_errors())
+            getConfig().addError("ERROR Image was not created");
         try {
-            ImageIO.write(buffer, "png", file);
+            if (!getConfig().isError())
+                ImageIO.write(buffer, "png", file);
         } catch (IOException e) {
             if (!getConfig().isSuppress_errors())
                 getConfig().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));

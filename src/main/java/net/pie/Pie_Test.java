@@ -24,14 +24,18 @@ public class Pie_Test {
         Pie_Config config = new Pie_Config();
         config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);
 
-        Pie_Source source = new Pie_Source();
+        Pie_Source source = new Pie_Source(config);
         source.encrypt_Text("السلام عليكم هذا اختبار");
 
-        Pie_Encode encode = new Pie_Encode(config, source);
+        Pie_Encode encode = new Pie_Encode(source);
         config.getUtils().saveImage_to_file(encode.getEncoded_image(), new File(config.getUtils().getDesktopPath() + File.separator + "myImage.png"));
+
         Pie_Decode decode = new Pie_Decode(config, encode.getEncoded_image());
 
-        System.out.println(decode.getDecoded_Message());
+        if (config.isError())
+            config.display_Errors();
+        else
+            System.out.println(decode.getDecoded_Message());
     }
 
 }

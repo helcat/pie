@@ -5,8 +5,9 @@ import java.nio.charset.StandardCharsets;
 public class Pie_Source {
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
-    public Pie_Source() {
-
+    private Pie_Config config;
+    public Pie_Source(Pie_Config config) {
+        setConfig(config);
     }
 
     /*************************************
@@ -20,38 +21,57 @@ public class Pie_Source {
     /*************************************
      * Process Text
      *************************************/
-    public byte[] process(Pie_Config config) {
-        byte[] null_bytes = null;
-
-        if (getType().equals(Pie_Source_Type.TEXT)) {
-            StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
-            StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
-            byte[] bytes = config.getUtils().compress(append.toString());
-            String text = Pie_Base64.encodeBytes(bytes);
-            return text.getBytes(StandardCharsets.UTF_8);
+    public byte[] encode_process() {
+        switch (getType()) {
+            case TEXT -> { return processText(); }
         }
 
-        return null_bytes;
+        if (!getConfig().isSuppress_errors())
+            getConfig().addError("Warning encoding process - invalid type");
+        return null;
     }
 
+    /*************************************
+     * Text only processing
+     *************************************/
+    private byte[] processText() {
+        if (getContent().isEmpty()) {
+            if (!getConfig().isSuppress_errors())
+                getConfig().addError("Warning Text processing - No text - nothing to process");
+            return null;
+        }
+        StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
+        StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
+        byte[] bytes = config.getUtils().compress(append.toString());
+        String text = Pie_Base64.encodeBytes(bytes);
+        return text.getBytes(StandardCharsets.UTF_8);
+    }
 
     /*************************************
      * getters and setters
      *************************************/
-    public Pie_Source_Type getType() {
+    private Pie_Source_Type getType() {
         return type;
     }
 
-    public void setType(Pie_Source_Type type) {
+    private void setType(Pie_Source_Type type) {
         this.type = type == null ? Pie_Source_Type.TEXT : type;
     }
 
-    public String getContent() {
+    private String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    private void setContent(String content) {
         this.content = content;
+    }
+
+    public Pie_Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Pie_Config config) {
+        this.config = config;
     }
 }
 

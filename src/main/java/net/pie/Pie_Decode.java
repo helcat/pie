@@ -26,6 +26,11 @@ public class Pie_Decode {
      * decode
      *************************************************/
     private void decode(BufferedImage toBeDecrypted) {
+        if (toBeDecrypted == null && !getConfig().isSuppress_errors())
+            getConfig().addError("ERROR Cannot decode null image");
+        if (getConfig().isError())
+            return;
+
         int pixelColor = 0;
         int count = 0;
         // int retrievedAlpha = (pixelColor >> 24) & 0xFF;
