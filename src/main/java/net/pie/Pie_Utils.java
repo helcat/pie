@@ -23,7 +23,7 @@ public class Pie_Utils {
     public Pie_Utils(Pie_Config config) {
         setConfig(config);
     }
-    private Logger log = Logger.getLogger(Pie_Decode.class.getName());
+    private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
 
     /** *******************************************************<br>

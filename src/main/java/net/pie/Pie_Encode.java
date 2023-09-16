@@ -12,7 +12,7 @@ public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
     private Pie_Source source;
-    private Logger log = Logger.getLogger(Pie_Encode.class.getName());
+    private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
 
     /** ******************************************************<br>
@@ -198,10 +198,6 @@ public class Pie_Encode {
 
     public Logger getLog() {
         return log;
-    }
-
-    public void setLog(Logger log) {
-        this.log = log;
     }
 
     public void setError(boolean error) {

@@ -1,20 +1,16 @@
 package net.pie;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.logging.Level.SEVERE;
-
-
 public class Pie_Decode {
     private String decoded_Message;
     private Pie_Config config;
     private BufferedImage toBeDecrypted;
-    private Logger log = Logger.getLogger(Pie_Decode.class.getName());
+    private Logger log = Logger.getLogger(this.getClass().getName());
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -63,12 +59,12 @@ public class Pie_Decode {
         if (getConfig().isError())
             return;
 
-        int pixelColor = 0;
+        int pixelColor;
         int count = 0;
         // int retrievedAlpha = (pixelColor >> 24) & 0xFF;
-        int retrievedRed = 0;
-        int retrievedGreen = 0;
-        int retrievedBlue = 0;
+        int retrievedRed ;
+        int retrievedGreen;
+        int retrievedBlue;
 
         int[] message = new int[((getToBeDecrypted().getHeight() * getToBeDecrypted().getWidth()) * getConfig().getRgbCount())];
         for (int y = 0; y < getToBeDecrypted().getHeight(); y++) {
@@ -128,10 +124,6 @@ public class Pie_Decode {
 
     public Logger getLog() {
         return log;
-    }
-
-    public void setLog(Logger log) {
-        this.log = log;
     }
 
 }
