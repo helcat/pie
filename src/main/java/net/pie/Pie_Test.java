@@ -51,11 +51,14 @@ public class Pie_Test {
         Pie_Source source = new Pie_Source(config);
         source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
 
+        Pie_Destination encoded_Image_destination = new Pie_Destination();
+        encoded_Image_destination.setLocal_file(new File(config.getUtils().getDesktopPath() + File.separator + "My_Image.png"));
+
+        config.setSave_Encoded_Image(encoded_Image_destination);
+
         Pie_Encode encoder = new Pie_Encode(source);
         encoder.encode();
         BufferedImage image = encoder.getEncoded_image();
-
-        source.getConfig().getUtils().saveImage_to_file(image, new File(source.getConfig().getUtils().getDesktopPath() + File.separator + "myImage.png"));
 
         return image;
     }
