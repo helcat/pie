@@ -2,19 +2,20 @@ package net.pie;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class Pie_Config {
     private final int rgbCount = 3;
-    private Pie_Log log = null;
     private Pie_Minimum minimum = null;
     private Pie_Utils utils = null;
+    private Level log_level = Level.SEVERE;
+    private boolean error = false;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
      * Holds all the optional data, Utils and encoding / decoding defaults
      **/
     public Pie_Config() {
-        setLog(new Pie_Log());
         setMinimum(new Pie_Minimum());
         setUtils(new Pie_Utils(this));
     }
@@ -35,7 +36,7 @@ public class Pie_Config {
     }
 
     public void setMinimum(Pie_Minimum minimum) {
-        this.minimum = minimum;
+        this.minimum = minimum == null ? new Pie_Minimum() : minimum;
     }
 
     public int getRgbCount() {
@@ -47,15 +48,35 @@ public class Pie_Config {
     }
 
     public void setUtils(Pie_Utils utils) {
-        this.utils = utils;
+        this.utils = utils == null ? new Pie_Utils(this) : utils;
     }
 
-    public Pie_Log getLog() {
-        return log;
+    public Level getLog_level() {
+        return log_level;
     }
 
-    public void setLog(Pie_Log log) {
-        this.log = log;
+    /** ***************************************************************<br>
+     * <b>Set Logging Level</b><br>
+     * Allowed values : The Default is Level.SEVERE<br>
+     * Level.OFF - (Turn off logging)<br>
+     * Level.FINEST<br>
+     * Level.FINER<br>
+     * Level.FINE<br>
+     * Level.CONFIG<br>
+     * Level.INFO<br>
+     * Level.WARNING<br>
+     * Level.SEVERE (Default)<br>
+     */
+    public void setLog_level(Level log_level) {
+        this.log_level = log_level;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
     }
 }
 

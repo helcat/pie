@@ -150,6 +150,11 @@ import java.util.Objects;
  * @author Robert Harder
  * @author rob@iharder.net
  * @version 2.3.7
+ * <br><br>
+ * <p>
+ * NOTE This is a 3rd Party CLass not associated with PIE. But meets all the demands of the application
+ * My thanks to Robert Harder for creating this class.
+ * </p>
  */
 public class Pie_Base64
 {

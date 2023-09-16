@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterOutputStream;
 
@@ -21,6 +23,8 @@ public class Pie_Utils {
     public Pie_Utils(Pie_Config config) {
         setConfig(config);
     }
+    private Logger log = Logger.getLogger(Pie_Decode.class.getName());
+    private boolean error = false;
 
     /** *******************************************************<br>
      * <b>convert Array</b><br>
@@ -29,7 +33,7 @@ public class Pie_Utils {
      **/
     public byte[] convert_Array(int[] list) {
         if (list == null || list.length == 0) {
-                getConfig().getLog().addError("ERROR convert_Array - Nothing in array");
+            logging(Level.SEVERE,"ERROR convert_Array - Nothing in array");
             return new byte[0];
         }
 
@@ -39,6 +43,18 @@ public class Pie_Utils {
             byteArray[i] = (byte) list[i];
 
         return byteArray;
+    }
+
+    /** *********************************************************<br>
+     * <b>Error</b><br>
+     * Set the log entry and set error if required
+     * @param level (Logging level)
+     * @param message (Logging Message)
+     **/
+    private void logging(Level level, String message) {
+        getLog().log(level,  message);
+        if (level.equals(Level.SEVERE))
+            setError(true);
     }
 
     /** *******************************************************<br>
@@ -53,7 +69,7 @@ public class Pie_Utils {
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
-            getConfig().getLog().addError(MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+            logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
         }
         return baos.toByteArray();
     }
@@ -70,7 +86,7 @@ public class Pie_Utils {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            getConfig().getLog().addError(MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
+            logging(Level.SEVERE,MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
         }
         return baos.toString(StandardCharsets.UTF_8);
     }
@@ -122,7 +138,7 @@ public class Pie_Utils {
             }
 
         } catch (IOException e) {
-                getConfig().getLog().addError(MessageFormat.format("load_image File - {0}", e.getMessage()));
+            logging(Level.SEVERE,MessageFormat.format("load_image File - {0}", e.getMessage()));
         }
 
         return image;
@@ -138,7 +154,7 @@ public class Pie_Utils {
         try {
             ImageIO.write(buffer, "PNG", baos);
         } catch (IOException e) {
-                getConfig().getLog().addError(MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
+            logging(Level.SEVERE,MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
         }
         return baos;
     }
@@ -151,12 +167,12 @@ public class Pie_Utils {
      **/
     public void saveImage_to_file(BufferedImage buffer, File file) {
         if (buffer == null)
-            getConfig().getLog().addError("Image was not created");
+            logging(Level.SEVERE,"Image was not created");
         try {
-            if (! getConfig().getLog().isError())
+            if (!isError())
                 ImageIO.write(buffer, "png", file);
         } catch (IOException e) {
-            getConfig().getLog().addError(MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
+            logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
         }
     }
 
@@ -178,7 +194,7 @@ public class Pie_Utils {
                 baos.close();
             }
         } catch (IOException e) {
-            getConfig().getLog().addError(MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
+            logging(Level.SEVERE,MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
         }
         return is;
     }
@@ -223,6 +239,21 @@ public class Pie_Utils {
         this.config = config;
     }
 
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
+    }
 }
 
 

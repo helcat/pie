@@ -5,11 +5,15 @@ import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
     private Pie_Source source;
+    private Logger log = Logger.getLogger(Pie_Encode.class.getName());
+    private boolean error = false;
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
@@ -19,24 +23,29 @@ public class Pie_Encode {
     public Pie_Encode(Pie_Source source) {
         setSource(source);
         setConfig(source.getConfig());
-        encode();
     }
 
-    /** ******************************************************<br>
-     * <b>Has Error</b><br>
-     * Checks to see if an error has been registered with in the configuration.<br>
-     * @return boolean
+    /** *********************************************************<br>
+     * <b>Error</b><br>
+     * Set the log entry and set error if required
+     * @param level (Logging level)
+     * @param message (Logging Message)
      **/
-    public boolean isError() {
-        return getConfig().getLog().isError();
+    private void logging(Level level, String message) {
+        getLog().log(level,  message);
+        if (level.equals(Level.SEVERE))
+            setError(true);
     }
 
     /** ******************************************************<br>
      * <b>encode</b><br>
      * Encodes the data as the image pixel by pixel.<br>
+     * After setting Pie_Encode use encode(). Allows for changing settings.
      * @see Pie_Source Uses Pie_Source to collect the data to be used as pixels.
      **/
-    private void encode() {
+    public void encode() {
+        getLog().setLevel(getConfig().getLog_level());
+        logging(Level.INFO,"Encoding Started");
         setEncoded_image(null);
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null)
@@ -63,6 +72,7 @@ public class Pie_Encode {
         }
 
         createImage(size, list);
+        logging(Level.INFO,"Encoding Complete");
     }
 
     /** ******************************************************<br>
@@ -72,6 +82,7 @@ public class Pie_Encode {
      * @param list A list of already encoded colors which will be placed in to the BufferedImage.
      **/
     private void createImage(int size, List<Color> list) {
+        logging(Level.INFO,"Encoding Image");
         BufferedImage data_image = createDataImage(size, list);
         if (isError())
             return;
@@ -96,6 +107,7 @@ public class Pie_Encode {
      * @return offset (int)
      **/
     private int dataImageOffset(int size, int dim) {
+        logging(Level.INFO,"Encoding Offset");
         if (getConfig().getMinimum() != null && getConfig().getMinimum().getPosition() != null) {
             switch (getConfig().getMinimum().getPosition()) {
                 case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> {
@@ -120,6 +132,7 @@ public class Pie_Encode {
      * @return bufferedimage - the real encoded image.
      **/
     private BufferedImage createDataImage(int size, List<Color> list) {
+        logging(Level.INFO,"Encoding Data Image");
         BufferedImage buffImg = null;
         if (!isError() && size > 0 && list != null && !list.isEmpty()) {
             buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
@@ -181,5 +194,21 @@ public class Pie_Encode {
 
     public void setSource(Pie_Source source) {
         this.source = source;
+    }
+
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
+    public boolean isError() {
+        return error;
     }
 }

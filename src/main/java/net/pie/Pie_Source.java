@@ -19,7 +19,7 @@ public class Pie_Source {
      * <b>encrypt_Text</b><br>
      * Sets text to be used in the encoded image.
      **/
-    public void encrypt_Text(String text) {
+    public void encode_Text(String text) {
         setContent(text);
         setType(Pie_Source_Type.TEXT);
     }
@@ -33,8 +33,6 @@ public class Pie_Source {
         switch (getType()) {
             case TEXT -> { return processText(); }
         }
-
-        getConfig().getLog().addError("encoding process - invalid type");
         return null;
     }
 
@@ -43,10 +41,8 @@ public class Pie_Source {
      * The process for encoding direct text.
      **/
     private byte[] processText() {
-        if (getContent().isEmpty()) {
-            getConfig().getLog().addError("Text processing - No text - nothing to process");
+        if (getContent().isEmpty())
             return null;
-        }
         StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
         StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
         byte[] bytes = config.getUtils().compress(append.toString());

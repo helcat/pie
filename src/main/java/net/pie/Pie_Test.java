@@ -7,35 +7,74 @@ git commit -m "Work Commit"
 git push origin main
  */
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.logging.Level;
 
 public class Pie_Test {
-    /*************************************************
-     * Main Start -> Runnable Jar السلام عليكم هذا اختبار
-     *************************************************/
+    /** ***********************************************<br>
+     * <b>Main Start</b><br>
+     * Runnable from jar. Example Arabic text "السلام عليكم هذا اختبار" Encoding
+     * @param args if null will use the arabic text supplied.
+     **/
     public static void main(String[] args) {
-        new Pie_Test();
+        new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
     }
 
-    /*************************************************
-     * Start
-     *************************************************/
-    public Pie_Test() {
+    /** ***********************************************<br>
+     * <b>Pie_Test</b><br>
+     * Uses Example Arabic text "السلام عليكم هذا اختبار" Encoding When args is not supplied
+     * @param arg (Text Supplied when starting the jar)
+     **/
+    public Pie_Test(String arg) {
+        BufferedImage image = encode(arg);
+
+        if (image != null) {
+            String value = decode(image);
+            System.out.println(value);
+        }
+
+    }
+
+    /** ******************************************************<br>
+     * <b>encode</b><br>
+     * Encodes text to the image.<br>
+     * Create a basic config and source. Place the config in the source. Use source with the Pie_Encode function.
+     * @param text
+     * @return BufferedImage
+     */
+    public BufferedImage encode(String text) {
         Pie_Config config = new Pie_Config();
+        config.setLog_level(Level.SEVERE);
         config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);
 
         Pie_Source source = new Pie_Source(config);
-        source.encrypt_Text("السلام عليكم هذا اختبار");
+        source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
 
-        Pie_Encode encode = new Pie_Encode(source);
-        config.getUtils().saveImage_to_file(encode.getEncoded_image(), new File(config.getUtils().getDesktopPath() + File.separator + "myImage.png"));
+        Pie_Encode encoder = new Pie_Encode(source);
+        encoder.encode();
+        BufferedImage image = encoder.getEncoded_image();
 
-        Pie_Decode decode = new Pie_Decode(config, encode.getEncoded_image());
+        source.getConfig().getUtils().saveImage_to_file(image, new File(source.getConfig().getUtils().getDesktopPath() + File.separator + "myImage.png"));
 
-        if (config.getLog().isError())
-            config.getLog().display_Errors();
-        else
-            System.out.println(decode.getDecoded_Message());
+        return image;
     }
 
+    /** ******************************************************<br>
+     * <b>decode</b><br>
+     * Decodes the image file to restore the text.<br>
+     * Create a basic config. Place the config in the Pie_Decode along with the image file.
+     * @param image
+     * @return String
+     */
+    public String decode(BufferedImage image) {
+        Pie_Config config = new Pie_Config();
+        config.setLog_level(Level.SEVERE);
+
+        Pie_Decode decoder = new Pie_Decode(config, image);
+        decoder.decode();
+        if (!decoder.getConfig().isError())
+            return decoder.getDecoded_Message();
+        return null;
+    }
 }
