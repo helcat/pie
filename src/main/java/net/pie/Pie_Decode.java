@@ -7,6 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Pie_Decode {
+    private static String beginning = "{**";
+    private static String end = "**}";
     private String decoded_Message;
     private Pie_Config config;
     private BufferedImage toBeDecrypted;
@@ -85,7 +87,8 @@ public class Pie_Decode {
             }
         }
 
-        String base64_text = new String(getConfig().getUtils().convert_Array(message), StandardCharsets.UTF_8).trim();
+        String base64_text = collect_encoded_parms(new String(getConfig().getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
+
         try {
             setDecoded_Message(getConfig().getUtils().decompress(Pie_Base64.decode(base64_text)));
         } catch (IOException e) {
@@ -93,6 +96,14 @@ public class Pie_Decode {
             return;
         }
         logging(Level.INFO,"Decoding Completed");
+    }
+
+    private String collect_encoded_parms(String base64_text) {
+        if (base64_text.startsWith(beginning) && base64_text.contains(end)) {
+            String parms = base64_text.substring(0, base64_text.lastIndexOf(end) + end.length());
+            base64_text = base64_text.replace(parms, "");
+        }
+        return base64_text;
     }
 
     /** *******************************************************************<br>

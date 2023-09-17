@@ -16,9 +16,12 @@ import java.util.stream.Stream;
  * This is used to collect the data to build the encoded image.
  **/
 public class Pie_Source {
+    private static String beginning = "{**";
+    private static String end = "**}";
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
     private Pie_Config config;
+    private String file_name = null;
 
     private Logger log = Logger.getLogger(this.getClass().getName());
 
@@ -41,12 +44,26 @@ public class Pie_Source {
 
     /** *******************************************************<br>
      * <b>encrypt_Text</b><br>
-     * Sets text to be used in the encoded image.
+     * Sets text to be used in the encoded image.<br>
+     * "encoded_text.txt" will be encoded as the file name
      * @param text (This is a direct text to encoding option)
      **/
     public void encode_Text(String text) {
         setContent(text);
         setType(Pie_Source_Type.TEXT);
+        setFile_name("encoded_text.txt");
+    }
+
+    /** *******************************************************<br>
+     * <b>encrypt_Text</b><br>
+     * Sets text to be used in the encoded image.
+     * @param text (This is a direct text to encoding option)
+     * @param file_name (set a file name that will be encoded in to the image so that the decoded information can be saved with an original file name)
+     **/
+    public void encode_Text(String text, String file_name) {
+        setContent(text);
+        setType(Pie_Source_Type.TEXT);
+        setFile_name(file_name);
     }
 
     /** *******************************************************<br>
@@ -69,6 +86,7 @@ public class Pie_Source {
      * @param text (File)
      **/
     public void encode_Txt_File(File text) {
+        setFile_name(text.getName());
         Path filePath = text.toPath();
         StringBuilder contentBuilder = new StringBuilder();
         try (Stream<String> stream = Files.lines(Paths.get(filePath.toUri()), StandardCharsets.UTF_8)) {
@@ -82,7 +100,7 @@ public class Pie_Source {
     }
 
     /** *********************************************************<br>
-     * <b>Error</b><br>
+     * <b>logging</b><br>
      * Set the log entry and set error if required
      * @param level (Logging level)
      * @param message (Logging Message)
@@ -115,12 +133,20 @@ public class Pie_Source {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
             byte[] bytes = config.getUtils().compress(append.toString());
-            String text = Pie_Base64.encodeBytes(bytes);
+            String text = encoding_addon() + Pie_Base64.encodeBytes(bytes);
             return text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return null;
         }
+    }
+
+    /** *******************************************************<br>
+     * <b>Add on to the encoding</b><br>
+     **/
+    private String encoding_addon() {
+        String filename_encoding = getFile_name() != null && !getFile_name().isEmpty() ? beginning + getFile_name() + end : null;
+        return (filename_encoding != null ? filename_encoding : "");
     }
 
     /** *******************************************************<br>
@@ -157,6 +183,14 @@ public class Pie_Source {
 
     public void setLog(Logger log) {
         this.log = log;
+    }
+
+    public String getFile_name() {
+        return file_name;
+    }
+
+    public void setFile_name(String file_name) {
+        this.file_name = file_name;
     }
 }
 

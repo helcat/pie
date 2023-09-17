@@ -48,7 +48,7 @@ public class Pie_Test {
 
         Pie_Source source = new Pie_Source(config);
         //source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
-        source.encode_Txt_File(config.getUtils().getDesktopPath() + File.separator + "commodoredot64@gmail.com.txt");
+        source.encode_Txt_File(config.getUtils().getDesktopPath() + File.separator + "to be done.txt");
 
         Pie_Encoded_Destination encoded_Image_destination = new Pie_Encoded_Destination();
         encoded_Image_destination.setLocal_file(new File(config.getUtils().getDesktopPath() + File.separator + "My_Image.png"));
