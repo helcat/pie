@@ -1,6 +1,14 @@
 package net.pie;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /** *******************************************************<br>
  * <b>Pie_Source</b><br>
@@ -11,6 +19,22 @@ public class Pie_Source {
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
     private Pie_Config config;
+
+    private Logger log = Logger.getLogger(this.getClass().getName());
+
+    /** *******************************************************<br>
+     * <b>Pie_Source</b><br>
+     * Sets a new instance of Pie_Config with default parameters.
+     **/
+    public Pie_Source() {
+        setConfig(new Pie_Config());
+    }
+
+    /** *******************************************************<br>
+     * <b>Pie_Source</b><br>
+     * @param config
+     * Sets a new instance with a given Pie_Config with custom parameters.
+     **/
     public Pie_Source(Pie_Config config) {
         setConfig(config);
     }
@@ -18,10 +42,53 @@ public class Pie_Source {
     /** *******************************************************<br>
      * <b>encrypt_Text</b><br>
      * Sets text to be used in the encoded image.
+     * @param text (This is a direct text to encoding option)
      **/
     public void encode_Text(String text) {
         setContent(text);
         setType(Pie_Source_Type.TEXT);
+    }
+
+    /** *******************************************************<br>
+     * <b>encode_Txt_File_Contents</b><br>
+     * Reads a text file, collects all the text and puts it to string.
+     * @param text_path (String Path to File)
+     **/
+    public void encode_Txt_File(String text_path) {
+        try {
+            encode_Txt_File(new File(text_path));
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Invalid File " + e.getMessage());
+            return;
+        }
+    }
+
+    /** *******************************************************<br>
+     * <b>encode_Txt_File</b><br>
+     * Reads a text file, collects all the text and puts it to string.
+     * @param text (File)
+     **/
+    public void encode_Txt_File(File text) {
+        Path filePath = text.toPath();
+        StringBuilder contentBuilder = new StringBuilder();
+        try (Stream<String> stream = Files.lines(Paths.get(filePath.toUri()), StandardCharsets.UTF_8)) {
+            stream.forEach(s -> contentBuilder.append(s).append("\n"));
+        } catch (IOException e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+            return;
+        }
+        setContent(contentBuilder.toString());
+        setType(Pie_Source_Type.TEXT);
+    }
+
+    /** *********************************************************<br>
+     * <b>Error</b><br>
+     * Set the log entry and set error if required
+     * @param level (Logging level)
+     * @param message (Logging Message)
+     **/
+    private void logging(Level level, String message) {
+        getLog().log(level,  message);
     }
 
     /** *******************************************************<br>
@@ -33,6 +100,7 @@ public class Pie_Source {
         switch (getType()) {
             case TEXT -> { return processText(); }
         }
+        logging(Level.SEVERE,"Unable to find encode process type");
         return null;
     }
 
@@ -43,11 +111,16 @@ public class Pie_Source {
     private byte[] processText() {
         if (getContent().isEmpty())
             return null;
-        StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
-        StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
-        byte[] bytes = config.getUtils().compress(append.toString());
-        String text = Pie_Base64.encodeBytes(bytes);
-        return text.getBytes(StandardCharsets.UTF_8);
+        try {
+            StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
+            StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
+            byte[] bytes = config.getUtils().compress(append.toString());
+            String text = Pie_Base64.encodeBytes(bytes);
+            return text.getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+            return null;
+        }
     }
 
     /** *******************************************************<br>
@@ -76,6 +149,14 @@ public class Pie_Source {
 
     public void setConfig(Pie_Config config) {
         this.config = config;
+    }
+
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
     }
 }
 

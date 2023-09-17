@@ -76,7 +76,8 @@ public class Pie_Encode {
         /** Process the image - send to destination if required) **/
         if (getConfig().getSave_Encoded_Image() != null && getEncoded_image() != null) {
             getConfig().getSave_Encoded_Image().setImage(getEncoded_image());
-            getConfig().getSave_Encoded_Image().save_Encoded_Image();
+            if (getConfig().getSave_Encoded_Image().save_Encoded_Image())
+                logging(Level.WARNING,"Encoding image was not saved");
         }
 
         logging(Level.INFO,"Encoding Complete");

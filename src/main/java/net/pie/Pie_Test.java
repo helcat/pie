@@ -28,12 +28,10 @@ public class Pie_Test {
      **/
     public Pie_Test(String arg) {
         BufferedImage image = encode(arg);
-
         if (image != null) {
             String value = decode(image);
             System.out.println(value);
         }
-
     }
 
     /** ******************************************************<br>
@@ -49,9 +47,10 @@ public class Pie_Test {
         config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);
 
         Pie_Source source = new Pie_Source(config);
-        source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
+        //source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
+        source.encode_Txt_File(config.getUtils().getDesktopPath() + File.separator + "commodoredot64@gmail.com.txt");
 
-        Pie_Destination encoded_Image_destination = new Pie_Destination();
+        Pie_Encoded_Destination encoded_Image_destination = new Pie_Encoded_Destination();
         encoded_Image_destination.setLocal_file(new File(config.getUtils().getDesktopPath() + File.separator + "My_Image.png"));
 
         config.setSave_Encoded_Image(encoded_Image_destination);

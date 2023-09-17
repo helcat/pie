@@ -1,16 +1,18 @@
 package net.pie;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
+/** *******************************************************************<br>
+ * <b>Pie_Config</b><br>
+ * This is optional. A new instance is automatically built when
+ **/
 public class Pie_Config {
     private final int rgbCount = 3;
     private Pie_Minimum minimum = null;
     private Pie_Utils utils = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
-    private Pie_Destination save_Encoded_Image;
+    private Pie_Encoded_Destination save_Encoded_Image;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -80,11 +82,11 @@ public class Pie_Config {
         this.error = error;
     }
 
-    public Pie_Destination getSave_Encoded_Image() {
+    public Pie_Encoded_Destination getSave_Encoded_Image() {
         return save_Encoded_Image;
     }
 
-    public void setSave_Encoded_Image(Pie_Destination save_Encoded_Image) {
+    public void setSave_Encoded_Image(Pie_Encoded_Destination save_Encoded_Image) {
         this.save_Encoded_Image = save_Encoded_Image;
     }
 }

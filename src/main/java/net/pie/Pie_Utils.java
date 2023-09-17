@@ -165,15 +165,16 @@ public class Pie_Utils {
      * @param buffer - the encoded BufferedImage
      * @param file - send in a file and the BufferedImage will be saved to it.
      **/
-    public void saveImage_to_file(BufferedImage buffer, File file) {
+    public boolean saveImage_to_file(BufferedImage buffer, File file) {
         if (buffer == null)
             logging(Level.SEVERE,"Image was not created");
         try {
             if (!isError())
-                ImageIO.write(buffer, "png", file);
+                return ImageIO.write(buffer, "png", file);
         } catch (IOException e) {
             logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
         }
+        return false;
     }
 
     /** *******************************************************<br>
