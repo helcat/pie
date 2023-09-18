@@ -1,7 +1,7 @@
-package net.pie;
+package net.pie.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.pie.Pie_Config;
+import net.pie.enums.Pie_Position;
 
 public class Pie_Minimum {
     private int width = 0;
@@ -12,7 +12,8 @@ public class Pie_Minimum {
      * <b>Pie_Minimum</b><br>
      * Sets the minimum size the encoded image can be. The width, height and position can be set<br>
      * When the encoded image is created, if the image is smaller than the minimum size is put into<br>
-     * another transparent image at the position requested. If zero is used the size of the encoded image is used.
+     * another transparent image at the position requested. If zero is used the size of the encoded image is used.<br>
+     * Note this is not a requirement. a default instance is set within the Pie_Config which can be changed if required.
      * @see Pie_Position Use Pie_Position to position the image.
      * @see Pie_Config this component is set as an object within the configuration. (Pie_Config)
      **/

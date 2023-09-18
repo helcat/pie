@@ -1,4 +1,6 @@
-package net.pie;
+package net.pie.utils;
+
+import net.pie.utils.Pie_Utils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

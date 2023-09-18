@@ -1,4 +1,6 @@
-package net.pie;
+package net.pie.utils;
+
+import net.pie.Pie_Config;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageInputStream;

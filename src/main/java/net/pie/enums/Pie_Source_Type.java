@@ -1,4 +1,6 @@
-package net.pie;
+package net.pie.enums;
+
+import net.pie.Pie_Source;
 
 /** *******************************************************<br>
  * <b>Pie_Source_Type</b><br>

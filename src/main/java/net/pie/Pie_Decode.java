@@ -1,5 +1,7 @@
 package net.pie;
 
+import net.pie.utils.Pie_Base64;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
