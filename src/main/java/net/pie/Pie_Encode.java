@@ -71,6 +71,13 @@ public class Pie_Encode {
             }
         }
 
+        // finish
+        if (r != null && g == null)
+            list.add(createColor(r, 0, 0));
+        else if (r != null && g != null)
+            list.add(createColor(r, g, 0));
+
+
         createImage(size, list);
 
         /** Process the image - send to destination if required) **/

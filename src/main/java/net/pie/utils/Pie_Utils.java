@@ -2,6 +2,9 @@ package net.pie.utils;
 
 import net.pie.Pie_Config;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
@@ -230,6 +233,42 @@ public class Pie_Utils {
         File file = view.getHomeDirectory();
         return file.getPath();
     }
+
+    public final static String encryptionKey =        "cbgf5ee0-a594-11"; //"AccEncryptionKey"; //"aesEncryptionKey";
+    public final static String EncryptioninitVector = "egc9d5c0-t594-48"; //"encryptionIntVec";
+
+    /****************************************************
+     * encrypt
+     ****************************************************/
+    public String encrypt(String value) {
+        try {
+            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
+            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
+            byte[] encrypted = cipher.doFinal(value.getBytes());
+            return Pie_Base64.encodeBytes(encrypted);
+        } catch (Exception ex) {
+            logging(Level.SEVERE,MessageFormat.format("encryption - {0}", ex.getMessage()));
+        }
+        return null;
+    }
+
+    public String decrypt(String encrypted) {
+        try {
+            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
+            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+            byte[] toEncrypt = Pie_Base64.decode(encrypted);
+            byte[] original = cipher.doFinal(toEncrypt);
+            return new String(original);
+        } catch (Exception ex) {
+            logging(Level.SEVERE,MessageFormat.format("decryption - {0}", ex.getMessage()));
+        }
+        return null;
+    }
+
 
     /** *******************************************************<br>
      * <b>getters and setters</b><br>

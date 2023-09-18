@@ -137,7 +137,8 @@ public class Pie_Source {
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
-            byte[] bytes = config.getUtils().compress(append.toString());
+            String encrypted = getConfig().getUtils().encrypt(append.toString());
+            byte[] bytes = config.getUtils().compress(encrypted);
             String text = encoding_addon() + Pie_Base64.encodeBytes(bytes);
             return text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {

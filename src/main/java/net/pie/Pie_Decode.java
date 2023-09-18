@@ -92,7 +92,8 @@ public class Pie_Decode {
         String base64_text = collect_encoded_parms(new String(getConfig().getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
 
         try {
-            setDecoded_Message(getConfig().getUtils().decompress(Pie_Base64.decode(base64_text)));
+            String decrypted = getConfig().getUtils().decrypt(getConfig().getUtils().decompress(Pie_Base64.decode(base64_text)));
+            setDecoded_Message(decrypted);
         } catch (IOException e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
