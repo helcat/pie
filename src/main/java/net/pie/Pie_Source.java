@@ -137,9 +137,9 @@ public class Pie_Source {
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
-            byte[] bytes = config.getUtils().compress(append.toString());
-            String text = encoding_addon() + Pie_Base64.encodeBytes(bytes);
-            return text.getBytes(StandardCharsets.UTF_8);
+            byte[] compressedBytes = config.getUtils().compress(append.toString());
+            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(compressedBytes);
+            return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return null;

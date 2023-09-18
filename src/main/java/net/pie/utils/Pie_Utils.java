@@ -240,13 +240,13 @@ public class Pie_Utils {
     /****************************************************
      * encrypt
      ****************************************************/
-    public String encrypt(String value) {
+    public String encrypt(byte[] value) {
         try {
             IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
             SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-            byte[] encrypted = cipher.doFinal(value.getBytes());
+            byte[] encrypted = cipher.doFinal(value);
             return Pie_Base64.encodeBytes(encrypted);
         } catch (Exception ex) {
             logging(Level.SEVERE,MessageFormat.format("encryption - {0}", ex.getMessage()));
@@ -254,15 +254,16 @@ public class Pie_Utils {
         return null;
     }
 
-    public String decrypt(String encrypted) {
+    public byte[] decrypt(String encrypted) {
         try {
             IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
             SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
             byte[] toEncrypt = Pie_Base64.decode(encrypted);
-            byte[] original = cipher.doFinal(toEncrypt);
-            return new String(original);
+            return cipher.doFinal(toEncrypt);
+            //String decrypted = new String(original);
+           // return decrypted;
         } catch (Exception ex) {
             logging(Level.SEVERE,MessageFormat.format("decryption - {0}", ex.getMessage()));
         }
