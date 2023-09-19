@@ -150,8 +150,11 @@ public class Pie_Source {
      * <b>Add on to the encoding</b><br>
      **/
     private String encoding_addon() {
-        String filename_encoding = getFile_name() != null && !getFile_name().isEmpty() ? beginning + getFile_name() + end : null;
-        return (filename_encoding != null ? filename_encoding : "");
+        StringBuilder addon = new StringBuilder("");
+        addon.append(getFile_name() != null && !getFile_name().isEmpty() ? getFile_name()  : "");
+        addon.append("?");
+        addon.append(getType().ordinal());
+        return beginning + getConfig().getUtils().encrypt(addon.toString().getBytes(StandardCharsets.UTF_8)) + end;
     }
 
     /** *******************************************************<br>

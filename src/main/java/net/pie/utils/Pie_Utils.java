@@ -43,7 +43,6 @@ public class Pie_Utils {
         }
 
         byte[] byteArray = new byte[list.length];
-
         for (int i = 0; i < list.length; i++)
             byteArray[i] = (byte) list[i];
 

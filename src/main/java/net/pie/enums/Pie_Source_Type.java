@@ -11,7 +11,19 @@ public enum Pie_Source_Type {
     TEXT,
     TEXT_FILE,
     FILE,
-    DOWNLOAD
+    DOWNLOAD;
+
+    /** *******************************************<br>
+     * <b>get Pie_Source_Type from saved ordinal</b>
+     * @param ordinal
+     * @return Pie_Source_Type
+     */
+    public static Pie_Source_Type get(int ordinal) {
+        for (Pie_Source_Type s : Pie_Source_Type.values())
+            if (s.ordinal() == ordinal)
+                return s;
+        return null;
+    }
 }
 
 

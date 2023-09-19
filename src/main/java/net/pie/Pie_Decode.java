@@ -1,6 +1,8 @@
 package net.pie;
 
+import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Base64;
+import net.pie.utils.Pie_Decoded_Destination;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -101,10 +103,26 @@ public class Pie_Decode {
         logging(Level.INFO,"Decoding Completed");
     }
 
+    /** *******************************************************************<br>
+     * Collect any parameters that have been encoded
+     * @param base64_text
+     * @return String
+     */
     private String collect_encoded_parms(String base64_text) {
         if (base64_text.startsWith(beginning) && base64_text.contains(end)) {
             String parms = base64_text.substring(0, base64_text.lastIndexOf(end) + end.length());
             base64_text = base64_text.replace(parms, "");
+
+            parms = parms.replace(beginning ,"");
+            parms = parms.replace(end ,"");
+            parms = new String(getConfig().getUtils().decrypt(parms));
+            if (parms.lastIndexOf("?") != -1) {
+                String[] parts = parms.split("\\?", 2);
+                if (getConfig().getSave_Decoded_Source() == null)
+                    getConfig().setSave_Decoded_Source(new Pie_Decoded_Destination());
+                getConfig().getSave_Decoded_Source().setFile_name(parts[0]);
+                getConfig().getSave_Decoded_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
+            }
         }
         return base64_text;
     }

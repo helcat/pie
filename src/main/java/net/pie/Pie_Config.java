@@ -1,5 +1,6 @@
 package net.pie;
 
+import net.pie.utils.Pie_Decoded_Destination;
 import net.pie.utils.Pie_Encoded_Destination;
 import net.pie.utils.Pie_Minimum;
 import net.pie.utils.Pie_Utils;
@@ -17,6 +18,7 @@ public class Pie_Config {
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private Pie_Encoded_Destination save_Encoded_Image;
+    private Pie_Decoded_Destination save_Decoded_Source;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -92,6 +94,14 @@ public class Pie_Config {
 
     public void setSave_Encoded_Image(Pie_Encoded_Destination save_Encoded_Image) {
         this.save_Encoded_Image = save_Encoded_Image;
+    }
+
+    public Pie_Decoded_Destination getSave_Decoded_Source() {
+        return save_Decoded_Source;
+    }
+
+    public void setSave_Decoded_Source(Pie_Decoded_Destination save_Decoded_Source) {
+        this.save_Decoded_Source = save_Decoded_Source;
     }
 }
 
