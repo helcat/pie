@@ -61,7 +61,7 @@ public class Pie_Test {
     private Pie_Config build_a_encoding_config() {
         Pie_Config config = new Pie_Config();
         config.setLog_level(Level.SEVERE);                                                  // Optional
-        config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);     // Optional
+        config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);   // Optional
         config.setSave_Encoded_Image(save_Image_After_Encoding());                          // Optional
         config.setSave_Decoded_Source(save_Source_After_Decoding());                        // Optional
         return config;
@@ -96,7 +96,7 @@ public class Pie_Test {
      */
     private Pie_Decoded_Destination save_Source_After_Decoding() {
         Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
-        decoded_Source_destination.setLocal_folder(new File(getUtils().getDesktopPath() + File.separator + "shared"));
+        decoded_Source_destination.setLocal_folder(new File(getUtils().getDesktopPath() + File.separator + "batch"));
         return decoded_Source_destination;
     }
 

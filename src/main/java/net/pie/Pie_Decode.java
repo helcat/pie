@@ -5,7 +5,7 @@ import net.pie.utils.Pie_Base64;
 import net.pie.utils.Pie_Decoded_Destination;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +16,7 @@ public class Pie_Decode {
     private String decoded_Message;
     private Pie_Config config;
     private BufferedImage toBeDecrypted;
+    private ByteArrayOutputStream decoded_bytes;
     private Logger log = Logger.getLogger(this.getClass().getName());
 
     /** *********************************************************<br>
@@ -95,7 +96,7 @@ public class Pie_Decode {
             byte[] from_image_bytes = getConfig().getUtils().convert_Array(message);
             String base64_text = collect_encoded_parms(new String(from_image_bytes, StandardCharsets.UTF_8).trim());
             byte[] decrypted  = getConfig().getUtils().decrypt(base64_text);
-            setDecoded_Message(getConfig().getUtils().decompress(decrypted));
+            save(decrypted);
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
@@ -104,11 +105,34 @@ public class Pie_Decode {
     }
 
     /** *******************************************************************<br>
-     * Collect any parameters that have been encoded
+     * <b>save the decoded bytes for the client to decide what to do with them</b>
+     * @param bytes
+     */
+    private void save(byte[] bytes) {
+        if (getConfig().getSave_Decoded_Source().getSource_type() == Pie_Source_Type.TEXT) {
+            setDecoded_Message(getConfig().getUtils().decompress_return_String(bytes));
+        }else{
+            setDecoded_bytes(getConfig().getUtils().decompress_return_Baos(bytes));
+            if (getConfig().getSave_Decoded_Source().getLocal_folder() != null && getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory()) {
+                File f = new File(getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory() + File.separator + getConfig().getSave_Decoded_Source().getFile_name());
+                try(OutputStream outputStream = new FileOutputStream(f)) {
+                    getDecoded_bytes().writeTo(outputStream);
+                } catch (IOException e) {
+                    logging(Level.SEVERE,"Saving to file error : " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    /** *******************************************************************<br>
+     * <b>Collect any parameters that have been encoded</b>
      * @param base64_text
      * @return String
      */
     private String collect_encoded_parms(String base64_text) {
+        if (getConfig().getSave_Decoded_Source() == null)
+            getConfig().setSave_Decoded_Source(new Pie_Decoded_Destination());
+
         if (base64_text.startsWith(beginning) && base64_text.contains(end)) {
             String parms = base64_text.substring(0, base64_text.lastIndexOf(end) + end.length());
             base64_text = base64_text.replace(parms, "");
@@ -117,9 +141,7 @@ public class Pie_Decode {
             parms = parms.replace(end ,"");
             parms = new String(getConfig().getUtils().decrypt(parms));
             if (parms.lastIndexOf("?") != -1) {
-                String[] parts = parms.split("\\?", 2);
-                if (getConfig().getSave_Decoded_Source() == null)
-                    getConfig().setSave_Decoded_Source(new Pie_Decoded_Destination());
+                String[] parts = parms.split("\\?", 0);
                 getConfig().getSave_Decoded_Source().setFile_name(parts[0]);
                 getConfig().getSave_Decoded_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
             }
@@ -158,4 +180,11 @@ public class Pie_Decode {
         return log;
     }
 
+    public ByteArrayOutputStream getDecoded_bytes() {
+        return decoded_bytes;
+    }
+
+    public void setDecoded_bytes(ByteArrayOutputStream decoded_bytes) {
+        this.decoded_bytes = decoded_bytes;
+    }
 }

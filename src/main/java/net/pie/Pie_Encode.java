@@ -56,7 +56,7 @@ public class Pie_Encode {
 
         Integer r = null;
         Integer g = null;
-        Integer b = null;
+        Integer b;
         List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
@@ -80,7 +80,7 @@ public class Pie_Encode {
 
         createImage(size, list);
 
-        /** Process the image - send to destination if required) **/
+        /** Process the image - send to destination if required **/
         if (getConfig().getSave_Encoded_Image() != null && getEncoded_image() != null) {
             getConfig().getSave_Encoded_Image().setImage(getEncoded_image());
             if (getConfig().getSave_Encoded_Image().save_Encoded_Image())

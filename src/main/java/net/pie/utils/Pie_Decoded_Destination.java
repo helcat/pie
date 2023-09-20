@@ -54,7 +54,7 @@ public class Pie_Decoded_Destination {
         this.web_address = web_address;
     }
 
-    private File getLocal_folder() {
+    public File getLocal_folder() {
         return local_folder;
     }
 

@@ -25,6 +25,8 @@ public class Pie_Source {
     private String content;
     private Pie_Config config;
     private String file_name = null;
+    private byte[] content_bytes = null;
+
 
     private Logger log = Logger.getLogger(this.getClass().getName());
 
@@ -76,9 +78,9 @@ public class Pie_Source {
      * The file name will be taken from the path.
      * @param text_path (String Path to File)
      **/
-    public void encode_Txt_File(String text_path) {
+    public void encode_Txt_File_To_String(String text_path) {
         try {
-            encode_Txt_File(new File(text_path));
+            encode_Txt_File_To_String(new File(text_path));
         } catch (Exception e) {
             logging(Level.SEVERE,"Invalid File " + e.getMessage());
             return;
@@ -86,11 +88,11 @@ public class Pie_Source {
     }
 
     /** *******************************************************<br>
-     * <b>encode_Txt_File</b><br>
+     * <b>encode_Txt_File_To_String</b><br>
      * Reads a text file, collects all the text and puts it to string.
      * @param text (File)
      **/
-    public void encode_Txt_File(File text) {
+    public void encode_Txt_File_To_String(File text) {
         setFile_name(text.getName());
         Path filePath = text.toPath();
         StringBuilder contentBuilder = new StringBuilder();
@@ -122,6 +124,7 @@ public class Pie_Source {
     public byte[] encode_process() {
         switch (getType()) {
             case TEXT -> { return processText(); }
+            case TEXT_FILE -> { return processFile(); }
         }
         logging(Level.SEVERE,"Unable to find encode process type");
         return null;
@@ -138,6 +141,23 @@ public class Pie_Source {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
             byte[] compressedBytes = config.getUtils().compress(append.toString());
+            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(compressedBytes);
+            return base64Text.getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+            return null;
+        }
+    }
+
+    /** *******************************************************<br>
+     * <b>File processing</b><br>
+     * The process for encoding direct text.
+     **/
+    private byte[] processFile() {
+        if (getContent().isEmpty())
+            return null;
+        try {
+            byte[] compressedBytes = config.getUtils().compressBytes(getContent_bytes());
             String base64Text = encoding_addon() + getConfig().getUtils().encrypt(compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
@@ -199,6 +219,14 @@ public class Pie_Source {
 
     public void setFile_name(String file_name) {
         this.file_name = file_name;
+    }
+
+    public byte[] getContent_bytes() {
+        return content_bytes;
+    }
+
+    public void setContent_bytes(byte[] content_bytes) {
+        this.content_bytes = content_bytes;
     }
 }
 
