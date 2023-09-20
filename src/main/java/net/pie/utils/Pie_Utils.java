@@ -1,6 +1,7 @@
 package net.pie.utils;
 
 import net.pie.Pie_Config;
+import net.pie.enums.Pie_Constants;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -185,7 +186,7 @@ public class Pie_Utils {
     public ByteArrayOutputStream saveImage_to_baos(BufferedImage buffer) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            ImageIO.write(buffer, "PNG", baos);
+            ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), baos);
         } catch (IOException e) {
             logging(Level.SEVERE,MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
         }
@@ -203,7 +204,7 @@ public class Pie_Utils {
             logging(Level.SEVERE,"Image was not created");
         try {
             if (!isError())
-                return ImageIO.write(buffer, "png", file);
+                return ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), file);
         } catch (IOException e) {
             logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
         }
@@ -219,7 +220,7 @@ public class Pie_Utils {
         InputStream is = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            boolean ok = ImageIO.write(buffer, "PNG", baos);
+            boolean ok = ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), baos);
             if (ok) {
                 is = new ByteArrayInputStream(baos.toByteArray());
                 baos.close();
@@ -232,25 +233,6 @@ public class Pie_Utils {
         }
         return is;
     }
-
-    /**
-     *     // Create raw data.
-     *     Map<Integer, String> data = new HashMap<Integer, String>();
-     *     data.put(1, "hello");
-     *     data.put(2, "world");
-     *     System.out.println(data.toString());
-     *
-     *     // Convert Map to byte array
-     *     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-     *     ObjectOutputStream out = new ObjectOutputStream(byteOut);
-     *     out.writeObject(data);
-     *
-     *     // Parse byte array to Map
-     *     ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
-     *     ObjectInputStream in = new ObjectInputStream(byteIn);
-     *     Map<Integer, String> data2 = (Map<Integer, String>) in.readObject();
-     *     System.out.println(data2.toString());
-     */
 
     /** *******************************************************<br>
      * <b>get path to desktop</b><br>
@@ -268,11 +250,22 @@ public class Pie_Utils {
     /****************************************************
      * encrypt
      ****************************************************/
-    public String encrypt(byte[] value) {
+    public String encrypt(boolean encrypt, byte[] value) {
+        if (!encrypt) {
+            try {
+                logging(Level.INFO,"No Encryption Added");
+                return Pie_Base64.encodeBytes(value);
+            } catch (Exception e) {
+                logging(Level.SEVERE,MessageFormat.format("decryption - {0}", e.getMessage()));
+                return null;
+            }
+        }
+
         try {
-            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
-            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            logging(Level.INFO,"Encryption Added");
+            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes(StandardCharsets.UTF_8));
+            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes(StandardCharsets.UTF_8), Pie_Constants.KEYSPEC.getParm2());
+            Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
             byte[] encrypted = cipher.doFinal(value);
             return Pie_Base64.encodeBytes(encrypted);
@@ -282,16 +275,24 @@ public class Pie_Utils {
         return null;
     }
 
-    public byte[] decrypt(String encrypted) {
+    public byte[] decrypt(boolean decrypt, String encrypted) {
+        if (!decrypt) {
+            try {
+                logging(Level.INFO,"No Decryption Required");
+                return Pie_Base64.decode(encrypted);
+            } catch (IOException e) {
+                logging(Level.SEVERE,MessageFormat.format("decryption - {0}", e.getMessage()));
+                return null;
+            }
+        }
         try {
-            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes("UTF-8"));
-            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            logging(Level.INFO,"Decryption In Progress");
+            IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes(StandardCharsets.UTF_8));
+            SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes(StandardCharsets.UTF_8), Pie_Constants.KEYSPEC.getParm2());
+            Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
             byte[] toEncrypt = Pie_Base64.decode(encrypted);
             return cipher.doFinal(toEncrypt);
-            //String decrypted = new String(original);
-           // return decrypted;
         } catch (Exception ex) {
             logging(Level.SEVERE,MessageFormat.format("decryption - {0}", ex.getMessage()));
         }

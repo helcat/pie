@@ -1,5 +1,6 @@
 package net.pie;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Base64;
 
@@ -19,8 +20,6 @@ import java.util.stream.Stream;
  * This is used to collect the data to build the encoded image.
  **/
 public class Pie_Source {
-    private static String beginning = "{**";
-    private static String end = "**}";
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
     private Pie_Config config;
@@ -106,6 +105,41 @@ public class Pie_Source {
         setType(Pie_Source_Type.TEXT);
     }
 
+    /** *******************************************************<br>
+     * <b>encode_File</b><br>
+     * Reads a file converts it to bytes
+     * @param file_path (Path to File)
+     **/
+    public void encode_File(String file_path) {
+        encode_File(new File(file_path));
+    }
+
+    /** *******************************************************<br>
+     * <b>encode_File</b><br>
+     * Reads a file converts it to bytes
+     * @param file (File)
+     **/
+    public void encode_File(File file) {
+        Path filePath = file.toPath();
+        try {
+            encode_File(Files.readAllBytes(filePath), file.getName());
+        } catch (IOException e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+        }
+    }
+
+    /** *******************************************************<br>
+     * <b>encode_File</b><br>
+     * Supply the bytes your self, and give a file name
+     * @param file_bytes (File)
+     * @param file_name (File)
+     **/
+    public void encode_File(byte[] file_bytes, String file_name) {
+        setFile_name(file_name);
+        setContent_bytes(file_bytes);
+        setType(Pie_Source_Type.FILE);
+    }
+
     /** *********************************************************<br>
      * <b>logging</b><br>
      * Set the log entry and set error if required
@@ -124,7 +158,7 @@ public class Pie_Source {
     public byte[] encode_process() {
         switch (getType()) {
             case TEXT -> { return processText(); }
-            case TEXT_FILE -> { return processFile(); }
+            case FILE -> { return processFile(); }
         }
         logging(Level.SEVERE,"Unable to find encode process type");
         return null;
@@ -139,9 +173,9 @@ public class Pie_Source {
             return null;
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
-            StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % config.getRgbCount()));
+            StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
             byte[] compressedBytes = config.getUtils().compress(append.toString());
-            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(compressedBytes);
+            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(getConfig().isAddEncryption(), compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -154,11 +188,11 @@ public class Pie_Source {
      * The process for encoding direct text.
      **/
     private byte[] processFile() {
-        if (getContent().isEmpty())
+        if (getContent_bytes() == null || getContent_bytes().length == 0)
             return null;
         try {
             byte[] compressedBytes = config.getUtils().compressBytes(getContent_bytes());
-            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(compressedBytes);
+            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(getConfig().isAddEncryption(),compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -174,7 +208,11 @@ public class Pie_Source {
         addon.append(getFile_name() != null && !getFile_name().isEmpty() ? getFile_name()  : "");
         addon.append("?");
         addon.append(getType().ordinal());
-        return beginning + getConfig().getUtils().encrypt(addon.toString().getBytes(StandardCharsets.UTF_8)) + end;
+        addon.append("?");
+        addon.append(getConfig().isAddEncryption() ? "E":"N");
+        return Pie_Constants.PARM_BEGINNING.getParm2() +
+                getConfig().getUtils().encrypt(true,addon.toString().getBytes(StandardCharsets.UTF_8)) +
+                Pie_Constants.PARM_ENDING.getParm2();
     }
 
     /** *******************************************************<br>

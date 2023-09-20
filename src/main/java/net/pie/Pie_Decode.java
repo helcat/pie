@@ -1,5 +1,6 @@
 package net.pie;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Base64;
 import net.pie.utils.Pie_Decoded_Destination;
@@ -11,8 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Pie_Decode {
-    private static String beginning = "{**";
-    private static String end = "**}";
     private String decoded_Message;
     private Pie_Config config;
     private BufferedImage toBeDecrypted;
@@ -73,7 +72,7 @@ public class Pie_Decode {
         int retrievedGreen;
         int retrievedBlue;
 
-        int[] message = new int[((getToBeDecrypted().getHeight() * getToBeDecrypted().getWidth()) * getConfig().getRgbCount())];
+        int[] message = new int[((getToBeDecrypted().getHeight() * getToBeDecrypted().getWidth()) * Pie_Constants.RGB_COUNT.getParm1())];
         for (int y = 0; y < getToBeDecrypted().getHeight(); y++) {
             for (int x = 0; x < getToBeDecrypted().getWidth(); x++) {
                 pixelColor = getToBeDecrypted().getRGB(x, y);
@@ -92,11 +91,11 @@ public class Pie_Decode {
             }
         }
 
+        setToBeDecrypted(null); // clear bufferedimage save memory
+
         try {
-            byte[] from_image_bytes = getConfig().getUtils().convert_Array(message);
-            String base64_text = collect_encoded_parms(new String(from_image_bytes, StandardCharsets.UTF_8).trim());
-            byte[] decrypted  = getConfig().getUtils().decrypt(base64_text);
-            save(decrypted);
+            String decode_this = collect_encoded_parms(new String(getConfig().getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
+            save(getConfig().getUtils().decrypt(getConfig().isAddEncryption(), decode_this));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
@@ -114,7 +113,7 @@ public class Pie_Decode {
         }else{
             setDecoded_bytes(getConfig().getUtils().decompress_return_Baos(bytes));
             if (getConfig().getSave_Decoded_Source().getLocal_folder() != null && getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory()) {
-                File f = new File(getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory() + File.separator + getConfig().getSave_Decoded_Source().getFile_name());
+                File f = new File(getConfig().getSave_Decoded_Source().getLocal_folder() + File.separator + getConfig().getSave_Decoded_Source().getFile_name());
                 try(OutputStream outputStream = new FileOutputStream(f)) {
                     getDecoded_bytes().writeTo(outputStream);
                 } catch (IOException e) {
@@ -133,17 +132,18 @@ public class Pie_Decode {
         if (getConfig().getSave_Decoded_Source() == null)
             getConfig().setSave_Decoded_Source(new Pie_Decoded_Destination());
 
-        if (base64_text.startsWith(beginning) && base64_text.contains(end)) {
-            String parms = base64_text.substring(0, base64_text.lastIndexOf(end) + end.length());
+        if (base64_text.startsWith(Pie_Constants.PARM_BEGINNING.getParm2()) && base64_text.contains(Pie_Constants.PARM_ENDING.getParm2())) {
+            String parms = base64_text.substring(0, base64_text.lastIndexOf(Pie_Constants.PARM_ENDING.getParm2()) + Pie_Constants.PARM_ENDING.getParm2().length());
             base64_text = base64_text.replace(parms, "");
 
-            parms = parms.replace(beginning ,"");
-            parms = parms.replace(end ,"");
-            parms = new String(getConfig().getUtils().decrypt(parms));
+            parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
+            parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
+            parms = new String(getConfig().getUtils().decrypt(true, parms));
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
                 getConfig().getSave_Decoded_Source().setFile_name(parts[0]);
                 getConfig().getSave_Decoded_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
+                getConfig().setAddEncryption(parts[2].equalsIgnoreCase("e"));
             }
         }
         return base64_text;

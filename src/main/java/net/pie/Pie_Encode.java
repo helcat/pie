@@ -1,5 +1,7 @@
 package net.pie;
 
+import net.pie.enums.Pie_Constants;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
@@ -51,12 +53,18 @@ public class Pie_Encode {
         if (isError() || originalArray == null)
             return;
 
-        double dimension = Math.sqrt((double) originalArray.length / getConfig().getRgbCount());
+        double dimension = Math.sqrt((double) originalArray.length / Pie_Constants.RGB_COUNT.getParm1());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
+        if (size > Pie_Constants.MAX_IMAGE_SIZE.getParm1()) {
+            logging(Level.SEVERE,"Cannot Generate Image Size " + size  + " x " + size);
+            logging(Level.SEVERE,"Max Allowed Image Size " + Pie_Constants.MAX_IMAGE_SIZE.getParm1()  + " x " + Pie_Constants.MAX_IMAGE_SIZE.getParm1());
+            return;
+        }
+        logging(Level.INFO,"Generating Image Size " + size  + " x " + size);
 
         Integer r = null;
         Integer g = null;
-        Integer b;
+        int b;
         List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
@@ -74,7 +82,7 @@ public class Pie_Encode {
         // finish
         if (r != null && g == null)
             list.add(createColor(r, 0, 0));
-        else if (r != null && g != null)
+        else if (r != null)
             list.add(createColor(r, g, 0));
 
 

@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.utils.Pie_Utils;
 
 import java.awt.image.BufferedImage;
@@ -15,7 +16,6 @@ import java.net.URL;
 public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
-
     private BufferedImage image = null;
 
     /** *******************************************************************<br>
@@ -39,7 +39,7 @@ public class Pie_Encoded_Destination {
      **/
     public boolean save_Encoded_Image() {
         Pie_Utils utils = new Pie_Utils();
-        if (getLocal_file() != null && getImage() != null && getLocal_file().getName().toLowerCase().endsWith("png"))
+        if (getLocal_file() != null && getImage() != null && getLocal_file().getName().toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             return utils.saveImage_to_file(getImage(), getLocal_file());
         return false;
     }

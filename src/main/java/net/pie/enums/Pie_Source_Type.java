@@ -9,7 +9,6 @@ import net.pie.Pie_Source;
  **/
 public enum Pie_Source_Type {
     TEXT,
-    TEXT_FILE,
     FILE,
     DOWNLOAD;
 

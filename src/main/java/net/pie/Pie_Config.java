@@ -12,13 +12,13 @@ import java.util.logging.Level;
  * This is optional. A new instance is automatically built when
  **/
 public class Pie_Config {
-    private final int rgbCount = 3;
     private Pie_Minimum minimum = null;
     private Pie_Utils utils = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private Pie_Encoded_Destination save_Encoded_Image;
     private Pie_Decoded_Destination save_Decoded_Source;
+    private boolean addEncryption = true;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -46,10 +46,6 @@ public class Pie_Config {
 
     public void setMinimum(Pie_Minimum minimum) {
         this.minimum = minimum == null ? new Pie_Minimum() : minimum;
-    }
-
-    public int getRgbCount() {
-        return rgbCount;
     }
 
     public Pie_Utils getUtils() {
@@ -102,6 +98,14 @@ public class Pie_Config {
 
     public void setSave_Decoded_Source(Pie_Decoded_Destination save_Decoded_Source) {
         this.save_Decoded_Source = save_Decoded_Source;
+    }
+
+    public boolean isAddEncryption() {
+        return addEncryption;
+    }
+
+    public void setAddEncryption(boolean addEncryption) {
+        this.addEncryption = addEncryption;
     }
 }
 
