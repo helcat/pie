@@ -76,7 +76,7 @@ public class Pie_Test {
     private Pie_Source build_a_source(Pie_Config config) {
         Pie_Source source = new Pie_Source(config);
         //source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
-        source.encode_Txt_File(getUtils().getDesktopPath() + File.separator + "hello.txt");
+        source.encode_Txt_File_To_String(getUtils().getDesktopPath() + File.separator + "hello.txt");
         return source;
     }
 
