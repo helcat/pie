@@ -14,7 +14,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.CharacterIterator;
 import java.text.MessageFormat;
+import java.text.StringCharacterIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
@@ -33,7 +35,7 @@ public class Pie_Utils {
     }
     private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
-
+    private Runtime runtime = Runtime.getRuntime();
     /** *********************************************************<br>
      * <b>Error</b><br>
      * Set the log entry and set error if required
@@ -290,6 +292,44 @@ public class Pie_Utils {
         return null;
     }
 
+    /**
+     * *****************************************************<br>
+     * <b>Shows Used Memory in logs</b><br>
+     *
+     * @return
+     */
+    public void memory() {
+        logging(Level.INFO,"Memory Used : " +
+                humanReadableByteCountSI(runtime.totalMemory() - runtime.freeMemory())
+        );
+    }
+/*
+	Runtime runtime = Runtime.getRuntime();
+		JSONObject j = new JSONObject();
+		j.put("total", runtime.totalMemory());
+		j.put("free", runtime.freeMemory());
+		j.put("max", runtime.maxMemory());
+		j.put("used", runtime.totalMemory() - runtime.freeMemory());
+
+		j.put("free-text", FileUtils.byteCountToDisplaySize(runtime.freeMemory()));
+		j.put("total-text", FileUtils.byteCountToDisplaySize(runtime.totalMemory()));
+		j.put("max-text", FileUtils.byteCountToDisplaySize(runtime.maxMemory()));
+		j.put("used-text", FileUtils.byteCountToDisplaySize(runtime.totalMemory() - runtime.freeMemory()));
+		return j;
+ */
+
+    public String humanReadableByteCountSI(long bytes) {
+        if (-1000 < bytes && bytes < 1000) {
+            return bytes + " B";
+        }
+        CharacterIterator ci = new StringCharacterIterator("kMGTPE");
+        while (bytes <= -999_950 || bytes >= 999_950) {
+            bytes /= 1000;
+            ci.next();
+        }
+        return String.format("%.1f %cB", bytes / 1000.0, ci.current());
+    }
+
 
     /** *******************************************************<br>
      * <b>getters and setters</b><br>
@@ -316,6 +356,14 @@ public class Pie_Utils {
 
     public void setError(boolean error) {
         this.error = error;
+    }
+
+    public Runtime getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(Runtime runtime) {
+        this.runtime = runtime;
     }
 }
 

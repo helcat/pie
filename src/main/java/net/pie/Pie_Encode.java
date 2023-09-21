@@ -1,10 +1,12 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.utils.Pie_Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.nio.charset.StandardCharsets;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,13 +18,14 @@ public class Pie_Encode {
     private Pie_Source source;
     private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
-
+    private Pie_Utils utils = new Pie_Utils();
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
      * @param source
      * @see Pie_Source Pie_Source to load in the content.
      **/
     public Pie_Encode(Pie_Source source) {
+        getUtils().memory();
         setSource(source);
         setConfig(source.getConfig());
     }
@@ -209,5 +212,13 @@ public class Pie_Encode {
 
     public boolean isError() {
         return error;
+    }
+
+    public Pie_Utils getUtils() {
+        return utils;
+    }
+
+    public void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }

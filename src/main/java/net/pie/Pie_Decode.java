@@ -114,6 +114,7 @@ public class Pie_Decode {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
         }
         logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
+        getUtils().memory();
     }
 
     /** *******************************************************************<br>
