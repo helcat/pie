@@ -5,7 +5,9 @@ import net.pie.utils.Pie_Encoded_Destination;
 import net.pie.utils.Pie_Minimum;
 import net.pie.utils.Pie_Utils;
 
+import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.zip.Deflater;
 
 /** *******************************************************************<br>
  * <b>Pie_Config</b><br>
@@ -15,9 +17,10 @@ public class Pie_Config {
     private Pie_Minimum encoder_Minimum = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
+    private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private Pie_Encoded_Destination save_Encoder_Image;
     private Pie_Decoded_Destination save_Decoder_Source;
-    private boolean encoder_Add_Encryption = true;
+    private boolean encoder_Add_Encryption = false; // Set outside not inside
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -96,6 +99,28 @@ public class Pie_Config {
 
     public void setEncoder_Add_Encryption(boolean encoder_Add_Encryption) {
         this.encoder_Add_Encryption = encoder_Add_Encryption;
+    }
+
+    public int getEncoder_Compression_Level() {
+        return encoder_Compression_Level;
+    }
+
+    /** ***************************************************************<br>
+     * <b>Allowed Values</b><br>
+     * Deflater.BEST_COMPRESSION<br>
+     * Deflater.DEFLATED<br>
+     * Deflater.FULL_FLUSH<br>
+     * Deflater.HUFFMAN_ONLY<br>
+     * Deflater.BEST_SPEED      <b><- Default</b><br>
+     * Deflater.NO_COMPRESSION<br>
+     * @param encoder_Compression_Level (int)
+     */
+    public void setEncoder_Compression_Level(int encoder_Compression_Level) {
+        if (!Arrays.asList(Deflater.NO_COMPRESSION, Deflater.BEST_SPEED, Deflater.HUFFMAN_ONLY,
+                Deflater.FULL_FLUSH, Deflater.DEFLATED, Deflater.BEST_COMPRESSION).
+                contains(encoder_Compression_Level))
+            encoder_Compression_Level = Deflater.BEST_SPEED;
+        this.encoder_Compression_Level = encoder_Compression_Level;
     }
 }
 

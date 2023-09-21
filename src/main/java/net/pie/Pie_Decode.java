@@ -56,6 +56,16 @@ public class Pie_Decode {
     }
 
     /** *********************************************************<br>
+     * <b>Check if in error</b>
+     * @return boolean
+     */
+    private boolean isError() {
+        if (getConfig().isError() || getUtils().isError())
+            return true;
+        return false;
+    }
+
+    /** *********************************************************<br>
      * <b>decode</b><br>
      * After setting Pie_Decode use decode() to start the decoding process.
      * This allows for changing of settings before decoding process starts.
@@ -66,7 +76,7 @@ public class Pie_Decode {
         logging(Level.INFO,"Decoding Started");
         if (getToBeDecrypted() == null)
             logging(Level.SEVERE,"Cannot decode null image");
-        if (getConfig().isError())
+        if (isError())
             return;
 
         int pixelColor;
@@ -97,13 +107,13 @@ public class Pie_Decode {
 
         setToBeDecrypted(null); // clear bufferedimage save memory
 
-        try {
-            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim())));
+        try { // keep message_txt out side so parms can be set
+            String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
+            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
-            return;
         }
-        logging(Level.INFO,"Decoding Completed");
+        logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
     }
 
     /** *******************************************************************<br>
@@ -111,6 +121,10 @@ public class Pie_Decode {
      * @param bytes
      */
     private void save(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            logging(Level.INFO,"Nothing to save");
+            return;
+        }
         if (getConfig().getSave_Decoder_Source().getSource_type() == Pie_Source_Type.TEXT) {
             setDecoded_Message(getUtils().decompress_return_String(bytes));
         }else{
@@ -132,27 +146,33 @@ public class Pie_Decode {
      * @return String
      */
     private String collect_encoded_parms(String base64_text) {
-        if (getConfig().getSave_Decoder_Source() == null)
-            getConfig().setSave_Decoder_Source(new Pie_Decoded_Destination());
+        try {
+            if (getConfig().getSave_Decoder_Source() == null)
+                getConfig().setSave_Decoder_Source(new Pie_Decoded_Destination());
 
-        if (base64_text.startsWith(Pie_Constants.PARM_BEGINNING.getParm2()) && base64_text.contains(Pie_Constants.PARM_ENDING.getParm2())) {
-            String parms = base64_text.substring(0, base64_text.lastIndexOf(Pie_Constants.PARM_ENDING.getParm2()) + Pie_Constants.PARM_ENDING.getParm2().length());
-            base64_text = base64_text.replace(parms, "");
+            if (base64_text.startsWith(Pie_Constants.PARM_BEGINNING.getParm2()) && base64_text.contains(Pie_Constants.PARM_ENDING.getParm2())) {
+                String parms = base64_text.substring(0, base64_text.lastIndexOf(Pie_Constants.PARM_ENDING.getParm2()) + Pie_Constants.PARM_ENDING.getParm2().length());
+                base64_text = base64_text.replace(parms, "");
 
-            parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
-            parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
-            parms = new String(getUtils().decrypt(true, parms));
-            if (parms.lastIndexOf("?") != -1) {
-                String[] parts = parms.split("\\?", 0);
-                getConfig().getSave_Decoder_Source().setFile_name(parts[0]);
-                getConfig().getSave_Decoder_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
-                getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
+                parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
+                parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
+                parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms));
+                if (parms.lastIndexOf("?") != -1) {
+                    String[] parts = parms.split("\\?", 0);
+                    getConfig().getSave_Decoder_Source().setFile_name(parts[0]);
+                    getConfig().getSave_Decoder_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
+                    getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
+                }
+            }else{
+                logging(Level.SEVERE,"Nothing to decode");
+                return null;
             }
-        }else{
-            logging(Level.SEVERE,"Nothing to decode");
+            return base64_text;
+
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return null;
         }
-        return base64_text;
     }
 
     /** *******************************************************************<br>

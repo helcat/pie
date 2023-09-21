@@ -213,7 +213,7 @@ public class Pie_Source {
         addon.append("?");
         addon.append(getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
         return Pie_Constants.PARM_BEGINNING.getParm2() +
-                getUtils().encrypt(true,addon.toString().getBytes(StandardCharsets.UTF_8)) +
+                getUtils().encrypt(true, getUtils().compress( addon.toString())) +
                 Pie_Constants.PARM_ENDING.getParm2();
     }
 

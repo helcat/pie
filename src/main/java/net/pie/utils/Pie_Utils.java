@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
@@ -52,7 +54,8 @@ public class Pie_Utils {
     public byte[] compress(String text) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            OutputStream out = new DeflaterOutputStream(baos);
+            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
@@ -69,7 +72,8 @@ public class Pie_Utils {
     public byte[] compressBytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            OutputStream out = new DeflaterOutputStream(baos);
+            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
             out.write(bytes);
             out.close();
         } catch (IOException e) {
@@ -98,7 +102,8 @@ public class Pie_Utils {
     public ByteArrayOutputStream decompress_return_Baos(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            OutputStream out = new InflaterOutputStream(baos);
+            Inflater decompressor = new Inflater(true);
+            OutputStream out = new InflaterOutputStream(baos, decompressor);
             out.write(bytes);
             out.close();
         } catch (IOException e) {
@@ -258,6 +263,10 @@ public class Pie_Utils {
     }
 
     public byte[] decrypt(boolean decrypt, String encrypted) {
+        if (encrypted == null || "".equals(encrypted.trim())) {
+            logging(Level.INFO,"Nothing to decrypt");
+            return null;
+        }
         if (!decrypt) {
             try {
                 logging(Level.INFO,"No Decryption Required");

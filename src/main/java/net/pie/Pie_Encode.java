@@ -51,7 +51,7 @@ public class Pie_Encode {
         setEncoded_image(null);
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null || originalArray.length == 0) {
-            logging(Level.WARNING,"Nothing to encode");
+            logging(Level.INFO,"Nothing to encode");
             return;
         }
 

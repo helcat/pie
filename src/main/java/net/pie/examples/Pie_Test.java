@@ -19,6 +19,7 @@ import net.pie.utils.Pie_Utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.logging.Level;
+import java.util.zip.Deflater;
 
 public class Pie_Test {
 
@@ -63,7 +64,8 @@ public class Pie_Test {
         config.setLog_level(Level.INFO);                                                  // Optional
         config.getEncoder_Minimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);   // Optional
         config.setSave_Encoder_Image(save_Image_After_Encoding());                         // Optional
-        config.setEncoder_Add_Encryption(true);
+        config.setEncoder_Add_Encryption(false);                                            // Optional
+        config.setEncoder_Compression_Level(Deflater.BEST_COMPRESSION);                     // Optional
         return config;
     }
 
@@ -76,7 +78,7 @@ public class Pie_Test {
     private Pie_Source build_a_source(Pie_Config config) {
         Pie_Source source = new Pie_Source(config);
         //source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
-        source.encode_File(getUtils().getDesktopPath() + File.separator + "background.jpg");
+        source.encode_File(getUtils().getDesktopPath() + File.separator + "Notes.txt");
         return source;
     }
 
