@@ -3,6 +3,7 @@ package net.pie;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Base64;
+import net.pie.utils.Pie_Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class Pie_Source {
     private Pie_Config config;
     private String file_name = null;
     private byte[] content_bytes = null;
+    private Pie_Utils utils = new Pie_Utils();
 
 
     private Logger log = Logger.getLogger(this.getClass().getName());
@@ -35,6 +37,7 @@ public class Pie_Source {
      **/
     public Pie_Source() {
         setConfig(new Pie_Config());
+        getUtils().setConfig(getConfig());
     }
 
     /** *******************************************************<br>
@@ -45,6 +48,7 @@ public class Pie_Source {
      **/
     public Pie_Source(Pie_Config config) {
         setConfig(config);
+        getUtils().setConfig(getConfig());
     }
 
     /** *******************************************************<br>
@@ -174,8 +178,8 @@ public class Pie_Source {
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
-            byte[] compressedBytes = config.getUtils().compress(append.toString());
-            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(getConfig().isAddEncryption(), compressedBytes);
+            byte[] compressedBytes = getUtils().compress(append.toString());
+            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isAddEncryption(), compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -191,8 +195,8 @@ public class Pie_Source {
         if (getContent_bytes() == null || getContent_bytes().length == 0)
             return null;
         try {
-            byte[] compressedBytes = config.getUtils().compressBytes(getContent_bytes());
-            String base64Text = encoding_addon() + getConfig().getUtils().encrypt(getConfig().isAddEncryption(),compressedBytes);
+            byte[] compressedBytes = getUtils().compressBytes(getContent_bytes());
+            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isAddEncryption(),compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -209,9 +213,9 @@ public class Pie_Source {
         addon.append("?");
         addon.append(getType().ordinal());
         addon.append("?");
-        addon.append(getConfig().isAddEncryption() ? "E":"N");
+        addon.append(getConfig().isAddEncryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
         return Pie_Constants.PARM_BEGINNING.getParm2() +
-                getConfig().getUtils().encrypt(true,addon.toString().getBytes(StandardCharsets.UTF_8)) +
+                getUtils().encrypt(true,addon.toString().getBytes(StandardCharsets.UTF_8)) +
                 Pie_Constants.PARM_ENDING.getParm2();
     }
 
@@ -265,6 +269,14 @@ public class Pie_Source {
 
     public void setContent_bytes(byte[] content_bytes) {
         this.content_bytes = content_bytes;
+    }
+
+    public Pie_Utils getUtils() {
+        return utils;
+    }
+
+    public void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }
 

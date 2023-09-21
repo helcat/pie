@@ -60,9 +60,9 @@ public class Pie_Test {
      */
     private Pie_Config build_a_encoding_config() {
         Pie_Config config = new Pie_Config();
-        config.setLog_level(Level.INFO);                                                  // Optional
+        config.setLog_level(Level.INFO);                                                    // Optional
         config.getMinimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);   // Optional
-        config.setSave_Encoded_Image(save_Image_After_Encoding());                         // Optional
+        config.setSave_Encoded_Image(save_Image_After_Encoding());                          // Optional
         config.setAddEncryption(true);
         return config;
     }
@@ -76,7 +76,7 @@ public class Pie_Test {
     private Pie_Source build_a_source(Pie_Config config) {
         Pie_Source source = new Pie_Source(config);
         //source.encode_Text(text == null ? "السلام عليكم هذا اختبار" : text);
-        source.encode_File(getUtils().getDesktopPath() + File.separator + "background.jpg");
+        source.encode_File(getUtils().getDesktopPath() + File.separator + "fire2.jpg");
         return source;
     }
 
@@ -89,17 +89,6 @@ public class Pie_Test {
         encoded_Image_destination.setLocal_file(new File(
                 getUtils().getDesktopPath() + File.separator + "My_Image.png"));
         return encoded_Image_destination;
-    }
-
-    /** ******************************************************<br>
-     * <b>Optional Save source after decoding</b>
-     * @return Pie_Decoded_Destination
-     */
-    private Pie_Decoded_Destination save_Source_After_Decoding() {
-        Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
-        decoded_Source_destination.setLocal_folder(new File(
-                getUtils().getDesktopPath() + File.separator + "shared"));
-        return decoded_Source_destination;
     }
 
     /** ******************************************************<br>
@@ -119,6 +108,17 @@ public class Pie_Test {
         if (!decoder.getConfig().isError())
             return decoder.getDecoded_Message();
         return null;
+    }
+
+    /** ******************************************************<br>
+     * <b>Optional Save source after decoding</b>
+     * @return Pie_Decoded_Destination
+     */
+    private Pie_Decoded_Destination save_Source_After_Decoding() {
+        Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
+        decoded_Source_destination.setLocal_folder(new File(
+                getUtils().getDesktopPath() + File.separator + "batch"));
+        return decoded_Source_destination;
     }
 
     /** *******************************************************************<br>

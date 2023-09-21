@@ -4,6 +4,7 @@ import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Base64;
 import net.pie.utils.Pie_Decoded_Destination;
+import net.pie.utils.Pie_Utils;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -17,6 +18,7 @@ public class Pie_Decode {
     private BufferedImage toBeDecrypted;
     private ByteArrayOutputStream decoded_bytes;
     private Logger log = Logger.getLogger(this.getClass().getName());
+    private Pie_Utils utils = new Pie_Utils();
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -27,6 +29,7 @@ public class Pie_Decode {
     public Pie_Decode(BufferedImage toBeDecrypted) {
         setConfig(new Pie_Config());
         setToBeDecrypted(toBeDecrypted);
+        getUtils().setConfig(getConfig());
     }
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -37,6 +40,7 @@ public class Pie_Decode {
     public Pie_Decode(Pie_Config config, BufferedImage toBeDecrypted) {
         setConfig(config);
         setToBeDecrypted(toBeDecrypted);
+        getUtils().setConfig(getConfig());
     }
 
     /** *********************************************************<br>
@@ -94,8 +98,8 @@ public class Pie_Decode {
         setToBeDecrypted(null); // clear bufferedimage save memory
 
         try {
-            String decode_this = collect_encoded_parms(new String(getConfig().getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
-            save(getConfig().getUtils().decrypt(getConfig().isAddEncryption(), decode_this));
+            String decode_this = collect_encoded_parms(new String(getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
+            save(getUtils().decrypt(getConfig().isAddEncryption(), decode_this));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
@@ -109,9 +113,9 @@ public class Pie_Decode {
      */
     private void save(byte[] bytes) {
         if (getConfig().getSave_Decoded_Source().getSource_type() == Pie_Source_Type.TEXT) {
-            setDecoded_Message(getConfig().getUtils().decompress_return_String(bytes));
+            setDecoded_Message(getUtils().decompress_return_String(bytes));
         }else{
-            setDecoded_bytes(getConfig().getUtils().decompress_return_Baos(bytes));
+            setDecoded_bytes(getUtils().decompress_return_Baos(bytes));
             if (getConfig().getSave_Decoded_Source().getLocal_folder() != null && getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory()) {
                 File f = new File(getConfig().getSave_Decoded_Source().getLocal_folder() + File.separator + getConfig().getSave_Decoded_Source().getFile_name());
                 try(OutputStream outputStream = new FileOutputStream(f)) {
@@ -138,12 +142,12 @@ public class Pie_Decode {
 
             parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
             parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
-            parms = new String(getConfig().getUtils().decrypt(true, parms));
+            parms = new String(getUtils().decrypt(true, parms));
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
                 getConfig().getSave_Decoded_Source().setFile_name(parts[0]);
                 getConfig().getSave_Decoded_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
-                getConfig().setAddEncryption(parts[2].equalsIgnoreCase("e"));
+                getConfig().setAddEncryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
             }
         }
         return base64_text;
@@ -186,5 +190,13 @@ public class Pie_Decode {
 
     public void setDecoded_bytes(ByteArrayOutputStream decoded_bytes) {
         this.decoded_bytes = decoded_bytes;
+    }
+
+    public Pie_Utils getUtils() {
+        return utils;
+    }
+
+    public void setUtils(Pie_Utils utils) {
+        this.utils = utils;
     }
 }

@@ -13,7 +13,9 @@ public enum Pie_Constants {
     RGB_COUNT (3, ""),
     IMAGE_TYPE (0, "png"),
     CIPHER (0,"AES/CBC/PKCS5PADDING"),
-    KEYSPEC (0,"AES")
+    KEYSPEC (0,"AES"),
+    ENC (0, "E"),
+    NO_ENC (0, "N")
     ;
 
     public int parm1 = 0;

@@ -13,7 +13,6 @@ import java.util.logging.Level;
  **/
 public class Pie_Config {
     private Pie_Minimum minimum = null;
-    private Pie_Utils utils = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private Pie_Encoded_Destination save_Encoded_Image;
@@ -26,7 +25,6 @@ public class Pie_Config {
      **/
     public Pie_Config() {
         setMinimum(new Pie_Minimum());
-        setUtils(new Pie_Utils(this));
     }
 
     /**
@@ -46,14 +44,6 @@ public class Pie_Config {
 
     public void setMinimum(Pie_Minimum minimum) {
         this.minimum = minimum == null ? new Pie_Minimum() : minimum;
-    }
-
-    public Pie_Utils getUtils() {
-        return utils;
-    }
-
-    public void setUtils(Pie_Utils utils) {
-        this.utils = utils == null ? new Pie_Utils(this) : utils;
     }
 
     public Level getLog_level() {
