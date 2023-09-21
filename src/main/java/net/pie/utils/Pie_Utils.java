@@ -32,24 +32,6 @@ public class Pie_Utils {
     private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
 
-    /** *******************************************************<br>
-     * <b>convert Array</b><br>
-     * Convert int array to byte array.<br>
-     * @param list (int[])
-     **/
-    public byte[] convert_Array(int[] list) {
-        if (list == null || list.length == 0) {
-            logging(Level.SEVERE,"ERROR convert_Array - Nothing in array");
-            return new byte[0];
-        }
-
-        byte[] byteArray = new byte[list.length];
-        for (int i = 0; i < list.length; i++)
-            byteArray[i] = (byte) list[i];
-
-        return byteArray;
-    }
-
     /** *********************************************************<br>
      * <b>Error</b><br>
      * Set the log entry and set error if required

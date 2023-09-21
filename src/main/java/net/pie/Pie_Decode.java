@@ -76,7 +76,7 @@ public class Pie_Decode {
         int retrievedGreen;
         int retrievedBlue;
 
-        int[] message = new int[((getToBeDecrypted().getHeight() * getToBeDecrypted().getWidth()) * Pie_Constants.RGB_COUNT.getParm1())];
+        byte[] message = new byte[((getToBeDecrypted().getHeight() * getToBeDecrypted().getWidth()) * Pie_Constants.RGB_COUNT.getParm1())];
         for (int y = 0; y < getToBeDecrypted().getHeight(); y++) {
             for (int x = 0; x < getToBeDecrypted().getWidth(); x++) {
                 pixelColor = getToBeDecrypted().getRGB(x, y);
@@ -87,19 +87,18 @@ public class Pie_Decode {
                     continue;
 
                 if (retrievedRed > 0)
-                    message[count++] = retrievedRed;
+                    message[count++] = (byte) retrievedRed;
                 if (retrievedGreen > 0)
-                    message[count++] = retrievedGreen;
+                    message[count++] = (byte) retrievedGreen;
                 if (retrievedBlue > 0)
-                    message[count++] = retrievedBlue;
+                    message[count++] = (byte) retrievedBlue;
             }
         }
 
         setToBeDecrypted(null); // clear bufferedimage save memory
 
         try {
-            String decode_this = collect_encoded_parms(new String(getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
-            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), decode_this));
+            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim())));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
@@ -149,6 +148,9 @@ public class Pie_Decode {
                 getConfig().getSave_Decoder_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
                 getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
             }
+        }else{
+            logging(Level.SEVERE,"Nothing to decode");
+            return null;
         }
         return base64_text;
     }

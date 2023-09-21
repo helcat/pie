@@ -50,8 +50,10 @@ public class Pie_Encode {
         logging(Level.INFO,"Encoding Started");
         setEncoded_image(null);
         byte[] originalArray = getSource().encode_process();
-        if (isError() || originalArray == null)
+        if (isError() || originalArray == null || originalArray.length == 0) {
+            logging(Level.WARNING,"Nothing to encode");
             return;
+        }
 
         double dimension = Math.sqrt((double) originalArray.length / Pie_Constants.RGB_COUNT.getParm1());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
@@ -64,7 +66,8 @@ public class Pie_Encode {
 
         Integer r = null;
         Integer g = null;
-        int b;
+        int b=0, x =0, y = 0;
+        BufferedImage data_image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
@@ -72,21 +75,24 @@ public class Pie_Encode {
             } else if (g == null) {
                 g = i;
             } else {
+                if (x >= size) {
+                    x = 0;
+                    y ++;
+                }
                 b = i;
-                list.add(createColor(r, g, b));
+                data_image.setRGB(x++, y, createColor(r, g, b).getRGB());
                 r = null;
                 g = null;
             }
         }
 
-        // finish
+        // finish any spare pixels
         if (r != null && g == null)
-            list.add(createColor(r, 0, 0));
+            data_image.setRGB(x, y, createColor(r, 0, 0).getRGB());
         else if (r != null)
-            list.add(createColor(r, g, 0));
+            data_image.setRGB(x, y, createColor(r, g, 0).getRGB());
 
-
-        createImage(size, list);
+        createImage(data_image, size);
 
         /** Process the image - send to destination if required **/
         if (getConfig().getSave_Encoder_Image() != null && getEncoded_image() != null) {
@@ -102,16 +108,14 @@ public class Pie_Encode {
      * <b>Create Image</b><br>
      * Creates the encoded bufferedimage : Stage 2 - Image within image.<br>
      * @param size uses a calculation to determin the size of the original image.
-     * @param list A list of already encoded colors which will be placed in to the BufferedImage.
      **/
-    private void createImage(int size, List<Color> list) {
-        logging(Level.INFO,"Encoding Image");
-        BufferedImage data_image = createDataImage(size, list);
+    private void createImage(BufferedImage data_image, int size) {
         if (isError())
             return;
         int width = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getWidth() : 0, size);
         int height = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getHeight() : 0, size);
         if (data_image != null && (width > size || height > size)) {
+            logging(Level.INFO,"Extending Encoded Image");
             BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = buffImg.createGraphics();
             g.drawImage(data_image, null,dataImageOffset(size, width), dataImageOffset(size, height));
@@ -145,30 +149,6 @@ public class Pie_Encode {
             }
         }
         return 0;
-    }
-
-    /** ******************************************************<br>
-     * <b>Create Data Image</b><br>
-     * Creates the encoded bufferedimage : Stage 1 - Original Image<br>
-     * @param size uses a calculation to determin the size of the original image.
-     * @param list A list of already encoded colors which will be placed in to the BufferedImage.
-     * @return bufferedimage - the real encoded image.
-     **/
-    private BufferedImage createDataImage(int size, List<Color> list) {
-        logging(Level.INFO,"Encoding Data Image");
-        BufferedImage buffImg = null;
-        if (!isError() && size > 0 && list != null && !list.isEmpty()) {
-            buffImg = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-            int count = 0;
-            for (int y = 0; y < buffImg.getHeight(); y++) {
-                for (int x = 0; x < buffImg.getWidth(); x++) {
-                    buffImg.setRGB(x, y, list.get(count++).getRGB());
-                    if (count >= list.size())
-                        return buffImg;
-                }
-            }
-        }
-        return buffImg;
     }
 
     /** ******************************************************<br>

@@ -178,9 +178,8 @@ public class Pie_Source {
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
-            byte[] compressedBytes = getUtils().compress(append.toString());
-            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), compressedBytes);
-            return base64Text.getBytes(StandardCharsets.UTF_8);
+            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), getUtils().compress(append.toString()))).
+                    getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return null;
@@ -195,9 +194,8 @@ public class Pie_Source {
         if (getContent_bytes() == null || getContent_bytes().length == 0)
             return null;
         try {
-            byte[] compressedBytes = getUtils().compressBytes(getContent_bytes());
-            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),compressedBytes);
-            return base64Text.getBytes(StandardCharsets.UTF_8);
+            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),getUtils().compressBytes(getContent_bytes()))).
+                    getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return null;
