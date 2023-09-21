@@ -12,19 +12,19 @@ import java.util.logging.Level;
  * This is optional. A new instance is automatically built when
  **/
 public class Pie_Config {
-    private Pie_Minimum minimum = null;
+    private Pie_Minimum encoder_Minimum = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
-    private Pie_Encoded_Destination save_Encoded_Image;
-    private Pie_Decoded_Destination save_Decoded_Source;
-    private boolean addEncryption = true;
+    private Pie_Encoded_Destination save_Encoder_Image;
+    private Pie_Decoded_Destination save_Decoder_Source;
+    private boolean encoder_Add_Encryption = true;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
      * Holds all the optional data, Utils and encoding / decoding defaults
      **/
     public Pie_Config() {
-        setMinimum(new Pie_Minimum());
+        setEncoder_Minimum(new Pie_Minimum());
     }
 
     /**
@@ -38,16 +38,12 @@ public class Pie_Config {
      * <b>getters and setters</b><br>
      * General Getters and Setters
      **/
-    public Pie_Minimum getMinimum() {
-        return minimum;
+    public Pie_Minimum getEncoder_Minimum() {
+        return encoder_Minimum;
     }
 
-    public void setMinimum(Pie_Minimum minimum) {
-        this.minimum = minimum == null ? new Pie_Minimum() : minimum;
-    }
-
-    public Level getLog_level() {
-        return log_level;
+    public void setEncoder_Minimum(Pie_Minimum encoder_Minimum) {
+        this.encoder_Minimum = encoder_Minimum;
     }
 
     /** ***************************************************************<br>
@@ -74,28 +70,32 @@ public class Pie_Config {
         this.error = error;
     }
 
-    public Pie_Encoded_Destination getSave_Encoded_Image() {
-        return save_Encoded_Image;
+    public Level getLog_level() {
+        return log_level;
     }
 
-    public void setSave_Encoded_Image(Pie_Encoded_Destination save_Encoded_Image) {
-        this.save_Encoded_Image = save_Encoded_Image;
+    public Pie_Encoded_Destination getSave_Encoder_Image() {
+        return save_Encoder_Image;
     }
 
-    public Pie_Decoded_Destination getSave_Decoded_Source() {
-        return save_Decoded_Source;
+    public void setSave_Encoder_Image(Pie_Encoded_Destination save_Encoder_Image) {
+        this.save_Encoder_Image = save_Encoder_Image;
     }
 
-    public void setSave_Decoded_Source(Pie_Decoded_Destination save_Decoded_Source) {
-        this.save_Decoded_Source = save_Decoded_Source;
+    public Pie_Decoded_Destination getSave_Decoder_Source() {
+        return save_Decoder_Source;
     }
 
-    public boolean isAddEncryption() {
-        return addEncryption;
+    public void setSave_Decoder_Source(Pie_Decoded_Destination save_Decoder_Source) {
+        this.save_Decoder_Source = save_Decoder_Source;
     }
 
-    public void setAddEncryption(boolean addEncryption) {
-        this.addEncryption = addEncryption;
+    public boolean isEncoder_Add_Encryption() {
+        return encoder_Add_Encryption;
+    }
+
+    public void setEncoder_Add_Encryption(boolean encoder_Add_Encryption) {
+        this.encoder_Add_Encryption = encoder_Add_Encryption;
     }
 }
 

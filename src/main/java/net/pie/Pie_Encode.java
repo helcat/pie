@@ -89,9 +89,9 @@ public class Pie_Encode {
         createImage(size, list);
 
         /** Process the image - send to destination if required **/
-        if (getConfig().getSave_Encoded_Image() != null && getEncoded_image() != null) {
-            getConfig().getSave_Encoded_Image().setImage(getEncoded_image());
-            if (getConfig().getSave_Encoded_Image().save_Encoded_Image())
+        if (getConfig().getSave_Encoder_Image() != null && getEncoded_image() != null) {
+            getConfig().getSave_Encoder_Image().setImage(getEncoded_image());
+            if (getConfig().getSave_Encoder_Image().save_Encoded_Image())
                 logging(Level.WARNING,"Encoding image was not saved");
         }
 
@@ -109,8 +109,8 @@ public class Pie_Encode {
         BufferedImage data_image = createDataImage(size, list);
         if (isError())
             return;
-        int width = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getWidth() : 0, size);
-        int height = Math.max(getConfig().getMinimum() != null ? getConfig().getMinimum().getHeight() : 0, size);
+        int width = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getWidth() : 0, size);
+        int height = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getHeight() : 0, size);
         if (data_image != null && (width > size || height > size)) {
             BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = buffImg.createGraphics();
@@ -131,8 +131,8 @@ public class Pie_Encode {
      **/
     private int dataImageOffset(int size, int dim) {
         logging(Level.INFO,"Encoding Offset");
-        if (getConfig().getMinimum() != null && getConfig().getMinimum().getPosition() != null) {
-            switch (getConfig().getMinimum().getPosition()) {
+        if (getConfig().getEncoder_Minimum() != null && getConfig().getEncoder_Minimum().getPosition() != null) {
+            switch (getConfig().getEncoder_Minimum().getPosition()) {
                 case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> {
                     return 0;
                 }

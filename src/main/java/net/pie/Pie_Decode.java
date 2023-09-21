@@ -99,7 +99,7 @@ public class Pie_Decode {
 
         try {
             String decode_this = collect_encoded_parms(new String(getUtils().convert_Array(message), StandardCharsets.UTF_8).trim());
-            save(getUtils().decrypt(getConfig().isAddEncryption(), decode_this));
+            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), decode_this));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return;
@@ -112,12 +112,12 @@ public class Pie_Decode {
      * @param bytes
      */
     private void save(byte[] bytes) {
-        if (getConfig().getSave_Decoded_Source().getSource_type() == Pie_Source_Type.TEXT) {
+        if (getConfig().getSave_Decoder_Source().getSource_type() == Pie_Source_Type.TEXT) {
             setDecoded_Message(getUtils().decompress_return_String(bytes));
         }else{
             setDecoded_bytes(getUtils().decompress_return_Baos(bytes));
-            if (getConfig().getSave_Decoded_Source().getLocal_folder() != null && getConfig().getSave_Decoded_Source().getLocal_folder().isDirectory()) {
-                File f = new File(getConfig().getSave_Decoded_Source().getLocal_folder() + File.separator + getConfig().getSave_Decoded_Source().getFile_name());
+            if (getConfig().getSave_Decoder_Source().getLocal_folder() != null && getConfig().getSave_Decoder_Source().getLocal_folder().isDirectory()) {
+                File f = new File(getConfig().getSave_Decoder_Source().getLocal_folder() + File.separator + getConfig().getSave_Decoder_Source().getFile_name());
                 try(OutputStream outputStream = new FileOutputStream(f)) {
                     getDecoded_bytes().writeTo(outputStream);
                 } catch (IOException e) {
@@ -133,8 +133,8 @@ public class Pie_Decode {
      * @return String
      */
     private String collect_encoded_parms(String base64_text) {
-        if (getConfig().getSave_Decoded_Source() == null)
-            getConfig().setSave_Decoded_Source(new Pie_Decoded_Destination());
+        if (getConfig().getSave_Decoder_Source() == null)
+            getConfig().setSave_Decoder_Source(new Pie_Decoded_Destination());
 
         if (base64_text.startsWith(Pie_Constants.PARM_BEGINNING.getParm2()) && base64_text.contains(Pie_Constants.PARM_ENDING.getParm2())) {
             String parms = base64_text.substring(0, base64_text.lastIndexOf(Pie_Constants.PARM_ENDING.getParm2()) + Pie_Constants.PARM_ENDING.getParm2().length());
@@ -145,9 +145,9 @@ public class Pie_Decode {
             parms = new String(getUtils().decrypt(true, parms));
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
-                getConfig().getSave_Decoded_Source().setFile_name(parts[0]);
-                getConfig().getSave_Decoded_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
-                getConfig().setAddEncryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
+                getConfig().getSave_Decoder_Source().setFile_name(parts[0]);
+                getConfig().getSave_Decoder_Source().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
+                getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
             }
         }
         return base64_text;

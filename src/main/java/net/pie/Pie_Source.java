@@ -179,7 +179,7 @@ public class Pie_Source {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
             byte[] compressedBytes = getUtils().compress(append.toString());
-            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isAddEncryption(), compressedBytes);
+            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -196,7 +196,7 @@ public class Pie_Source {
             return null;
         try {
             byte[] compressedBytes = getUtils().compressBytes(getContent_bytes());
-            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isAddEncryption(),compressedBytes);
+            String base64Text = encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),compressedBytes);
             return base64Text.getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -213,7 +213,7 @@ public class Pie_Source {
         addon.append("?");
         addon.append(getType().ordinal());
         addon.append("?");
-        addon.append(getConfig().isAddEncryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
+        addon.append(getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
         return Pie_Constants.PARM_BEGINNING.getParm2() +
                 getUtils().encrypt(true,addon.toString().getBytes(StandardCharsets.UTF_8)) +
                 Pie_Constants.PARM_ENDING.getParm2();
