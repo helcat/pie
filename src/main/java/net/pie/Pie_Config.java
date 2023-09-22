@@ -25,7 +25,6 @@ public class Pie_Config {
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = true;
     private int max_Encoded_Image_Size = 20000;
-
     private ConsoleHandler customHandler = null;
 
     /** *******************************************************************<br>
