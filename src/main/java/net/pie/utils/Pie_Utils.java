@@ -7,7 +7,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.image.BufferedImage;
@@ -17,9 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.logging.ConsoleHandler;
+import java.util.Base64;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
@@ -30,9 +28,6 @@ public class Pie_Utils {
     private Runtime runtime = Runtime.getRuntime();
     private Pie_Config config = null;
 
-    public Pie_Utils() {
-        setConfig(new Pie_Config());
-    }
     public Pie_Utils(Pie_Config config) {
         setConfig(config);
     }
@@ -231,7 +226,7 @@ public class Pie_Utils {
         if (!encrypt) {
             try {
                 getConfig().logging(Level.INFO,label + " No Encryption Added");
-                return Pie_Base64.encodeBytes(value);
+                return Base64.getEncoder().encodeToString(value);
             } catch (Exception e) {
                 getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", e.getMessage()));
                 return null;
@@ -245,7 +240,7 @@ public class Pie_Utils {
             Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
             byte[] encrypted = cipher.doFinal(value);
-            return Pie_Base64.encodeBytes(encrypted);
+            return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception ex) {
             getConfig().logging(Level.SEVERE,MessageFormat.format(label+ " Encryption - {0}", ex.getMessage()));
         }
@@ -260,8 +255,8 @@ public class Pie_Utils {
         if (!decrypt) {
             try {
                 getConfig().logging(Level.INFO,label + " No Decryption Required");
-                return Pie_Base64.decode(encrypted);
-            } catch (IOException e) {
+                return Base64.getDecoder().decode(encrypted);
+            } catch (Exception e) {
                 getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", e.getMessage()));
                 return null;
             }
@@ -272,7 +267,7 @@ public class Pie_Utils {
             SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes(StandardCharsets.UTF_8), Pie_Constants.KEYSPEC.getParm2());
             Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
-            byte[] toEncrypt = Pie_Base64.decode(encrypted);
+            byte[] toEncrypt = Base64.getDecoder().decode(encrypted);
             return cipher.doFinal(toEncrypt);
         } catch (Exception ex) {
             getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", ex.getMessage()));
@@ -290,7 +285,9 @@ public class Pie_Utils {
     }
     public void usedMemory(long previous_Menory, String label) {
         getConfig().logging(Level.INFO,label + " Memory Used : " +
-                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)
+                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory) +
+                " : Available : " + humanReadableBytes(runtime.maxMemory()) +
+                " : Total : " + humanReadableBytes(runtime.totalMemory())
         );
     }
 /*

@@ -1,8 +1,10 @@
 package net.pie;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.utils.*;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +24,9 @@ public class Pie_Config {
     private Pie_Decoded_Destination save_Decoder_Source;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = true;
+    private int max_Encoded_Image_Size = 20000;
+
+    private ConsoleHandler customHandler = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -45,12 +50,17 @@ public class Pie_Config {
      **/
     private void setUpLogging() {
         if (log == null) {
-            log = Logger.getLogger(this.getClass().getName());
+            log = Logger.getLogger(UUID.randomUUID().toString());
             log.setUseParentHandlers(false);
-            ConsoleHandler customHandler = new ConsoleHandler();
-            customHandler.setFormatter(new Pie_Logging_Format());
-            log.addHandler(customHandler);
+            setCustomHandler(new ConsoleHandler());
+            getCustomHandler().setFormatter(new Pie_Logging_Format());
+            log.addHandler(getCustomHandler());
         }
+    }
+
+    void exit() {
+        log.removeHandler(getCustomHandler());
+        log = null;
     }
 
     /** *********************************************************<br>
@@ -169,6 +179,29 @@ public class Pie_Config {
 
     public void setLog(Logger log) {
         this.log = log;
+    }
+
+    public ConsoleHandler getCustomHandler() {
+        return customHandler;
+    }
+
+    public void setCustomHandler(ConsoleHandler customHandler) {
+        this.customHandler = customHandler;
+    }
+
+    public int getMax_Encoded_Image_Size() {
+        return max_Encoded_Image_Size;
+    }
+
+    /** ***************************************************************<br>
+     * The Maximum image size the encoder will encode to.<br>
+     * This depends on your memory and device specification to stop going out of memory.
+     * @param max_Encoded_Image_Size (int)
+     */
+    public void setMax_Encoded_Image_Size(int max_Encoded_Image_Size) {
+        if (max_Encoded_Image_Size < Pie_Constants.MIN_IMAGE_SIZE.getParm1())
+            max_Encoded_Image_Size = Pie_Constants.MIN_IMAGE_SIZE.getParm1();
+        this.max_Encoded_Image_Size = max_Encoded_Image_Size;
     }
 }
 

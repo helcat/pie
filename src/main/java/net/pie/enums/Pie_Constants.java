@@ -7,7 +7,7 @@ import java.security.spec.KeySpec;
  * Constants used in PIE
  **/
 public enum Pie_Constants {
-    MAX_IMAGE_SIZE (14000, ""),
+    MIN_IMAGE_SIZE (5000, ""),
     PARM_BEGINNING (0, "{*"),
     PARM_ENDING (0, "*}"),
     RGB_COUNT (3, ""),

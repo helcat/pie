@@ -23,7 +23,7 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "4016343-11 - GRADING CERT - New Certificate of Rank_2021_FA.pdf";
+    private String temp_To_Be_Encoded = "ideaIC-2023.2.1.exe";
     private String temp_Encoded_Imaage = "My_Image.png";
     private String temp_Decode_To = "batch";
 

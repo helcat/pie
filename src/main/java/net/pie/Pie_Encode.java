@@ -6,7 +6,6 @@ import net.pie.utils.Pie_Utils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Pie_Encode {
     private Pie_Config config;
@@ -50,14 +49,18 @@ public class Pie_Encode {
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null || originalArray.length == 0) {
             logging(Level.INFO,"Encoding FAILED : Nothing to encode");
+            getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+            getConfig().exit();
             return;
         }
 
         double dimension = Math.sqrt((double) originalArray.length / Pie_Constants.RGB_COUNT.getParm1());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
-        if (size > Pie_Constants.MAX_IMAGE_SIZE.getParm1()) {
+        if (size > getConfig().getMax_Encoded_Image_Size()) {
             logging(Level.SEVERE,"Cannot Generate Image Size " + size  + " x " + size);
-            logging(Level.SEVERE,"Max Allowed Image Size " + Pie_Constants.MAX_IMAGE_SIZE.getParm1()  + " x " + Pie_Constants.MAX_IMAGE_SIZE.getParm1());
+            logging(Level.SEVERE,"Max Allowed Image Size " + getConfig().getMax_Encoded_Image_Size()  + " x " + getConfig().getMax_Encoded_Image_Size());
+            getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+            getConfig().exit();
             return;
         }
         logging(Level.INFO,"Generating Image Size " + size  + " x " + size);
@@ -100,6 +103,7 @@ public class Pie_Encode {
 
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+        getConfig().exit();
         if (getConfig().isEncoder_run_gc_after()) System.gc();
     }
 

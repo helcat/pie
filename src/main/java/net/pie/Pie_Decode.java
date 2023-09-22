@@ -2,7 +2,6 @@ package net.pie;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
-import net.pie.utils.Pie_Base64;
 import net.pie.utils.Pie_Decoded_Destination;
 import net.pie.utils.Pie_Utils;
 
@@ -10,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Pie_Decode {
     private String decoded_Message;
@@ -18,6 +16,7 @@ public class Pie_Decode {
     private BufferedImage toBeDecrypted;
     private ByteArrayOutputStream decoded_bytes;
     private Pie_Utils utils = null;
+    private long memory_Start = 0;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -26,6 +25,7 @@ public class Pie_Decode {
      * @param toBeDecrypted     Image to be decrypted
      **/
     public Pie_Decode(BufferedImage toBeDecrypted) {
+        setMemory_Start(getUtils().getMemory());
         setConfig(new Pie_Config());
         setToBeDecrypted(toBeDecrypted);
         setUtils(new Pie_Utils(getConfig()));
@@ -73,10 +73,11 @@ public class Pie_Decode {
     public void decode() {
         getConfig().getLog().setLevel(getConfig().getLog_level());
         logging(Level.INFO,"Decoding Started");
-        if (getToBeDecrypted() == null)
-            logging(Level.SEVERE,"Cannot decode null image");
-        if (isError())
+        if (isError() || getToBeDecrypted() == null) {
+            logging(Level.SEVERE, "Cannot decode null image");
+            getConfig().exit();
             return;
+        }
 
         int pixelColor;
         int count = 0;
@@ -111,8 +112,11 @@ public class Pie_Decode {
             save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
+            e.printStackTrace();
         }
         logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
+        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
+        getConfig().exit();
     }
 
     /** *******************************************************************<br>
@@ -215,5 +219,13 @@ public class Pie_Decode {
 
     public void setUtils(Pie_Utils utils) {
         this.utils = utils;
+    }
+
+    public long getMemory_Start() {
+        return memory_Start;
+    }
+
+    public void setMemory_Start(long memory_Start) {
+        this.memory_Start = memory_Start;
     }
 }
