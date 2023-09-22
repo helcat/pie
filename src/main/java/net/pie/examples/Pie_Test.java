@@ -23,9 +23,9 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "ideaIC-2023.2.1.exe";
+    private String temp_To_Be_Encoded = "background.jpg";
     private String temp_Encoded_Imaage = "My_Image.png";
-    private String temp_Decode_To = "batch";
+    private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
@@ -45,19 +45,6 @@ public class Pie_Test {
     }
 
     /** ******************************************************<br>
-     * <b>encode</b><br>
-     * Encodes text to the image.<br>
-     * Create a basic config and source. Place the config in the source. Use source with the Pie_Encode function.
-     * @param text
-     * @return BufferedImage
-     */
-    private BufferedImage encode(String text) {
-        Pie_Encode encoder = new Pie_Encode(build_a_source(build_a_encoding_config()));     // Optional Config
-        encoder.encode();
-        return encoder.getEncoded_image();
-    }
-
-    /** ******************************************************<br>
      * <b>Build a configuration file. This one is just for the encoding process.</b>
      * @return Pie_Config
      */
@@ -72,16 +59,21 @@ public class Pie_Test {
     }
 
     /** ******************************************************<br>
-     * <b>Required Source.</b><br>
-     * Build a source object of what to encode
-     * @param config
-     * @return Pie_Source
+     * <b>encode</b><br>
+     * Encodes text to the image.<br>
+     * Create a basic config and source. Place the config in the source. Use source with the Pie_Encode function.
+     * @param text
+     * @return BufferedImage
      */
-    private Pie_Source build_a_source(Pie_Config config) {
-        Pie_Source source = new Pie_Source(config);
-        //source.encode_Text("السلام عليكم هذا اختبار");
-        source.encode_File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded);
-        return source;
+    private BufferedImage encode(String text) {
+        Pie_Source source = new Pie_Source(
+            build_a_encoding_config(),
+            new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)
+        );
+
+        Pie_Encode encoder = new Pie_Encode(source);     // Optional Config
+        encoder.encode();
+        return encoder.getEncoded_image();
     }
 
     /** ******************************************************<br>
