@@ -26,7 +26,8 @@ public class Pie_Source {
     private Pie_Config config;
     private String file_name = null;
     private byte[] content_bytes = null;
-    private Pie_Utils utils = new Pie_Utils();
+    private Pie_Utils utils = null;
+    private long memory_Start = 0;
 
 
     private Logger log = Logger.getLogger(this.getClass().getName());
@@ -37,7 +38,8 @@ public class Pie_Source {
      **/
     public Pie_Source() {
         setConfig(new Pie_Config());
-        getUtils().setConfig(getConfig());
+        setUtils(new Pie_Utils(getConfig()));
+        setMemory_Start(getUtils().getMemory());
     }
 
     /** *******************************************************<br>
@@ -48,7 +50,7 @@ public class Pie_Source {
      **/
     public Pie_Source(Pie_Config config) {
         setConfig(config);
-        getUtils().setConfig(getConfig());
+        setUtils(new Pie_Utils(getConfig()));
     }
 
     /** *******************************************************<br>
@@ -152,6 +154,8 @@ public class Pie_Source {
      **/
     private void logging(Level level, String message) {
         getLog().log(level,  message);
+        if (level.equals(Level.SEVERE))
+            getConfig().setError(true);
     }
 
     /** *******************************************************<br>
@@ -160,6 +164,9 @@ public class Pie_Source {
      * it can use direct text, use a file or download one.
      **/
     public byte[] encode_process() {
+        if (isError())
+            return null;
+
         switch (getType()) {
             case TEXT -> { return processText(); }
             case FILE -> { return processFile(); }
@@ -168,17 +175,27 @@ public class Pie_Source {
         return null;
     }
 
+    /** *********************************************************<br>
+     * <b>Check if in error</b>
+     * @return boolean
+     */
+    private boolean isError() {
+        if (getConfig().isError() || getUtils().isError())
+            return true;
+        return false;
+    }
+
     /** *******************************************************<br>
      * <b>Text processing</b><br>
      * The process for encoding direct text.
      **/
     private byte[] processText() {
-        if (getContent().isEmpty())
+        if (getContent() == null || getContent().isEmpty())
             return null;
         try {
             StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
             StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
-            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), getUtils().compress(append.toString()))).
+            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), getUtils().compress(append.toString()), "Main Encoding : ")).
                     getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -194,7 +211,7 @@ public class Pie_Source {
         if (getContent_bytes() == null || getContent_bytes().length == 0)
             return null;
         try {
-            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),getUtils().compressBytes(getContent_bytes()))).
+            return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),getUtils().compressBytes(getContent_bytes()), "Main Encoding : ")).
                     getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -213,7 +230,7 @@ public class Pie_Source {
         addon.append("?");
         addon.append(getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
         return Pie_Constants.PARM_BEGINNING.getParm2() +
-                getUtils().encrypt(true, getUtils().compress( addon.toString())) +
+                getUtils().encrypt(true, getUtils().compress( addon.toString()), "Instruction Encoding : ") +
                 Pie_Constants.PARM_ENDING.getParm2();
     }
 
@@ -275,6 +292,14 @@ public class Pie_Source {
 
     public void setUtils(Pie_Utils utils) {
         this.utils = utils;
+    }
+
+    public long getMemory_Start() {
+        return memory_Start;
+    }
+
+    public void setMemory_Start(long memory_Start) {
+        this.memory_Start = memory_Start;
     }
 }
 

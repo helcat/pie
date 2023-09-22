@@ -37,8 +37,7 @@ public class Pie_Encoded_Destination {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image() {
-        Pie_Utils utils = new Pie_Utils();
+    public boolean save_Encoded_Image(Pie_Utils utils) {
         if (getLocal_file() != null && getImage() != null && getLocal_file().getName().toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             return utils.saveImage_to_file(getImage(), getLocal_file());
         return false;

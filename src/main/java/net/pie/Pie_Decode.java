@@ -17,8 +17,7 @@ public class Pie_Decode {
     private Pie_Config config;
     private BufferedImage toBeDecrypted;
     private ByteArrayOutputStream decoded_bytes;
-    private Logger log = Logger.getLogger(this.getClass().getName());
-    private Pie_Utils utils = new Pie_Utils();
+    private Pie_Utils utils = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -29,7 +28,7 @@ public class Pie_Decode {
     public Pie_Decode(BufferedImage toBeDecrypted) {
         setConfig(new Pie_Config());
         setToBeDecrypted(toBeDecrypted);
-        getUtils().setConfig(getConfig());
+        setUtils(new Pie_Utils(getConfig()));
     }
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -40,7 +39,7 @@ public class Pie_Decode {
     public Pie_Decode(Pie_Config config, BufferedImage toBeDecrypted) {
         setConfig(config);
         setToBeDecrypted(toBeDecrypted);
-        getUtils().setConfig(getConfig());
+        setUtils(new Pie_Utils(getConfig()));
     }
 
     /** *********************************************************<br>
@@ -50,7 +49,7 @@ public class Pie_Decode {
      * @param message (Logging Message)
      **/
     private void logging(Level level, String message) {
-        getLog().log(level,  message);
+        getConfig().getLog().log(level,  message);
         if (level.equals(Level.SEVERE))
             getConfig().setError(true);
     }
@@ -72,7 +71,7 @@ public class Pie_Decode {
      * @see Pie_Decode Use after Pie_Decode.
      **/
     public void decode() {
-        getLog().setLevel(getConfig().getLog_level());
+        getConfig().getLog().setLevel(getConfig().getLog_level());
         logging(Level.INFO,"Decoding Started");
         if (getToBeDecrypted() == null)
             logging(Level.SEVERE,"Cannot decode null image");
@@ -109,12 +108,11 @@ public class Pie_Decode {
 
         try { // keep message_txt out side so parms can be set
             String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
-            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt));
+            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
         }
         logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
-        getUtils().memory();
     }
 
     /** *******************************************************************<br>
@@ -157,7 +155,7 @@ public class Pie_Decode {
 
                 parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
                 parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
-                parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms));
+                parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms, "Instruction Decoding : "));
                 if (parms.lastIndexOf("?") != -1) {
                     String[] parts = parms.split("\\?", 0);
                     getConfig().getSave_Decoder_Source().setFile_name(parts[0]);
@@ -201,10 +199,6 @@ public class Pie_Decode {
 
     public void setToBeDecrypted(BufferedImage toBeDecrypted) {
         this.toBeDecrypted = toBeDecrypted;
-    }
-
-    public Logger getLog() {
-        return log;
     }
 
     public ByteArrayOutputStream getDecoded_bytes() {

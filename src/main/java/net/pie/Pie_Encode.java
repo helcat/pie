@@ -5,10 +5,6 @@ import net.pie.utils.Pie_Utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,18 +12,17 @@ public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
     private Pie_Source source;
-    private Logger log = Logger.getLogger(this.getClass().getName());
     private boolean error = false;
-    private Pie_Utils utils = new Pie_Utils();
+    private Pie_Utils utils = null;
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
-     * @param source
+     * @param source (Send in a Pie_Source object)
      * @see Pie_Source Pie_Source to load in the content.
      **/
     public Pie_Encode(Pie_Source source) {
-        getUtils().memory();
         setSource(source);
         setConfig(source.getConfig());
+        setUtils(new Pie_Utils(getConfig()));
     }
 
     /** *********************************************************<br>
@@ -37,7 +32,7 @@ public class Pie_Encode {
      * @param message (Logging Message)
      **/
     private void logging(Level level, String message) {
-        getLog().log(level,  message);
+        getConfig().getLog().log(level,  message);
         if (level.equals(Level.SEVERE))
             setError(true);
     }
@@ -49,12 +44,12 @@ public class Pie_Encode {
      * @see Pie_Source Uses Pie_Source to collect the data to be used as pixels.
      **/
     public void encode() {
-        getLog().setLevel(getConfig().getLog_level());
-        logging(Level.INFO,"Encoding Started");
+        getConfig().getLog().setLevel(getConfig().getLog_level());
+        logging(Level.INFO,"Encoding Process Started");
         setEncoded_image(null);
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null || originalArray.length == 0) {
-            logging(Level.INFO,"Nothing to encode");
+            logging(Level.INFO,"Encoding FAILED : Nothing to encode");
             return;
         }
 
@@ -71,7 +66,6 @@ public class Pie_Encode {
         Integer g = null;
         int b=0, x =0, y = 0;
         BufferedImage data_image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-        List<Color> list = new ArrayList<>();
         for (int i : originalArray) {
             if (r == null) {
                 r = i;
@@ -97,14 +91,16 @@ public class Pie_Encode {
 
         createImage(data_image, size);
 
-        /** Process the image - send to destination if required **/
+        // Process the image - send to destination if required
         if (getConfig().getSave_Encoder_Image() != null && getEncoded_image() != null) {
             getConfig().getSave_Encoder_Image().setImage(getEncoded_image());
-            if (getConfig().getSave_Encoder_Image().save_Encoded_Image())
+            if (getConfig().getSave_Encoder_Image().save_Encoded_Image(getUtils()))
                 logging(Level.WARNING,"Encoding image was not saved");
         }
 
         logging(Level.INFO,"Encoding Complete");
+        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+        if (getConfig().isEncoder_run_gc_after()) System.gc();
     }
 
     /** ******************************************************<br>
@@ -168,7 +164,7 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * <b>Checks the number to make sure its above zero.</b><br>
-     * @param check
+     * @param check (the int to check)
      * @return int
      **/
     private int checker(int check) {
@@ -200,10 +196,6 @@ public class Pie_Encode {
 
     public void setSource(Pie_Source source) {
         this.source = source;
-    }
-
-    public Logger getLog() {
-        return log;
     }
 
     public void setError(boolean error) {

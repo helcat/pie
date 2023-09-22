@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
@@ -25,27 +26,15 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
-
+    private boolean error = false;
+    private Runtime runtime = Runtime.getRuntime();
     private Pie_Config config = null;
+
     public Pie_Utils() {
         setConfig(new Pie_Config());
     }
     public Pie_Utils(Pie_Config config) {
         setConfig(config);
-    }
-    private Logger log = Logger.getLogger(this.getClass().getName());
-    private boolean error = false;
-    private Runtime runtime = Runtime.getRuntime();
-    /** *********************************************************<br>
-     * <b>Error</b><br>
-     * Set the log entry and set error if required
-     * @param level (Logging level)
-     * @param message (Logging Message)
-     **/
-    private void logging(Level level, String message) {
-        getLog().log(level,  message);
-        if (level.equals(Level.SEVERE))
-            setError(true);
     }
 
     /** *******************************************************<br>
@@ -61,7 +50,7 @@ public class Pie_Utils {
             out.write(text.getBytes(StandardCharsets.UTF_8));
             out.close();
         } catch (IOException e) {
-            logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
         }
         return baos.toByteArray();
     }
@@ -79,7 +68,7 @@ public class Pie_Utils {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
         }
         return baos.toByteArray();
     }
@@ -109,7 +98,7 @@ public class Pie_Utils {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            logging(Level.SEVERE,MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
         }
         return baos;
     }
@@ -122,7 +111,7 @@ public class Pie_Utils {
     public BufferedImage load_image(Object stream) {
         BufferedImage image = null;
         if (stream == null)
-            return image;
+            return null;
 
         try {
             if (stream instanceof File) {
@@ -144,13 +133,8 @@ public class Pie_Utils {
                 ((FileInputStream) stream).close();
             }
 
-            else if (stream instanceof FileImageInputStream) {
-                image = ImageIO.read((FileImageInputStream) stream);
-                ((FileImageInputStream) stream).close();
-            }
-
             else if (stream instanceof InputStream) {
-                image = ImageIO.read((ImageInputStream) stream);
+                image = ImageIO.read((InputStream) stream);
                 ((InputStream) stream).close();
             }
 
@@ -161,7 +145,7 @@ public class Pie_Utils {
             }
 
         } catch (IOException e) {
-            logging(Level.SEVERE,MessageFormat.format("load_image File - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format("load_image File - {0}", e.getMessage()));
         }
 
         return image;
@@ -177,7 +161,7 @@ public class Pie_Utils {
         try {
             ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), baos);
         } catch (IOException e) {
-            logging(Level.SEVERE,MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format("saveImage_to_baos ByteArrayOutputStream - {0}", e.getMessage()));
         }
         return baos;
     }
@@ -189,13 +173,15 @@ public class Pie_Utils {
      * @param file - send in a file and the BufferedImage will be saved to it.
      **/
     public boolean saveImage_to_file(BufferedImage buffer, File file) {
-        if (buffer == null)
-            logging(Level.SEVERE,"Image was not created");
+        if (buffer == null) {
+            getConfig().logging(Level.SEVERE, "Image was not created");
+            return false;
+        }
         try {
             if (!isError())
                 return ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), file);
         } catch (IOException e) {
-            logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
         }
         return false;
     }
@@ -218,16 +204,18 @@ public class Pie_Utils {
                 baos.close();
             }
         } catch (IOException e) {
-            logging(Level.SEVERE,MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format("ERROR saveImage_to_file - {0}", e.getMessage()));
         }
         return is;
     }
 
     /** *******************************************************<br>
      * <b>get path to desktop</b><br>
+     * STATIC METHOD. use Pie_Utils.getDesktopPath() note this is optional.<br>
+     * Not required just handy if you need it.<br>
      * Simple function that gets the path to the desktop. Can be used when saving files.
      **/
-    public String getDesktopPath() {
+    public static String getDesktopPath() {
         FileSystemView view = FileSystemView.getFileSystemView();
         File file = view.getHomeDirectory();
         return file.getPath();
@@ -239,19 +227,19 @@ public class Pie_Utils {
     /****************************************************
      * encrypt
      ****************************************************/
-    public String encrypt(boolean encrypt, byte[] value) {
+    public String encrypt(boolean encrypt, byte[] value, String label) {
         if (!encrypt) {
             try {
-                logging(Level.INFO,"No Encryption Added");
+                getConfig().logging(Level.INFO,label + " No Encryption Added");
                 return Pie_Base64.encodeBytes(value);
             } catch (Exception e) {
-                logging(Level.SEVERE,MessageFormat.format("decryption - {0}", e.getMessage()));
+                getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", e.getMessage()));
                 return null;
             }
         }
 
         try {
-            logging(Level.INFO,"Encryption Added");
+            getConfig().logging(Level.INFO,label + " Encryption Added");
             IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes(StandardCharsets.UTF_8));
             SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes(StandardCharsets.UTF_8), Pie_Constants.KEYSPEC.getParm2());
             Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
@@ -259,27 +247,27 @@ public class Pie_Utils {
             byte[] encrypted = cipher.doFinal(value);
             return Pie_Base64.encodeBytes(encrypted);
         } catch (Exception ex) {
-            logging(Level.SEVERE,MessageFormat.format("encryption - {0}", ex.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format(label+ " Encryption - {0}", ex.getMessage()));
         }
         return null;
     }
 
-    public byte[] decrypt(boolean decrypt, String encrypted) {
+    public byte[] decrypt(boolean decrypt, String encrypted, String label) {
         if (encrypted == null || "".equals(encrypted.trim())) {
-            logging(Level.INFO,"Nothing to decrypt");
+            getConfig().logging(Level.INFO,label + " Nothing to decrypt");
             return null;
         }
         if (!decrypt) {
             try {
-                logging(Level.INFO,"No Decryption Required");
+                getConfig().logging(Level.INFO,label + " No Decryption Required");
                 return Pie_Base64.decode(encrypted);
             } catch (IOException e) {
-                logging(Level.SEVERE,MessageFormat.format("decryption - {0}", e.getMessage()));
+                getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", e.getMessage()));
                 return null;
             }
         }
         try {
-            logging(Level.INFO,"Decryption In Progress");
+            getConfig().logging(Level.INFO,label + " Decryption In Progress");
             IvParameterSpec iv = new IvParameterSpec(EncryptioninitVector.getBytes(StandardCharsets.UTF_8));
             SecretKeySpec skeySpec = new SecretKeySpec(encryptionKey.getBytes(StandardCharsets.UTF_8), Pie_Constants.KEYSPEC.getParm2());
             Cipher cipher = Cipher.getInstance(Pie_Constants.CIPHER.getParm2());
@@ -287,20 +275,22 @@ public class Pie_Utils {
             byte[] toEncrypt = Pie_Base64.decode(encrypted);
             return cipher.doFinal(toEncrypt);
         } catch (Exception ex) {
-            logging(Level.SEVERE,MessageFormat.format("decryption - {0}", ex.getMessage()));
+            getConfig().logging(Level.SEVERE,MessageFormat.format(label + " Decryption - {0}", ex.getMessage()));
         }
         return null;
     }
 
     /**
      * *****************************************************<br>
-     * <b>Shows Used Memory in logs</b><br>
-     *
+     * <b>Collects the amount of memory used</b><br>
      * @return
      */
-    public void memory() {
-        logging(Level.INFO,"Memory Used : " +
-                humanReadableByteCountSI(runtime.totalMemory() - runtime.freeMemory())
+    public long getMemory() {
+        return runtime.totalMemory() - runtime.freeMemory();
+    }
+    public void usedMemory(long previous_Menory, String label) {
+        getConfig().logging(Level.INFO,label + " Memory Used : " +
+                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)
         );
     }
 /*
@@ -318,7 +308,7 @@ public class Pie_Utils {
 		return j;
  */
 
-    public String humanReadableByteCountSI(long bytes) {
+    private String humanReadableBytes(long bytes) {
         if (-1000 < bytes && bytes < 1000) {
             return bytes + " B";
         }
@@ -340,14 +330,6 @@ public class Pie_Utils {
     }
     public void setConfig(Pie_Config config) {
         this.config = config;
-    }
-
-    public Logger getLog() {
-        return log;
-    }
-
-    public void setLog(Logger log) {
-        this.log = log;
     }
 
     public boolean isError() {

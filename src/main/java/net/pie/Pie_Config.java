@@ -1,12 +1,11 @@
 package net.pie;
 
-import net.pie.utils.Pie_Decoded_Destination;
-import net.pie.utils.Pie_Encoded_Destination;
-import net.pie.utils.Pie_Minimum;
-import net.pie.utils.Pie_Utils;
+import net.pie.utils.*;
 
 import java.util.Arrays;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
 /** *******************************************************************<br>
@@ -14,6 +13,7 @@ import java.util.zip.Deflater;
  * This is optional. A new instance is automatically built when
  **/
 public class Pie_Config {
+    private Logger log = null;
     private Pie_Minimum encoder_Minimum = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
@@ -21,12 +21,14 @@ public class Pie_Config {
     private Pie_Encoded_Destination save_Encoder_Image;
     private Pie_Decoded_Destination save_Decoder_Source;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
+    private boolean encoder_run_gc_after = true;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
      * Holds all the optional data, Utils and encoding / decoding defaults
      **/
     public Pie_Config() {
+        setUpLogging();
         setEncoder_Minimum(new Pie_Minimum());
     }
 
@@ -35,6 +37,32 @@ public class Pie_Config {
      **/
     public void save_encoded_image_to(String message) {
 
+    }
+
+    /** *********************************************************<br>
+     * <b>Logging</b><br>
+     * Sets up the logging for this class
+     **/
+    private void setUpLogging() {
+        if (log == null) {
+            log = Logger.getLogger(this.getClass().getName());
+            log.setUseParentHandlers(false);
+            ConsoleHandler customHandler = new ConsoleHandler();
+            customHandler.setFormatter(new Pie_Logging_Format());
+            log.addHandler(customHandler);
+        }
+    }
+
+    /** *********************************************************<br>
+     * <b>Logging</b><br>
+     * Set the log entry and set error if required
+     * @param level (Logging level)
+     * @param message (Logging Message)
+     **/
+    public void logging(Level level, String message) {
+        getLog().log(level,  message);
+        if (level.equals(Level.SEVERE))
+            setError(true);
     }
 
     /** *******************************************************************<br>
@@ -121,6 +149,26 @@ public class Pie_Config {
                 contains(encoder_Compression_Level))
             encoder_Compression_Level = Deflater.BEST_SPEED;
         this.encoder_Compression_Level = encoder_Compression_Level;
+    }
+
+    public boolean isEncoder_run_gc_after() {
+        return encoder_run_gc_after;
+    }
+
+    /** ***************************************************************<br>
+     * <b>to run the garbage collector immediately after the encoding set to true</b>
+     * @param encoder_run_gc_after (boolean) Default is false
+     */
+    public void setEncoder_run_gc_after(boolean encoder_run_gc_after) {
+        this.encoder_run_gc_after = encoder_run_gc_after;
+    }
+
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
     }
 }
 
