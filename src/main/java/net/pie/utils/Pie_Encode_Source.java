@@ -1,8 +1,7 @@
-package net.pie;
+package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
-import net.pie.utils.Pie_Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,15 +10,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /** *******************************************************<br>
- * <b>Pie_Source</b><br>
+ * <b>Pie_Encode_Source</b><br>
  * Sets the source for the encoded image.<br>
  * This is used to collect the data to build the encoded image.
  **/
-public class Pie_Source {
+public class Pie_Encode_Source {
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
     private String content;
     private Pie_Config config;
@@ -29,13 +27,13 @@ public class Pie_Source {
     private long memory_Start = 0;
 
     /** *******************************************************<br>
-     * <b>Pie_Source</b><br>
+     * <b>Pie_Encode_Source</b><br>
      * Sets a new instance with a given Pie_Config with custom parameters.<br>
      * Note, if the config is not entered a default one will be set up.
      * @param config
      * @param encode (Object) Can be String of text or a File
      */
-    public Pie_Source(Pie_Config config, Object encode) {
+    public Pie_Encode_Source(Pie_Config config, Object encode) {
         process(config, encode);
     }
 
@@ -45,7 +43,7 @@ public class Pie_Source {
      * @param encode (Byte[])
      * @param file_name
      */
-    public Pie_Source(Pie_Config config, byte[] encode, String file_name) {
+    public Pie_Encode_Source(Pie_Config config, byte[] encode, String file_name) {
         setConfig(config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(file_name);
@@ -59,7 +57,7 @@ public class Pie_Source {
      * @param encode (String)
      * @param file_name
      */
-    public Pie_Source(Pie_Config config, String encode, String file_name) {
+    public Pie_Encode_Source(Pie_Config config, String encode, String file_name) {
         setConfig(config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(file_name == null ? "Decoded_Text.txt" : file_name);

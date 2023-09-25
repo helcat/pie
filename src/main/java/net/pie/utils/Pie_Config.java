@@ -1,4 +1,4 @@
-package net.pie;
+package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.utils.*;
@@ -20,7 +20,6 @@ public class Pie_Config {
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
-    private Pie_Decoded_Destination save_Decoder_Source;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = true;
     private int max_Encoded_Image_Size = 20000;
@@ -56,7 +55,7 @@ public class Pie_Config {
         }
     }
 
-    void exit() {
+    public void exit() {
         log.removeHandler(getCustomHandler());
         log = null;
     }
@@ -111,14 +110,6 @@ public class Pie_Config {
 
     public Level getLog_level() {
         return log_level;
-    }
-
-    public Pie_Decoded_Destination getSave_Decoder_Source() {
-        return save_Decoder_Source;
-    }
-
-    public void setSave_Decoder_Source(Pie_Decoded_Destination save_Decoder_Source) {
-        this.save_Decoder_Source = save_Decoder_Source;
     }
 
     public boolean isEncoder_Add_Encryption() {

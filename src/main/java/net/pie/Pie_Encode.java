@@ -1,6 +1,8 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.utils.Pie_Config;
+import net.pie.utils.Pie_Encode_Source;
 import net.pie.utils.Pie_Encoded_Destination;
 import net.pie.utils.Pie_Utils;
 
@@ -10,17 +12,17 @@ import java.util.logging.Level;
 
 public class Pie_Encode {
     private Pie_Config config;
-    private BufferedImage encoded_image;
-    private Pie_Source source;
+    private Pie_Encode_Source source;
     private Pie_Encoded_Destination destination;
     private boolean error = false;
     private Pie_Utils utils = null;
+    
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
      * @param source (Send in a Pie_Source object)
-     * @see Pie_Source Pie_Source to load in the content.
+     * @see Pie_Encode_Source Pie_Source to load in the content.
      **/
-    public Pie_Encode(Pie_Source source, Pie_Encoded_Destination encoded_destination) {
+    public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
         setSource(source);
         setDestination(encoded_destination);
         setConfig(source.getConfig());
@@ -43,12 +45,18 @@ public class Pie_Encode {
      * <b>encode</b><br>
      * Encodes the data as the image pixel by pixel.<br>
      * After setting Pie_Encode use encode(). Allows for changing settings.
-     * @see Pie_Source Uses Pie_Source to collect the data to be used as pixels.
+     * @see Pie_Encode_Source Uses Pie_Source to collect the data to be used as pixels.
      **/
     public void encode() {
+        if (isError()) {
+            logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().exit();
+            return;
+        }
+
         getConfig().getLog().setLevel(getConfig().getLog_level());
         logging(Level.INFO,"Encoding Process Started");
-        setEncoded_image(null);
+
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null || originalArray.length == 0) {
             logging(Level.INFO,"Encoding FAILED : Nothing to encode");
@@ -95,12 +103,27 @@ public class Pie_Encode {
         else if (r != null)
             data_image.setRGB(x, y, createColor(r, g, 0).getRGB());
 
-        createImage(data_image, size);
+        if (isError()) {
+            logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().exit();
+            return;
+        }
+
+        BufferedImage buffImg = null;
+        int width = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getWidth() : 0, size);
+        int height = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getHeight() : 0, size);
+        if (width > size || height > size) {
+            logging(Level.INFO,"Extending Encoded Image");
+            buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gd = buffImg.createGraphics();
+            gd.drawImage(data_image, null,dataImageOffset(size, width), dataImageOffset(size, height));
+            gd.dispose();
+        }
 
         // Process the image - send to destination if required
-        if (getDestination() != null && getEncoded_image() != null) {
-            getDestination().setImage(getEncoded_image());
-            if (getDestination().save_Encoded_Image(getUtils()))
+        if (getDestination() != null) {
+            getDestination().setImage(buffImg != null ? buffImg : data_image);
+            if (!getDestination().save_Encoded_Image(getUtils()))
                 logging(Level.WARNING,"Encoding image was not saved");
         }
 
@@ -108,28 +131,6 @@ public class Pie_Encode {
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
         getConfig().exit();
         if (getConfig().isEncoder_run_gc_after()) System.gc();
-    }
-
-    /** ******************************************************<br>
-     * <b>Create Image</b><br>
-     * Creates the encoded bufferedimage : Stage 2 - Image within image.<br>
-     * @param size uses a calculation to determin the size of the original image.
-     **/
-    private void createImage(BufferedImage data_image, int size) {
-        if (isError())
-            return;
-        int width = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getWidth() : 0, size);
-        int height = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getHeight() : 0, size);
-        if (data_image != null && (width > size || height > size)) {
-            logging(Level.INFO,"Extending Encoded Image");
-            BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = buffImg.createGraphics();
-            g.drawImage(data_image, null,dataImageOffset(size, width), dataImageOffset(size, height));
-            g.dispose();
-            setEncoded_image(buffImg);
-        }else {
-            setEncoded_image(data_image);
-        }
     }
 
     /** ******************************************************<br>
@@ -189,19 +190,11 @@ public class Pie_Encode {
         return config;
     }
 
-    public BufferedImage getEncoded_image() {
-        return encoded_image;
-    }
-
-    private void setEncoded_image(BufferedImage encoded_image) {
-        this.encoded_image = encoded_image;
-    }
-
-    public Pie_Source getSource() {
+    public Pie_Encode_Source getSource() {
         return source;
     }
 
-    public void setSource(Pie_Source source) {
+    public void setSource(Pie_Encode_Source source) {
         this.source = source;
     }
 

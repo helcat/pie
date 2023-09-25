@@ -17,6 +17,8 @@ public class Pie_Decoded_Destination {
     private URL web_address;
     private String file_name = null;
     private Pie_Source_Type source_type = null;
+    private boolean error = false;
+    private String error_message = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -32,13 +34,21 @@ public class Pie_Decoded_Destination {
     public Pie_Decoded_Destination(File folder) {
         setLocal_folder(folder);
     }
+
     /** *******************************************************************<br>
      * <b>setLocal_folder</b><br>
      * sets a local folder, where to save the file
      **/
     public void setLocal_folder(File local_folder) {
-        if (local_folder != null && !local_folder.isDirectory())
+        if (local_folder != null && !local_folder.exists()  ||
+            local_folder != null && !local_folder.isDirectory()) {
+            setError(true);
+            if (!local_folder.exists())
+                setError_message("Decoder Destination Folder Does Not Exist : " + local_folder);
+            else if (!local_folder.isDirectory())
+                setError_message("Decoder Destination Folder Is Invalid : " + local_folder);
             local_folder = null;
+        }
         this.local_folder = local_folder;
     }
 
@@ -74,7 +84,21 @@ public class Pie_Decoded_Destination {
         this.source_type = source_type;
     }
 
+    public boolean isError() {
+        return error;
+    }
 
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
+    public String getError_message() {
+        return error_message;
+    }
+
+    public void setError_message(String error_message) {
+        this.error_message = error_message;
+    }
 }
 
 
