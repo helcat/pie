@@ -1,6 +1,7 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.utils.Pie_Encoded_Destination;
 import net.pie.utils.Pie_Utils;
 
 import java.awt.*;
@@ -11,6 +12,7 @@ public class Pie_Encode {
     private Pie_Config config;
     private BufferedImage encoded_image;
     private Pie_Source source;
+    private Pie_Encoded_Destination destination;
     private boolean error = false;
     private Pie_Utils utils = null;
     /** ******************************************************<br>
@@ -18,8 +20,9 @@ public class Pie_Encode {
      * @param source (Send in a Pie_Source object)
      * @see Pie_Source Pie_Source to load in the content.
      **/
-    public Pie_Encode(Pie_Source source) {
+    public Pie_Encode(Pie_Source source, Pie_Encoded_Destination encoded_destination) {
         setSource(source);
+        setDestination(encoded_destination);
         setConfig(source.getConfig());
         setUtils(new Pie_Utils(getConfig()));
     }
@@ -95,9 +98,9 @@ public class Pie_Encode {
         createImage(data_image, size);
 
         // Process the image - send to destination if required
-        if (getConfig().getSave_Encoder_Image() != null && getEncoded_image() != null) {
-            getConfig().getSave_Encoder_Image().setImage(getEncoded_image());
-            if (getConfig().getSave_Encoder_Image().save_Encoded_Image(getUtils()))
+        if (getDestination() != null && getEncoded_image() != null) {
+            getDestination().setImage(getEncoded_image());
+            if (getDestination().save_Encoded_Image(getUtils()))
                 logging(Level.WARNING,"Encoding image was not saved");
         }
 
@@ -216,5 +219,13 @@ public class Pie_Encode {
 
     public void setUtils(Pie_Utils utils) {
         this.utils = utils;
+    }
+
+    public Pie_Encoded_Destination getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Pie_Encoded_Destination destination) {
+        this.destination = destination;
     }
 }

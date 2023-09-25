@@ -11,7 +11,7 @@ import net.pie.Pie_Config;
 import net.pie.Pie_Decode;
 import net.pie.Pie_Encode;
 import net.pie.Pie_Source;
-import net.pie.enums.Pie_Position;
+import net.pie.enums.Pie_Constants;
 import net.pie.utils.Pie_Decoded_Destination;
 import net.pie.utils.Pie_Encoded_Destination;
 import net.pie.utils.Pie_Utils;
@@ -23,9 +23,9 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_To_Be_Encoded = "fire2.jpg";
     private String temp_Encoded_Imaage = "My_Image.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
@@ -50,11 +50,10 @@ public class Pie_Test {
      */
     private Pie_Config build_a_encoding_config() {
         Pie_Config config = new Pie_Config();
-        config.setLog_level(Level.INFO);                                                            // Optional
-        config.getEncoder_Minimum().setDimension(0, 0, Pie_Position.MIDDLE_CENTER);   // Optional
-        config.setSave_Encoder_Image(save_Image_After_Encoding());                                  // Optional
-        config.setEncoder_Add_Encryption(false);                                                    // Optional
-        config.setEncoder_Compression_Level(Deflater.BEST_COMPRESSION);                             // Optional
+        config.setLog_level(Level.INFO);                                                            // Optional default is Level.SEVERE
+        config.getEncoder_Minimum().setDimension(0, 0, Pie_Constants.MIDDLE_CENTER);   // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
+        config.setEncoder_Add_Encryption(false);                                                    // Optional default is true
+        config.setEncoder_Compression_Level(Deflater.BEST_COMPRESSION);                             // Optional default is Deflater.BEST_SPEED
         return config;
     }
 
@@ -66,36 +65,14 @@ public class Pie_Test {
      * @return BufferedImage
      */
     private BufferedImage encode(String text) {
-        Pie_Source source = new Pie_Source(
-            build_a_encoding_config(),
-            new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)
-        );
+        Pie_Source source = new Pie_Source( build_a_encoding_config(), new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));
 
-        Pie_Encode encoder = new Pie_Encode(source);     // Optional Config
+        Pie_Encoded_Destination encoded_destination = new Pie_Encoded_Destination();
+        encoded_destination.setLocal_file(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage));
+
+        Pie_Encode encoder = new Pie_Encode(source, encoded_destination);     // Optional Config
         encoder.encode();
         return encoder.getEncoded_image();
-    }
-
-    /** ******************************************************<br>
-     * <b>Optional Save image after encoding just to see what it looks like</b>
-     * @return Pie_Encoded_Destination
-     */
-    private Pie_Encoded_Destination save_Image_After_Encoding() {
-        Pie_Encoded_Destination encoded_Image_destination = new Pie_Encoded_Destination();
-        encoded_Image_destination.setLocal_file(new File(
-                Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage));
-        return encoded_Image_destination;
-    }
-
-    /** ******************************************************<br>
-     * <b>Optional Save source after decoding</b>
-     * @return Pie_Decoded_Destination
-     */
-    private Pie_Decoded_Destination save_Source_After_Decoding() {
-        Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
-        decoded_Source_destination.setLocal_folder(new File(
-                Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To));
-        return decoded_Source_destination;
     }
 
     /** ******************************************************<br>
@@ -107,7 +84,11 @@ public class Pie_Test {
      */
     private String decode(BufferedImage image) {
         Pie_Config config = new Pie_Config();
-        config.setSave_Decoder_Source(save_Source_After_Decoding());                        // Optional
+
+        Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
+        decoded_Source_destination.setLocal_folder(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To));
+
+        config.setSave_Decoder_Source(decoded_Source_destination);                        // Optional
         config.setLog_level(Level.INFO);
 
         Pie_Decode decoder = new Pie_Decode(config, image);

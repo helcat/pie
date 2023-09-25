@@ -20,7 +20,6 @@ public class Pie_Config {
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
-    private Pie_Encoded_Destination save_Encoder_Image;
     private Pie_Decoded_Destination save_Decoder_Source;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = true;
@@ -112,14 +111,6 @@ public class Pie_Config {
 
     public Level getLog_level() {
         return log_level;
-    }
-
-    public Pie_Encoded_Destination getSave_Encoder_Image() {
-        return save_Encoder_Image;
-    }
-
-    public void setSave_Encoder_Image(Pie_Encoded_Destination save_Encoder_Image) {
-        this.save_Encoder_Image = save_Encoder_Image;
     }
 
     public Pie_Decoded_Destination getSave_Decoder_Source() {

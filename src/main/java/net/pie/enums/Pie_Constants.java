@@ -1,6 +1,6 @@
 package net.pie.enums;
 
-import java.security.spec.KeySpec;
+import java.util.Arrays;
 
 /** *******************************************************<br>
  * <b>Pie_Constants</b><br>
@@ -14,8 +14,25 @@ public enum Pie_Constants {
     IMAGE_TYPE (0, "png"),
     CIPHER (0,"AES/CBC/PKCS5PADDING"),
     KEYSPEC (0,"AES"),
+
     ENC (0, "E"),
-    NO_ENC (0, "N")
+    NO_ENC (0, "N"),
+
+    TOP_LEFT (0, "TL"),
+    TOP_CENTER (1, "TC"),
+    TOP_RIGHT (2, "TR"),
+    MIDDLE_LEFT (3, "ML"),
+    MIDDLE_CENTER(4, "MC") ,
+    MIDDLE_RIGHT (5, "MR"),
+    BOTTOM_LEFT (6, "BL"),
+    BOTTOM_CENTER (7, "BC"),
+    BOTTOM_RIGHT (8, "BR"),
+
+    SINGLE_FILE (0, "S"),
+    MULTI_FILE (1, "M"),
+    MULTI_FILE_PLUS_DECOYS (1, "MD"),
+    ZIP_MULTI_FILE (2, "Z"),
+    ZIP_MULTI_FILE_PLUS_DECOYS (2, "ZD"),
     ;
 
     public int parm1 = 0;
@@ -24,6 +41,13 @@ public enum Pie_Constants {
     Pie_Constants(int p1, String p2) {
         parm1 = p1;
         parm2 = p2;
+    }
+
+    /** *******************************************************<br>
+     * get positions : seems lazy and should be its own enum but there is a logic behind it.
+     */
+    public static java.util.List<Pie_Constants> getPositionList() {
+        return Arrays.asList(TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT);
     }
 
     /** *******************************************************<br>
