@@ -88,7 +88,8 @@ public class Pie_Decode {
         int retrievedGreen;
         int retrievedBlue;
 
-        byte[] message = new byte[((buffimage.getHeight() * buffimage.getWidth()) * Pie_Constants.RGB_COUNT.getParm1())];
+        int mode = 0;
+        byte[] message = null;
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
                 pixelColor = buffimage.getRGB(x, y);
@@ -98,6 +99,14 @@ public class Pie_Decode {
                 if (retrievedRed == 0 && retrievedGreen == 0 && retrievedBlue == 0)
                     continue;
 
+                if (message == null) {
+                    mode = mode + (retrievedRed > 0 ? 1 : 0);
+                    mode = mode + (retrievedGreen > 0 ? 1 : 0);
+                    mode = mode + (retrievedBlue > 0 ? 1 : 0);
+                    message = new byte[((buffimage.getHeight() * buffimage.getWidth()) * mode)];
+                }
+
+
                 if (retrievedRed > 0)
                     message[count++] = (byte) retrievedRed;
                 if (retrievedGreen > 0)
@@ -105,6 +114,12 @@ public class Pie_Decode {
                 if (retrievedBlue > 0)
                     message[count++] = (byte) retrievedBlue;
             }
+        }
+
+        if (message == null) {
+            logging(Level.SEVERE,"Decoding Error");
+            getConfig().exit();
+            return;
         }
 
         try { // keep message_txt out side so parms can be set

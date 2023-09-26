@@ -136,7 +136,7 @@ public class Pie_Encode_Source {
                     return null;
                 try {
                     StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
-                    StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % Pie_Constants.RGB_COUNT.getParm1()));
+                    StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getEncoder_mode().getParm1().length()));
                     return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), getUtils().compress(append.toString()), "Main Encoding : ")).
                             getBytes(StandardCharsets.UTF_8);
                 } catch (Exception e) {

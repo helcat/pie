@@ -283,6 +283,8 @@ public class Pie_Utils {
         return runtime.totalMemory() - runtime.freeMemory();
     }
     public void usedMemory(long previous_Menory, String label) {
+        if (!getConfig().isShow_Memory_Usage_In_Logs())
+            return;
         getConfig().logging(Level.INFO,label + " Memory Used : " +
                 humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory) +
                 " : Available : " + humanReadableBytes(runtime.maxMemory()) +

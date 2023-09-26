@@ -1,10 +1,7 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
-import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_Encode_Source;
-import net.pie.utils.Pie_Encoded_Destination;
-import net.pie.utils.Pie_Utils;
+import net.pie.utils.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -65,35 +62,73 @@ public class Pie_Encode {
             return;
         }
 
-        double dimension = Math.sqrt((double) originalArray.length / Pie_Constants.RGB_COUNT.getParm1());
-        int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
-        if (size > getConfig().getMax_Encoded_Image_Size()) {
-            logging(Level.SEVERE,"Cannot Generate Image Size " + size  + " x " + size);
-            logging(Level.SEVERE,"Max Allowed Image Size " + getConfig().getMax_Encoded_Image_Size()  + " x " + getConfig().getMax_Encoded_Image_Size());
-            getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+        Pie_Size image_size = calculate_image_Size(originalArray.length);
+        if (image_size == null) {
             getConfig().exit();
             return;
         }
-        logging(Level.INFO,"Generating Image Size " + size  + " x " + size);
 
-        Integer r = null;
-        Integer g = null;
+        BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
+
+        if (isError()) {
+            logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().exit();
+            return;
+        }
+
+        BufferedImage buffImg = null;
+        int width = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getWidth() : 0, image_size.getWidth());
+        int height = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getHeight() : 0, image_size.getHeight());
+        if (width > image_size.getWidth() || height > image_size.getHeight()) {
+            logging(Level.INFO,"Extending Encoded Image");
+            buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gd = buffImg.createGraphics();
+            gd.drawImage(data_image, null,dataImageOffset(image_size.getWidth(), width), dataImageOffset(image_size.getHeight(), height));
+            gd.dispose();
+        }
+
+        // Process the image - send to destination if required
+        if (getDestination() != null) {
+            getDestination().setImage(buffImg != null ? buffImg : data_image);
+            if (!getDestination().save_Encoded_Image(getUtils()))
+                logging(Level.WARNING,"Encoding image was not saved");
+        }else{
+            logging(Level.WARNING,"No Encoding Destination Set");
+        }
+
+        logging(Level.INFO,"Encoding Complete");
+        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+        getConfig().exit();
+        if (getConfig().isEncoder_run_gc_after()) System.gc();
+    }
+
+    /** ******************************************************<br>
+     * Create the encoded image Mode 1
+     * @param image_size
+     * @param originalArray
+     * @return BufferedImage
+     */
+    private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
+        logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
+
+        Integer r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
+        Integer g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
         int b=0, x =0, y = 0;
-        BufferedImage data_image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), BufferedImage.TYPE_INT_ARGB);
         for (int i : originalArray) {
-            if (r == null) {
+            if (r == null && getConfig().getEncoder_mode().getParm1().contains("R")) {
                 r = i;
-            } else if (g == null) {
+            } else if (g == null && getConfig().getEncoder_mode().getParm1().contains("G")) {
                 g = i;
             } else {
-                if (x >= size) {
+                if (x >= image_size.getWidth()) {
                     x = 0;
                     y ++;
                 }
                 b = i;
                 data_image.setRGB(x++, y, createColor(r, g, b).getRGB());
-                r = null;
-                g = null;
+                r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
+                g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
             }
         }
 
@@ -103,34 +138,7 @@ public class Pie_Encode {
         else if (r != null)
             data_image.setRGB(x, y, createColor(r, g, 0).getRGB());
 
-        if (isError()) {
-            logging(Level.SEVERE,"Encoding FAILED");
-            getConfig().exit();
-            return;
-        }
-
-        BufferedImage buffImg = null;
-        int width = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getWidth() : 0, size);
-        int height = Math.max(getConfig().getEncoder_Minimum() != null ? getConfig().getEncoder_Minimum().getHeight() : 0, size);
-        if (width > size || height > size) {
-            logging(Level.INFO,"Extending Encoded Image");
-            buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D gd = buffImg.createGraphics();
-            gd.drawImage(data_image, null,dataImageOffset(size, width), dataImageOffset(size, height));
-            gd.dispose();
-        }
-
-        // Process the image - send to destination if required
-        if (getDestination() != null) {
-            getDestination().setImage(buffImg != null ? buffImg : data_image);
-            if (!getDestination().save_Encoded_Image(getUtils()))
-                logging(Level.WARNING,"Encoding image was not saved");
-        }
-
-        logging(Level.INFO,"Encoding Complete");
-        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
-        getConfig().exit();
-        if (getConfig().isEncoder_run_gc_after()) System.gc();
+        return data_image;
     }
 
     /** ******************************************************<br>
@@ -142,8 +150,8 @@ public class Pie_Encode {
      **/
     private int dataImageOffset(int size, int dim) {
         logging(Level.INFO,"Encoding Offset");
-        if (getConfig().getEncoder_Minimum() != null && getConfig().getEncoder_Minimum().getPosition() != null) {
-            switch (getConfig().getEncoder_Minimum().getPosition()) {
+        if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
+            switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
                 case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> {
                     return 0;
                 }
@@ -156,6 +164,37 @@ public class Pie_Encode {
             }
         }
         return 0;
+    }
+
+    /** ******************************************************<br>
+     * <b>Calculate image Size</b>
+     * @return Pie_Size
+     */
+    public Pie_Size calculate_image_Size(int length) {
+        Pie_Size image_size = new Pie_Size();
+
+        // No Max.
+        double dimension = Math.sqrt((double) length / getConfig().getEncoder_mode().getParm1().length());
+        int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
+        image_size.setHeight(size);
+        image_size.setWidth(size);
+
+        if (getConfig().hasEncoder_Maximum_Image()) {
+            if (length > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
+                logging(Level.SEVERE, "Maximum Image Size Is %d x %d Increase Memory and / or Maximum Image Size Limit".
+                        formatted(getConfig().getEncoder_Maximum_Image().getWidth(), getConfig().getEncoder_Maximum_Image().getHeight()));
+                getConfig().exit();
+                return null;
+            }
+
+            if (image_size.getWidth() > getConfig().getEncoder_Maximum_Image().getWidth()  || image_size.getHeight() > getConfig().getEncoder_Maximum_Image().getHeight())
+                image_size = getConfig().getEncoder_Maximum_Image();
+
+        }else{
+            logging(Level.WARNING,"Maximum Image Size Is Not Set");
+        }
+
+        return image_size;
     }
 
     /** ******************************************************<br>
