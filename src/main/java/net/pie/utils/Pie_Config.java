@@ -23,7 +23,7 @@ public class Pie_Config {
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = false;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_1;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_3;
 
     // All
     private Level log_level = Level.SEVERE;
@@ -180,6 +180,14 @@ public class Pie_Config {
         return encoder_mode;
     }
 
+    /** ***************************************************************<br>
+     * <b>setEncoder_mode</b><br>
+     * Encode mode allows for different encodings to be put on to the image.<br>
+     * Allowed encodings are ENCODE_MODE_5, ENCODE_MODE_4, ENCODE_MODE_3, ENCODE_MODE_2, ENCODE_MODE_1<br>
+     * ENCODE_MODE_3 is the default. Smaller images. The size of the image can increase depending on the mode selected.
+     * @param encoder_mode
+     * @see Pie_Encode_Mode
+     */
     public void setEncoder_mode(Pie_Encode_Mode encoder_mode) {
         this.encoder_mode = encoder_mode;
     }

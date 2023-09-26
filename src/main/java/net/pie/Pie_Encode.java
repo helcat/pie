@@ -1,6 +1,7 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
 import java.awt.*;
@@ -62,15 +63,15 @@ public class Pie_Encode {
             return;
         }
 
-        Pie_Size image_size = calculate_image_Size(originalArray.length);
-        if (image_size == null) {
+        Pie_Size image_size = calculate_image_Mode(originalArray.length);
+        if (image_size == null) { // all else fails quit
             getConfig().exit();
             return;
         }
 
         BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
 
-        if (isError()) {
+        if (isError() || data_image == null) {
             logging(Level.SEVERE,"Encoding FAILED");
             getConfig().exit();
             return;
@@ -113,13 +114,35 @@ public class Pie_Encode {
 
         Integer r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
         Integer g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
-        int b=0, x =0, y = 0;
+        Integer b = 0, x =0, y = 0;
         BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        boolean finish_me = false;
+
         for (int i : originalArray) {
-            if (r == null && getConfig().getEncoder_mode().getParm1().contains("R")) {
+            if (getConfig().getEncoder_mode() == Pie_Encode_Mode.ENCODE_MODE_5) { // R only
+                if (x >= image_size.getWidth()) {
+                    x = 0;
+                    y++;
+                }
+                data_image.setRGB(x++, y, createColor(i, 0, 0).getRGB());
+                finish_me = false;
+
+            }else if (getConfig().getEncoder_mode() == Pie_Encode_Mode.ENCODE_MODE_4) { // G only
+                if (x >= image_size.getWidth()) {
+                    x = 0;
+                    y ++;
+                }
+                data_image.setRGB(x++, y, createColor(0, i, 0).getRGB());
+                finish_me = false;
+
+            } else if (r == null && getConfig().getEncoder_mode().getParm1().contains("R")) {
                 r = i;
+                finish_me = true;
+
             } else if (g == null && getConfig().getEncoder_mode().getParm1().contains("G")) {
                 g = i;
+                finish_me = true;
+
             } else {
                 if (x >= image_size.getWidth()) {
                     x = 0;
@@ -129,14 +152,14 @@ public class Pie_Encode {
                 data_image.setRGB(x++, y, createColor(r, g, b).getRGB());
                 r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
                 g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
+                b = getConfig().getEncoder_mode().getParm1().contains("B") ? null : 0;
+                finish_me = false;
             }
         }
 
         // finish any spare pixels
-        if (r != null && g == null)
-            data_image.setRGB(x, y, createColor(r, 0, 0).getRGB());
-        else if (r != null)
-            data_image.setRGB(x, y, createColor(r, g, 0).getRGB());
+        if (finish_me)
+            data_image.setRGB(x, y, createColor(r == null ? 0 : r, g == null ? 0 : g, b == null ? 0 : b).getRGB());
 
         return data_image;
     }
@@ -167,23 +190,52 @@ public class Pie_Encode {
     }
 
     /** ******************************************************<br>
-     * <b>Calculate image Size</b>
+     * <b>Calculate image Mode</b>
      * @return Pie_Size
      */
-    public Pie_Size calculate_image_Size(int length) {
+    public Pie_Size calculate_image_Mode(int length) {
+        Pie_Size image_size = null;
+        if (getConfig().getEncoder_mode().getParm1().length() == 3)
+            return calculate_image_Size(length, getConfig().getEncoder_mode());
+
+        if (getConfig().getEncoder_mode().getParm1().length() == 1) {
+            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
+            if (image_size == null)
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_2); // try 2
+            if (image_size == null)
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_3); // try 3
+            return image_size;
+        }
+
+        if (getConfig().getEncoder_mode().getParm1().length() == 2) {
+            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
+            if (image_size == null)
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_3);
+            return image_size;
+        }
+        return null;
+    }
+
+    /** ******************************************************<br>
+     * <b>Calculate image Size</b><br>
+     * @param length
+     * @param mode
+     * @return Pie_Size
+     */
+    public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
         Pie_Size image_size = new Pie_Size();
 
         // No Max.
-        double dimension = Math.sqrt((double) length / getConfig().getEncoder_mode().getParm1().length());
+        double dimension = Math.sqrt((double) length / mode.getParm1().length());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
         image_size.setHeight(size);
         image_size.setWidth(size);
 
         if (getConfig().hasEncoder_Maximum_Image()) {
             if (length > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
-                logging(Level.SEVERE, "Maximum Image Size Is %d x %d Increase Memory and / or Maximum Image Size Limit".
-                        formatted(getConfig().getEncoder_Maximum_Image().getWidth(), getConfig().getEncoder_Maximum_Image().getHeight()));
-                getConfig().exit();
+                logging(Level.WARNING,"Image Size Would be "+size + " x "+ size + ", Maximum Size Is "+getConfig().getEncoder_Maximum_Image().getWidth()+
+                                " x "+ getConfig().getEncoder_Maximum_Image().getHeight()+" " +
+                                "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
             }
 

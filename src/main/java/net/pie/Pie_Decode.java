@@ -80,6 +80,11 @@ public class Pie_Decode {
         }
 
         BufferedImage buffimage = getUtils().load_image(getSource().getLocal_file());
+        if (buffimage == null) {
+            logging(Level.SEVERE, "Cannot decode null image");
+            getConfig().exit();
+            return;
+        }
 
         int pixelColor;
         int count = 0;
