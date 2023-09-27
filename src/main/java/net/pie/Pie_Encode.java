@@ -56,7 +56,7 @@ public class Pie_Encode {
         }
 
         getConfig().getLog().setLevel(getConfig().getLog_level());
-        logging(Level.INFO,"Encoding Process Started");
+        logging(Level.INFO,"Encoding Process ("+getConfig().getEncoder_mode().toString()+") Started");
 
         byte[] originalArray = getSource().encode_process();
         if (isError() || originalArray == null || originalArray.length == 0) {
@@ -228,7 +228,7 @@ public class Pie_Encode {
         image_size.setWidth(size);
 
         if (getConfig().hasEncoder_Maximum_Image()) {
-            if (length > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
+            if ((size * 2) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
                 logging(Level.WARNING,"Image Size Would be "+size + " x "+ size + ", Maximum Size Is "+getConfig().getEncoder_Maximum_Image().getWidth()+
                                 " x "+ getConfig().getEncoder_Maximum_Image().getHeight()+" " +
                                 "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");

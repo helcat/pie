@@ -109,30 +109,36 @@ public class Pie_Utils {
 
         try {
             if (stream instanceof File) {
+                getConfig().logging(Level.INFO,"Loading Encoded File");
                 image = ImageIO.read((File) stream);
             }
 
             else if (stream instanceof ByteArrayOutputStream) {
+                getConfig().logging(Level.INFO,"Loading Encoded ByteArrayOutputStream");
                 image = ImageIO.read((ImageInputStream) stream);
                 ((ByteArrayOutputStream) stream).close();
             }
 
             else if (stream instanceof ImageInputStream) {
+                getConfig().logging(Level.INFO,"Loading Encoded ImageInputStream");
                 image = ImageIO.read((ImageInputStream) stream);
                 ((ImageInputStream) stream).close();
             }
 
             else if (stream instanceof FileInputStream) {
+                getConfig().logging(Level.INFO,"Loading Encoded FileInputStream");
                 image = ImageIO.read((FileInputStream) stream);
                 ((FileInputStream) stream).close();
             }
 
             else if (stream instanceof InputStream) {
+                getConfig().logging(Level.INFO,"Loading Encoded InputStream");
                 image = ImageIO.read((InputStream) stream);
                 ((InputStream) stream).close();
             }
 
             else if (stream instanceof URL) {
+                getConfig().logging(Level.INFO,"Loading Encoded URL");
                 InputStream is =  ((URL) stream).openStream();
                 image = ImageIO.read((ImageInputStream) is);
                 is.close();
