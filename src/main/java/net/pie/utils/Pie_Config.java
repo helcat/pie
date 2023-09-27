@@ -19,11 +19,12 @@ public class Pie_Config {
 
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = null;
-    private Pie_Size encoder_Maximum_Image = new Pie_Size(15000, 15000);
+    private Pie_Size encoder_Maximum_Image = new Pie_Size(16000, 16000);
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_run_gc_after = false;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_3;
+    private boolean encoder_Transparent = false;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
 
     // All
     private Level log_level = Level.SEVERE;
@@ -180,11 +181,25 @@ public class Pie_Config {
         return encoder_mode;
     }
 
+    public boolean isEncoder_Transparent() {
+        return encoder_Transparent;
+    }
+
+    /** ***************************************************************<br>
+     * <b>setEncoder_Transparent</b><br>
+     * this setting will create a transparent image but will keep all the data intact for decoding.<br>
+     * The default is off (false).<br>
+     * Note this setting is ignored if the alpha channel is used as part of the encoding process.
+     * @param encoder_Transparent (boolean) Default false
+     */
+    public void setEncoder_Transparent(boolean encoder_Transparent) {
+        this.encoder_Transparent = encoder_Transparent;
+    }
+
     /** ***************************************************************<br>
      * <b>setEncoder_mode</b><br>
      * Encode mode allows for different encodings to be put on to the image.<br>
-     * Allowed encodings are ENCODE_MODE_5, ENCODE_MODE_4, ENCODE_MODE_3, ENCODE_MODE_2, ENCODE_MODE_1<br>
-     * ENCODE_MODE_3 is the default. Smaller images. The size of the image can increase depending on the mode selected.
+     * ENCODE_MODE_RGB. is the default. Smaller images. The size of the image can increase depending on the mode selected.
      * @param encoder_mode
      * @see Pie_Encode_Mode
      */

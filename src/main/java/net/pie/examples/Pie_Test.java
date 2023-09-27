@@ -19,7 +19,7 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "fire2.jpg";
+    private String temp_To_Be_Encoded = "ideaIC-2023.2.1.exe";
     private String temp_Encoded_Imaage = "My_Image.png";
     private String temp_Decode_To = "batch";
 
@@ -40,7 +40,8 @@ public class Pie_Test {
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Constants.MIDDLE_CENTER));   // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
         encoding_config.setEncoder_Add_Encryption(false);                                                    // Optional default is true
         encoding_config.setEncoder_Compression_Level(Deflater.BEST_COMPRESSION);                             // Optional default is Deflater.BEST_SPEED
-        encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_3);                                      // Optional default is Pie_Encode_Mode.ENCODE_MODE_3
+        encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                    // Optional default is Pie_Encode_Mode.ENCODE_MODE_3
+        encoding_config.setEncoder_Transparent(false);                                                        // Optional default is off (false)
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

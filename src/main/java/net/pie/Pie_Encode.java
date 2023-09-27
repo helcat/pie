@@ -1,11 +1,13 @@
 package net.pie;
 
-import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 public class Pie_Encode {
@@ -18,6 +20,7 @@ public class Pie_Encode {
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
      * @param source (Send in a Pie_Source object)
+     * @param encoded_destination (Pie_Encoded_Destination)
      * @see Pie_Encode_Source Pie_Source to load in the content.
      **/
     public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
@@ -111,55 +114,40 @@ public class Pie_Encode {
      */
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
         logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
-
-        Integer r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
-        Integer g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
-        Integer b = 0, x =0, y = 0;
+        Integer x =0, y = 0;
         BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        boolean finish_me = false;
+        return buildImage(data_image, originalArray, getConfig().getEncoder_mode().getParm1() );
+    }
 
+    /** *********************************************************<br>
+     * Red, Green, or Blue Only
+     * @param data_image (BufferedImage)
+     * @param originalArray (byte[])
+     * @param rbg (String)
+     * @return BufferedImage
+     */
+    private BufferedImage buildImage(BufferedImage data_image, byte[] originalArray, String rbg) {
+        int x =0, y = 0, count = 0;
+        boolean hasAlpha = rbg.contains("A");
+        List<Integer> store = new ArrayList<Integer>();
         for (int i : originalArray) {
-            if (getConfig().getEncoder_mode() == Pie_Encode_Mode.ENCODE_MODE_5) { // R only
-                if (x >= image_size.getWidth()) {
-                    x = 0;
-                    y++;
-                }
-                data_image.setRGB(x++, y, createColor(i, 0, 0).getRGB());
-                finish_me = false;
+            store.add(i);
+            if (store.size() < rbg.length())
+                continue;
 
-            }else if (getConfig().getEncoder_mode() == Pie_Encode_Mode.ENCODE_MODE_4) { // G only
-                if (x >= image_size.getWidth()) {
-                    x = 0;
-                    y ++;
-                }
-                data_image.setRGB(x++, y, createColor(0, i, 0).getRGB());
-                finish_me = false;
-
-            } else if (r == null && getConfig().getEncoder_mode().getParm1().contains("R")) {
-                r = i;
-                finish_me = true;
-
-            } else if (g == null && getConfig().getEncoder_mode().getParm1().contains("G")) {
-                g = i;
-                finish_me = true;
-
-            } else {
-                if (x >= image_size.getWidth()) {
-                    x = 0;
-                    y ++;
-                }
-                b = i;
-                data_image.setRGB(x++, y, createColor(r, g, b).getRGB());
-                r = getConfig().getEncoder_mode().getParm1().contains("R") ? null : 0;
-                g = getConfig().getEncoder_mode().getParm1().contains("G") ? null : 0;
-                b = getConfig().getEncoder_mode().getParm1().contains("B") ? null : 0;
-                finish_me = false;
+            if (x >= data_image.getWidth()) {
+                x = 0; y++;
             }
-        }
 
-        // finish any spare pixels
-        if (finish_me)
-            data_image.setRGB(x, y, createColor(r == null ? 0 : r, g == null ? 0 : g, b == null ? 0 : b).getRGB());
+            count = 0;
+            data_image.setRGB(x++, y,
+                    hasAlpha ?
+                        new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, checkerAlpha(store.get(count++))).getRGB() :
+                    getConfig().isEncoder_Transparent() ?
+                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, 1).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0).getRGB());
+            store.clear();
+            }
 
         return data_image;
     }
@@ -191,26 +179,34 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * <b>Calculate image Mode</b>
+     * @param length (int)
      * @return Pie_Size
      */
     public Pie_Size calculate_image_Mode(int length) {
         Pie_Size image_size = null;
-        if (getConfig().getEncoder_mode().getParm1().length() == 3)
+        if (getConfig().getEncoder_mode().getParm1().length() == 4)
             return calculate_image_Size(length, getConfig().getEncoder_mode());
+
+        if (getConfig().getEncoder_mode().getParm1().length() == 3) {
+            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
+            if (image_size == null)
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_ARGB); // try 4
+            return image_size;
+        }
 
         if (getConfig().getEncoder_mode().getParm1().length() == 1) {
             image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
             if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_2); // try 2
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_GB); // try 2
             if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_3); // try 3
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB); // try 3
             return image_size;
         }
 
         if (getConfig().getEncoder_mode().getParm1().length() == 2) {
             image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
             if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_3);
+                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB);
             return image_size;
         }
         return null;
@@ -218,8 +214,8 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * <b>Calculate image Size</b><br>
-     * @param length
-     * @param mode
+     * @param length (int)
+     * @param mode (Pie_Encode_Mode)
      * @return Pie_Size
      */
     public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
@@ -250,15 +246,12 @@ public class Pie_Encode {
     }
 
     /** ******************************************************<br>
-     * <b>Create Color</b><br>
-     * Creates a color with encoded numbers<br>
-     * @param r encoded byte.
-     * @param g encoded byte.
-     * @param b encoded byte.
-     * @return Encoded Color
+     * <b>Checks the number to make sure its above zero.</b><br>
+     * @param check (the int to check)
+     * @return int
      **/
-    private Color createColor(int r, int g, int b) {
-        return new Color(checker(r), checker(g), checker(b));
+    private int checker(int check) {
+        return Math.max(check, 0);
     }
 
     /** ******************************************************<br>
@@ -266,8 +259,8 @@ public class Pie_Encode {
      * @param check (the int to check)
      * @return int
      **/
-    private int checker(int check) {
-        return Math.max(check, 0);
+    private int checkerAlpha(int check) {
+        return Math.max(check, 1);
     }
 
     /** *******************************************************<br>

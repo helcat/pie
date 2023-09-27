@@ -43,9 +43,11 @@ public class Pie_Decode {
      * @param message (Logging Message)
      **/
     private void logging(Level level, String message) {
-        getConfig().getLog().log(level,  message);
-        if (level.equals(Level.SEVERE))
-            getConfig().setError(true);
+        if (getConfig().getLog() != null) {
+            getConfig().getLog().log(level, message);
+            if (level.equals(Level.SEVERE))
+                getConfig().setError(true);
+        }
     }
 
     /** *********************************************************<br>
@@ -88,8 +90,8 @@ public class Pie_Decode {
 
         int pixelColor;
         int count = 0;
-        // int retrievedAlpha = (pixelColor >> 24) & 0xFF;
-        int retrievedRed ;
+        int retrievedAlpha;
+        int retrievedRed;
         int retrievedGreen;
         int retrievedBlue;
 
@@ -101,6 +103,8 @@ public class Pie_Decode {
                 retrievedRed = (pixelColor >> 16) & 0xFF;
                 retrievedGreen = (pixelColor >> 8) & 0xFF;
                 retrievedBlue = pixelColor & 0xFF;
+                retrievedAlpha = (pixelColor >> 24) & 0xFF;
+
                 if (retrievedRed == 0 && retrievedGreen == 0 && retrievedBlue == 0)
                     continue;
 
@@ -108,6 +112,7 @@ public class Pie_Decode {
                     mode = mode + (retrievedRed > 0 ? 1 : 0);
                     mode = mode + (retrievedGreen > 0 ? 1 : 0);
                     mode = mode + (retrievedBlue > 0 ? 1 : 0);
+                    mode = mode + (retrievedAlpha > 0 && retrievedAlpha < 255 ? 1 : 0);
                     message = new byte[((buffimage.getHeight() * buffimage.getWidth()) * mode)];
                 }
 
@@ -118,6 +123,8 @@ public class Pie_Decode {
                     message[count++] = (byte) retrievedGreen;
                 if (retrievedBlue > 0)
                     message[count++] = (byte) retrievedBlue;
+                if (retrievedAlpha > 0 && retrievedAlpha < 255)
+                    message[count++] = (byte) retrievedAlpha;
             }
         }
 
