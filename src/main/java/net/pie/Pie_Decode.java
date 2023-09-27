@@ -116,7 +116,6 @@ public class Pie_Decode {
                     message = new byte[((buffimage.getHeight() * buffimage.getWidth()) * mode)];
                 }
 
-
                 if (retrievedRed > 0)
                     message[count++] = (byte) retrievedRed;
                 if (retrievedGreen > 0)

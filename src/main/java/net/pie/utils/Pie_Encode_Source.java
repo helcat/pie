@@ -94,6 +94,7 @@ public class Pie_Encode_Source {
                     setContent(contentBuilder.toString());
                     setType(Pie_Source_Type.TEXT);
                 }else{
+                    logging(Level.INFO,"Loading File " + f.getName());
                     Path filePath = f.toPath();
                     setFile_name(f.getName());
                     try {
