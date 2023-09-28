@@ -7,6 +7,7 @@ import net.pie.utils.Pie_Decode_Source;
 import net.pie.utils.Pie_Decoded_Destination;
 import net.pie.utils.Pie_Utils;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +30,7 @@ public class Pie_Decode {
      * @param decoded_Source_destination Image to be decrypted
      **/
     public Pie_Decode(Pie_Decode_Source source, Pie_Decoded_Destination decoded_Source_destination) {
+        ImageIO.setUseCache(false);
         setConfig(source.getConfig());
         setUtils(new Pie_Utils(getConfig()));
         setMemory_Start(getUtils().getMemory());

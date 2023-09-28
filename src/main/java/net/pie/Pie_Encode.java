@@ -4,6 +4,7 @@ import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Pie_Encode {
      * @see Pie_Encode_Source Pie_Source to load in the content.
      **/
     public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
+        ImageIO.setUseCache(false);
         setSource(source);
         setDestination(encoded_destination);
         setConfig(source.getConfig());
@@ -118,7 +120,10 @@ public class Pie_Encode {
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
         logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
         Integer x =0, y = 0;
-        BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        int image_type = BufferedImage.TYPE_INT_RGB;
+        if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().isEncoder_Transparent())
+            image_type = BufferedImage.TYPE_INT_ARGB;
+        BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type);
         return buildImage(data_image, originalArray, getConfig().getEncoder_mode().getParm1() );
     }
 
@@ -145,10 +150,10 @@ public class Pie_Encode {
             count = 0;
             data_image.setRGB(x++, y,
                     hasAlpha ?
-                        new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, checkerAlpha(store.get(count++))).getRGB() :
+                        new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
                     getConfig().isEncoder_Transparent() ?
-                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, 1).getRGB() :
-                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0).getRGB());
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
             store.clear();
         }
 
@@ -161,10 +166,10 @@ public class Pie_Encode {
             count = 0;
             data_image.setRGB(x++, y,
                     hasAlpha ?
-                            new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, checkerAlpha(store.get(count++))).getRGB() :
+                            new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
                             getConfig().isEncoder_Transparent() ?
-                                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, 1).getRGB() :
-                                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0).getRGB());
+                                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
+                                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
             store.clear();
         }
         return data_image;
@@ -275,20 +280,26 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * <b>Checks the number to make sure its above zero.</b><br>
-     * @param check (the int to check)
+     * @param store (stored bytes)
+     * @param position (position of stored byte)
      * @return int
      **/
-    private int checker(int check) {
-        return Math.max(check, 0);
+    private int checker(List<Integer> store, int position) {
+        if (store.size() > position)
+            return Math.max(store.get(position), 0);
+        return 0;
     }
 
     /** ******************************************************<br>
      * <b>Checks the number to make sure its above zero.</b><br>
-     * @param check (the int to check)
+     * @param store (stored bytes)
+     * @param position (position of stored byte)
      * @return int
      **/
-    private int checkerAlpha(int check) {
-        return Math.max(check, 1);
+    private int checkerAlpha(List<Integer> store, int position) {
+        if (store.size() > position)
+            return Math.max(store.get(position), 1);
+        return 0;
     }
 
     /** *******************************************************<br>
@@ -333,4 +344,5 @@ public class Pie_Encode {
     public void setDestination(Pie_Encoded_Destination destination) {
         this.destination = destination;
     }
+
 }

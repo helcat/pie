@@ -28,6 +28,7 @@ public class Pie_Utils {
     private Pie_Config config = null;
 
     public Pie_Utils(Pie_Config config) {
+        ImageIO.setUseCache(false);
         setConfig(config);
     }
 
@@ -178,10 +179,11 @@ public class Pie_Utils {
             return false;
         }
         try {
-            if (!isError())
+            if (!isError()) {
                 return ImageIO.write(buffer, Pie_Constants.IMAGE_TYPE.getParm2(), file);
+            }
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE,MessageFormat.format("saveImage_to_file - {0}", e.getMessage()));
+            getConfig().logging(Level.SEVERE,"Unable to save to file : " + e.getMessage());
         }
         return false;
     }
