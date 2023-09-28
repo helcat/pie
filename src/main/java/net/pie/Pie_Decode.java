@@ -207,12 +207,17 @@ public class Pie_Decode {
                 return null;
             }
 
-            if (base64_text.startsWith(Pie_Constants.PARM_BEGINNING.getParm2()) && base64_text.contains(Pie_Constants.PARM_ENDING.getParm2())) {
-                String parms = base64_text.substring(0, base64_text.lastIndexOf(Pie_Constants.PARM_ENDING.getParm2()) + Pie_Constants.PARM_ENDING.getParm2().length());
-                base64_text = base64_text.replace(parms, "");
+            if (base64_text.contains("*")) {
+                String[] data = base64_text.split("\\*");
+                if  (data.length == 0) {
+                    logging(Level.SEVERE,"Nothing to decode");
+                    getConfig().exit();
+                    return null;
+                }
+                String parms = data[0];
+                base64_text = data[1];
 
-                parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
-                parms = parms.replace(Pie_Constants.PARM_ENDING.getParm2() ,"");
+                //parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
                 parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms, "Instruction Decoding : "));
                 if (parms.lastIndexOf("?") != -1) {
                     String[] parts = parms.split("\\?", 0);

@@ -7,8 +7,7 @@ import java.util.Arrays;
  * Constants used in PIE
  **/
 public enum Pie_Constants {
-    PARM_BEGINNING (0, "{*"),
-    PARM_ENDING (0, "*}"),
+    PARM_SPLIT_TAG (0, "*"),
     IMAGE_TYPE (0, "png"),
     CIPHER (0,"AES/CBC/PKCS5PADDING"),
     KEYSPEC (0,"AES"),

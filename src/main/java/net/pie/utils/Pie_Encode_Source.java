@@ -184,9 +184,7 @@ public class Pie_Encode_Source {
             "?" +
             (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
 
-        return Pie_Constants.PARM_BEGINNING.getParm2() +
-                getUtils().encrypt(true, getUtils().compress(addon), "Instruction Encoding : ") +
-                Pie_Constants.PARM_ENDING.getParm2();
+        return  getUtils().encrypt(true, getUtils().compress(addon), "Instruction Encoding : ") + Pie_Constants.PARM_SPLIT_TAG.getParm2();
     }
 
     /** *******************************************************<br>
