@@ -127,6 +127,19 @@ public class Pie_Decode {
             }
         }
 
+        // clear down
+        buffimage = null;
+        count = 0;
+        pixelColor = 0;
+        count = 0;
+        retrievedAlpha = 0;
+        retrievedRed= 0;
+        retrievedGreen = 0;
+        retrievedBlue = 0;
+
+        if (getConfig().isRun_gc_after())
+            System.gc();
+
         if (message == null) {
             logging(Level.SEVERE,"Decoding Error");
             getConfig().exit();
@@ -135,6 +148,11 @@ public class Pie_Decode {
 
         try { // keep message_txt out side so parms can be set
             String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
+            if (message_txt == null || message_txt.isEmpty()) {
+                logging(Level.SEVERE,"Decoding Error");
+                getConfig().exit();
+                return;
+            }
             save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
         } catch (Exception e) {
             logging(Level.SEVERE,"Decoding Error " + e.getMessage());
@@ -145,6 +163,9 @@ public class Pie_Decode {
         logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
         getUtils().usedMemory(getMemory_Start(), "Decoding : ");
         getConfig().exit();
+
+        if (getConfig().isRun_gc_after())
+            System.gc();
     }
 
     /** *******************************************************************<br>

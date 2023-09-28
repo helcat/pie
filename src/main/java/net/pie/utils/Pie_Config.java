@@ -22,9 +22,10 @@ public class Pie_Config {
     private Pie_Size encoder_Maximum_Image = new Pie_Size(16000, 16000);
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
-    private boolean encoder_run_gc_after = false;
+    private boolean run_gc_after = false;           // run garbage collector when required.
     private boolean encoder_Transparent = false;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
+    private Pie_Constants encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
 
     // All
     private Level log_level = Level.SEVERE;
@@ -144,17 +145,17 @@ public class Pie_Config {
         this.encoder_Compression_Level = encoder_Compression_Level;
     }
 
-    public boolean isEncoder_run_gc_after() {
-        return encoder_run_gc_after;
+    public boolean isRun_gc_after() {
+        return run_gc_after;
     }
 
     /** ***************************************************************<br>
-     * <b>to run the garbage collector immediately after the encoding</b><br>
-     * When true, this should help with any memory issues from building the encoded image.
-     * @param encoder_run_gc_after (boolean) Default is false.
+     * <b>to run the garbage collector</b><br>
+     * When true, this should help with any memory issues.
+     * @param run_gc_after (boolean) Default is false.
      */
-    public void setEncoder_run_gc_after(boolean encoder_run_gc_after) {
-        this.encoder_run_gc_after = encoder_run_gc_after;
+    public void setRun_gc_after(boolean run_gc_after) {
+        this.run_gc_after = run_gc_after;
     }
 
     public Logger getLog() {
@@ -179,6 +180,23 @@ public class Pie_Config {
 
     public Pie_Encode_Mode getEncoder_mode() {
         return encoder_mode;
+    }
+
+    /** ***************************************************************<br>
+     * Sets the shape of the encoded image<br>
+     * Allowed Values<br>
+     * SHAPE_SQUARE<br>
+     * SHAPE_RECTANGLE (Default) <br>
+     * @param encoder_shape (Pie_Constants)
+     */
+    public void setEncoder_shape(Pie_Constants encoder_shape) {
+        if (encoder_shape == null || !Pie_Constants.getShape().contains(encoder_shape))
+            encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
+        this.encoder_shape = encoder_shape;
+    }
+
+    public Pie_Constants getEncoder_shape() {
+        return encoder_shape;
     }
 
     public boolean isEncoder_Transparent() {

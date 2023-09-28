@@ -19,9 +19,9 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_To_Be_Encoded = "fire2.jpg";
     private String temp_Encoded_Imaage = "My_Image.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
@@ -43,7 +43,7 @@ public class Pie_Test {
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                    // Optional default is Pie_Encode_Mode.ENCODE_MODE_3
         encoding_config.setEncoder_Transparent(false);                                                        // Optional default is off (false)
         encoding_config.setShow_Memory_Usage_In_Logs(true);
-        encoding_config.setEncoder_run_gc_after(false);
+        encoding_config.setRun_gc_after(true);
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

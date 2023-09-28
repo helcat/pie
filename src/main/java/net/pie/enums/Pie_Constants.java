@@ -26,6 +26,9 @@ public enum Pie_Constants {
     BOTTOM_CENTER (7, "BC"),
     BOTTOM_RIGHT (8, "BR"),
 
+    SHAPE_RECTANGLE (1, "REC"),
+    SHAPE_SQUARE (2, "SQU"),
+
     SINGLE_FILE (0, "S"),
     MULTI_FILE (1, "M"),
     MULTI_FILE_PLUS_DECOYS (1, "MD"),
@@ -46,6 +49,12 @@ public enum Pie_Constants {
      */
     public static java.util.List<Pie_Constants> getPositionList() {
         return Arrays.asList(TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT);
+    }
+    /** *******************************************************<br>
+     * get Shape : seems lazy and should be its own enum but there is a logic behind it.
+     */
+    public static java.util.List<Pie_Constants> getShape() {
+        return Arrays.asList(SHAPE_RECTANGLE, SHAPE_SQUARE);
     }
 
     /** *******************************************************<br>

@@ -1,5 +1,6 @@
 package net.pie;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
@@ -68,13 +69,15 @@ public class Pie_Encode {
 
         Pie_Size image_size = calculate_image_Mode(originalArray.length);
         if (image_size == null) { // all else fails quit
+            originalArray = null;
             getConfig().exit();
             return;
         }
 
         BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
-
+        originalArray = null;
         if (isError() || data_image == null) {
+            data_image = null;
             logging(Level.SEVERE,"Encoding FAILED");
             getConfig().exit();
             return;
@@ -103,7 +106,7 @@ public class Pie_Encode {
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
         getConfig().exit();
-        if (getConfig().isEncoder_run_gc_after()) System.gc();
+        if (getConfig().isRun_gc_after()) System.gc();
     }
 
     /** ******************************************************<br>
@@ -147,8 +150,23 @@ public class Pie_Encode {
                     new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0).getRGB());
             store.clear();
+        }
+
+        // Finish any existing pixels
+        if (store.size() > 0) {
+            if (x >= data_image.getWidth()) {
+                x = 0; y++;
             }
 
+            count = 0;
+            data_image.setRGB(x++, y,
+                    hasAlpha ?
+                            new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, checkerAlpha(store.get(count++))).getRGB() :
+                            getConfig().isEncoder_Transparent() ?
+                                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0, 1).getRGB() :
+                                    new Color(rbg.contains("R") ? checker(store.get(count++)) : 0, rbg.contains("G") ? checker(store.get(count++)) : 0, rbg.contains("B") ? checker(store.get(count++)) : 0).getRGB());
+            store.clear();
+        }
         return data_image;
     }
 
@@ -220,24 +238,34 @@ public class Pie_Encode {
      */
     public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
         Pie_Size image_size = new Pie_Size();
-
-        // No Max.
         double dimension = Math.sqrt((double) length / mode.getParm1().length());
         int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
-        image_size.setHeight(size);
-        image_size.setWidth(size);
+
+        Pie_Constants shape = getConfig().getEncoder_shape();
+        if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
+            shape = Pie_Constants.SHAPE_SQUARE;
+
+        if (shape == Pie_Constants.SHAPE_SQUARE) {
+            image_size.setHeight(size);
+            image_size.setWidth(size);
+        }else{
+            if (size * 1.25 <= size + 1) {
+                image_size.setHeight(size);
+                image_size.setWidth(size);
+            } else {
+                image_size.setWidth((int) (size * 1.25));
+                image_size.setHeight((int) (size / 1.25));
+            }
+        }
 
         if (getConfig().hasEncoder_Maximum_Image()) {
-            if ((size * 2) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
-                logging(Level.WARNING,"Image Size Would be "+size + " x "+ size + ", Maximum Size Is "+getConfig().getEncoder_Maximum_Image().getWidth()+
-                                " x "+ getConfig().getEncoder_Maximum_Image().getHeight()+" " +
-                                "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
+            if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
+                logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
+                        ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
+                        " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
+                        "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
             }
-
-            if (image_size.getWidth() > getConfig().getEncoder_Maximum_Image().getWidth()  || image_size.getHeight() > getConfig().getEncoder_Maximum_Image().getHeight())
-                image_size = getConfig().getEncoder_Maximum_Image();
-
         }else{
             logging(Level.WARNING,"Maximum Image Size Is Not Set");
         }
