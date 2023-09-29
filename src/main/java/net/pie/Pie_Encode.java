@@ -208,38 +208,31 @@ public class Pie_Encode {
     public Pie_Size calculate_image_Mode(int length) {
         Pie_Size image_size = null;
         if (getConfig().getEncoder_mode().getParm1().length() == 4)
-            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
+            return calculate_image_Size(length, getConfig().getEncoder_mode());
 
-        else if (getConfig().getEncoder_mode().getParm1().length() == 3) {
+        if (getConfig().getEncoder_mode().getParm1().length() == 3) {
             image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
             if (image_size == null)
                 image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_ARGB); // try 4
+            return image_size;
         }
 
-        else if (getConfig().getEncoder_mode().getParm1().length() == 1) {
+        if (getConfig().getEncoder_mode().getParm1().length() == 1) {
             image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
             if (image_size == null)
                 image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_GB); // try 2
             if (image_size == null)
                 image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB); // try 3
+            return image_size;
         }
 
-        else if (getConfig().getEncoder_mode().getParm1().length() == 2) {
+        if (getConfig().getEncoder_mode().getParm1().length() == 2) {
             image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
             if (image_size == null)
                 image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB);
+            return image_size;
         }
-
-        if (image_size == null) {
-            logging(Level.SEVERE, "Image size is larger than maximum size of " +
-                (getConfig().hasEncoder_Maximum_Image() ?
-                        getConfig().getEncoder_Maximum_Image().getWidth() + " x " + getConfig().getEncoder_Maximum_Image().getHeight()
-                        : Pie_Constants.MAX_PROTECTED_SIZE + " x " + Pie_Constants.MAX_PROTECTED_SIZE) +
-                    " Increase Memory and / or add a Maximum Image Size. Encoding Failed");
-            return null;
-        }
-
-        return image_size;
+        return null;
     }
 
     /** ******************************************************<br>
@@ -271,11 +264,15 @@ public class Pie_Encode {
         }
 
         if (getConfig().hasEncoder_Maximum_Image()) {
-            if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
+            if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
+                logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
+                        ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
+                        " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
+                        "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
+            }
         }else{
-            if ((image_size.getWidth() * image_size.getHeight()) > Pie_Constants.MAX_PROTECTED_SIZE.getParm1() * 2)
-                return null;
+            logging(Level.WARNING,"Maximum Image Size Is Not Set");
         }
 
         return image_size;

@@ -17,7 +17,10 @@ import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Base64;
 import java.util.logging.Level;
-import java.util.zip.*;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
     private boolean error = false;
@@ -32,26 +35,37 @@ public class Pie_Utils {
     /** *******************************************************<br>
      * <b>compress</b><br>
      * Main functon for compressing.<br>
-     * @param in (InputStream Contents)
+     * @param text (String)
      **/
-    public byte[] compressInputStream(InputStream in) {
+    public byte[] compress(String text) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            Deflater deflater = new Deflater();
-            deflater.setLevel(getConfig().getEncoder_Compression_Level());
-            InputStream deflated = new DeflaterInputStream(in, deflater);
-            byte[] bytes = deflated.readAllBytes();
-            in.close();
-            deflated.close();
-
-            in = null;
-            deflated = null;
-            deflater = null;
-
-            return bytes;
+            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(text.getBytes(StandardCharsets.UTF_8));
+            out.close();
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Unable to read contents to be encoded " + e.getMessage());
+            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
         }
-        return null;
+        return baos.toByteArray();
+    }
+
+    /** *******************************************************<br>
+     * <b>compress</b><br>
+     * Main functon for compressing.<br>
+     * @param bytes (String)
+     **/
+    public byte[] compressBytes(byte[] bytes) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException e) {
+            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+        }
+        return baos.toByteArray();
     }
 
     /** *******************************************************<br>

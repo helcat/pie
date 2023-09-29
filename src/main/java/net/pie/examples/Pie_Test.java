@@ -19,9 +19,9 @@ import java.util.zip.Deflater;
 
 public class Pie_Test {
 
-    private String temp_To_Be_Encoded = "fire2.jpg";
+    private String temp_To_Be_Encoded = "background.jpg";
     private String temp_Encoded_Imaage = "My_Image";
-    private String temp_Decode_To = "batch";
+    private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
