@@ -3,8 +3,10 @@ package net.pie.utils;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,10 +21,9 @@ import java.util.stream.Stream;
  **/
 public class Pie_Encode_Source {
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
-    private String content;
     private Pie_Config config;
     private String file_name = null;
-    private byte[] content_bytes = null;
+    private InputStream content = null;
     private Pie_Utils utils = null;
     private long memory_Start = 0;
 
@@ -47,8 +48,7 @@ public class Pie_Encode_Source {
         setConfig(config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(file_name);
-        setContent_bytes(encode);
-        setType(Pie_Source_Type.FILE);
+        process(config, encode);
     }
 
     /** *******************************************************<br>
@@ -61,10 +61,14 @@ public class Pie_Encode_Source {
         setConfig(config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(file_name == null ? "Decoded_Text.txt" : file_name);
-        setContent(encode);
-        setType(Pie_Source_Type.FILE);
+        process(config, encode);
     }
 
+    /** *******************************************************<br>
+     * Do loading process
+     * @param config
+     * @param encode
+     */
     private void process(Pie_Config config, Object encode) {
         setConfig(config);
         setUtils(new Pie_Utils(getConfig()));
@@ -73,15 +77,17 @@ public class Pie_Encode_Source {
             return;
 
         }else if (encode instanceof String) {
-            setContent((String) encode);
+            setContent(new ByteArrayInputStream(((String) encode).getBytes(StandardCharsets.UTF_8)));
             setType(Pie_Source_Type.TEXT);
-            setFile_name("Decoded_Text.txt");
+            if (getFile_name() == null)
+                setFile_name("Decoded_Text.txt");
 
         }else if (encode instanceof File) {
             File f = (File) encode;
             if (f.isFile()) {
                 if (f.getName().toLowerCase().endsWith(".txt")) {
-                    setFile_name(f.getName());
+                    if (getFile_name() == null)
+                        setFile_name(f.getName());
                     Path filePath = f.toPath();
                     StringBuilder contentBuilder = new StringBuilder();
                     try (Stream<String> stream = Files.lines(Paths.get(filePath.toUri()), StandardCharsets.UTF_8)) {
@@ -91,14 +97,15 @@ public class Pie_Encode_Source {
                         getConfig().exit();
                         return;
                     }
-                    setContent(contentBuilder.toString());
+                    setContent(new ByteArrayInputStream(contentBuilder.toString().getBytes(StandardCharsets.UTF_8)));
                     setType(Pie_Source_Type.TEXT);
                 }else{
                     logging(Level.INFO,"Loading File " + f.getName());
                     Path filePath = f.toPath();
-                    setFile_name(f.getName());
+                    if (getFile_name() == null)
+                        setFile_name(f.getName());
                     try {
-                        setContent_bytes(Files.readAllBytes(filePath));
+                        setContent(Files.newInputStream(filePath));
                     } catch (IOException e) {
                         logging(Level.SEVERE,"Unable to read file " + e.getMessage());
                         getConfig().exit();
@@ -107,6 +114,18 @@ public class Pie_Encode_Source {
                     setType(Pie_Source_Type.FILE);
                 }
             }
+
+        }else if (encode instanceof ByteArrayInputStream) {
+            setContent((InputStream) encode);
+            setType(Pie_Source_Type.FILE);
+            if (getFile_name() == null)
+                setFile_name("Decoded_Text.txt");
+
+        }else if (encode instanceof byte[]) {
+                setContent(new ByteArrayInputStream((byte[]) encode));
+                setType(Pie_Source_Type.FILE);
+                if (getFile_name() == null)
+                    setFile_name("Decoded_Text.txt");
         }
     }
 
@@ -131,36 +150,31 @@ public class Pie_Encode_Source {
         if (isError())
             return null;
 
-        switch (getType()) {
-            case TEXT -> {
-                if (getContent() == null || getContent().isEmpty())
-                    return null;
-                try {
-                    StringBuilder toBeEncryptedBuilder = new StringBuilder(getContent());
-                    StringBuilder append = toBeEncryptedBuilder.append(" ".repeat(toBeEncryptedBuilder.toString().length() % getConfig().getEncoder_mode().getParm1().length()));
-                    return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(), getUtils().compress(append.toString()), "Main Encoding : ")).
-                            getBytes(StandardCharsets.UTF_8);
-                } catch (Exception e) {
-                    logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                    return null;
-                }
-            }
-            case FILE -> {
-                if (getContent_bytes() == null || getContent_bytes().length == 0) {
-                    return null;
-                }
-                try {
-                    return (encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),getUtils().compressBytes(getContent_bytes()), "Main Encoding : ")).
-                            getBytes(StandardCharsets.UTF_8);
-                } catch (Exception e) {
-                    logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                    return null;
-                }
-            }
+        if (getContent() == null)
+            return null;
+
+        try {
+            // problem need to encrypt then compress
+            String temp =  encoding_addon() + getUtils().encrypt(getConfig().isEncoder_Add_Encryption(),getUtils().compressInputStream(getContent()), "Main Encoding : ");
+            return temp.getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
         }
-        logging(Level.SEVERE,"Unable to find encode process type");
         return null;
     }
+
+    /**
+     * public static int length(InputStream inputStream, int chunkSize) throws IOException {
+     *     byte[] buffer = new byte[chunkSize];
+     *     int chunkBytesRead = 0;
+     *     int length = 0;
+     *     while((chunkBytesRead = inputStream.read(buffer)) != -1) {
+     *         length += chunkBytesRead;
+     *     }
+     *     return length;
+     * }
+     */
+
 
     /** *********************************************************<br>
      * <b>Check if in error</b>
@@ -184,7 +198,21 @@ public class Pie_Encode_Source {
             "?" +
             (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
 
-        return  getUtils().encrypt(true, getUtils().compress(addon), "Instruction Encoding : ") + Pie_Constants.PARM_SPLIT_TAG.getParm2();
+        return  getUtils().encrypt(true, getUtils().compressInputStream(new ByteArrayInputStream(addon.getBytes(StandardCharsets.UTF_8))),
+                "Instruction Encoding : ") + Pie_Constants.PARM_SPLIT_TAG.getParm2();
+    }
+
+    /** *******************************************************<br>
+     * <b>Close content</b>
+     */
+    private void close_Content() {
+        if (getContent() != null) {
+            try {
+                getContent().close();
+            } catch (IOException e) {
+                logging(Level.WARNING,"Unable to close content");
+            }
+        }
     }
 
     /** *******************************************************<br>
@@ -197,14 +225,6 @@ public class Pie_Encode_Source {
 
     private void setType(Pie_Source_Type type) {
         this.type = type == null ? Pie_Source_Type.TEXT : type;
-    }
-
-    private String getContent() {
-        return content;
-    }
-
-    private void setContent(String content) {
-        this.content = content;
     }
 
     public Pie_Config getConfig() {
@@ -223,14 +243,6 @@ public class Pie_Encode_Source {
         this.file_name = file_name;
     }
 
-    public byte[] getContent_bytes() {
-        return content_bytes;
-    }
-
-    public void setContent_bytes(byte[] content_bytes) {
-        this.content_bytes = content_bytes;
-    }
-
     public Pie_Utils getUtils() {
         return utils;
     }
@@ -245,6 +257,14 @@ public class Pie_Encode_Source {
 
     public void setMemory_Start(long memory_Start) {
         this.memory_Start = memory_Start;
+    }
+
+    public InputStream getContent() {
+        return content;
+    }
+
+    public void setContent(InputStream content) {
+        this.content = content;
     }
 }
 

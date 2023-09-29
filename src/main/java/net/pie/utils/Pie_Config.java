@@ -19,7 +19,7 @@ public class Pie_Config {
 
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = null;
-    private Pie_Size encoder_Maximum_Image = new Pie_Size(16000, 16000);
+    private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean run_gc_after = false;           // run garbage collector when required.

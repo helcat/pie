@@ -130,6 +130,7 @@ public class Pie_Decode {
         }
 
         // clear down
+        mode = 0;
         buffimage = null;
         count = 0;
         pixelColor = 0;

@@ -43,15 +43,21 @@ public class Pie_Encoded_Destination {
         return false;
     }
 
-    /** *******************************************************************<br>
-     * <b>getters and setters</b><br>
-     * General Getters and Setters
-     **/
     public File getLocal_file() {
         return local_file;
     }
 
+    /** *******************************************************************<br>
+     * <b>setLocal_file</b><br>
+     * Warning if local file exists it will be deleted first.<br>
+     * Sets up a file to contain the encoded image.<br>
+     * Local file must end with Pie_Constants.IMAGE_TYPE is not will be appended.
+     **/
     public void setLocal_file(File local_file) {
+        if (local_file != null && local_file.exists())
+            local_file.delete();
+        if (!local_file.getName().toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
+            local_file = new File(local_file + "." + Pie_Constants.IMAGE_TYPE.getParm2());
         this.local_file = local_file;
     }
 
