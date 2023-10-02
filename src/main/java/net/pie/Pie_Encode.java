@@ -5,10 +5,14 @@ import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -26,11 +30,86 @@ public class Pie_Encode {
      * @see Pie_Encode_Source Pie_Source to load in the content.
      **/
     public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
+        long startTime = System.currentTimeMillis();
         ImageIO.setUseCache(false);
         setSource(source);
         setDestination(encoded_destination);
         setConfig(source.getConfig());
         setUtils(new Pie_Utils(getConfig()));
+        getConfig().getLog().setLevel(getConfig().getLog_level());
+
+        if (getSource() == null || getSource().getInput() == null) {
+            logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
+            getConfig().exit();
+            return;
+        }
+        if (getSource().getInitial_source_size() == 0) {
+            logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
+            getConfig().exit();
+            return;
+        }
+
+        int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
+        if (bufferSize > getSource().getInitial_source_size())
+            bufferSize = getSource().getInitial_source_size();
+
+        int files_to_be_created = Math.toIntExact(getSource().getInitial_source_size() / bufferSize);
+        files_to_be_created = files_to_be_created + (getSource().getInitial_source_size() % bufferSize > 0  ? 1 :0);
+
+        try {
+            InputStream fis = getSource().getInput();
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
+            ByteArrayOutputStream outputStream = null;
+            ByteArrayInputStream byteArrayInputStream = null;
+
+            int file_count = 1;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                if (isError())
+                    return;
+
+                outputStream = new ByteArrayOutputStream();
+                outputStream.write(buffer, 0, bytesRead);
+
+                byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray());
+                outputStream.close();
+                encode(byteArrayInputStream.readAllBytes(), file_count, files_to_be_created);
+
+                byteArrayInputStream.close();
+                file_count++;
+            }
+
+            fis.close();
+            buffer = null;
+            bytesRead = 0;
+
+        } catch (IOException e) {
+            logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
+            getConfig().exit();
+            return;
+        }
+
+        logging(Level.INFO,"Encoding Complete");
+        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
+        logTime(startTime);
+        getConfig().exit();
+        if (getConfig().isRun_gc_after()) System.gc();
+    }
+
+    /** *********************************************************<br>
+     * Log how log it takes to encode
+     * @param startTime
+     */
+    private void logTime(long startTime) {
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+
+        long hours = elapsedTime / 3600000;
+        long minutes = (elapsedTime % 3600000) / 60000;
+        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
+        long milliseconds = elapsedTime % 1000;
+
+        logging(Level.INFO,"Elapsed time: " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
     }
 
     /** *********************************************************<br>
@@ -51,21 +130,29 @@ public class Pie_Encode {
      * After setting Pie_Encode use encode(). Allows for changing settings.
      * @see Pie_Encode_Source Uses Pie_Source to collect the data to be used as pixels.
      **/
-    public void encode() {
+    public void encode(byte[] originalArray, int file_number, int total_files) {
         if (isError()) {
             logging(Level.SEVERE,"Encoding FAILED");
             getConfig().exit();
             return;
         }
 
-        getConfig().getLog().setLevel(getConfig().getLog_level());
-        logging(Level.INFO,"Encoding Process ("+getConfig().getEncoder_mode().toString()+") Started");
-
-        byte[] originalArray = getSource().encode_process();
-        if (isError() || originalArray == null || originalArray.length == 0) {
-            logging(Level.INFO,"Encoding FAILED : Nothing to encode");
-            getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
-            getConfig().exit();
+        try {
+            if (getConfig().isEncoder_Add_Encryption()) {
+                originalArray = Base64.getEncoder().encode(
+                        getUtils().compressBytes(
+                                getUtils().encrypt_to_bytes(originalArray, "Image")
+                        )
+                );
+            }else{
+                originalArray = Base64.getEncoder().encode(
+                        getUtils().compressBytes(
+                                originalArray
+                        )
+                );
+            }
+        } catch (Exception e) {
+            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
         }
 
@@ -99,16 +186,11 @@ public class Pie_Encode {
         // Process the image - send to destination if required
         if (getDestination() != null) {
             getDestination().setImage(buffImg != null ? buffImg : data_image);
-            if (!getDestination().save_Encoded_Image(getUtils()))
+            if (!getDestination().save_Encoded_Image(getUtils(), file_number))
                 logging(Level.WARNING,"Encoding image was not saved");
         }else{
             logging(Level.WARNING,"No Encoding Destination Set");
         }
-
-        logging(Level.INFO,"Encoding Complete");
-        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
-        getConfig().exit();
-        if (getConfig().isRun_gc_after()) System.gc();
     }
 
     /** ******************************************************<br>
@@ -124,7 +206,7 @@ public class Pie_Encode {
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().isEncoder_Transparent())
             image_type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type);
-        return buildImage(data_image, originalArray, getConfig().getEncoder_mode().getParm1() );
+        return buildImage(data_image, image_size, originalArray, getConfig().getEncoder_mode().getParm1() );
     }
 
     /** *********************************************************<br>
@@ -134,7 +216,7 @@ public class Pie_Encode {
      * @param rbg (String)
      * @return BufferedImage
      */
-    private BufferedImage buildImage(BufferedImage data_image, byte[] originalArray, String rbg) {
+    private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
         int x =0, y = 0, count = 0;
         boolean hasAlpha = rbg.contains("A");
         List<Integer> store = new ArrayList<Integer>();
@@ -143,8 +225,9 @@ public class Pie_Encode {
             if (store.size() < rbg.length())
                 continue;
 
-            if (x >= data_image.getWidth()) {
-                x = 0; y++;
+            if (x >= size.getWidth()) {
+                x = 0;
+                y++;
             }
 
             count = 0;
@@ -158,11 +241,11 @@ public class Pie_Encode {
         }
 
         // Finish any existing pixels
-        if (store.size() > 0) {
-            if (x >= data_image.getWidth()) {
-                x = 0; y++;
+        if (!store.isEmpty()) {
+            if (x >= size.getWidth()) {
+                x = 0;
+                y++;
             }
-
             count = 0;
             data_image.setRGB(x++, y,
                     hasAlpha ?
@@ -172,6 +255,7 @@ public class Pie_Encode {
                                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
             store.clear();
         }
+
         return data_image;
     }
 
@@ -254,13 +338,8 @@ public class Pie_Encode {
             image_size.setHeight(size);
             image_size.setWidth(size);
         }else{
-            if (size * 1.25 <= size + 1) {
-                image_size.setHeight(size);
-                image_size.setWidth(size);
-            } else {
-                image_size.setWidth((int) (size * 1.25));
-                image_size.setHeight((int) (size / 1.25));
-            }
+            image_size.setWidth((int) (size * 1.25) );
+            image_size.setHeight((int) (size / 1.25) + ((size % 1.25) > 0 ? 1 :0) );
         }
 
         if (getConfig().hasEncoder_Maximum_Image()) {
@@ -300,6 +379,21 @@ public class Pie_Encode {
         if (store.size() > position)
             return Math.max(store.get(position), 1);
         return 0;
+    }
+
+    /** *******************************************************<br>
+     * <b>Add on to the encoding</b><br>
+     * @return String.
+     */
+    private String encoding_addon() {
+        String addon =
+                (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +
+                    "?" +
+                    getSource().getType().ordinal() +
+                    "?" +
+                    (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
+
+        return  getUtils().encrypt( getUtils().compress(addon), "Instruction Encoding : ") + Pie_Constants.PARM_SPLIT_TAG.getParm2();
     }
 
     /** *******************************************************<br>

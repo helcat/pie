@@ -5,6 +5,7 @@ package net.pie.enums;
  * Sets the source type in Pie_source.
  **/
 public enum Pie_Source_Type {
+    NONE,
     TEXT,
     FILE,
     DOWNLOAD;

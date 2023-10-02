@@ -18,16 +18,17 @@ import java.util.zip.Deflater;
 public class Pie_Config {
 
     // Encoder Only
-    private Pie_Size encoder_Minimum_Image = null;
+    private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
-    private boolean run_gc_after = false;           // run garbage collector when required.
     private boolean encoder_Transparent = false;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
     private Pie_Constants encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
+    private int max_encoded_image_mb = 200;
 
     // All
+    private boolean run_gc_after = false;           // run garbage collector when required.
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private ConsoleHandler customHandler = null;
@@ -180,6 +181,14 @@ public class Pie_Config {
 
     public Pie_Encode_Mode getEncoder_mode() {
         return encoder_mode;
+    }
+
+    public int getMax_encoded_image_mb() {
+        return max_encoded_image_mb;
+    }
+
+    public void setMax_encoded_image_mb(int max_encoded_image_mb) {
+        this.max_encoded_image_mb = max_encoded_image_mb;
     }
 
     /** ***************************************************************<br>
