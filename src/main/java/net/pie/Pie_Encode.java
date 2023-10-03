@@ -2,6 +2,7 @@ package net.pie;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
+import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
@@ -36,13 +37,15 @@ public class Pie_Encode {
         setDestination(encoded_destination);
         setConfig(source.getConfig());
         setUtils(new Pie_Utils(getConfig()));
-        getConfig().getLog().setLevel(getConfig().getLog_level());
 
-        if (getSource() == null || getSource().getInput() == null) {
+        if (getSource() == null ||
+                getSource().getType().equals(Pie_Source_Type.NONE)  ||
+                getSource().getInput() == null) {
             logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
             getConfig().exit();
             return;
         }
+
         if (getSource().getInitial_source_size() == 0) {
             logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
             getConfig().exit();
@@ -217,19 +220,21 @@ public class Pie_Encode {
      * @return BufferedImage
      */
     private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
-        int x =0, y = 0, count = 0;
+        int x =0, y = 0, count = 0, store_count = 0;
+
         boolean hasAlpha = rbg.contains("A");
-        List<Integer> store = new ArrayList<Integer>();
+        int[] store = new int[rbg.length()];
         for (int i : originalArray) {
-            store.add(i);
-            if (store.size() < rbg.length())
+            store[store_count ++] = i;
+            if (store_count < rbg.length())
                 continue;
 
-            if (x >= size.getWidth()) {
+            if (x == size.getWidth()) {
                 x = 0;
                 y++;
             }
 
+            store_count = 0;
             count = 0;
             data_image.setRGB(x++, y,
                     hasAlpha ?
@@ -237,25 +242,25 @@ public class Pie_Encode {
                     getConfig().isEncoder_Transparent() ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
-            store.clear();
+            store = new int[rbg.length()];
         }
 
         // Finish any existing pixels
-        if (!store.isEmpty()) {
+        if (store.length > 0) {
             if (x >= size.getWidth()) {
                 x = 0;
                 y++;
             }
             count = 0;
-            data_image.setRGB(x++, y,
+            data_image.setRGB(x, y,
                     hasAlpha ?
                             new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
                             getConfig().isEncoder_Transparent() ?
                                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
-            store.clear();
         }
 
+        size = null; store = null; x =0; y = 0; count = 0; store_count = 0; // Save every byte of memory possible.
         return data_image;
     }
 
@@ -327,8 +332,7 @@ public class Pie_Encode {
      */
     public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
         Pie_Size image_size = new Pie_Size();
-        double dimension = Math.sqrt((double) length / mode.getParm1().length());
-        int size = (int) ((dimension != (int) dimension) ? dimension + 1 : dimension);
+        int size = (int) Math.ceil(Math.sqrt((double) length / mode.getParm1().length()));
 
         Pie_Constants shape = getConfig().getEncoder_shape();
         if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
@@ -338,8 +342,8 @@ public class Pie_Encode {
             image_size.setHeight(size);
             image_size.setWidth(size);
         }else{
-            image_size.setWidth((int) (size * 1.25) );
-            image_size.setHeight((int) (size / 1.25) + ((size % 1.25) > 0 ? 1 :0) );
+            image_size.setWidth((int) Math.ceil(size * 1.25));
+            image_size.setHeight((int) Math.ceil(size / 1.25));
         }
 
         if (getConfig().hasEncoder_Maximum_Image()) {
@@ -363,9 +367,9 @@ public class Pie_Encode {
      * @param position (position of stored byte)
      * @return int
      **/
-    private int checker(List<Integer> store, int position) {
-        if (store.size() > position)
-            return Math.max(store.get(position), 0);
+    private int checker(int[] store, int position) {
+        if (store.length > position)
+            return Math.max(store[position], 0);
         return 0;
     }
 
@@ -375,9 +379,9 @@ public class Pie_Encode {
      * @param position (position of stored byte)
      * @return int
      **/
-    private int checkerAlpha(List<Integer> store, int position) {
-        if (store.size() > position)
-            return Math.max(store.get(position), 1);
+    private int checkerAlpha(int[] store, int position) {
+        if (store.length > position)
+            return Math.max(store[position], 1);
         return 0;
     }
 

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * This is used to collect the data to build the encoded image.
  **/
 public class Pie_Encode_Source {
-    private Pie_Source_Type type = Pie_Source_Type.FILE;
+    private Pie_Source_Type type = Pie_Source_Type.NONE;
     private Pie_Config config;
     private String file_name = null;
     private InputStream input = null;
@@ -33,35 +33,29 @@ public class Pie_Encode_Source {
      * @param encode (Object) Can be String of text or a File
      */
     public Pie_Encode_Source(Pie_Config config, Object encode) {
-        process(config, encode);
-    }
-
-    private void process(Pie_Config config, Object encode) {
         setInput(null);
         setType(Pie_Source_Type.NONE);
-        setConfig(config);
+        setConfig(config == null ? new Pie_Config() : config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(null);
 
         if (encode == null) {
-            logging(Level.SEVERE,"No Encoding Object Found");
+            getConfig().logging(Level.SEVERE,"No Encoding Object Found");
             getConfig().exit();
             return;
 
-        }else if (
-                encode instanceof ByteArrayInputStream ||
-                encode instanceof InputStream) {
+        }else if (encode instanceof InputStream) {
             try {
                 setInitial_source_size(((InputStream) encode).available());
             } catch (IOException e) {
-                logging(Level.SEVERE, "Unable to collect size from source");
+                getConfig().logging(Level.SEVERE, "Unable to collect size from source");
                 getConfig().exit();
                 return;
             }
             setInput((InputStream) encode);
             setType(Pie_Source_Type.FILE);
             if (getFile_name() == null) {
-                logging(Level.SEVERE, "File name is required for ByteArrayInputStream source");
+                getConfig().logging(Level.SEVERE, "File name is required for InputStream source");
                 getConfig().exit();
                 return;
             }
@@ -69,9 +63,9 @@ public class Pie_Encode_Source {
         }else if (encode instanceof byte[]) {
             setInitial_source_size(((byte[]) encode).length);
             setInput(new ByteArrayInputStream(((byte[]) encode)));
-            setType(Pie_Source_Type.TEXT);
+            setType(Pie_Source_Type.FILE);
             if (getFile_name() == null) {
-                logging(Level.SEVERE, "File name is required for byte[] source");
+                getConfig().logging(Level.SEVERE, "File name is required for byte[] source");
                 getConfig().exit();
                 return;
             }
@@ -84,48 +78,20 @@ public class Pie_Encode_Source {
         }else if (encode instanceof File) {
             File f = (File) encode;
             if (f.isFile()) {
-                if (f.getName().toLowerCase().endsWith(".txt")) {
-                    setFile_name(f.getName());
-                    Path filePath = f.toPath();
-                    StringBuilder contentBuilder = new StringBuilder();
-                    try (Stream<String> stream = Files.lines(Paths.get(filePath.toUri()), StandardCharsets.UTF_8)) {
-                        stream.forEach(s -> contentBuilder.append(s).append("\n"));
-                    } catch (IOException e) {
-                        logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                        getConfig().exit();
-                        return;
-                    }
-                    setInitial_source_size((contentBuilder.toString()).getBytes().length);
-                    setInput(new ByteArrayInputStream((contentBuilder.toString()).getBytes()));
-                    setType(Pie_Source_Type.TEXT);
-                }else{
-                    logging(Level.INFO,"Loading File " + f.getName());
-                    Path filePath = f.toPath();
-                    setFile_name(f.getName());
-                    setInitial_source_size((int) f.length());
-                    try {
-                        setInput(new FileInputStream((File) encode));
-                    } catch (FileNotFoundException e) {
-                        logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                        getConfig().exit();
-                        return;
-                    }
-                    setType(Pie_Source_Type.FILE);
+                getConfig().logging(Level.INFO,"Loading File " + f.getName());
+                Path filePath = f.toPath();
+                setFile_name(f.getName());
+                setInitial_source_size((int) f.length());
+                try {
+                    setInput(new FileInputStream((File) encode));
+                } catch (FileNotFoundException e) {
+                    getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+                    getConfig().exit();
+                    return;
                 }
+                setType(Pie_Source_Type.FILE);
             }
         }
-    }
-
-    /** *********************************************************<br>
-     * <b>logging</b><br>
-     * Set the log entry and set error if required
-     * @param level (Logging level)
-     * @param message (Logging Message)
-     **/
-    private void logging(Level level, String message) {
-        getConfig().getLog().log(level,  message);
-        if (level.equals(Level.SEVERE))
-            getConfig().setError(true);
     }
 
     /** *******************************************************<br>

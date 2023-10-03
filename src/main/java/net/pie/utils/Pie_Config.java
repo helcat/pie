@@ -187,6 +187,11 @@ public class Pie_Config {
         return max_encoded_image_mb;
     }
 
+    /** *******************************************************************<br>
+     * Maximum Mb of a file before it is spliced in to new files.*<br>
+     * Default is 200mb but can be increased depending on the memory of the encoding and decoding devices.
+     * @param max_encoded_image_mb (int)
+     */
     public void setMax_encoded_image_mb(int max_encoded_image_mb) {
         this.max_encoded_image_mb = max_encoded_image_mb;
     }
