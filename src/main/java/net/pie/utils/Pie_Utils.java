@@ -67,25 +67,13 @@ public class Pie_Utils {
         }
         return baos.toByteArray();
     }
-
-    /** *******************************************************<br>
-     * <b>decompress_return_String</b><br>
-     * Main functon for decompressing.<br>
-     * @param bytes (byte[])
-     * @return String
-     **/
-    public String decompress_return_String(byte[] bytes) {
-        ByteArrayOutputStream baos = decompress_return_Baos(bytes);
-        return baos == null ? null : baos.toString(StandardCharsets.UTF_8);
-    }
-
     /** *******************************************************<br>
      * <b>decompress_return_Baos</b><br>
      * Main functon for decompressing.<br>
      * @param bytes (byte[])
      * @return ByteArrayOutputStream
      **/
-    public ByteArrayOutputStream decompress_return_Baos(byte[] bytes) {
+    public byte[] decompress_return_bytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             Inflater decompressor = new Inflater(true);
@@ -95,7 +83,7 @@ public class Pie_Utils {
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE,MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
         }
-        return baos;
+        return baos.toByteArray();
     }
 
     /** *******************************************************<br>

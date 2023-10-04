@@ -43,21 +43,54 @@ public class Pie_Decode {
             return;
         }
 
+        byte[] message = start_Decode(); // First file decode.
+        if (message == null) {
+            getConfig().exit();
+            getSource().close();
+            return;
+        }
+
+        /**
+        try {
+            String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
+            if (message_txt == null || message_txt.isEmpty()) {
+                getConfig().logging(Level.SEVERE,"Decoding Error");
+                getConfig().exit();
+                return;
+            }
+            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
+        } catch (Exception e) {
+            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
+            getConfig().exit();
+            return;
+        }
+
+        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
+        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
+        getConfig().exit();
+
+         **/
+
+        if (getConfig().isRun_gc_after())
+            System.gc();
+    }
+
+    /** *********************************************************<br>
+     * Start Main Decodin
+     */
+    private byte[] start_Decode() {
         BufferedImage buffimage = null;
         try {
             buffimage = ImageIO.read(getSource().getInput());
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE, "Cannot read encoded image " + e.getMessage());
-            getConfig().exit();
-            getSource().close();
-            return;
+            return null;
         }
         getSource().close();
 
         if (buffimage == null) {
             getConfig().logging(Level.SEVERE, "Cannot decode null image");
-            getConfig().exit();
-            return;
+            return null;
         }
 
         int pixelColor;
@@ -109,50 +142,27 @@ public class Pie_Decode {
         retrievedGreen = 0;
         retrievedBlue = 0;
 
-        if (getConfig().isRun_gc_after())
-            System.gc();
-
         if (message == null) {
             getConfig().logging(Level.SEVERE,"Decoding Error");
-            getConfig().exit();
-            return;
+            return null;
         }
 
-        try { // keep message_txt out side so parms can be set
-            String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
-            if (message_txt == null || message_txt.isEmpty()) {
-                getConfig().logging(Level.SEVERE,"Decoding Error");
-                getConfig().exit();
-                return;
-            }
-            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
-        } catch (Exception e) {
-            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
-            getConfig().exit();
-            return;
-        }
-
-        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
-        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
-        getConfig().exit();
-
-        if (getConfig().isRun_gc_after())
-            System.gc();
+        return getUtils().decompress_return_bytes(message);
     }
 
     /** *******************************************************************<br>
      * <b>save the decoded bytes for the client to decide what to do with them</b>
      * @param bytes
-     */
+
     private void save(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
             getConfig().logging(Level.INFO,"Nothing to save");
             return;
         }
         if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
-            setDecoded_Message(getUtils().decompress_return_String(bytes));
+            //setDecoded_Message(getUtils().decompress_return_String(bytes));
         }else{
-            setDecoded_bytes(getUtils().decompress_return_Baos(bytes));
+            //setDecoded_bytes(getUtils().decompress_return_Baos(bytes));
             if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
                 File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + getDecoded_Source_destination().getFile_name());
                 try(OutputStream outputStream = new FileOutputStream(f)) {
@@ -163,12 +173,12 @@ public class Pie_Decode {
             }
         }
     }
-
+     */
     /** *******************************************************************<br>
      * <b>Collect any parameters that have been encoded</b>
      * @param base64_text
      * @return String
-     */
+
     private String collect_encoded_parms(String base64_text) {
         try {
             if (getDecoded_Source_destination() == null) {
@@ -188,7 +198,7 @@ public class Pie_Decode {
                 base64_text = data[1];
 
                 //parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
-                parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms, "Instruction Decoding : "));
+                //parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms, "Instruction Decoding : "));
                 if (parms.lastIndexOf("?") != -1) {
                     String[] parts = parms.split("\\?", 0);
                     getDecoded_Source_destination().setFile_name(parts[0]);
@@ -207,6 +217,7 @@ public class Pie_Decode {
             return null;
         }
     }
+     */
 
     /** *******************************************************************<br>
      * <b>getters and setters</b><br>

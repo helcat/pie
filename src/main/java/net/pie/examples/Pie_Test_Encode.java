@@ -42,7 +42,7 @@ public class Pie_Test_Encode {
         encoding_config.setEncoder_Transparent(false);                                                              // Optional default is false Ignored if Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(false);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(false);                                                             // Optional default is false
-        encoding_config.setRun_gc_after(true);
+        encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));
