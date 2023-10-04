@@ -33,6 +33,7 @@ public class Pie_Config {
     private boolean error = false;
     private ConsoleHandler customHandler = null;
     private boolean show_Memory_Usage_In_Logs = false;
+    private boolean show_Timings_In_Logs = false;
     private Logger log = null;
 
     /** *******************************************************************<br>
@@ -215,6 +216,14 @@ public class Pie_Config {
 
     public boolean isEncoder_Transparent() {
         return encoder_Transparent;
+    }
+
+    public boolean isShow_Timings_In_Logs() {
+        return show_Timings_In_Logs;
+    }
+
+    public void setShow_Timings_In_Logs(boolean show_Timings_In_Logs) {
+        this.show_Timings_In_Logs = show_Timings_In_Logs;
     }
 
     /** ***************************************************************<br>

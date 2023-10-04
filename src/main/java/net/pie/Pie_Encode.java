@@ -9,7 +9,10 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +51,12 @@ public class Pie_Encode {
 
         if (getSource().getInitial_source_size() == 0) {
             logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
+            getConfig().exit();
+            return;
+        }
+
+        if (getDestination() == null) {
+            logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
             getConfig().exit();
             return;
         }
@@ -104,6 +113,9 @@ public class Pie_Encode {
      * @param startTime
      */
     private void logTime(long startTime) {
+        if (!getConfig().isShow_Timings_In_Logs())
+            return;
+
         long endTime = System.currentTimeMillis();
         long elapsedTime = endTime - startTime;
 
@@ -140,24 +152,36 @@ public class Pie_Encode {
             return;
         }
 
+        ByteBuffer buffer = null;
+        byte[] data = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
+        byte[] addon = null;
+
+        if (file_number == 1) {
+            addon = encoding_addon(total_files);
+            buffer = ByteBuffer.allocate(addon.length + data.length);
+            buffer.put(addon);
+        }else{
+            buffer = ByteBuffer.allocate(data.length);
+        }
+
+        buffer.put(data);
+        buffer.rewind();
+
         try {
-            if (getConfig().isEncoder_Add_Encryption()) {
-                originalArray = Base64.getEncoder().encode(
-                        getUtils().compressBytes(
-                                getUtils().encrypt_to_bytes(originalArray, "Image")
-                        )
-                );
-            }else{
-                originalArray = Base64.getEncoder().encode(
-                        getUtils().compressBytes(
-                                originalArray
-                        )
-                );
-            }
+            originalArray = Base64.getEncoder().encode(
+                getUtils().compressBytes(
+                        buffer.array()
+                )
+            );
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
         }
+
+        addon = null;
+        data = null;
+        buffer.clear();
+        buffer = null;
 
         Pie_Size image_size = calculate_image_Mode(originalArray.length);
         if (image_size == null) { // all else fails quit
@@ -187,13 +211,9 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (getDestination() != null) {
-            getDestination().setImage(buffImg != null ? buffImg : data_image);
-            if (!getDestination().save_Encoded_Image(getUtils(), file_number))
-                logging(Level.WARNING,"Encoding image was not saved");
-        }else{
-            logging(Level.WARNING,"No Encoding Destination Set");
-        }
+        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number))
+            logging(Level.SEVERE,"Encoding image was not saved");
+
     }
 
     /** ******************************************************<br>
@@ -238,7 +258,7 @@ public class Pie_Encode {
             count = 0;
             data_image.setRGB(x++, y,
                     hasAlpha ?
-                        new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
                     getConfig().isEncoder_Transparent() ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
@@ -254,10 +274,10 @@ public class Pie_Encode {
             count = 0;
             data_image.setRGB(x, y,
                     hasAlpha ?
-                            new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
-                            getConfig().isEncoder_Transparent() ?
-                                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
-                                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
+                    getConfig().isEncoder_Transparent() ?
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
         }
 
         size = null; store = null; x =0; y = 0; count = 0; store_count = 0; // Save every byte of memory possible.
@@ -349,9 +369,9 @@ public class Pie_Encode {
         if (getConfig().hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
                 logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
-                        ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
-                        " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
-                        "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
+                ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
+                " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
+                "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
             }
         }else{
@@ -389,15 +409,18 @@ public class Pie_Encode {
      * <b>Add on to the encoding</b><br>
      * @return String.
      */
-    private String encoding_addon() {
+    private byte[] encoding_addon(int total_files) {
         String addon =
-                (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +
-                    "?" +
-                    getSource().getType().ordinal() +
-                    "?" +
-                    (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2());
+            (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +
+            "?" +
+            getSource().getType().ordinal() +
+            "?" +
+            (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +
+            "?" +
+            total_files +
+            Pie_Constants.PARM_SPLIT_TAG.getParm2();
 
-        return  getUtils().encrypt( getUtils().compress(addon), "Instruction Encoding : ") + Pie_Constants.PARM_SPLIT_TAG.getParm2();
+        return  addon.getBytes(StandardCharsets.UTF_8) ;
     }
 
     /** *******************************************************<br>

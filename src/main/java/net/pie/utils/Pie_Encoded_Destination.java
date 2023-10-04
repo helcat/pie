@@ -3,8 +3,10 @@ package net.pie.utils;
 import net.pie.enums.Pie_Constants;
 import net.pie.utils.Pie_Utils;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 /** *******************************************************************<br>
@@ -16,7 +18,6 @@ import java.net.URL;
 public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
-    private BufferedImage image = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -37,10 +38,34 @@ public class Pie_Encoded_Destination {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image(Pie_Utils utils, int file_number) {
-        if (getLocal_file() != null && getImage() != null && getLocal_file().getName().toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
-            return utils.saveImage_to_file(getImage(), new File(getLocal_file().toString() + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2()));
+    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number) {
+        if (getLocal_file() != null) {
+            try {
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), addFileNumber(file_number));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return false;
+    }
+
+    /** *******************************************************************<br>
+     * Add File number if second file is required
+     * @param file_number (int)
+     */
+    private File addFileNumber(int file_number) {
+        String name = getLocal_file().getName();
+        if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
+            name = name.substring(0, name.length() - ("."+Pie_Constants.IMAGE_TYPE.getParm2()).length());
+        if (file_number > 1)
+            name = name + "_" + file_number;
+        name = name + "."+Pie_Constants.IMAGE_TYPE.getParm2();
+
+        File file = new File(
+                getLocal_file().getAbsolutePath().substring(0,getLocal_file().getAbsolutePath().length() -  getLocal_file().getName().length()) + name);
+        if (file.exists())
+            file.delete();
+        return file;
     }
 
     public File getLocal_file() {
@@ -51,14 +76,17 @@ public class Pie_Encoded_Destination {
      * <b>setLocal_file</b><br>
      * Warning if local file exists it will be deleted first.<br>
      * Sets up a file to contain the encoded image.<br>
-     * Local file must end with Pie_Constants.IMAGE_TYPE is not will be appended.
+     * Local file name extension will be added or changed if required.<br>
+     * Extension should be ".png".
      **/
     public void setLocal_file(File local_file) {
-        if (local_file != null && local_file.exists())
-            local_file.delete();
-        if (!local_file.getName().toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
-            local_file = new File(local_file + "." + Pie_Constants.IMAGE_TYPE.getParm2());
-        this.local_file = local_file;
+        if (local_file != null) {
+            if (local_file.exists() && local_file.isFile())
+                local_file.delete();
+            this.local_file = local_file;
+            return;
+        }
+        this.local_file = null;
     }
 
     public URL getWeb_address() {
@@ -69,13 +97,6 @@ public class Pie_Encoded_Destination {
         this.web_address = web_address;
     }
 
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
 }
 
 

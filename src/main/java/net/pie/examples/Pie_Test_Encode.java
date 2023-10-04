@@ -35,12 +35,13 @@ public class Pie_Test_Encode {
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
-        encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Constants.MIDDLE_CENTER));      // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
+        encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Constants.MIDDLE_CENTER));     // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
         encoding_config.setEncoder_Add_Encryption(true);                                                           // Optional default is true
-        encoding_config.setEncoder_Compression_Level(Deflater.BEST_SPEED);                                    // Optional default is Deflater.BEST_SPEED
+        encoding_config.setEncoder_Compression_Level(Deflater.BEST_SPEED);                                          // Optional default is Deflater.BEST_SPEED
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
-        encoding_config.setEncoder_Transparent(false);                                                              // Optional default is off (false)
-        encoding_config.setShow_Memory_Usage_In_Logs(true);
+        encoding_config.setEncoder_Transparent(false);                                                              // Optional default is false Ignored if Pie_Encode_Mode.ENCODE_MODE_ARGB
+        encoding_config.setShow_Memory_Usage_In_Logs(false);                                                        // Optional default is false
+        encoding_config.setShow_Timings_In_Logs(false);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);
 
         // Build a Source File
