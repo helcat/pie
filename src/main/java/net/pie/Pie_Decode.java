@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Decode {
@@ -132,6 +133,10 @@ public class Pie_Decode {
             }
         }
 
+        System.out.println(message);
+
+        byte[] bytes =  Base64.getDecoder().decode(message);
+
         // clear down
         buffimage = null;
         count = 0;
@@ -147,7 +152,14 @@ public class Pie_Decode {
             return null;
         }
 
-        return getUtils().decompress_return_bytes(message);
+
+        byte[] bytes55 =  Base64.getDecoder().decode(message);
+
+
+       // byte[] bytes =  Base64.getDecoder().decode(message);
+        byte[] bytes2 = getUtils().decompress_return_bytes(message);
+
+        return message;
     }
 
     /** *******************************************************************<br>

@@ -72,7 +72,6 @@ public class Pie_Test {
                 new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage + "." + Pie_Constants.IMAGE_TYPE.getParm2()));
 
         // Do the decoding : Decodes the image.
-        Pie_Decode decoder = new Pie_Decode(decode_source, decoded_Source_destination);
-        decoder.decode();
+        new Pie_Decode(decode_source, decoded_Source_destination);
     }
 }

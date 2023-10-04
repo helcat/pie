@@ -7,23 +7,18 @@ git commit -m "Work Commit"
 git push origin main
  */
 
-import net.pie.Pie_Decode;
 import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.*;
-import java.text.MessageFormat;
-import java.util.Base64;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "CorecreateSOW.pdf";
+    private String temp_To_Be_Encoded = "background.jpg";
     private String temp_Encoded_Imaage = "encoded_image.png";
 
     public static void main(String[] args) {
@@ -36,7 +31,7 @@ public class Pie_Test_Encode {
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Constants.MIDDLE_CENTER));     // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
-        encoding_config.setEncoder_Add_Encryption(true);                                                           // Optional default is true
+        encoding_config.setEncoder_Add_Encryption(false);                                                           // Optional default is true
         encoding_config.setEncoder_Compression_Level(Deflater.BEST_SPEED);                                          // Optional default is Deflater.BEST_SPEED
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setEncoder_Transparent(false);                                                              // Optional default is false Ignored if Pie_Encode_Mode.ENCODE_MODE_ARGB

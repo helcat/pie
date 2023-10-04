@@ -160,12 +160,12 @@ public class Pie_Encode {
 
         ByteBuffer buffer = null;
         byte[] data = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
-        byte[] addon = null;
 
         if (file_number == 1) {
-            addon = encoding_addon(total_files);
+            byte[] addon = encoding_addon(total_files);
             buffer = ByteBuffer.allocate(addon.length + data.length);
             buffer.put(addon);
+            addon = null;
         }else{
             buffer = ByteBuffer.allocate(data.length);
         }
@@ -174,17 +174,14 @@ public class Pie_Encode {
         buffer.rewind();
 
         try {
-            originalArray = Base64.getEncoder().encode(
-                getUtils().compressBytes(
-                        buffer.array()
-                )
-            );
+            byte[] message = buffer.array();
+            ///byte[] compressed = getUtils().compressBytes( message);
+            originalArray = Base64.getEncoder().encode( message);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
         }
 
-        addon = null;
         data = null;
         buffer.clear();
         buffer = null;
@@ -248,9 +245,14 @@ public class Pie_Encode {
     private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
         int x =0, y = 0, count = 0, store_count = 0;
 
+        int counter = 0;
+
         boolean hasAlpha = rbg.contains("A");
-        int[] store = new int[rbg.length()];
+        int[] store = null;
+
         for (int i : originalArray) {
+            if (store == null)
+                store = new int[rbg.length()];
             store[store_count ++] = i;
             if (store_count < rbg.length())
                 continue;
@@ -268,11 +270,11 @@ public class Pie_Encode {
                     getConfig().isEncoder_Transparent() ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
-            store = new int[rbg.length()];
+            store = null;
         }
 
         // Finish any existing pixels
-        if (store.length > 0) {
+        if (store != null && Arrays.stream(store).sum() > 0) {
             if (x >= size.getWidth()) {
                 x = 0;
                 y++;
