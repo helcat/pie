@@ -36,56 +36,26 @@ public class Pie_Decode {
         setMemory_Start(getUtils().getMemory());
         setDecoded_Source_destination(decoded_Source_destination);
         setSource(source);
-    }
 
-    /** *********************************************************<br>
-     * <b>Error</b><br>
-     * Set the log entry and set error if required
-     * @param level (Logging level)
-     * @param message (Logging Message)
-     **/
-    private void logging(Level level, String message) {
-        if (getConfig().getLog() != null) {
-            getConfig().getLog().log(level, message);
-            if (level.equals(Level.SEVERE))
-                getConfig().setError(true);
-        }
-    }
-
-    /** *********************************************************<br>
-     * <b>Check if in error</b>
-     * @return boolean
-     */
-    private boolean isError() {
-        if (getConfig().isError() || getUtils().isError())
-            return true;
-        return false;
-    }
-
-    /** *********************************************************<br>
-     * <b>decode</b><br>
-     * After setting Pie_Decode use decode() to start the decoding process.
-     * This allows for changing of settings before decoding process starts.
-     * @see Pie_Decode Use after Pie_Decode.
-     **/
-    public void decode() {
-        if (isError() || getDecoded_Source_destination().isError()) {
-            logging(Level.SEVERE, getDecoded_Source_destination().getError_message());
+        if (getSource() == null ) {
+            getConfig().logging(Level.SEVERE,"Decoding FAILED : Nothing to decode");
             getConfig().exit();
             return;
         }
 
-        getConfig().getLog().setLevel(getConfig().getLog_level());
-        logging(Level.INFO,"Decoding Started");
-        if (isError() || getSource() == null) {
-            logging(Level.SEVERE, "Cannot decode null image");
+        BufferedImage buffimage = null;
+        try {
+            buffimage = ImageIO.read(getSource().getInput());
+        } catch (IOException e) {
+            getConfig().logging(Level.SEVERE, "Cannot read encoded image " + e.getMessage());
             getConfig().exit();
+            getSource().close();
             return;
         }
+        getSource().close();
 
-        BufferedImage buffimage = getUtils().load_image(getSource().getLocal_file());
         if (buffimage == null) {
-            logging(Level.SEVERE, "Cannot decode null image");
+            getConfig().logging(Level.SEVERE, "Cannot decode null image");
             getConfig().exit();
             return;
         }
@@ -143,7 +113,7 @@ public class Pie_Decode {
             System.gc();
 
         if (message == null) {
-            logging(Level.SEVERE,"Decoding Error");
+            getConfig().logging(Level.SEVERE,"Decoding Error");
             getConfig().exit();
             return;
         }
@@ -151,18 +121,18 @@ public class Pie_Decode {
         try { // keep message_txt out side so parms can be set
             String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
             if (message_txt == null || message_txt.isEmpty()) {
-                logging(Level.SEVERE,"Decoding Error");
+                getConfig().logging(Level.SEVERE,"Decoding Error");
                 getConfig().exit();
                 return;
             }
             save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
         } catch (Exception e) {
-            logging(Level.SEVERE,"Decoding Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             getConfig().exit();
             return;
         }
 
-        logging(isError() ? Level.SEVERE : Level.INFO,"Decoding " + (isError()  ? "Process FAILED" : "Complete"));
+        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
         getUtils().usedMemory(getMemory_Start(), "Decoding : ");
         getConfig().exit();
 
@@ -176,7 +146,7 @@ public class Pie_Decode {
      */
     private void save(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
-            logging(Level.INFO,"Nothing to save");
+            getConfig().logging(Level.INFO,"Nothing to save");
             return;
         }
         if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
@@ -188,7 +158,7 @@ public class Pie_Decode {
                 try(OutputStream outputStream = new FileOutputStream(f)) {
                     getDecoded_bytes().writeTo(outputStream);
                 } catch (IOException e) {
-                    logging(Level.SEVERE,"Saving to file error : " + e.getMessage());
+                    getConfig().logging(Level.SEVERE,"Saving to file error : " + e.getMessage());
                 }
             }
         }
@@ -202,7 +172,7 @@ public class Pie_Decode {
     private String collect_encoded_parms(String base64_text) {
         try {
             if (getDecoded_Source_destination() == null) {
-                logging(Level.SEVERE, "No Decoder Destination");
+                getConfig().logging(Level.SEVERE, "No Decoder Destination");
                 getConfig().exit();
                 return null;
             }
@@ -210,7 +180,7 @@ public class Pie_Decode {
             if (base64_text.contains("*")) {
                 String[] data = base64_text.split("\\*");
                 if  (data.length == 0) {
-                    logging(Level.SEVERE,"Nothing to decode");
+                    getConfig().logging(Level.SEVERE,"Nothing to decode");
                     getConfig().exit();
                     return null;
                 }
@@ -226,14 +196,14 @@ public class Pie_Decode {
                     getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
                 }
             }else{
-                logging(Level.SEVERE,"Nothing to decode");
+                getConfig().logging(Level.SEVERE,"Nothing to decode");
                 getConfig().exit();
                 return null;
             }
             return base64_text;
 
         } catch (Exception e) {
-            logging(Level.SEVERE,"Decoding Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
             return null;
         }
     }

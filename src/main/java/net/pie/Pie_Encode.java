@@ -52,12 +52,14 @@ public class Pie_Encode {
         if (getSource().getInitial_source_size() == 0) {
             logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
             getConfig().exit();
+            getSource().close();
             return;
         }
 
         if (getDestination() == null) {
             logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
             getConfig().exit();
+            getSource().close();
             return;
         }
 
@@ -77,8 +79,10 @@ public class Pie_Encode {
 
             int file_count = 1;
             while ((bytesRead = fis.read(buffer)) != -1) {
-                if (isError())
+                if (isError()) {
+                    getSource().close();
                     return;
+                }
 
                 outputStream = new ByteArrayOutputStream();
                 outputStream.write(buffer, 0, bytesRead);
@@ -98,6 +102,7 @@ public class Pie_Encode {
         } catch (IOException e) {
             logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
             getConfig().exit();
+            getSource().close();
             return;
         }
 
@@ -105,6 +110,7 @@ public class Pie_Encode {
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
         logTime(startTime);
         getConfig().exit();
+        getSource().close();
         if (getConfig().isRun_gc_after()) System.gc();
     }
 

@@ -1,15 +1,9 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
-
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
 /** *******************************************************<br>
  * <b>Pie_Encode_Source</b><br>
@@ -92,6 +86,16 @@ public class Pie_Encode_Source {
                 setType(Pie_Source_Type.FILE);
             }
         }
+    }
+
+    /** *******************************************************<br>
+     * Close the input stream
+     */
+    public void close() {
+        try {
+            if (getInput() != null)
+                getInput().close();
+        } catch (IOException e) {}
     }
 
     /** *******************************************************<br>
