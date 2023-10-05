@@ -163,8 +163,7 @@ public class Pie_Utils {
         return null;
     }
 
-    /**
-     * *****************************************************<br>
+    /** *****************************************************<br>
      * <b>Collects the amount of memory used</b><br>
      * @return
      */
@@ -207,6 +206,26 @@ public class Pie_Utils {
         return String.format("%.1f %cB", bytes / 1000.0, ci.current());
     }
 
+    /** *****************************************************<br>
+     * Write bytes to a text file, Used to debug.
+     * @param message (Byte[])
+     * @param file_name (String)
+     */
+    public void write_Bytes_To_File (byte[] message, String file_name) {
+        File out = new File(getDesktopPath() + File.separator + file_name);
+        try (FileWriter writer = new FileWriter(out)) {
+            try {
+                for (byte b : message) {
+                    String byteAsString = String.valueOf(b);
+                    writer.write(byteAsString);
+                }
+                writer.close();
+            } catch (IOException e) {
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /** *******************************************************<br>
      * <b>getters and setters</b><br>

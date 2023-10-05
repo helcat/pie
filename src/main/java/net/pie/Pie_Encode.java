@@ -26,7 +26,7 @@ public class Pie_Encode {
     private Pie_Encoded_Destination destination;
     private boolean error = false;
     private Pie_Utils utils = null;
-    
+
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
      * @param source (Send in a Pie_Source object)
@@ -161,7 +161,7 @@ public class Pie_Encode {
         ByteBuffer buffer = null;
         byte[] data = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
 
-        if (file_number == 1) {
+        if (file_number == 999) {
             byte[] addon = encoding_addon(total_files);
             buffer = ByteBuffer.allocate(addon.length + data.length);
             buffer.put(addon);
@@ -174,9 +174,7 @@ public class Pie_Encode {
         buffer.rewind();
 
         try {
-            byte[] message = buffer.array();
-            ///byte[] compressed = getUtils().compressBytes( message);
-            originalArray = Base64.getEncoder().encode( message);
+            originalArray = Base64.getEncoder().encode( getUtils().compressBytes( buffer.array()));
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
@@ -221,8 +219,8 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * Create the encoded image Mode 1
-     * @param image_size
-     * @param originalArray
+     * @param image_size (Pie_Size)
+     * @param originalArray (byte[])
      * @return BufferedImage
      */
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
@@ -244,9 +242,6 @@ public class Pie_Encode {
      */
     private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
         int x =0, y = 0, count = 0, store_count = 0;
-
-        int counter = 0;
-
         boolean hasAlpha = rbg.contains("A");
         int[] store = null;
 

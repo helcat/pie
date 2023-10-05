@@ -44,13 +44,13 @@ public class Pie_Decode {
             return;
         }
 
-        byte[] message = start_Decode(); // First file decode.
+        ByteArrayOutputStream  message = start_Decode(); // First file decode.
         if (message == null) {
             getConfig().exit();
             getSource().close();
             return;
         }
-
+        save(message);
         /**
         try {
             String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
@@ -74,12 +74,14 @@ public class Pie_Decode {
 
         if (getConfig().isRun_gc_after())
             System.gc();
+        getConfig().logging(Level.INFO, "Decode Complete");
     }
 
     /** *********************************************************<br>
      * Start Main Decodin
      */
-    private byte[] start_Decode() {
+    private ByteArrayOutputStream start_Decode() {
+        getConfig().logging(Level.INFO, "Decode Started");
         BufferedImage buffimage = null;
         try {
             buffimage = ImageIO.read(getSource().getInput());
@@ -95,14 +97,13 @@ public class Pie_Decode {
         }
 
         int pixelColor;
-        int count = 0;
         int retrievedAlpha;
         int retrievedRed;
         int retrievedGreen;
         int retrievedBlue;
 
         int mode = 0;
-        byte[] message = null;
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
                 pixelColor = buffimage.getRGB(x, y);
@@ -114,78 +115,86 @@ public class Pie_Decode {
                 if (retrievedRed == 0 && retrievedGreen == 0 && retrievedBlue == 0)
                     continue;
 
-                if (message == null) {
-                    mode = mode + (retrievedRed > 0 ? 1 : 0);
-                    mode = mode + (retrievedGreen > 0 ? 1 : 0);
-                    mode = mode + (retrievedBlue > 0 ? 1 : 0);
-                    mode = mode + (retrievedAlpha > 0 && retrievedAlpha < 255 ? 1 : 0);
-                    message = new byte[((buffimage.getHeight() * buffimage.getWidth()) * mode)];
-                }
-
                 if (retrievedRed > 0)
-                    message[count++] = (byte) retrievedRed;
+                    bytes.write((byte) retrievedRed);
                 if (retrievedGreen > 0)
-                    message[count++] = (byte) retrievedGreen;
+                    bytes.write((byte) retrievedGreen);
                 if (retrievedBlue > 0)
-                    message[count++] = (byte) retrievedBlue;
+                    bytes.write((byte) retrievedBlue);
                 if (retrievedAlpha > 0 && retrievedAlpha < 255)
-                    message[count++] = (byte) retrievedAlpha;
+                    bytes.write((byte) retrievedAlpha);
             }
         }
 
-        System.out.println(message);
-
-        byte[] bytes =  Base64.getDecoder().decode(message);
+        byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
 
         // clear down
         buffimage = null;
-        count = 0;
         pixelColor = 0;
-        count = 0;
         retrievedAlpha = 0;
         retrievedRed= 0;
         retrievedGreen = 0;
         retrievedBlue = 0;
+
+        try {
+            bytes.close();
+            bytes = null;
+        } catch (IOException e) {  }
 
         if (message == null) {
             getConfig().logging(Level.SEVERE,"Decoding Error");
             return null;
         }
 
-
-        byte[] bytes55 =  Base64.getDecoder().decode(message);
-
-
-       // byte[] bytes =  Base64.getDecoder().decode(message);
-        byte[] bytes2 = getUtils().decompress_return_bytes(message);
-
-        return message;
+        //byte[] bytes2 = getUtils().decompress_return_bytes(message);
+        bytes = new ByteArrayOutputStream();
+        bytes.writeBytes(message);
+        return bytes;
     }
 
     /** *******************************************************************<br>
      * <b>save the decoded bytes for the client to decide what to do with them</b>
-     * @param bytes
+     * @param bytes ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+     */
+    private void save(ByteArrayOutputStream bytes) {
+        OutputStream outputStream = null;
 
-    private void save(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
+        if (bytes == null || bytes.size() == 0) {
             getConfig().logging(Level.INFO,"Nothing to save");
             return;
         }
+
         if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
-            //setDecoded_Message(getUtils().decompress_return_String(bytes));
         }else{
-            //setDecoded_bytes(getUtils().decompress_return_Baos(bytes));
             if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + getDecoded_Source_destination().getFile_name());
-                try(OutputStream outputStream = new FileOutputStream(f)) {
-                    getDecoded_bytes().writeTo(outputStream);
+                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + "fire2.jpg"); //getDecoded_Source_destination().getFile_name());
+
+                try {
+                    outputStream = new FileOutputStream(f);
+                } catch (FileNotFoundException e) {
+                    getConfig().logging(Level.SEVERE,"Creating stream Error : " + e.getMessage());
+                    return;
+                }
+                try {
+                    bytes.writeTo(outputStream);
                 } catch (IOException e) {
-                    getConfig().logging(Level.SEVERE,"Saving to file error : " + e.getMessage());
+                    getConfig().logging(Level.SEVERE,"Writing to stream error : " + e.getMessage());
                 }
             }
         }
+        try {
+            bytes.close();
+            bytes = null;
+        } catch (IOException e) {  }
+
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+                outputStream = null;
+            }
+        } catch (IOException ex) {  }
     }
-     */
+
     /** *******************************************************************<br>
      * <b>Collect any parameters that have been encoded</b>
      * @param base64_text
