@@ -50,7 +50,9 @@ public class Pie_Decode {
             getSource().close();
             return;
         }
+
         save(message);
+
         /**
         try {
             String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
@@ -81,6 +83,7 @@ public class Pie_Decode {
      * Start Main Decodin
      */
     private ByteArrayOutputStream start_Decode() {
+        byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
         getConfig().logging(Level.INFO, "Decode Started");
         BufferedImage buffimage = null;
         try {
@@ -103,6 +106,7 @@ public class Pie_Decode {
         int retrievedBlue;
 
         int mode = 0;
+        byte[] addon = null;
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
@@ -128,6 +132,13 @@ public class Pie_Decode {
 
         byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
 
+        for (byte b : message) {
+            if (b == split_tag[0]) {
+                System.out.println("Hi");
+                break;
+            }
+        }
+
         // clear down
         buffimage = null;
         pixelColor = 0;
@@ -146,7 +157,6 @@ public class Pie_Decode {
             return null;
         }
 
-        //byte[] bytes2 = getUtils().decompress_return_bytes(message);
         bytes = new ByteArrayOutputStream();
         bytes.writeBytes(message);
         return bytes;

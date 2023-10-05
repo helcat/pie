@@ -161,7 +161,7 @@ public class Pie_Encode {
         ByteBuffer buffer = null;
         byte[] data = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
 
-        if (file_number == 999) {
+        if (file_number == 1) {
             byte[] addon = encoding_addon(total_files);
             buffer = ByteBuffer.allocate(addon.length + data.length);
             buffer.put(addon);

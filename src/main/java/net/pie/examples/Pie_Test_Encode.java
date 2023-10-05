@@ -18,7 +18,7 @@ import java.util.zip.Deflater;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "fire2.jpg";
+    private String temp_To_Be_Encoded = "coreprint_new.png";
     private String temp_Encoded_Imaage = "encoded_image.png";
 
     public static void main(String[] args) {
