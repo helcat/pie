@@ -23,6 +23,7 @@ public class Pie_Config {
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
     private boolean encoder_Add_Encryption = false; // Set outside not inside
     private boolean encoder_Transparent = false;
+    private boolean encoder_overwrite_file = false;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
     private Pie_Constants encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
     private int max_encoded_image_mb = 200;
@@ -224,6 +225,14 @@ public class Pie_Config {
 
     public void setShow_Timings_In_Logs(boolean show_Timings_In_Logs) {
         this.show_Timings_In_Logs = show_Timings_In_Logs;
+    }
+
+    public boolean isEncoder_overwrite_file() {
+        return encoder_overwrite_file;
+    }
+
+    public void setEncoder_overwrite_file(boolean encoder_overwrite_file) {
+        this.encoder_overwrite_file = encoder_overwrite_file;
     }
 
     /** ***************************************************************<br>

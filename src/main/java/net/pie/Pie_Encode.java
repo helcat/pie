@@ -64,6 +64,7 @@ public class Pie_Encode {
             getSource().close();
             return;
         }
+        getDestination().setConfig(getConfig());
 
         int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
         if (bufferSize > getSource().getInitial_source_size())
@@ -217,7 +218,7 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number))
+        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number, getSource().getFile_name()))
             logging(Level.SEVERE,"Encoding image was not saved");
 
     }

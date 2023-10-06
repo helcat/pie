@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
 
 /** *******************************************************************<br>
  * <b>Pie_Encoded_Destination</b><br>
@@ -18,6 +19,7 @@ import java.net.URL;
 public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
+    private Pie_Config config = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -38,10 +40,15 @@ public class Pie_Encoded_Destination {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number) {
+    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, String source_filename) {
         if (getLocal_file() != null) {
+            if (getLocal_file().exists() && !getConfig().isEncoder_overwrite_file()) {
+                getConfig().logging(Level.SEVERE,"Encoded file already exists : New encoded file - " + getLocal_file().getName() + " Was not created, Set config to overwrite file is required");
+                return false;
+            }
+
             try {
-                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), addFileNumber(file_number));
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), addFileNumber(file_number, source_filename));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -53,8 +60,11 @@ public class Pie_Encoded_Destination {
      * Add File number if second file is required
      * @param file_number (int)
      */
-    private File addFileNumber(int file_number) {
-        String name = getLocal_file().getName();
+    private File addFileNumber(int file_number, String source_filename) {
+        String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
+        if (name.equals(source_filename))
+            name = "enc_" + name;
+
         if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             name = name.substring(0, name.length() - ("."+Pie_Constants.IMAGE_TYPE.getParm2()).length());
         if (file_number > 1)
@@ -62,9 +72,14 @@ public class Pie_Encoded_Destination {
         name = name + "."+Pie_Constants.IMAGE_TYPE.getParm2();
 
         File file = new File(
-                getLocal_file().getAbsolutePath().substring(0,getLocal_file().getAbsolutePath().length() -  getLocal_file().getName().length()) + name);
+            getLocal_file().isDirectory() ?
+            getLocal_file().getAbsolutePath() + File.separator + name
+            :
+            getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+        );
         if (file.exists())
-            file.delete();
+            getConfig().logging(Level.WARNING,"File Exists : " + file.getName() + (getConfig().isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+
         return file;
     }
 
@@ -97,6 +112,13 @@ public class Pie_Encoded_Destination {
         this.web_address = web_address;
     }
 
+    public Pie_Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Pie_Config config) {
+        this.config = config;
+    }
 }
 
 

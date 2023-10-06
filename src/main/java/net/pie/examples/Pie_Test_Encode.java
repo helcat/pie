@@ -18,8 +18,8 @@ import java.util.zip.Deflater;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "coreprint_new.png";
-    private String temp_Encoded_Imaage = "encoded_image.png";
+    private String temp_To_Be_Encoded = "coreprint.png";
+    private String temp_Encoded_Image = "coreprint.png";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -38,13 +38,14 @@ public class Pie_Test_Encode {
         encoding_config.setShow_Memory_Usage_In_Logs(false);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(false);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
+        encoding_config.setEncoder_overwrite_file(false);
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));
 
         // Tell the encoder where to store the encoded image
         Pie_Encoded_Destination encoded_destination = new Pie_Encoded_Destination();
-        encoded_destination.setLocal_file(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage));
+        encoded_destination.setLocal_file(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Image));
 
         // Do Encoding, Will create the image and put it in the destination
         new Pie_Encode(source, encoded_destination);     // Optional Config

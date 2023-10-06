@@ -16,6 +16,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Decode {
+    private boolean  decoding_process_started = false;
     private String decoded_Message;
     private Pie_Config config;
     private ByteArrayOutputStream decoded_bytes;
@@ -25,6 +26,8 @@ public class Pie_Decode {
     private Pie_Decode_Source source = null;
     private byte[] start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
     private byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
+    private int processing_file = 0;
+    private int total_files = 0;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -35,6 +38,9 @@ public class Pie_Decode {
      **/
     public Pie_Decode(Pie_Decode_Source source, Pie_Decoded_Destination decoded_Source_destination) {
         ImageIO.setUseCache(false);
+        setProcessing_file(0);
+        setTotal_files(0);
+        setDecoding_process_started(false);
         setConfig(source.getConfig());
         setUtils(new Pie_Utils(getConfig()));
         setMemory_Start(getUtils().getMemory());
@@ -42,19 +48,25 @@ public class Pie_Decode {
         setSource(source);
 
         if (getSource() == null ) {
-            getConfig().logging(Level.SEVERE,"Decoding FAILED : Nothing to decode");
+            getConfig().logging(Level.SEVERE,"Decoding FAILED : Source required");
             getConfig().exit();
             return;
         }
 
+        if (getDecoded_Source_destination() == null ) {
+            getConfig().logging(Level.SEVERE,"Decoding FAILED : Source destination required");
+            getConfig().exit();
+            return;
+        }
+
+        setProcessing_file(1);
         ByteArrayOutputStream  message = start_Decode(); // First file decode.
         if (message == null) {
             getConfig().exit();
             getSource().close();
             return;
         }
-
-        save(message);
+        save(message, getDecoded_Source_destination().getFile_name());
 
         /**
         try {
@@ -70,37 +82,35 @@ public class Pie_Decode {
             getConfig().exit();
             return;
         }
-
-        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
-        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
-        getConfig().exit();
-
          **/
 
+        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
         if (getConfig().isRun_gc_after())
             System.gc();
-        getConfig().logging(Level.INFO, "Decode Complete");
+        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
+        getConfig().exit();
     }
 
     /** *********************************************************<br>
      * Start Main Decodin
      */
     private ByteArrayOutputStream start_Decode() {
-        getConfig().logging(Level.INFO, "Decode Started");
         BufferedImage buffimage = null;
         try {
+            getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
             buffimage = ImageIO.read(getSource().getInput());
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Cannot read encoded image " + e.getMessage());
+            getConfig().logging(Level.SEVERE, "Invalid Encoded Image " + e.getMessage());
             return null;
         }
         getSource().close();
 
         if (buffimage == null) {
-            getConfig().logging(Level.SEVERE, "Cannot decode null image");
+            getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
             return null;
         }
 
+        getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
         int pixelColor;
         int retrievedAlpha;
         int retrievedRed;
@@ -132,26 +142,6 @@ public class Pie_Decode {
             }
         }
 
-        byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
-
-        if (message[0] != split_tag[0] && message[0] != start_tag[0]) {
-            getConfig().logging(Level.SEVERE,"Invalid or Decoy Encoded Image");
-            return null;
-        }else if (message[0] == split_tag[0]) {
-            int count = 0;
-            boolean found = false;
-            for (byte b : message) {
-                if (b == split_tag[0]) {
-                    found = true;
-                    break;
-                }
-                count ++;
-            }
-            message = Arrays.copyOfRange(message, found && count >= 1 ? (count + 1) : 1, message.length);
-        }else if (message[0] != start_tag[0]) {
-            message = Arrays.copyOfRange(message,1, message.length);
-        }
-
         // clear down
         buffimage = null;
         pixelColor = 0;
@@ -160,10 +150,40 @@ public class Pie_Decode {
         retrievedGreen = 0;
         retrievedBlue = 0;
 
+        byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
+
         try {
             bytes.close();
             bytes = null;
         } catch (IOException e) {  }
+
+        if (message[0] != split_tag[0] && message[0] != start_tag[0]) {
+            getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
+            return null;
+        }else if (message[0] == split_tag[0]) {
+            setDecoding_process_started(true);
+            int count = 1;
+            boolean found = false;
+            for (byte b : message) {
+                if (count > 1 && b == split_tag[0]) {
+                    found = true;
+                    break;
+                }
+                count ++;
+            }
+            if (!found) {
+                getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
+                return null;
+            }
+            collect_encoded_parms(Arrays.copyOfRange(message, 1, count));
+            message = Arrays.copyOfRange(message, count, message.length);
+        }else if (message[0] != start_tag[0]) {
+            if (!isDecoding_process_started()) {
+                getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
+                return null;
+            }
+            message = Arrays.copyOfRange(message,1, message.length);
+        }
 
         if (message == null) {
             getConfig().logging(Level.SEVERE,"Decoding Error");
@@ -179,7 +199,7 @@ public class Pie_Decode {
      * <b>save the decoded bytes for the client to decide what to do with them</b>
      * @param bytes ByteArrayOutputStream bytes = new ByteArrayOutputStream();
      */
-    private void save(ByteArrayOutputStream bytes) {
+    private void save(ByteArrayOutputStream bytes, String file_name) {
         OutputStream outputStream = null;
 
         if (bytes == null || bytes.size() == 0) {
@@ -190,7 +210,7 @@ public class Pie_Decode {
         if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
         }else{
             if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + "coreprint_new.png"); //getDecoded_Source_destination().getFile_name());
+                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
 
                 try {
                     outputStream = new FileOutputStream(f);
@@ -220,48 +240,24 @@ public class Pie_Decode {
 
     /** *******************************************************************<br>
      * <b>Collect any parameters that have been encoded</b>
-     * @param base64_text
-     * @return String
-
-    private String collect_encoded_parms(String base64_text) {
-        try {
-            if (getDecoded_Source_destination() == null) {
-                getConfig().logging(Level.SEVERE, "No Decoder Destination");
-                getConfig().exit();
-                return null;
-            }
-
-            if (base64_text.contains("*")) {
-                String[] data = base64_text.split("\\*");
-                if  (data.length == 0) {
-                    getConfig().logging(Level.SEVERE,"Nothing to decode");
-                    getConfig().exit();
-                    return null;
-                }
-                String parms = data[0];
-                base64_text = data[1];
-
-                //parms = parms.replace(Pie_Constants.PARM_BEGINNING.getParm2() ,"");
-                //parms = getUtils().decompress_return_String(getUtils().decrypt(true, parms, "Instruction Decoding : "));
-                if (parms.lastIndexOf("?") != -1) {
-                    String[] parts = parms.split("\\?", 0);
-                    getDecoded_Source_destination().setFile_name(parts[0]);
-                    getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[1])));
-                    getConfig().setEncoder_Add_Encryption(parts[2].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
-                }
-            }else{
-                getConfig().logging(Level.SEVERE,"Nothing to decode");
-                getConfig().exit();
-                return null;
-            }
-            return base64_text;
-
-        } catch (Exception e) {
-            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
-            return null;
-        }
-    }
+     * @param add_on_bytes (byte[])
      */
+    private void collect_encoded_parms(byte[] add_on_bytes) {
+        if (getDecoded_Source_destination() == null)
+            setDecoded_Source_destination(new Pie_Decoded_Destination());
+        try {
+            String parms = new String(add_on_bytes, StandardCharsets.UTF_8);
+            int parm = 0;
+            if (parms.lastIndexOf("?") != -1) {
+                String[] parts = parms.split("\\?", 0);
+                getDecoded_Source_destination().setFile_name(parts[parm ++]);
+                getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));
+                getConfig().setEncoder_Add_Encryption(parts[parm ++].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
+                setTotal_files(Integer.parseInt(parts[parm ++]));
+            }
+
+        } catch (Exception e) {}
+    }
 
     /** *******************************************************************<br>
      * <b>getters and setters</b><br>
@@ -320,5 +316,29 @@ public class Pie_Decode {
 
     public void setSource(Pie_Decode_Source source) {
         this.source = source;
+    }
+
+    public boolean isDecoding_process_started() {
+        return decoding_process_started;
+    }
+
+    public void setDecoding_process_started(boolean decoding_process_started) {
+        this.decoding_process_started = decoding_process_started;
+    }
+
+    public int getTotal_files() {
+        return total_files;
+    }
+
+    public void setTotal_files(int total_files) {
+        this.total_files = total_files;
+    }
+
+    public int getProcessing_file() {
+        return processing_file;
+    }
+
+    public void setProcessing_file(int processing_file) {
+        this.processing_file = processing_file;
     }
 }
