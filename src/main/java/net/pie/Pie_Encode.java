@@ -26,6 +26,8 @@ public class Pie_Encode {
     private Pie_Encoded_Destination destination;
     private boolean error = false;
     private Pie_Utils utils = null;
+    private byte[] start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
+    private byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
@@ -159,32 +161,35 @@ public class Pie_Encode {
         }
 
         ByteBuffer buffer = null;
-        byte[] data = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
+        originalArray = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
+        int total_Length = originalArray.length;
 
         if (file_number == 1) {
             byte[] addon = encoding_addon(total_files);
-            buffer = ByteBuffer.allocate(addon.length + data.length);
+            buffer = ByteBuffer.allocate(split_tag.length+ addon.length + split_tag.length + total_Length);
+            buffer.put(split_tag);
             buffer.put(addon);
+            buffer.put(split_tag);
             addon = null;
         }else{
-            buffer = ByteBuffer.allocate(data.length);
+            buffer = ByteBuffer.allocate((start_tag.length)+  +total_Length);
         }
 
-        buffer.put(data);
+        buffer.put(originalArray);
         buffer.rewind();
 
         try {
             originalArray = Base64.getEncoder().encode( getUtils().compressBytes( buffer.array()));
+            total_Length = originalArray.length;
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
         }
 
-        data = null;
         buffer.clear();
         buffer = null;
 
-        Pie_Size image_size = calculate_image_Mode(originalArray.length);
+        Pie_Size image_size = calculate_image_Mode(total_Length);
         if (image_size == null) { // all else fails quit
             originalArray = null;
             getConfig().exit();
@@ -420,8 +425,7 @@ public class Pie_Encode {
             "?" +
             (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +
             "?" +
-            total_files +
-            Pie_Constants.PARM_SPLIT_TAG.getParm2();
+            total_files;
 
         return  addon.getBytes(StandardCharsets.UTF_8) ;
     }

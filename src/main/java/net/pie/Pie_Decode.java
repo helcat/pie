@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
 
@@ -22,6 +23,8 @@ public class Pie_Decode {
     private long memory_Start = 0;
     private Pie_Decoded_Destination decoded_Source_destination;
     private Pie_Decode_Source source = null;
+    private byte[] start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
+    private byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -83,7 +86,6 @@ public class Pie_Decode {
      * Start Main Decodin
      */
     private ByteArrayOutputStream start_Decode() {
-        byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
         getConfig().logging(Level.INFO, "Decode Started");
         BufferedImage buffimage = null;
         try {
@@ -132,11 +134,22 @@ public class Pie_Decode {
 
         byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
 
-        for (byte b : message) {
-            if (b == split_tag[0]) {
-                System.out.println("Hi");
-                break;
+        if (message[0] != split_tag[0] && message[0] != start_tag[0]) {
+            getConfig().logging(Level.SEVERE,"Invalid or Decoy Encoded Image");
+            return null;
+        }else if (message[0] == split_tag[0]) {
+            int count = 0;
+            boolean found = false;
+            for (byte b : message) {
+                if (b == split_tag[0]) {
+                    found = true;
+                    break;
+                }
+                count ++;
             }
+            message = Arrays.copyOfRange(message, found && count >= 1 ? (count + 1) : 1, message.length);
+        }else if (message[0] != start_tag[0]) {
+            message = Arrays.copyOfRange(message,1, message.length);
         }
 
         // clear down
@@ -177,7 +190,7 @@ public class Pie_Decode {
         if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
         }else{
             if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + "fire2.jpg"); //getDecoded_Source_destination().getFile_name());
+                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + "coreprint_new.png"); //getDecoded_Source_destination().getFile_name());
 
                 try {
                     outputStream = new FileOutputStream(f);

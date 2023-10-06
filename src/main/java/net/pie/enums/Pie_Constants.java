@@ -9,7 +9,8 @@ import java.util.Arrays;
 public enum Pie_Constants {
     MIN_PROTECTED_SIZE (50, "MIN"),
     MAX_PROTECTED_SIZE (15000, "MAX"),
-    PARM_SPLIT_TAG (0, "*"),
+    PARM_SPLIT_TAG (0, "|"),
+    PARM_START_TAG (0, ">"),
     IMAGE_TYPE (0, "png"),
     CIPHER (0,"AES/CBC/PKCS5PADDING"),
     KEYSPEC (0,"AES"),
