@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -34,6 +35,7 @@ public class Pie_URL implements Cloneable {
     private boolean doInput = true;
     private boolean doOutput = true;
     private boolean followRedirects = false;
+    private HttpURLConnection http;
 
     /** *********************************************************<br>
      * Pie_URL<br>
@@ -56,47 +58,53 @@ public class Pie_URL implements Cloneable {
             setConnection_type(Pie_Connection_Type.GET);
 
         try {
-            URL url = new URL(getHost());
-            URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection) con;
+            URL url = null;
+            HttpURLConnection http = null;
+            if (getHost().toLowerCase().startsWith("https://")) {
+                url = new URL(getHost());
+                setHttp((HttpsURLConnection) url.openConnection());
+            } else {
+                url = new URL(getHost());
+                setHttp((HttpURLConnection) url.openConnection());
+            }
 
             if (getContent_type() != null && !getContent_type().trim().isEmpty())
-                http.setRequestProperty("Content-type", getContent_type());
+                getHttp().setRequestProperty("Content-type", getContent_type());
 
             if (getBase64_basic_auth() != null && !getBase64_basic_auth().trim().isEmpty())
-                http.setRequestProperty("Authorization", "Basic " + getBase64_basic_auth());
+                getHttp().setRequestProperty("Authorization", "Basic " + getBase64_basic_auth());
 
-            http.setRequestMethod(getConnection_type().toString()); // PUT is another valid option
+            getHttp().setRequestMethod(getConnection_type().toString()); // PUT is another valid option
 
-            http.setReadTimeout(getReadTimeout());    // 10 seconds, wait for data to become available.
-            http.setConnectTimeout(getConnectTimeout());    // 5 seconds, wait if not connected by then terminate
-            http.setDoInput(isDoInput());
-            http.setDoOutput(isDoOutput());
+            getHttp().setReadTimeout(getReadTimeout());    // 10 seconds, wait for data to become available.
+            getHttp().setConnectTimeout(getConnectTimeout());    // 5 seconds, wait if not connected by then terminate
+            getHttp().setDoInput(isDoInput());
+            getHttp().setDoOutput(isDoOutput());
 
             if (isFollowRedirects())
-                http.setInstanceFollowRedirects (isFollowRedirects());
+                getHttp().setInstanceFollowRedirects (isFollowRedirects());
 
             if (getSend_data() != null && !getSend_data().trim().isEmpty()) {
                 byte[] send_bytes = getSend_data().getBytes(StandardCharsets.UTF_8);
-                http.setRequestProperty("Content-Length", ""+send_bytes.length);
-                http.getOutputStream().write(send_bytes);
+                getHttp().setRequestProperty("Content-Length", ""+send_bytes.length);
+                getHttp().getOutputStream().write(send_bytes);
             }
 
-            if(http.getResponseCode() > 299) {
-                setError_message(http.getResponseMessage());
-                setError_status(http.getResponseCode());
-                http.disconnect();
+            if(getHttp().getResponseCode() > 299) {
+                setError_message(getHttp().getResponseMessage());
+                setError_status(getHttp().getResponseCode());
+                getHttp().disconnect();
             }
 
-            if (http.getInputStream() != null) {
-                setInput(http.getInputStream());
+            if (getHttp().getInputStream() != null) {
+                setInput(getHttp().getInputStream());
             }else{
                 setError_message("No file to download");
                 setError(true);
             }
 
             if (getFile_name() != null && !getFile_name().trim().isEmpty())
-                setFile_name(getFileName(http));
+                setFile_name(getFileName());
 
             if (getFile_name() == null || getFile_name().trim().isEmpty()) {
                 setError_message("Missing file name for download");
@@ -110,6 +118,16 @@ public class Pie_URL implements Cloneable {
     }
 
     /** *********************************************************<br>
+     * Close
+     */
+    private void close() {
+        try {
+            getInput().close();
+            getHttp().disconnect();
+        } catch (IOException ignored) { }
+    }
+
+    /** *********************************************************<br>
      * create_basic_auth<br>
      * Creates a basic Authorization for the url.<br>
      * This is only required if the connection needs if<br>
@@ -117,22 +135,22 @@ public class Pie_URL implements Cloneable {
      * to use : both Basic_auth_user_name and Basic_auth_password must be filled in with correct data.
      */
     private void create_basic_auth() {
-        if (getBasic_auth_user_name() != null && !"".equals(getBasic_auth_user_name().trim()) &&
-                getBasic_auth_password() != null && !"".equals(getBasic_auth_password().trim())) {
+        if (getBasic_auth_user_name() != null && !getBasic_auth_user_name().trim().isEmpty() &&
+                getBasic_auth_password() != null && !getBasic_auth_password().trim().isEmpty()) {
             String loginDetails = getBasic_auth_user_name() + ":" + getBasic_auth_password();
             setBase64_basic_auth(Base64.getEncoder().encodeToString(loginDetails.getBytes(StandardCharsets.UTF_8)));
         }
     }
 
-    public String getFileName(URLConnection urlC) throws IOException {
+    public String getFileName() throws IOException {
         String fileName = null;
-        String contentDisposition = urlC.getHeaderField("content-disposition");
+        String contentDisposition = getHttp().getHeaderField("content-disposition");
         if (contentDisposition != null) {
             fileName = extractFileNameFromContentDisposition(contentDisposition);
         }
 
         if (fileName == null) {
-            StringTokenizer st = new StringTokenizer(urlC.getURL().getFile(), "/");
+            StringTokenizer st = new StringTokenizer(getHttp().getURL().getFile(), "/");
             while (st.hasMoreTokens())
                 fileName = st.nextToken();
         }
@@ -295,6 +313,14 @@ public class Pie_URL implements Cloneable {
 
     public void setFollowRedirects(boolean followRedirects) {
         this.followRedirects = followRedirects;
+    }
+
+    public HttpURLConnection getHttp() {
+        return http;
+    }
+
+    public void setHttp(HttpURLConnection http) {
+        this.http = http;
     }
 
     public enum Pie_Connection_Type {

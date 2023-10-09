@@ -39,7 +39,7 @@ public class Pie_Decode_Source {
                 return;
             }
 
-        }else if (decode instanceof URL || decode instanceof InputStream) {
+        }else if (decode instanceof URL || decode instanceof InputStream || decode instanceof Pie_URL) {
             setDecode_object(decode);
 
         }else if (decode instanceof List<?> list) {
