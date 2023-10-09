@@ -14,11 +14,14 @@ import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "encoded_image.png";
+    private String temp_Encoded_Imaage = "enc_coreprint.png";
     private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
@@ -40,10 +43,17 @@ public class Pie_Test_Decode {
 
         // Source file. (Image which was encoded)
         Pie_Decode_Source decode_source = new Pie_Decode_Source(
-                decoding_config,
-                new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage));
+                    decoding_config,
+                    //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
+                    new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage)
+            );
 
         // Do the decoding : Decodes the image.
-        new Pie_Decode(decode_source, decoded_Source_destination);
+        Pie_Decode decoder = new Pie_Decode(decode_source, decoded_Source_destination);
+
+        //Map<String, Object> values = decoder.getEncoded_Data_Values();
+        //system.out.println(values);
+
+        decoder.process_Decoding();
     }
 }

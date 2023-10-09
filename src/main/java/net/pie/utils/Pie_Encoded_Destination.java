@@ -41,14 +41,15 @@ public class Pie_Encoded_Destination {
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
     public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, String source_filename) {
-        if (getLocal_file() != null) {
-            if (getLocal_file().exists() && !getConfig().isEncoder_overwrite_file()) {
-                getConfig().logging(Level.SEVERE,"Encoded file already exists : New encoded file - " + getLocal_file().getName() + " Was not created, Set config to overwrite file is required");
+        File toFile = addFileNumber(file_number, source_filename);
+        if (toFile != null) {
+            if (toFile.exists() && !getConfig().isEncoder_overwrite_file()) {
+                getConfig().logging(Level.SEVERE,"Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
                 return false;
             }
 
             try {
-                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), addFileNumber(file_number, source_filename));
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

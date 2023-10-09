@@ -26,8 +26,6 @@ public class Pie_Encode {
     private Pie_Encoded_Destination destination;
     private boolean error = false;
     private Pie_Utils utils = null;
-    private byte[] start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
-    private byte[] split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8);
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b>
@@ -167,13 +165,14 @@ public class Pie_Encode {
 
         if (file_number == 1) {
             byte[] addon = encoding_addon(total_files);
-            buffer = ByteBuffer.allocate(split_tag.length+ addon.length + split_tag.length + total_Length);
-            buffer.put(split_tag);
+            buffer = ByteBuffer.allocate(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
+                    addon.length + Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length + total_Length);
+            buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
             buffer.put(addon);
-            buffer.put(split_tag);
+            buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
             addon = null;
         }else{
-            buffer = ByteBuffer.allocate((start_tag.length)+  +total_Length);
+            buffer = ByteBuffer.allocate((Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length)+  +total_Length);
         }
 
         buffer.put(originalArray);
@@ -233,7 +232,7 @@ public class Pie_Encode {
         logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
         Integer x =0, y = 0;
         int image_type = BufferedImage.TYPE_INT_RGB;
-        if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().isEncoder_Transparent())
+        if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type);
         return buildImage(data_image, image_size, originalArray, getConfig().getEncoder_mode().getParm1() );
@@ -249,6 +248,9 @@ public class Pie_Encode {
     private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
         int x =0, y = 0, count = 0, store_count = 0;
         boolean hasAlpha = rbg.contains("A");
+        boolean transparent = rbg.contains("T");
+        rbg = rbg.replace("T", "");
+
         int[] store = null;
 
         for (int i : originalArray) {
@@ -268,7 +270,7 @@ public class Pie_Encode {
             data_image.setRGB(x++, y,
                     hasAlpha ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
-                    getConfig().isEncoder_Transparent() ?
+                            transparent ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
             store = null;
@@ -284,7 +286,7 @@ public class Pie_Encode {
             data_image.setRGB(x, y,
                     hasAlpha ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
-                    getConfig().isEncoder_Transparent() ?
+                            transparent ?
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
                     new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
         }
@@ -360,20 +362,7 @@ public class Pie_Encode {
      * @return Pie_Size
      */
     public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
-        Pie_Size image_size = new Pie_Size();
-        int size = (int) Math.ceil(Math.sqrt((double) length / mode.getParm1().length()));
-
-        Pie_Constants shape = getConfig().getEncoder_shape();
-        if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
-            shape = Pie_Constants.SHAPE_SQUARE;
-
-        if (shape == Pie_Constants.SHAPE_SQUARE) {
-            image_size.setHeight(size);
-            image_size.setWidth(size);
-        }else{
-            image_size.setWidth((int) Math.ceil(size * 1.25));
-            image_size.setHeight((int) Math.ceil(size / 1.25));
-        }
+        Pie_Size image_size = getPieSize((double) length, mode);
 
         if (getConfig().hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
@@ -387,6 +376,31 @@ public class Pie_Encode {
             logging(Level.WARNING,"Maximum Image Size Is Not Set");
         }
 
+        return image_size;
+    }
+
+    /** ******************************************************<br>
+     * getPieSize
+     * @param length (double)
+     * @param mode (Pie_Encode_Mode)
+     * @return Pie_Size
+     */
+    private Pie_Size getPieSize(double length, Pie_Encode_Mode mode) {
+        String string_mode = mode.getParm1().replace("T", "");
+        Pie_Size image_size = new Pie_Size();
+        int size = (int) Math.ceil(Math.sqrt(length / string_mode.length()));
+
+        Pie_Constants shape = getConfig().getEncoder_shape();
+        if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
+            shape = Pie_Constants.SHAPE_SQUARE;
+
+        if (shape == Pie_Constants.SHAPE_SQUARE) {
+            image_size.setHeight(size);
+            image_size.setWidth(size);
+        }else{
+            image_size.setWidth((int) Math.ceil(size * 1.25));
+            image_size.setHeight((int) Math.ceil(size / 1.25));
+        }
         return image_size;
     }
 

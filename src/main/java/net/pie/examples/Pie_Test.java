@@ -41,7 +41,6 @@ public class Pie_Test {
         encoding_config.setEncoder_Add_Encryption(false);                                                           // Optional default is true
         encoding_config.setEncoder_Compression_Level(Deflater.BEST_COMPRESSION);                                    // Optional default is Deflater.BEST_SPEED
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
-        encoding_config.setEncoder_Transparent(false);                                                              // Optional default is off (false)
         encoding_config.setShow_Memory_Usage_In_Logs(true);
         encoding_config.setRun_gc_after(true);
 

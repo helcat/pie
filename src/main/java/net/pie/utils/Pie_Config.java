@@ -6,9 +6,7 @@ import net.pie.utils.*;
 
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import java.util.zip.Deflater;
 
 /** *******************************************************************<br>
@@ -21,9 +19,8 @@ public class Pie_Config {
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private int encoder_Compression_Level = Deflater.BEST_SPEED;
-    private boolean encoder_Add_Encryption = false; // Set outside not inside
-    private boolean encoder_Transparent = false;
-    private boolean encoder_overwrite_file = false;
+    private boolean encoder_Add_Encryption = false;
+    private boolean encoder_overwrite_file = true;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
     private Pie_Constants encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
     private int max_encoded_image_mb = 200;
@@ -56,7 +53,7 @@ public class Pie_Config {
      * <b>Logging</b><br>
      * Sets up the logging for this class
      **/
-    private void setUpLogging() {
+    public void setUpLogging() {
         if (getLog() == null) {
             setLog(Logger.getLogger(UUID.randomUUID().toString()));
             getLog().setUseParentHandlers(false);
@@ -215,10 +212,6 @@ public class Pie_Config {
         return encoder_shape;
     }
 
-    public boolean isEncoder_Transparent() {
-        return encoder_Transparent;
-    }
-
     public boolean isShow_Timings_In_Logs() {
         return show_Timings_In_Logs;
     }
@@ -231,19 +224,12 @@ public class Pie_Config {
         return encoder_overwrite_file;
     }
 
+    /** ***************************************************************<br>
+     * Allows newly created encoded files to be overwritten. Default is true.
+     * @param encoder_overwrite_file (boolean)
+     */
     public void setEncoder_overwrite_file(boolean encoder_overwrite_file) {
         this.encoder_overwrite_file = encoder_overwrite_file;
-    }
-
-    /** ***************************************************************<br>
-     * <b>setEncoder_Transparent</b><br>
-     * this setting will create a transparent image but will keep all the data intact for decoding.<br>
-     * The default is off (false).<br>
-     * Note this setting is ignored if the alpha channel is used as part of the encoding process.
-     * @param encoder_Transparent (boolean) Default false
-     */
-    public void setEncoder_Transparent(boolean encoder_Transparent) {
-        this.encoder_Transparent = encoder_Transparent;
     }
 
     /** ***************************************************************<br>
@@ -304,6 +290,16 @@ public class Pie_Config {
                 getEncoder_Maximum_Image().getWidth() == 0)
             return false;
         return true;
+    }
+
+    /** ******************************************************************<br>
+     * Pie_Logging_Format
+     */
+    public class Pie_Logging_Format extends Formatter {
+        @Override
+        public String format(LogRecord record) {
+            return record.getLevel() + ": " + record.getMessage() + "\n";
+        }
     }
 }
 
