@@ -8,21 +8,14 @@ git push origin main
  */
 
 import net.pie.Pie_Decode;
-import net.pie.Pie_Encode;
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encode_Mode;
 import net.pie.utils.*;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
 import java.util.logging.Level;
-import java.util.zip.Deflater;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_coreprint.png";
-    private String temp_Decode_To = "batch";
+    private String temp_Encoded_Imaage = "enc_background.jpg.png";
+    private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();
