@@ -33,7 +33,26 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+        // Two numbers to combine
+// Two numbers to combine
+        int x = 64;
+        int y = 64;
 
+// Combine them into one
+        int z = combine(x, y);
+
+// Print the combined number
+        System.out.println("The combined number is " + z);
+
+// Extract the original numbers
+        int x1 = extractFirst(z);
+        int y1 = extractSecond(z);
+
+// Print the extracted numbers
+        System.out.println("The first number is " + x1);
+        System.out.println("The second number is " + y1);
+
+        /**
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
@@ -72,5 +91,26 @@ public class Pie_Test {
 
         // Do the decoding : Decodes the image.
         new Pie_Decode(decode_source, decoded_Source_destination);
+
+         **/
     }
+
+    // Combine two numbers into one
+    public static int combine(int x, int y) {
+// Shift x left by 8 bits and or it with y
+        return (x << 8) | y;
+    }
+
+    // Extract the first number from the combined one
+    public static int extractFirst(int z) {
+// Right shift z by 8 bits
+        return z >> 8;
+    }
+
+    // Extract the second number from the combined one
+    public static int extractSecond(int z) {
+// And z with 0xFF
+        return z & 0xFF;
+    }
+
 }
