@@ -1,12 +1,11 @@
 package net.pie.utils;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.StringTokenizer;
+import java.util.zip.GZIPInputStream;
 
 public class Pie_URL implements Cloneable {
     public Object clone() {
@@ -21,12 +20,10 @@ public class Pie_URL implements Cloneable {
     private boolean error = false;
     private String error_message = null;
     private int error_status = 200;
-    private String basic_auth_user_name  = null;
-    private String basic_auth_password = null;
-    private String base64_basic_auth = null;
+    private Pie_URL_Basic_Auth basic_auth = null;
     private String content_type = "text/plain; charset=UTF-8";
     private InputStream input = null;
-    private String send_data = null;
+    private String data_to_send = null;
     private Pie_Connection_Type connection_type = Pie_Connection_Type.GET;
     private String file_name = null;
 
@@ -35,6 +32,7 @@ public class Pie_URL implements Cloneable {
     private boolean doInput = true;
     private boolean doOutput = true;
     private boolean followRedirects = false;
+    private boolean useCaches = false;
     private HttpURLConnection http;
 
     /** *********************************************************<br>
@@ -45,15 +43,29 @@ public class Pie_URL implements Cloneable {
     }
 
     /** *********************************************************<br>
-     * Pie_URL<br>
-     * @param host (String)
+     * Pie_URL
+     * @param host (String) Including http/s
      */
     public Pie_URL(String host) {
+        setConnection_type(Pie_Connection_Type.GET);
         setHost(host);
     }
 
-    public void send_Request_Data() {
-        create_basic_auth();
+    /** *********************************************************<br>
+     * Pie_URL
+     * @param host (String) Including http/s
+     */
+    public Pie_URL(String host, String data) {
+        setConnection_type(Pie_Connection_Type.POST);
+        setData_to_send(data);
+        setHost(host);
+    }
+
+    /** *********************************************************<br>
+     * receive<br>
+     * called within the encode procedure.
+     */
+    public void receive() {
         if (getConnection_type() == null)
             setConnection_type(Pie_Connection_Type.GET);
 
@@ -71,39 +83,43 @@ public class Pie_URL implements Cloneable {
             if (getContent_type() != null && !getContent_type().trim().isEmpty())
                 getHttp().setRequestProperty("Content-type", getContent_type());
 
-            if (getBase64_basic_auth() != null && !getBase64_basic_auth().trim().isEmpty())
-                getHttp().setRequestProperty("Authorization", "Basic " + getBase64_basic_auth());
+            if (getBasic_auth() != null && getBasic_auth().getBase64() != null &&
+                    !getBasic_auth().getBase64().trim().isEmpty())
+                getHttp().setRequestProperty("Authorization", "Basic " + getBasic_auth().getBase64());
 
-            getHttp().setRequestMethod(getConnection_type().toString()); // PUT is another valid option
+            getHttp().setRequestMethod(getConnection_type().toString());
 
-            getHttp().setReadTimeout(getReadTimeout());    // 10 seconds, wait for data to become available.
-            getHttp().setConnectTimeout(getConnectTimeout());    // 5 seconds, wait if not connected by then terminate
+            getHttp().setReadTimeout(getReadTimeout());
+            getHttp().setConnectTimeout(getConnectTimeout());
             getHttp().setDoInput(isDoInput());
             getHttp().setDoOutput(isDoOutput());
+            getHttp().setUseCaches(isUseCaches());
 
             if (isFollowRedirects())
                 getHttp().setInstanceFollowRedirects (isFollowRedirects());
 
-            if (getSend_data() != null && !getSend_data().trim().isEmpty()) {
-                byte[] send_bytes = getSend_data().getBytes(StandardCharsets.UTF_8);
+            if (getData_to_send() != null && !getData_to_send().trim().isEmpty()) {
+                byte[] send_bytes = getData_to_send().getBytes(StandardCharsets.UTF_8);
                 getHttp().setRequestProperty("Content-Length", ""+send_bytes.length);
                 getHttp().getOutputStream().write(send_bytes);
+            } else {
+                getHttp().setRequestProperty("Content-Length", "0");
             }
 
-            if(getHttp().getResponseCode() > 299) {
+            if (getHttp().getResponseCode() > 299) {
                 setError_message(getHttp().getResponseMessage());
                 setError_status(getHttp().getResponseCode());
                 getHttp().disconnect();
             }
 
             if (getHttp().getInputStream() != null) {
-                setInput(getHttp().getInputStream());
+                setInput(isGZipped(getHttp().getInputStream(), getHttp().getContentEncoding()));
             }else{
                 setError_message("No file to download");
                 setError(true);
             }
 
-            if (getFile_name() != null && !getFile_name().trim().isEmpty())
+            if (getFile_name() == null || getFile_name().trim().isEmpty())
                 setFile_name(getFileName());
 
             if (getFile_name() == null || getFile_name().trim().isEmpty()) {
@@ -120,29 +136,20 @@ public class Pie_URL implements Cloneable {
     /** *********************************************************<br>
      * Close
      */
-    private void close() {
+    void close() {
         try {
-            getInput().close();
-            getHttp().disconnect();
+            if (getInput() != null)
+                getInput().close();
+            if (getHttp() != null)
+                getHttp().disconnect();
         } catch (IOException ignored) { }
     }
 
     /** *********************************************************<br>
-     * create_basic_auth<br>
-     * Creates a basic Authorization for the url.<br>
-     * This is only required if the connection needs if<br>
-     * The setBase64_basic_auth can be used instead but must be in the correct format.<br>
-     * to use : both Basic_auth_user_name and Basic_auth_password must be filled in with correct data.
+     * getFileName
+     * @return File Name (String)
      */
-    private void create_basic_auth() {
-        if (getBasic_auth_user_name() != null && !getBasic_auth_user_name().trim().isEmpty() &&
-                getBasic_auth_password() != null && !getBasic_auth_password().trim().isEmpty()) {
-            String loginDetails = getBasic_auth_user_name() + ":" + getBasic_auth_password();
-            setBase64_basic_auth(Base64.getEncoder().encodeToString(loginDetails.getBytes(StandardCharsets.UTF_8)));
-        }
-    }
-
-    public String getFileName() throws IOException {
+    public String getFileName() {
         String fileName = null;
         String contentDisposition = getHttp().getHeaderField("content-disposition");
         if (contentDisposition != null) {
@@ -158,20 +165,39 @@ public class Pie_URL implements Cloneable {
         return fileName;
     }
 
-    public final String extractFileNameFromContentDisposition(String contentDisposition) {
+    public String extractFileNameFromContentDisposition(String contentDisposition) {
         String[] attributes = contentDisposition.split(";");
         for (String a : attributes) {
             if (a.toLowerCase().contains("filename")) {
                 try {
                     return a.substring(a.indexOf('\"') + 1, a.lastIndexOf('\"'));
                 } catch (Exception e) {
-                    return a.substring(a.indexOf('=') + 1, a.length());
+                    return a.substring(a.indexOf('=') + 1);
                 }
             }
         }
 
         // not found
         return null;
+    }
+
+    /** *********************************************************<br>
+     * if compressed return normal stream<br>
+     * @param stream (original stream in)
+     * @param contentEncodin (is compressed)
+     * @return InputStream
+     */
+    private InputStream isGZipped(InputStream stream, String contentEncodin) {
+        if (contentEncodin != null && contentEncodin.equalsIgnoreCase("gzip")) {
+            InputStream inputStream = null;
+            try {
+                inputStream = new GZIPInputStream(stream);
+                stream.close();
+            } catch (IOException ignored) {
+            }
+            return inputStream;
+        }
+        return stream;
     }
 
     private String getHost() {
@@ -206,30 +232,6 @@ public class Pie_URL implements Cloneable {
         this.error_status = error_status;
     }
 
-    public String getBasic_auth_user_name() {
-        return basic_auth_user_name;
-    }
-
-    public void setBasic_auth_user_name(String basic_auth_user_name) {
-        this.basic_auth_user_name = basic_auth_user_name;
-    }
-
-    public String getBasic_auth_password() {
-        return basic_auth_password;
-    }
-
-    public void setBasic_auth_password(String basic_auth_password) {
-        this.basic_auth_password = basic_auth_password;
-    }
-
-    public String getBase64_basic_auth() {
-        return base64_basic_auth;
-    }
-
-    public void setBase64_basic_auth(String base64_basic_auth) {
-        this.base64_basic_auth = base64_basic_auth;
-    }
-
     public String getContent_type() {
         return content_type;
     }
@@ -251,12 +253,12 @@ public class Pie_URL implements Cloneable {
         this.input = input;
     }
 
-    public String getSend_data() {
-        return send_data;
+    public String getData_to_send() {
+        return data_to_send;
     }
 
-    public void setSend_data(String send_data) {
-        this.send_data = send_data;
+    public void setData_to_send(String send_data) {
+        this.data_to_send = data_to_send;
     }
 
     public Pie_Connection_Type getConnection_type() {
@@ -321,6 +323,22 @@ public class Pie_URL implements Cloneable {
 
     public void setHttp(HttpURLConnection http) {
         this.http = http;
+    }
+
+    public Pie_URL_Basic_Auth getBasic_auth() {
+        return basic_auth;
+    }
+
+    public void setBasic_auth(Pie_URL_Basic_Auth basic_auth) {
+        this.basic_auth = basic_auth;
+    }
+
+    public boolean isUseCaches() {
+        return useCaches;
+    }
+
+    public void setUseCaches(boolean useCaches) {
+        this.useCaches = useCaches;
     }
 
     public enum Pie_Connection_Type {

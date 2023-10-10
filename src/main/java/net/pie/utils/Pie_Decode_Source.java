@@ -62,7 +62,6 @@ public class Pie_Decode_Source {
 
         if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No object detected to decode");
-            getConfig().exit();
             return;
 
         }else if (getDecode_object() instanceof File f) {
@@ -71,8 +70,19 @@ public class Pie_Decode_Source {
                 setInput(new FileInputStream((File) getDecode_object()));
             } catch (FileNotFoundException e) {
                 getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                getConfig().exit();
             }
+            return;
+
+        }else if (getDecode_object() instanceof Pie_URL u) {
+            getConfig().logging(Level.INFO,"Downloading File ");
+            u.receive();
+            if (u.getInput() == null || u.getError_message() != null) {
+                getConfig().logging(Level.SEVERE,"Pie_URL Failed " +(u.getError_message() != null ? u.getError_message() : ""));
+                u.close();
+                return;
+            }
+            setInput(u.getInput());
+
             return;
 
         }else if (getDecode_object() instanceof URL u) {
@@ -81,7 +91,6 @@ public class Pie_Decode_Source {
                 setInput(u.openStream());
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
-                getConfig().exit();
             }
             return;
 
@@ -97,7 +106,6 @@ public class Pie_Decode_Source {
                     setInput(new FileInputStream((File) getDecode_object()));
                 } catch (FileNotFoundException e) {
                     getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                    getConfig().exit();
                 }
 
             }else if (list.get(processing_number - 1) instanceof URL u) {
@@ -106,7 +114,6 @@ public class Pie_Decode_Source {
                     setInput(u.openStream());
                 } catch (IOException e) {
                     getConfig().logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
-                    getConfig().exit();
                 }
 
             }else if (list.get(processing_number - 1) instanceof InputStream is) {
@@ -122,6 +129,9 @@ public class Pie_Decode_Source {
      * Close the input stream
      */
     public void close() {
+        if (getDecode_object() instanceof Pie_URL u) {
+            u.close();
+        }
         try {
             if (getInput() != null)
                 getInput().close();

@@ -81,6 +81,8 @@ public class Pie_Config {
     public void logging(Level level, String message) {
         if (level.equals(Level.OFF))
             return;
+        if (getLog() == null)
+            return;
         getLog().log(level,  message);
         if (level.equals(Level.SEVERE))
             setError(true);

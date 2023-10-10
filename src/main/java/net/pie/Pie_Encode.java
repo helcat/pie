@@ -433,6 +433,15 @@ public class Pie_Encode {
      * @return String.
      */
     private byte[] encoding_addon(int total_files) {
+        String addon_files = "";
+        if (total_files > 1) {
+            for (int i = 2; i <= total_files; i++) {
+                if (!addon_files.isEmpty())
+                    addon_files = addon_files + "*";
+                addon_files = addon_files + getDestination().create_File_Name(i, getSource().getFile_name());
+            }
+        }
+
         String addon =
             (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +
             "?" +
@@ -440,7 +449,9 @@ public class Pie_Encode {
             "?" +
             (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +
             "?" +
-            total_files;
+            total_files +
+            "?" +
+            addon_files;
 
         return  addon.getBytes(StandardCharsets.UTF_8) ;
     }

@@ -58,10 +58,12 @@ public class Pie_Encoded_Destination {
     }
 
     /** *******************************************************************<br>
-     * Add File number if second file is required
+     * Create a file name
      * @param file_number (int)
+     * @param source_filename (String)
+     * @return String
      */
-    private File addFileNumber(int file_number, String source_filename) {
+    public String create_File_Name(int file_number, String source_filename) {
         String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
@@ -71,7 +73,15 @@ public class Pie_Encoded_Destination {
         if (file_number > 1)
             name = name + "_" + file_number;
         name = name + "."+Pie_Constants.IMAGE_TYPE.getParm2();
+        return name;
+    }
 
+    /** *******************************************************************<br>
+     * Add File number if second file is required
+     * @param file_number (int)
+     */
+    private File addFileNumber(int file_number, String source_filename) {
+        String name = create_File_Name(file_number, source_filename);
         File file = new File(
             getLocal_file().isDirectory() ?
             getLocal_file().getAbsolutePath() + File.separator + name

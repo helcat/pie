@@ -28,6 +28,7 @@ public class Pie_Decode {
     private int total_files = 0;
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
+    private String[] addon_Files = null;
 
 
     /** *********************************************************<br>
@@ -192,7 +193,7 @@ public class Pie_Decode {
         try {
             getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
             getSource().next(getProcessing_file());
-            if (getSource().getInput() != null)
+            if (!getConfig().isError() && getSource().getInput() != null )
                 buffimage = ImageIO.read(getSource().getInput());
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE, "Invalid Encoded Image " + e.getMessage());
@@ -322,6 +323,14 @@ public class Pie_Decode {
                 getConfig().setEncoder_Add_Encryption(parts[parm ++].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
                 setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));
 
+                String files = parts[parm ++];
+                if (!files.isEmpty()) {
+                    if (files.contains("*"))
+                        setAddon_Files(files.split("\\*", 0));
+                    else
+                        setAddon_Files(new String[]{files});
+                }
+
                 if (map_values) {
                     setEncoded_values(new HashMap<>());
                     getEncoded_values().put("total_files", getTotal_files());
@@ -430,5 +439,13 @@ public class Pie_Decode {
 
     private void setEncoded_values(Map<String, Object> encoded_values) {
         this.encoded_values = encoded_values;
+    }
+
+    public String[] getAddon_Files() {
+        return addon_Files;
+    }
+
+    public void setAddon_Files(String[] addon_Files) {
+        this.addon_Files = addon_Files;
     }
 }

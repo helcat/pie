@@ -14,8 +14,8 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_background.jpg.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Encoded_Imaage = "enc_ideaIC-2023.2.1.exe.png";
+    private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -37,6 +37,7 @@ public class Pie_Test_Decode {
         // Source file. (Image which was encoded)
         Pie_Decode_Source decode_source = new Pie_Decode_Source(
                     decoding_config,
+                    //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
                     //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
                     new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage)
             );
