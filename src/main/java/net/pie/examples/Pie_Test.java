@@ -23,6 +23,10 @@ public class Pie_Test {
     private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
+        // int rgbColor = (decimalValue << 16);
+        // int redChannel = (retrievedColor >> 16) & 0xFF; // Extract the red channel
+
+
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
     }
 
@@ -34,16 +38,20 @@ public class Pie_Test {
     public Pie_Test(String arg) {
         // Two numbers to combine
 // Two numbers to combine
-        int x = 0;
-        int y = 0;
+        int x = 43;
+        int y = 63;
 
 // Combine them into one
         int z = combine(x, y);
+// Print the combined number
+        System.out.println("The combined number is " + z);
+
         double test = z / 255;
         System.out.println("combined / 255 = "+ test);
 
-// Print the combined number
-        System.out.println("The combined number is " + z);
+        double test2 = test * 255;
+        System.out.println(test + " * 255 = "+ test2);
+
 
 // Extract the original numbers
         int x1 = extractFirst(z);

@@ -411,6 +411,7 @@ public class Pie_Encode {
      * @return int
      **/
     private int checker(int[] store, int position) {
+        position = (position << 16);
         if (store.length > position)
             return Math.max(store[position], 0);
         return 0;
