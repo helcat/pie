@@ -6,16 +6,17 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.filechooser.FileSystemView;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -252,6 +253,37 @@ public class Pie_Utils {
 
     public void setRuntime(Runtime runtime) {
         this.runtime = runtime;
+    }
+
+    public byte[] superZip(byte[] bytes) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        List<Integer> store = new ArrayList<>();
+        int count = 0;
+        for (byte by : bytes) {
+
+            if (store != null && store.size() == 2) {
+                count = 0;
+                buffer.write((byte) combine(store));
+                store = new ArrayList<>();
+            }
+            store.add((int) by);
+        }
+        if (store.size() == 1) {
+            store.add((int) 0);
+            buffer.write((byte) combine(store));
+        }
+
+        return buffer.toByteArray();
+    }
+
+    public int combine(List<Integer> i) {
+        return (int) ((i.get(0) << 6) | i.get(1));
+    }
+    public static int extractFirst(int c) {
+        return c >> 6;
+    }
+    public static int extractSecond(int c) {
+        return c & 63;
     }
 }
 

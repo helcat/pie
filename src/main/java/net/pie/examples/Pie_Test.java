@@ -36,49 +36,43 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        // Two numbers to combine
-// Two numbers to combine
-        int x = 43;
-        int y = 63;
+/// Two bytes to combine
+        int a = 55;
+        int b = 33;
 
 // Combine them into one
-        int z = combine(x, y);
-// Print the combined number
-        System.out.println("The combined number is " + z);
+        int c = combine(a, b);
 
-        double test = z / 255;
-        System.out.println("combined / 255 = "+ test);
+// Print the combined byte
+        System.out.println("The combined byte is " + c);
 
-        double test2 = test * 255;
-        System.out.println(test + " * 255 = "+ test2);
+// Extract the original bytes
+        int a1 = extractFirst(c);
+        int b1 = extractSecond(c);
 
-
-// Extract the original numbers
-        int x1 = extractFirst(z);
-        int y1 = extractSecond(z);
-
-// Print the extracted numbers
-        System.out.println("The first number is " + x1);
-        System.out.println("The second number is " + y1);
+// Print the extracted bytes
+        System.out.println("The first byte is " + a1);
+        System.out.println("The second byte is " + b1);
 
     }
 
-    // Combine two numbers into one
-    public static int combine(int x, int y) {
-// Shift x left by 8 bits and or it with y
-        return (x << 8) | y;
+    // Combine two bytes into one byte
+    public static int combine(int a, int b) {
+// Shift a left by 6 bits and or it with b
+        return (a << 6) | b;
     }
 
-    // Extract the first number from the combined one
-    public static int extractFirst(int z) {
-// Right shift z by 8 bits
-        return z >> 8;
+    // Extract the first byte from the combined one
+    public static int extractFirst(int c) {
+// Right shift c by 6 bits
+        return c >> 6;
     }
 
-    // Extract the second number from the combined one
-    public static int extractSecond(int z) {
-// And z with 0xFF
-        return z & 0xFF;
+    // Extract the second byte from the combined one
+    public static int extractSecond(int c) {
+// And c with 63
+        return c & 63;
     }
+
 
 }

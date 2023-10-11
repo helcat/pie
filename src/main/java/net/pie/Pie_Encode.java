@@ -179,7 +179,16 @@ public class Pie_Encode {
         buffer.rewind();
 
         try {
-            originalArray = Base64.getEncoder().encode( getUtils().compressBytes( buffer.array()));
+            originalArray = Base64.getEncoder().encode (
+                    getUtils().compressBytes(
+                            getUtils().superZip(
+                                Base64.getEncoder().encode(
+                                        buffer.array()
+                                )
+                            )
+                    )
+            );
+
             total_Length = originalArray.length;
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -411,7 +420,6 @@ public class Pie_Encode {
      * @return int
      **/
     private int checker(int[] store, int position) {
-        position = (position << 16);
         if (store.length > position)
             return Math.max(store[position], 0);
         return 0;
