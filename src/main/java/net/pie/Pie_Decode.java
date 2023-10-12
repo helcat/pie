@@ -10,7 +10,6 @@ import net.pie.utils.Pie_Utils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
@@ -138,13 +137,7 @@ public class Pie_Decode {
      * Start Main Decodin
      */
     private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values) {
-        ByteArrayOutputStream bytes = readImage(buffimage);
-        byte[] message = getUtils().decompress_return_bytes(Base64.getDecoder().decode(bytes.toByteArray()));
-        try {
-            bytes.close();
-            bytes = null;
-        } catch (IOException e) {  }
-
+        byte[] message = Base64.getDecoder().decode(readImage(buffimage));
         if (message[0] != Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0] &&
                 message[0] != Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
             getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
@@ -164,8 +157,10 @@ public class Pie_Decode {
                 getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
                 return null;
             }
-            collect_encoded_parms(Arrays.copyOfRange(message, 1, count), map_values);
+
+            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Constants.DEFLATER), map_values);
             message = Arrays.copyOfRange(message, count, message.length);
+
         }else if (message[0] != Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
             if (!isDecoding_process_started()) {
                 getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
@@ -179,8 +174,8 @@ public class Pie_Decode {
             return null;
         }
 
-        bytes = new ByteArrayOutputStream();
-        bytes.writeBytes(message);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bytes.writeBytes(getUtils().decompress_return_bytes(message, getConfig().getEncoder_Compression_Method()));
         return bytes;
     }
 
@@ -213,7 +208,7 @@ public class Pie_Decode {
      * @param buffimage (BufferedImage)
      * @return ByteArrayOutputStream
      */
-    private ByteArrayOutputStream readImage(BufferedImage buffimage) {
+    private byte[] readImage(BufferedImage buffimage) {
         getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
         int pixelColor;
         int retrievedAlpha;
@@ -251,7 +246,12 @@ public class Pie_Decode {
         retrievedRed= 0;
         retrievedGreen = 0;
         retrievedBlue = 0;
-        return bytes;
+
+        try {
+            bytes.close();
+        } catch (IOException ignored) { }
+
+        return bytes.toByteArray();
     }
 
     /** *******************************************************************<br>
@@ -330,6 +330,8 @@ public class Pie_Decode {
                     else
                         setAddon_Files(new String[]{files});
                 }
+
+                getConfig().setEncoder_Compression_Method(Pie_Constants.get(parts[parm ++]));
 
                 if (map_values) {
                     setEncoded_values(new HashMap<>());

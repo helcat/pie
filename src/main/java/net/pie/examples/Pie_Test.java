@@ -14,6 +14,7 @@ import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
 
@@ -36,43 +37,26 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-/// Two bytes to combine
-        int a = 55;
-        int b = 33;
+        byte[] originalBytes = {102, 71, 78, 118, 99, 109, 86, 119, 99, 109};
 
-// Combine them into one
-        int c = combine(a, b);
+        // Combine two bytes into one
+        byte[] combinedBytes = new byte[originalBytes.length / 2];
+        for (int i = 0, j = 0; i < originalBytes.length; i += 2, j++) {
+            byte combinedByte = (byte) ((originalBytes[i] << 4) | (originalBytes[i + 1] & 0xFF));
+            combinedBytes[j] = combinedByte;
+        }
 
-// Print the combined byte
-        System.out.println("The combined byte is " + c);
+        // Restore the original bytes
+        byte[] restoredBytes = new byte[originalBytes.length];
+        for (int i = 0, j = 0; i < combinedBytes.length; i++, j += 2) {
+            byte combinedByte = combinedBytes[i];
+            restoredBytes[j] = (byte) ((combinedByte >> 4) & 0x0F);
+            restoredBytes[j + 1] = (byte) (combinedByte & 0x0F);
+        }
 
-// Extract the original bytes
-        int a1 = extractFirst(c);
-        int b1 = extractSecond(c);
-
-// Print the extracted bytes
-        System.out.println("The first byte is " + a1);
-        System.out.println("The second byte is " + b1);
-
+        // Print the results
+        System.out.println("Original Bytes: " + Arrays.toString(originalBytes));
+        System.out.println("Combined Bytes: " + Arrays.toString(combinedBytes));
+        System.out.println("Restored Bytes: " + Arrays.toString(restoredBytes));
     }
-
-    // Combine two bytes into one byte
-    public static int combine(int a, int b) {
-// Shift a left by 6 bits and or it with b
-        return (a << 6) | b;
-    }
-
-    // Extract the first byte from the combined one
-    public static int extractFirst(int c) {
-// Right shift c by 6 bits
-        return c >> 6;
-    }
-
-    // Extract the second byte from the combined one
-    public static int extractSecond(int c) {
-// And c with 63
-        return c & 63;
-    }
-
-
 }

@@ -160,11 +160,12 @@ public class Pie_Encode {
         }
 
         ByteBuffer buffer = null;
-        originalArray = getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray;
+        originalArray = getUtils().compressBytes(getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray,
+                getConfig().getEncoder_Compression_Method());
         int total_Length = originalArray.length;
 
         if (file_number == 1) {
-            byte[] addon = encoding_addon(total_files);
+            byte[] addon = getUtils().compressBytes(encoding_addon(total_files), Pie_Constants.DEFLATER);
             buffer = ByteBuffer.allocate(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
                     addon.length + Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length + total_Length);
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
@@ -180,13 +181,7 @@ public class Pie_Encode {
 
         try {
             originalArray = Base64.getEncoder().encode (
-                    getUtils().compressBytes(
-                            getUtils().superZip(
-                                Base64.getEncoder().encode(
-                                        buffer.array()
-                                )
-                            )
-                    )
+                            buffer.array()
             );
 
             total_Length = originalArray.length;
@@ -452,15 +447,18 @@ public class Pie_Encode {
         }
 
         String addon =
-            (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +
+            (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +   // 0 Source Name
             "?" +
-            getSource().getType().ordinal() +
+            getSource().getType().ordinal() +                                                                                   // 1 Type
             "?" +
-            (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +
+            (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +         // 2 Encryption
             "?" +
-            total_files +
+            total_files +                                                                                                       // 3 Number of Files
             "?" +
-            addon_files;
+            addon_files +                                                                                                       // 4 File Names
+            "?" +
+            getConfig().getEncoder_Compression_Method().getParm2() +                                                            // 5 Compression Type
+            "?";
 
         return  addon.getBytes(StandardCharsets.UTF_8) ;
     }

@@ -8,20 +8,13 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.logging.Level;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterOutputStream;
+import java.util.zip.*;
 
 public class Pie_Utils {
     private boolean error = false;
@@ -36,36 +29,58 @@ public class Pie_Utils {
     /** *******************************************************<br>
      * <b>compress</b><br>
      * Main functon for compressing.<br>
-     * @param text (String)
-     **/
-    public byte[] compress(String text) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
-            OutputStream out = new DeflaterOutputStream(baos, compressor);
-            out.write(text.getBytes(StandardCharsets.UTF_8));
-            out.close();
-        } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
-        }
-        return baos.toByteArray();
-    }
-
-    /** *******************************************************<br>
-     * <b>compress</b><br>
-     * Main functon for compressing.<br>
      * @param bytes (String)
      **/
-    public byte[] compressBytes(byte[] bytes) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            Deflater compressor = new Deflater(getConfig().getEncoder_Compression_Level(), true);
-            OutputStream out = new DeflaterOutputStream(baos, compressor);
-            out.write(bytes);
-            out.close();
-        } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, MessageFormat.format("ERROR compress - {0}", e.getMessage()));
+    public byte[] compressBytes(byte[] bytes, Pie_Constants method) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+
+        switch (method) {
+            case GZIP -> {
+                try {
+                    GZIPOutputStream gzipOS = new GZIPOutputStream(baos);
+                    gzipOS.write(bytes);
+                    gzipOS.close();
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "GZIP Compression Filed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
+
+            case DEFLATER -> {
+                try {
+                    Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+                    OutputStream out = new DeflaterOutputStream(baos, compressor);
+                    out.write(bytes);
+                    out.close();
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
+
+            case ZIP -> {
+                try {
+                    ZipOutputStream zipOS = new ZipOutputStream(baos);
+                    ZipEntry entry = new ZipEntry("data");
+                    entry.setSize(bytes.length);
+                    zipOS.putNextEntry(entry);
+                    zipOS.write(bytes);
+                    zipOS.closeEntry();
+                    zipOS.close();
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "ZIP Compression Filed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
         }
+
+        try {
+            baos.close();
+        } catch (IOException e) {  }
+
         return baos.toByteArray();
     }
     /** *******************************************************<br>
@@ -74,15 +89,58 @@ public class Pie_Utils {
      * @param bytes (byte[])
      * @return ByteArrayOutputStream
      **/
-    public byte[] decompress_return_bytes(byte[] bytes) {
+    public byte[] decompress_return_bytes(byte[] bytes, Pie_Constants method) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            Inflater decompressor = new Inflater(true);
-            OutputStream out = new InflaterOutputStream(baos, decompressor);
-            out.write(bytes);
-            out.close();
-        } catch (IOException e) {
-            getConfig().logging(Level.SEVERE,MessageFormat.format("ERROR decompress - {0}", e.getMessage()));
+
+        switch (method) {
+            case GZIP -> {
+                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+                try {
+                    GZIPInputStream gzipIS = new GZIPInputStream(bis);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = gzipIS.read(buffer)) > 0) {
+                        baos.write(buffer, 0, len);
+                    }
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
+
+            case DEFLATER -> {
+                try {
+                    Inflater decompressor = new Inflater(true);
+                    OutputStream out = new InflaterOutputStream(baos, decompressor);
+                    out.write(bytes);
+                    out.close();
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
+
+            case ZIP -> {
+                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+                try {
+                    ZipInputStream zipIS = new ZipInputStream(bis);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    ZipEntry entry = null;
+                    while ((entry = zipIS.getNextEntry()) != null)
+                        while ((len = zipIS.read(buffer)) > 0) {
+                            baos.write(buffer, 0, len);
+                        }
+                    bis.close();
+                    zipIS.close();
+                } catch (IOException e) {
+                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
+                    return bytes;
+                }
+                break;
+            }
         }
         return baos.toByteArray();
     }
@@ -253,37 +311,6 @@ public class Pie_Utils {
 
     public void setRuntime(Runtime runtime) {
         this.runtime = runtime;
-    }
-
-    public byte[] superZip(byte[] bytes) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        List<Integer> store = new ArrayList<>();
-        int count = 0;
-        for (byte by : bytes) {
-
-            if (store != null && store.size() == 2) {
-                count = 0;
-                buffer.write((byte) combine(store));
-                store = new ArrayList<>();
-            }
-            store.add((int) by);
-        }
-        if (store.size() == 1) {
-            store.add((int) 0);
-            buffer.write((byte) combine(store));
-        }
-
-        return buffer.toByteArray();
-    }
-
-    public int combine(List<Integer> i) {
-        return (int) ((i.get(0) << 6) | i.get(1));
-    }
-    public static int extractFirst(int c) {
-        return c >> 6;
-    }
-    public static int extractSecond(int c) {
-        return c & 63;
     }
 }
 

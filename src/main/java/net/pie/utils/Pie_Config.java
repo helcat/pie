@@ -17,7 +17,7 @@ public class Pie_Config {
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    private int encoder_Compression_Level = Deflater.BEST_SPEED;
+    private Pie_Constants encoder_Compression_Method = Pie_Constants.DEFLATER;
     private boolean encoder_Add_Encryption = false;
     private boolean encoder_overwrite_file = true;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
@@ -124,26 +124,20 @@ public class Pie_Config {
         this.encoder_Add_Encryption = encoder_Add_Encryption;
     }
 
-    public int getEncoder_Compression_Level() {
-        return encoder_Compression_Level;
+    public Pie_Constants getEncoder_Compression_Method() {
+        return encoder_Compression_Method;
     }
 
     /** ***************************************************************<br>
      * <b>Allowed Values</b><br>
-     * Deflater.BEST_COMPRESSION<br>
-     * Deflater.DEFLATED<br>
-     * Deflater.FULL_FLUSH<br>
-     * Deflater.HUFFMAN_ONLY<br>
-     * Deflater.BEST_SPEED      <b><- Default</b><br>
-     * Deflater.NO_COMPRESSION<br>
-     * @param encoder_Compression_Level (int)
+     * Pie_Constants.GZIP<br>
+     * Pie_Constants.DEFLATER (Default) <br>
+     * @param encoder_Compression_Method (int)
      */
-    public void setEncoder_Compression_Level(int encoder_Compression_Level) {
-        if (!Arrays.asList(Deflater.NO_COMPRESSION, Deflater.BEST_SPEED, Deflater.HUFFMAN_ONLY,
-                Deflater.FULL_FLUSH, Deflater.DEFLATED, Deflater.BEST_COMPRESSION).
-                contains(encoder_Compression_Level))
-            encoder_Compression_Level = Deflater.BEST_SPEED;
-        this.encoder_Compression_Level = encoder_Compression_Level;
+    public void setEncoder_Compression_Method(Pie_Constants encoder_Compression_Method) {
+        if (encoder_Compression_Method == null || !Arrays.asList(Pie_Constants.DEFLATER, Pie_Constants.GZIP, Pie_Constants.ZIP).contains(encoder_Compression_Method))
+            encoder_Compression_Method = Pie_Constants.DEFLATER;
+        this.encoder_Compression_Method = encoder_Compression_Method;
     }
 
     public boolean isRun_gc_after() {

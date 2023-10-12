@@ -31,11 +31,9 @@ public enum Pie_Constants {
     SHAPE_RECTANGLE (1, "REC"),
     SHAPE_SQUARE (2, "SQU"),
 
-    SINGLE_FILE (0, "S"),
-    MULTI_FILE (1, "M"),
-    MULTI_FILE_PLUS_DECOYS (1, "MD"),
-    ZIP_MULTI_FILE (2, "Z"),
-    ZIP_MULTI_FILE_PLUS_DECOYS (2, "ZD"),
+    DEFLATER (0, "D"),
+    GZIP (1, "G"),
+    ZIP (2, "Z")
     ;
 
     public int parm1 = 0;
@@ -57,6 +55,25 @@ public enum Pie_Constants {
      */
     public static java.util.List<Pie_Constants> getShape() {
         return Arrays.asList(SHAPE_RECTANGLE, SHAPE_SQUARE);
+    }
+
+    /** *******************************************<br>
+     * <b>get Pie_Constants from saved ordinal</b>
+     * @param ordinal
+     * @return Pie_Constants
+     */
+    public static Pie_Constants get(int ordinal) {
+        for (Pie_Constants s : Pie_Constants.values())
+            if (s.ordinal() == ordinal)
+                return s;
+        return null;
+    }
+
+    public static Pie_Constants get(String p2) {
+        for (Pie_Constants s : Pie_Constants.values())
+            if (s.getParm2().equals(p2))
+                return s;
+        return null;
     }
 
     /** *******************************************************<br>
