@@ -2,6 +2,8 @@ package net.pie.utils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -12,6 +14,7 @@ public class Pie_Decode_Source {
     private InputStream input;
     private Object decode_object;
     private Pie_Config config;
+    private String[] addon_Files = null;
 
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
@@ -65,9 +68,15 @@ public class Pie_Decode_Source {
             return;
 
         }else if (getDecode_object() instanceof File f) {
-            getConfig().logging(Level.INFO,"Loading File " + f.getName());
+            getConfig().logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_number == 1 ? f.getName() : getAddon_Files()[processing_number - 1]));
             try {
-                setInput(new FileInputStream((File) getDecode_object()));
+                if (getAddon_Files() == null || processing_number == 1) {
+                    setInput(new FileInputStream((File) getDecode_object()));
+                }else{
+                    Path path = Paths.get(((File) getDecode_object()).toURI());
+                    File nf = new File (path.getParent() + File.separator + getAddon_Files()[processing_number - 1]);
+                    setInput(new FileInputStream(nf));
+                }
             } catch (FileNotFoundException e) {
                 getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             }
@@ -161,6 +170,14 @@ public class Pie_Decode_Source {
 
     public void setDecode_object(Object decode_object) {
         this.decode_object = decode_object;
+    }
+
+    public String[] getAddon_Files() {
+        return addon_Files;
+    }
+
+    public void setAddon_Files(String[] addon_Files) {
+        this.addon_Files = addon_Files;
     }
 }
 

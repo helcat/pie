@@ -27,7 +27,7 @@ public class Pie_Decode {
     private int total_files = 0;
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
-    private String[] addon_Files = null;
+
 
 
     /** *********************************************************<br>
@@ -311,6 +311,7 @@ public class Pie_Decode {
      * @param add_on_bytes (byte[])
      */
     private void collect_encoded_parms(byte[] add_on_bytes, boolean map_values) {
+        getSource().setAddon_Files(null);
         if (getDecoded_Source_destination() == null)
             setDecoded_Source_destination(new Pie_Decoded_Destination());
         try {
@@ -326,9 +327,9 @@ public class Pie_Decode {
                 String files = parts[parm ++];
                 if (!files.isEmpty()) {
                     if (files.contains("*"))
-                        setAddon_Files(files.split("\\*", 0));
+                        getSource().setAddon_Files(files.split("\\*", 0));
                     else
-                        setAddon_Files(new String[]{files});
+                        getSource().setAddon_Files(new String[]{files});
                 }
 
                 getConfig().setEncoder_Compression_Method(Pie_Constants.get(parts[parm ++]));
@@ -441,13 +442,5 @@ public class Pie_Decode {
 
     private void setEncoded_values(Map<String, Object> encoded_values) {
         this.encoded_values = encoded_values;
-    }
-
-    public String[] getAddon_Files() {
-        return addon_Files;
-    }
-
-    public void setAddon_Files(String[] addon_Files) {
-        this.addon_Files = addon_Files;
     }
 }
