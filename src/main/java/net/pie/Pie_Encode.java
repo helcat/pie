@@ -174,6 +174,7 @@ public class Pie_Encode {
             addon = null;
         }else{
             buffer = ByteBuffer.allocate((Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length)+  +total_Length);
+            buffer.put(Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
         }
 
         buffer.put(originalArray);

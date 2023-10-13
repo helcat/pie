@@ -60,7 +60,7 @@ public class Pie_Decode_Source {
      * get next object
      * @param processing_number (int)
      */
-    public void next(int processing_number) throws IOException {
+    public void next(int processing_file) throws IOException {
         close();
 
         if (getDecode_object() == null) {
@@ -68,14 +68,19 @@ public class Pie_Decode_Source {
             return;
 
         }else if (getDecode_object() instanceof File f) {
-            getConfig().logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_number == 1 ? f.getName() : getAddon_Files()[processing_number - 1]));
+            getConfig().logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
             try {
-                if (getAddon_Files() == null || processing_number == 1) {
+                if (getAddon_Files() == null || processing_file == 0) {
                     setInput(new FileInputStream((File) getDecode_object()));
                 }else{
                     Path path = Paths.get(((File) getDecode_object()).toURI());
-                    File nf = new File (path.getParent() + File.separator + getAddon_Files()[processing_number - 1]);
-                    setInput(new FileInputStream(nf));
+                    File nf = new File (path.getParent() + File.separator + getAddon_Files()[processing_file - 1]);
+                    if (nf.exists()) {
+                        setInput(new FileInputStream(nf));
+                    }else{
+                        getConfig().logging(Level.SEVERE,"File " + nf.getName() + " is missing. Unable to continue.");
+                        return;
+                    }
                 }
             } catch (FileNotFoundException e) {
                 getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -109,7 +114,7 @@ public class Pie_Decode_Source {
             return;
 
         }else if (getDecode_object() instanceof List<?> list) {
-            if (list.get(processing_number - 1) instanceof File f) {
+            if (list.get(processing_file) instanceof File f) {
                 getConfig().logging(Level.INFO,"Loading File " + f.getName());
                 try {
                     setInput(new FileInputStream((File) getDecode_object()));
@@ -117,7 +122,7 @@ public class Pie_Decode_Source {
                     getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
                 }
 
-            }else if (list.get(processing_number - 1) instanceof URL u) {
+            }else if (list.get(processing_file) instanceof URL u) {
                 getConfig().logging(Level.INFO,"Downloading File " +u.toString());
                 try {
                     setInput(u.openStream());
@@ -125,7 +130,7 @@ public class Pie_Decode_Source {
                     getConfig().logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
                 }
 
-            }else if (list.get(processing_number - 1) instanceof InputStream is) {
+            }else if (list.get(processing_file) instanceof InputStream is) {
                 getConfig().logging(Level.INFO,"Using inputstream File" );
                 setInput(is);
             }

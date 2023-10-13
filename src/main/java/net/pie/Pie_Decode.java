@@ -23,7 +23,6 @@ public class Pie_Decode {
     private long memory_Start = 0;
     private Pie_Decoded_Destination decoded_Source_destination;
     private Pie_Decode_Source source = null;
-    private int processing_file = 0;
     private int total_files = 0;
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
@@ -39,7 +38,6 @@ public class Pie_Decode {
      **/
     public Pie_Decode(Pie_Decode_Source source, Pie_Decoded_Destination decoded_Source_destination) {
         ImageIO.setUseCache(false);
-        setProcessing_file(0);
         setTotal_files(0);
         setDecoding_process_started(false);
         setConfig(source.getConfig());
@@ -75,11 +73,11 @@ public class Pie_Decode {
         if (getConfig().isError())
             return null;
 
+        int processing_file = 0;
         if (getConfig().getLog() == null)
             getConfig().setUpLogging();
         getConfig().logging(Level.INFO,"Started Collecting Mapped Details");
-        setProcessing_file(1);
-        ByteArrayOutputStream  message = start_Decode(collectImage(), true); // First file decode.
+        ByteArrayOutputStream  message = start_Decode(collectImage(processing_file), true, processing_file); // First file decode.
         try {  Objects.requireNonNull(message).close();   } catch (IOException e) { }
         getConfig().logging(Level.INFO,"Finished Collecting Mapped Details");
         return getEncoded_values();
@@ -95,18 +93,24 @@ public class Pie_Decode {
         if (getConfig().getLog() == null)
             getConfig().setUpLogging();
 
-        setProcessing_file(1);
-        ByteArrayOutputStream  message = start_Decode(collectImage(), false); // First file decode.
+        int processing_file = 0;
+        ByteArrayOutputStream  message = start_Decode(collectImage(processing_file), false, processing_file); // First file decode.
         if (message != null) {
             setUpOutFile(getDecoded_Source_destination().getFile_name());
-            while (getProcessing_file() <= getTotal_files()) {
+            while (processing_file < getTotal_files()) {
                 save(message);
-                setProcessing_file(getProcessing_file() + 1);
-                if (getProcessing_file() > 1 && getProcessing_file() <= getTotal_files())
-                    message = start_Decode(collectImage(), false);
+                processing_file++;
+                if (processing_file > 0 && processing_file < getTotal_files()) {
+                    getUtils().usedMemory(getMemory_Start(), "Decoding : ");
+                    if (getConfig().isRun_gc_after())
+                        System.gc();
+                    message = start_Decode(collectImage(processing_file), false, processing_file);
+                    if (message == null)
+                        break;
+                }
             }
             closeOutFile();
-            try {  Objects.requireNonNull(message).close();   } catch (IOException ignored) { }
+            try {  if (message != null) message.close();   } catch (IOException ignored) { }
         }
 
         /**
@@ -136,41 +140,46 @@ public class Pie_Decode {
     /** *********************************************************<br>
      * Start Main Decodin
      */
-    private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values) {
-        byte[] message = Base64.getDecoder().decode(readImage(buffimage));
-        if (message[0] != Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0] &&
-                message[0] != Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-            getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
+    private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
+        if (buffimage == null)
             return null;
-        }else if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-            setDecoding_process_started(true);
-            int count = 1;
-            boolean found = false;
-            for (byte b : message) {
-                if (count > 1 && b == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-                    found = true;
-                    break;
+
+        byte[] message = Base64.getDecoder().decode(readImage(buffimage, processing_file));
+        if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0] || message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+
+            if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+                setDecoding_process_started(true);
+                int count = 1;
+                boolean found = false;
+                for (byte b : message) {
+                    if (count > 1 && b == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+                        found = true;
+                        break;
+                    }
+                    count++;
                 }
-                count ++;
+                if (!found) {
+                    getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+                    return null;
+                }
+
+                collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Constants.DEFLATER), map_values);
+                message = Arrays.copyOfRange(message, count, message.length);
+
+            } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+                if (!isDecoding_process_started()) {
+                    getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+                    return null;
+                }
+                message = Arrays.copyOfRange(message, 1, message.length);
             }
-            if (!found) {
-                getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
+
+            if (message == null || message.length == 0) {
+                getConfig().logging(Level.SEVERE, "Decoding Error");
                 return null;
             }
-
-            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Constants.DEFLATER), map_values);
-            message = Arrays.copyOfRange(message, count, message.length);
-
-        }else if (message[0] != Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-            if (!isDecoding_process_started()) {
-                getConfig().logging(Level.SEVERE,"Invalid Encoded Image");
-                return null;
-            }
-            message = Arrays.copyOfRange(message,1, message.length);
-        }
-
-        if (message == null ||  message.length == 0) {
-            getConfig().logging(Level.SEVERE,"Decoding Error");
+        }else{
+            getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
             return null;
         }
 
@@ -183,11 +192,11 @@ public class Pie_Decode {
      *  Collect BufferedImage from source
      * @return BufferedImage
      */
-    private BufferedImage collectImage() {
+    private BufferedImage collectImage(int processing_file) {
         BufferedImage buffimage = null;
         try {
-            getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
-            getSource().next(getProcessing_file());
+            getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
+            getSource().next(processing_file);
             if (!getConfig().isError() && getSource().getInput() != null )
                 buffimage = ImageIO.read(getSource().getInput());
         } catch (IOException e) {
@@ -208,8 +217,8 @@ public class Pie_Decode {
      * @param buffimage (BufferedImage)
      * @return ByteArrayOutputStream
      */
-    private byte[] readImage(BufferedImage buffimage) {
-        getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? getProcessing_file() + " / " + getTotal_files() : "" ));
+    private byte[] readImage(BufferedImage buffimage, int processing_file) {
+        getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? (processing_file + 1) + " / " + getTotal_files() : "" ));
         int pixelColor;
         int retrievedAlpha;
         int retrievedRed;
@@ -418,14 +427,6 @@ public class Pie_Decode {
 
     private void setTotal_files(int total_files) {
         this.total_files = total_files;
-    }
-
-    private int getProcessing_file() {
-        return processing_file;
-    }
-
-    private void setProcessing_file(int processing_file) {
-        this.processing_file = processing_file;
     }
 
     private OutputStream getOutputStream() {
