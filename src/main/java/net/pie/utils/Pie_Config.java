@@ -32,6 +32,7 @@ public class Pie_Config {
     private boolean show_Memory_Usage_In_Logs = false;
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
+    private Pie_Constants supplemental_files = Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -205,6 +206,23 @@ public class Pie_Config {
 
     public Pie_Constants getEncoder_shape() {
         return encoder_shape;
+    }
+
+    public Pie_Constants getSupplemental_files() {
+        return supplemental_files;
+    }
+
+    /** ***************************************************************<br>
+     * Sets what happens to any supplemental files.<br>
+     * Pie_Constants.ZIP_FILE will place all files into a zip file. (Default)<br>
+     * Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY  will place all supplemental files into a zip file. (Default)<br>
+     * Pie_Constants.SINGLE_ENTRIES will create supplemental files.<br>
+     * @param supplemental_files (Pie_Constants)
+     */
+    public void setSupplemental_files(Pie_Constants supplemental_files) {
+        if (supplemental_files == null || !Pie_Constants.getSupplementals().contains(supplemental_files))
+            supplemental_files = Pie_Constants.ZIP_FILE;
+        this.supplemental_files = supplemental_files;
     }
 
     public boolean isShow_Timings_In_Logs() {

@@ -1,14 +1,17 @@
 package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
-import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /** *******************************************************************<br>
  * <b>Pie_Encoded_Destination</b><br>
@@ -20,6 +23,9 @@ public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
     private Pie_Config config = null;
+    private ZipOutputStream zos = null;
+    private FileOutputStream fos = null;
+
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -55,6 +61,53 @@ public class Pie_Encoded_Destination {
             }
         }
         return false;
+    }
+
+    /** *******************************************************************<br>
+     * create a zip file for additional files
+     * @param zipFilePath (Path to zip file)
+     */
+    private void start_Zip_Stream(File zipFilePath) {
+        if (getConfig().getSupplemental_files().equals(Pie_Constants.ZIP_FILE) && getFos() == null) {
+            try {
+                setFos(new FileOutputStream(zipFilePath));
+                setZos(new ZipOutputStream(fos));
+            } catch (FileNotFoundException e) {
+                getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files " + e.getMessage());
+                return;
+            }
+        }
+    }
+
+    /** *******************************************************************<br>
+     * Create an entry in the zip file
+     * @param entryName (String)
+     * @param array (image array)
+     */
+    private void addZipEntry(String entryName, byte[] array) {
+        if (getZos() != null) {
+            ZipEntry entry = new ZipEntry(entryName);
+            try {
+                getZos().putNextEntry(entry);
+                getZos().write(array);
+                getZos().closeEntry();
+            } catch (IOException e) {
+                getConfig().logging(Level.SEVERE, "Unable to create zip entry for additional files " + e.getMessage());
+                return;
+            }
+        }
+    }
+
+    /** *******************************************************************<br>
+     * close zip files
+     */
+    private void closeZip() {
+        try {
+            if (getFos() != null)
+                getFos().close();
+            if (getZos() != null)
+                getZos().close();
+        } catch (IOException ignored) {  }
     }
 
     /** *******************************************************************<br>
@@ -129,6 +182,22 @@ public class Pie_Encoded_Destination {
 
     public void setConfig(Pie_Config config) {
         this.config = config;
+    }
+
+    public ZipOutputStream getZos() {
+        return zos;
+    }
+
+    public void setZos(ZipOutputStream zos) {
+        this.zos = zos;
+    }
+
+    public FileOutputStream getFos() {
+        return fos;
+    }
+
+    public void setFos(FileOutputStream fos) {
+        this.fos = fos;
     }
 }
 

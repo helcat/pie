@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_ideaIC-2023.2.1.exe.png";
+    private String temp_Encoded_Imaage = "enc_tomcat.zip.png";
     private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
@@ -29,7 +29,6 @@ public class Pie_Test_Decode {
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config();
         decoding_config.setLog_level(Level.INFO);
-        decoding_config.setShow_Memory_Usage_In_Logs(true);
 
         // Tell the decoder where to store the decoded file
         Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();

@@ -18,8 +18,8 @@ import java.util.zip.Deflater;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "ideaIC-2023.2.1.exe";
-    private String temp_Encoded_Image = "ideaIC-2023.2.1.exe";
+    private String temp_To_Be_Encoded = "tomcat.zip";
+    private String temp_Encoded_Image = "tomcat.zip";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -37,7 +37,8 @@ public class Pie_Test_Encode {
         encoding_config.setShow_Timings_In_Logs(false);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
         encoding_config.setEncoder_overwrite_file(true);                                                           // Optional default is false
-        encoding_config.setEncoder_Compression_Method(Pie_Constants.DEFLATER);
+        encoding_config.setEncoder_Compression_Method(Pie_Constants.DEFLATER);                                      // Optional default is Pie_Constants.DEFLATER
+        encoding_config.setSupplemental_files(Pie_Constants.ZIP_FILE);                                              // Optional default is Pie_Constants.ZIP_FILE
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

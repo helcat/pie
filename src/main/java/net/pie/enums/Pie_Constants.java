@@ -33,7 +33,11 @@ public enum Pie_Constants {
 
     DEFLATER (0, "D"),
     GZIP (1, "G"),
-    ZIP (2, "Z")
+    ZIP (2, "Z"),
+
+    ZIP_FILE (1, "C"),
+    ZIP_FILE_SUPPLEMENTAL_FILES_ONLY (2, "CS"),
+    SINGLE_FILES (2, "S")
     ;
 
     public int parm1 = 0;
@@ -55,6 +59,10 @@ public enum Pie_Constants {
      */
     public static java.util.List<Pie_Constants> getShape() {
         return Arrays.asList(SHAPE_RECTANGLE, SHAPE_SQUARE);
+    }
+
+    public static java.util.List<Pie_Constants> getSupplementals() {
+        return Arrays.asList(ZIP_FILE, ZIP_FILE_SUPPLEMENTAL_FILES_ONLY, SINGLE_FILES);
     }
 
     /** *******************************************<br>
