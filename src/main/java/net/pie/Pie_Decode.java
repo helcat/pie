@@ -184,7 +184,12 @@ public class Pie_Decode {
         }
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bytes.writeBytes(getUtils().decompress_return_bytes(message, getConfig().getEncoder_Compression_Method()));
+        try {
+            bytes.write(getUtils().decompress_return_bytes(message, getConfig().getEncoder_Compression_Method()));
+        } catch (IOException e) {
+            getConfig().logging(Level.SEVERE, "Writing Error " + e.getMessage());
+            return null;
+        }
         return bytes;
     }
 

@@ -35,7 +35,7 @@ public class Pie_Utils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
 
         switch (method) {
-            case GZIP -> {
+            case GZIP :
                 try {
                     GZIPOutputStream gzipOS = new GZIPOutputStream(baos);
                     gzipOS.write(bytes);
@@ -45,9 +45,8 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
 
-            case DEFLATER -> {
+            case DEFLATER :
                 try {
                     Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
                     OutputStream out = new DeflaterOutputStream(baos, compressor);
@@ -58,9 +57,8 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
 
-            case ZIP -> {
+            case ZIP :
                 try {
                     ZipOutputStream zipOS = new ZipOutputStream(baos);
                     ZipEntry entry = new ZipEntry("data");
@@ -74,7 +72,6 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
         }
 
         try {
@@ -91,10 +88,10 @@ public class Pie_Utils {
      **/
     public byte[] decompress_return_bytes(byte[] bytes, Pie_Constants method) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
+        ByteArrayInputStream bis = null;
         switch (method) {
-            case GZIP -> {
-                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            case GZIP :
+                bis = new ByteArrayInputStream(bytes);
                 try {
                     GZIPInputStream gzipIS = new GZIPInputStream(bis);
                     byte[] buffer = new byte[1024];
@@ -107,9 +104,8 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
 
-            case DEFLATER -> {
+            case DEFLATER :
                 try {
                     Inflater decompressor = new Inflater(true);
                     OutputStream out = new InflaterOutputStream(baos, decompressor);
@@ -120,10 +116,9 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
 
-            case ZIP -> {
-                ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            case ZIP :
+                bis = new ByteArrayInputStream(bytes);
                 try {
                     ZipInputStream zipIS = new ZipInputStream(bis);
                     byte[] buffer = new byte[1024];
@@ -140,7 +135,7 @@ public class Pie_Utils {
                     return bytes;
                 }
                 break;
-            }
+
         }
         return baos.toByteArray();
     }

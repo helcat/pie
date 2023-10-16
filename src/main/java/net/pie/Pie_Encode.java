@@ -76,7 +76,6 @@ public class Pie_Encode {
             byte[] buffer = new byte[bufferSize];
             int bytesRead;
             ByteArrayOutputStream outputStream = null;
-            ByteArrayInputStream byteArrayInputStream = null;
 
             int file_count = 1;
             while ((bytesRead = fis.read(buffer)) != -1) {
@@ -88,11 +87,8 @@ public class Pie_Encode {
                 outputStream = new ByteArrayOutputStream();
                 outputStream.write(buffer, 0, bytesRead);
 
-                byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray());
                 outputStream.close();
-                encode(byteArrayInputStream.readAllBytes(), file_count, files_to_be_created);
-
-                byteArrayInputStream.close();
+                encode(outputStream.toByteArray(), file_count, files_to_be_created);
                 file_count++;
             }
 
@@ -311,15 +307,20 @@ public class Pie_Encode {
         logging(Level.INFO,"Encoding Offset");
         if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
             switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
-                case TOP_LEFT, BOTTOM_LEFT, MIDDLE_LEFT -> {
+                case TOP_LEFT :
                     return 0;
-                }
-                case TOP_RIGHT, BOTTOM_RIGHT, MIDDLE_RIGHT -> {
+
+                case BOTTOM_LEFT :
+                    return 0;
+
+                case MIDDLE_LEFT :
+                    return 0;
+
+                case TOP_RIGHT: BOTTOM_RIGHT : MIDDLE_RIGHT :
                     return dim - size;
-                }
-                case TOP_CENTER, BOTTOM_CENTER, MIDDLE_CENTER -> {
+
+                case TOP_CENTER : BOTTOM_CENTER : MIDDLE_CENTER :
                     return (dim / 2) - (size / 2);
-                }
             }
         }
         return 0;
