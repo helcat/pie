@@ -131,6 +131,7 @@ public class Pie_Config {
 
     /** ***************************************************************<br>
      * <b>Allowed Values</b><br>
+     * Pie_Constants.ZIP<br>
      * Pie_Constants.GZIP<br>
      * Pie_Constants.DEFLATER (Default) <br>
      * @param encoder_Compression_Method (int)

@@ -4,11 +4,9 @@ import net.pie.enums.Pie_Constants;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,17 +45,24 @@ public class Pie_Encoded_Destination {
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
     public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, String source_filename) {
-        File toFile = addFileNumber(file_number, source_filename);
-        if (toFile != null) {
-            if (toFile.exists() && !getConfig().isEncoder_overwrite_file()) {
-                getConfig().logging(Level.SEVERE,"Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
-                return false;
-            }
+        if (getConfig().getSupplemental_files().equals(Pie_Constants.ZIP_FILE) && file_number == 1 ||
+                getConfig().getSupplemental_files().equals(Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && file_number > 1) {
+            start_Zip_Stream(getZip_File_Name(source_filename));
+            return addZipEntry(create_File_Name(file_number, source_filename), image);
+        }else {
+            // Single Files Only Or Beginning of Zip
+            File toFile = addFileNumber(file_number, source_filename);
+            if (toFile != null) {
+                if (toFile.exists() && !getConfig().isEncoder_overwrite_file()) {
+                    getConfig().logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
+                    return false;
+                }
 
-            try {
-                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                try {
+                    return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return false;
@@ -68,7 +73,9 @@ public class Pie_Encoded_Destination {
      * @param zipFilePath (Path to zip file)
      */
     private void start_Zip_Stream(File zipFilePath) {
-        if (getConfig().getSupplemental_files().equals(Pie_Constants.ZIP_FILE) && getFos() == null) {
+        if (getFos() != null)
+            return;
+        if (Arrays.asList(Pie_Constants.ZIP_FILE, Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getSupplemental_files())) {
             try {
                 setFos(new FileOutputStream(zipFilePath));
                 setZos(new ZipOutputStream(fos));
@@ -82,26 +89,35 @@ public class Pie_Encoded_Destination {
     /** *******************************************************************<br>
      * Create an entry in the zip file
      * @param entryName (String)
-     * @param array (image array)
+     * @param bi (BufferedImage)
      */
-    private void addZipEntry(String entryName, byte[] array) {
+    private boolean addZipEntry(String entryName, BufferedImage bi) {
         if (getZos() != null) {
             ZipEntry entry = new ZipEntry(entryName);
             try {
                 getZos().putNextEntry(entry);
-                getZos().write(array);
+
+                try {
+                    ImageIO.write(bi, "png", getZos());
+                } catch (IOException e) {
+                    getConfig().logging(Level.SEVERE, "Unable to create zip entry " + e.getMessage());
+                    return false;
+                }
+
                 getZos().closeEntry();
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE, "Unable to create zip entry for additional files " + e.getMessage());
-                return;
+                return false;
             }
+            return true;
         }
+        return false;
     }
 
     /** *******************************************************************<br>
      * close zip files
      */
-    private void closeZip() {
+    public void closeZip() {
         try {
             if (getFos() != null)
                 getFos().close();
@@ -132,6 +148,7 @@ public class Pie_Encoded_Destination {
     /** *******************************************************************<br>
      * Add File number if second file is required
      * @param file_number (int)
+     * @param source_filename (String)
      */
     private File addFileNumber(int file_number, String source_filename) {
         String name = create_File_Name(file_number, source_filename);
@@ -140,6 +157,29 @@ public class Pie_Encoded_Destination {
             getLocal_file().getAbsolutePath() + File.separator + name
             :
             getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+        );
+        if (file.exists())
+            getConfig().logging(Level.WARNING,"File Exists : " + file.getName() + (getConfig().isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+
+        return file;
+    }
+
+    /** *******************************************************************<br>
+     * Zip file name
+     * @param source_filename (int)
+     */
+    private File getZip_File_Name(String source_filename) {
+        String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
+        if (name.equals(source_filename))
+            name = "enc_" + name;
+        if (!name.toLowerCase().endsWith(".zip"))
+            name = name + ".zip";
+
+        File file = new File(
+                getLocal_file().isDirectory() ?
+                        getLocal_file().getAbsolutePath() + File.separator + name
+                        :
+                        getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             getConfig().logging(Level.WARNING,"File Exists : " + file.getName() + (getConfig().isEncoder_overwrite_file() ? " (Overwriting File)" : ""));

@@ -103,6 +103,9 @@ public class Pie_Encode {
             return;
         }
 
+        if (Arrays.asList(Pie_Constants.ZIP_FILE, Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getSupplemental_files()))
+            getDestination().closeZip();
+
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
         logTime(startTime);
