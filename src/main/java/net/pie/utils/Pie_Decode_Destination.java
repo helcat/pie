@@ -2,17 +2,16 @@ package net.pie.utils;
 
 import net.pie.enums.Pie_Source_Type;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 
 /** *******************************************************************<br>
- * <b>Pie_Encoded_Destination</b><br>
+ * <b>Pie_Encode_Destination</b><br>
  * Used to save the encoded image after its built.<br>
  * This is optional. The encoded bufferedImage is available directly after the encoded process.<br>
  * Use getEncoded_image from Pie_Encode
  **/
-public class Pie_Decoded_Destination {
+public class Pie_Decode_Destination {
     private File local_folder;
     private URL web_address;
     private String file_name = null;
@@ -21,17 +20,17 @@ public class Pie_Decoded_Destination {
     private String error_message = null;
 
     /** *******************************************************************<br>
-     * <b>Pie_Encoded_Destination</b><br>
+     * <b>Pie_Encode_Destination</b><br>
      * With no parameters, Pie_Encoded_Destination allows for custom parameters.
      **/
-    public Pie_Decoded_Destination() {
+    public Pie_Decode_Destination() {
     }
 
     /** *******************************************************************<br>
-     * <b>Pie_Encoded_Destination</b><br>
+     * <b>Pie_Encode_Destination</b><br>
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/
-    public Pie_Decoded_Destination(File folder) {
+    public Pie_Decode_Destination(File folder) {
         setLocal_folder(folder);
     }
 

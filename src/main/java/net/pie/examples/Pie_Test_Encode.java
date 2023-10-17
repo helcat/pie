@@ -8,8 +8,7 @@ git push origin main
  */
 
 import net.pie.Pie_Encode;
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encode_Mode;
+import net.pie.enums.*;
 import net.pie.utils.*;
 
 import java.io.*;
@@ -30,15 +29,15 @@ public class Pie_Test_Encode {
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
-        encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Constants.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
+        encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
         encoding_config.setEncoder_Add_Encryption(false);                                                           // Optional default is true
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(false);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(false);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
         encoding_config.setEncoder_overwrite_file(true);                                                           // Optional default is false
-        encoding_config.setEncoder_Compression_Method(Pie_Constants.DEFLATER);                                      // Optional default is Pie_Constants.DEFLATER
-        encoding_config.setSupplemental_files(Pie_Constants.ZIP_FILE);                                              // Optional default is Pie_Constants.ZIP_FILE
+        encoding_config.setEncoder_Compression_Method(Pie_Compress.DEFLATER);                                      // Optional default is Pie_Compress.DEFLATER
+        encoding_config.setEncoder_supplemental_files(Pie_Supplemental_Files.ZIP_FILE);                             // Optional default is Pie_Supplemental_Files.ZIP_FILE
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

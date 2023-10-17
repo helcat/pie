@@ -1,7 +1,6 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encode_Mode;
+import net.pie.enums.*;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -17,11 +16,12 @@ public class Pie_Config {
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    private Pie_Constants encoder_Compression_Method = Pie_Constants.DEFLATER;
+    private Pie_Compress encoder_Compression_Method = Pie_Compress.DEFLATER;
     private boolean encoder_Add_Encryption = false;
     private boolean encoder_overwrite_file = true;
+    private Pie_Supplemental_Files encoder_supplemental_files = Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
-    private Pie_Constants encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
+    private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private int max_encoded_image_mb = 200;
 
     // All
@@ -32,7 +32,6 @@ public class Pie_Config {
     private boolean show_Memory_Usage_In_Logs = false;
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
-    private Pie_Constants supplemental_files = Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -125,7 +124,7 @@ public class Pie_Config {
         this.encoder_Add_Encryption = encoder_Add_Encryption;
     }
 
-    public Pie_Constants getEncoder_Compression_Method() {
+    public Pie_Compress getEncoder_Compression_Method() {
         return encoder_Compression_Method;
     }
 
@@ -136,9 +135,9 @@ public class Pie_Config {
      * Pie_Constants.DEFLATER (Default) <br>
      * @param encoder_Compression_Method (int)
      */
-    public void setEncoder_Compression_Method(Pie_Constants encoder_Compression_Method) {
-        if (encoder_Compression_Method == null || !Arrays.asList(Pie_Constants.DEFLATER, Pie_Constants.GZIP, Pie_Constants.ZIP).contains(encoder_Compression_Method))
-            encoder_Compression_Method = Pie_Constants.DEFLATER;
+    public void setEncoder_Compression_Method(Pie_Compress encoder_Compression_Method) {
+        if (encoder_Compression_Method == null || !Arrays.asList(Pie_Compress.DEFLATER, Pie_Compress.GZIP, Pie_Compress.ZIP).contains(encoder_Compression_Method))
+            encoder_Compression_Method = Pie_Compress.DEFLATER;
         this.encoder_Compression_Method = encoder_Compression_Method;
     }
 
@@ -197,33 +196,33 @@ public class Pie_Config {
      * Allowed Values<br>
      * SHAPE_SQUARE<br>
      * SHAPE_RECTANGLE (Default) <br>
-     * @param encoder_shape (Pie_Constants)
+     * @param encoder_shape (Pie_Shape)
      */
-    public void setEncoder_shape(Pie_Constants encoder_shape) {
-        if (encoder_shape == null || !Pie_Constants.getShape().contains(encoder_shape))
-            encoder_shape = Pie_Constants.SHAPE_RECTANGLE;
+    public void setEncoder_shape(Pie_Shape encoder_shape) {
+        if (encoder_shape == null || !Pie_Shape.getShape().contains(encoder_shape))
+            encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
         this.encoder_shape = encoder_shape;
     }
 
-    public Pie_Constants getEncoder_shape() {
+    public Pie_Shape getEncoder_shape() {
         return encoder_shape;
     }
 
-    public Pie_Constants getSupplemental_files() {
-        return supplemental_files;
+    public Pie_Supplemental_Files getEncoder_supplemental_files() {
+        return encoder_supplemental_files;
     }
 
     /** ***************************************************************<br>
      * Sets what happens to any supplemental files.<br>
-     * Pie_Constants.ZIP_FILE will place all files into a zip file. (Default)<br>
-     * Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY  will place all supplemental files into a zip file. (Default)<br>
-     * Pie_Constants.SINGLE_ENTRIES will create supplemental files.<br>
-     * @param supplemental_files (Pie_Constants)
+     * Pie_Supplemental_Files.ZIP_FILE will place all files into a zip file. (Default)<br>
+     * Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY  will place all supplemental files into a zip file. (Default)<br>
+     * Pie_Supplemental_Files.SINGLE_ENTRIES will create supplemental files.<br>
+     * @param encoder_supplemental_files (Pie_Constants)
      */
-    public void setSupplemental_files(Pie_Constants supplemental_files) {
-        if (supplemental_files == null || !Pie_Constants.getSupplementals().contains(supplemental_files))
-            supplemental_files = Pie_Constants.ZIP_FILE;
-        this.supplemental_files = supplemental_files;
+    public void setEncoder_supplemental_files(Pie_Supplemental_Files encoder_supplemental_files) {
+        if (encoder_supplemental_files == null || !Pie_Supplemental_Files.getSupplementals().contains(encoder_supplemental_files))
+            encoder_supplemental_files = Pie_Supplemental_Files.ZIP_FILE;
+        this.encoder_supplemental_files = encoder_supplemental_files;
     }
 
     public boolean isShow_Timings_In_Logs() {

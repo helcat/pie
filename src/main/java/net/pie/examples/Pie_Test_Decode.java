@@ -31,7 +31,7 @@ public class Pie_Test_Decode {
         decoding_config.setLog_level(Level.INFO);
 
         // Tell the decoder where to store the decoded file
-        Pie_Decoded_Destination decoded_Source_destination = new Pie_Decoded_Destination();
+        Pie_Decode_Destination decoded_Source_destination = new Pie_Decode_Destination();
         decoded_Source_destination.setLocal_folder(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To));
 
         // Source file. (Image which was encoded)

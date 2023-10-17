@@ -6,25 +6,25 @@ import java.util.Arrays;
  * <b>Pie_Constants</b><br>
  * Constants used in PIE
  **/
-public enum Pie_Constants {
-    MIN_PROTECTED_SIZE (50, "MIN"),
-    MAX_PROTECTED_SIZE (15000, "MAX"),
-    PARM_SPLIT_TAG (0, "|"),
-    PARM_START_TAG (0, ">"),
-    IMAGE_TYPE (0, "png"),
-    CIPHER (0,"AES/CBC/PKCS5PADDING"),
-    KEYSPEC (0,"AES"),
+public enum Pie_Shape {
+    SHAPE_RECTANGLE (1, "R"),
+    SHAPE_SQUARE (2, "S"),
 
-    ENC (0, "E"),
-    NO_ENC (0, "N"),
     ;
 
     public int parm1 = 0;
     public String parm2;
 
-    Pie_Constants(int p1, String p2) {
+    Pie_Shape(int p1, String p2) {
         parm1 = p1;
         parm2 = p2;
+    }
+
+    /** *******************************************************<br>
+     * get Shape : seems lazy and should be its own enum but there is a logic behind it.
+     */
+    public static java.util.List<Pie_Shape> getShape() {
+        return Arrays.asList(SHAPE_RECTANGLE, SHAPE_SQUARE);
     }
 
     /** *******************************************<br>
@@ -32,15 +32,15 @@ public enum Pie_Constants {
      * @param ordinal
      * @return Pie_Constants
      */
-    public static Pie_Constants get(int ordinal) {
-        for (Pie_Constants s : Pie_Constants.values())
+    public static Pie_Shape get(int ordinal) {
+        for (Pie_Shape s : Pie_Shape.values())
             if (s.ordinal() == ordinal)
                 return s;
         return null;
     }
 
-    public static Pie_Constants get(String p2) {
-        for (Pie_Constants s : Pie_Constants.values())
+    public static Pie_Shape get(String p2) {
+        for (Pie_Shape s : Pie_Shape.values())
             if (s.getParm2().equals(p2))
                 return s;
         return null;

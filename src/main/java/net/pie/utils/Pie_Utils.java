@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
 
 import javax.crypto.Cipher;
@@ -31,7 +32,7 @@ public class Pie_Utils {
      * Main functon for compressing.<br>
      * @param bytes (String)
      **/
-    public byte[] compressBytes(byte[] bytes, Pie_Constants method) {
+    public byte[] compressBytes(byte[] bytes, Pie_Compress method) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
 
         switch (method) {
@@ -86,7 +87,7 @@ public class Pie_Utils {
      * @param bytes (byte[])
      * @return ByteArrayOutputStream
      **/
-    public byte[] decompress_return_bytes(byte[] bytes, Pie_Constants method) {
+    public byte[] decompress_return_bytes(byte[] bytes, Pie_Compress method) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bis = null;
         switch (method) {

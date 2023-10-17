@@ -1,28 +1,19 @@
 package net.pie.enums;
 
-import java.util.Arrays;
-
 /** *******************************************************<br>
  * <b>Pie_Constants</b><br>
  * Constants used in PIE
  **/
-public enum Pie_Constants {
-    MIN_PROTECTED_SIZE (50, "MIN"),
-    MAX_PROTECTED_SIZE (15000, "MAX"),
-    PARM_SPLIT_TAG (0, "|"),
-    PARM_START_TAG (0, ">"),
-    IMAGE_TYPE (0, "png"),
-    CIPHER (0,"AES/CBC/PKCS5PADDING"),
-    KEYSPEC (0,"AES"),
-
-    ENC (0, "E"),
-    NO_ENC (0, "N"),
+public enum Pie_Compress {
+    DEFLATER (0, "D"),
+    GZIP (1, "G"),
+    ZIP (2, "Z"),
     ;
 
     public int parm1 = 0;
     public String parm2;
 
-    Pie_Constants(int p1, String p2) {
+    Pie_Compress(int p1, String p2) {
         parm1 = p1;
         parm2 = p2;
     }
@@ -32,15 +23,15 @@ public enum Pie_Constants {
      * @param ordinal
      * @return Pie_Constants
      */
-    public static Pie_Constants get(int ordinal) {
-        for (Pie_Constants s : Pie_Constants.values())
+    public static Pie_Compress get(int ordinal) {
+        for (Pie_Compress s : Pie_Compress.values())
             if (s.ordinal() == ordinal)
                 return s;
         return null;
     }
 
-    public static Pie_Constants get(String p2) {
-        for (Pie_Constants s : Pie_Constants.values())
+    public static Pie_Compress get(String p2) {
+        for (Pie_Compress s : Pie_Compress.values())
             if (s.getParm2().equals(p2))
                 return s;
         return null;

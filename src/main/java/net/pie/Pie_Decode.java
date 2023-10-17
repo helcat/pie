@@ -1,10 +1,11 @@
 package net.pie;
 
+import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Decode_Source;
-import net.pie.utils.Pie_Decoded_Destination;
+import net.pie.utils.Pie_Decode_Destination;
 import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
@@ -21,7 +22,7 @@ public class Pie_Decode {
     private ByteArrayOutputStream decoded_bytes;
     private Pie_Utils utils = null;
     private long memory_Start = 0;
-    private Pie_Decoded_Destination decoded_Source_destination;
+    private Pie_Decode_Destination decoded_Source_destination;
     private Pie_Decode_Source source = null;
     private int total_files = 0;
     private OutputStream outputStream = null;
@@ -36,7 +37,7 @@ public class Pie_Decode {
      * @param source Image file which was encoded
      * @param decoded_Source_destination Image to be decrypted
      **/
-    public Pie_Decode(Pie_Decode_Source source, Pie_Decoded_Destination decoded_Source_destination) {
+    public Pie_Decode(Pie_Decode_Source source, Pie_Decode_Destination decoded_Source_destination) {
         ImageIO.setUseCache(false);
         setTotal_files(0);
         setDecoding_process_started(false);
@@ -163,7 +164,7 @@ public class Pie_Decode {
                     return null;
                 }
 
-                collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Constants.DEFLATER), map_values);
+                collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Compress.DEFLATER), map_values);
                 message = Arrays.copyOfRange(message, count, message.length);
 
             } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
@@ -327,7 +328,7 @@ public class Pie_Decode {
     private void collect_encoded_parms(byte[] add_on_bytes, boolean map_values) {
         getSource().setAddon_Files(null);
         if (getDecoded_Source_destination() == null)
-            setDecoded_Source_destination(new Pie_Decoded_Destination());
+            setDecoded_Source_destination(new Pie_Decode_Destination());
         try {
             String parms = new String(add_on_bytes, StandardCharsets.UTF_8);
             int parm = 0;
@@ -346,7 +347,7 @@ public class Pie_Decode {
                         getSource().setAddon_Files(new String[]{files});
                 }
 
-                getConfig().setEncoder_Compression_Method(Pie_Constants.get(parts[parm ++]));
+                getConfig().setEncoder_Compression_Method(Pie_Compress.get(parts[parm ++]));
 
                 if (map_values) {
                     setEncoded_values(new HashMap<>());
@@ -402,11 +403,11 @@ public class Pie_Decode {
         this.memory_Start = memory_Start;
     }
 
-    private Pie_Decoded_Destination getDecoded_Source_destination() {
+    private Pie_Decode_Destination getDecoded_Source_destination() {
         return decoded_Source_destination;
     }
 
-    private void setDecoded_Source_destination(Pie_Decoded_Destination decoded_Source_destination) {
+    private void setDecoded_Source_destination(Pie_Decode_Destination decoded_Source_destination) {
         this.decoded_Source_destination = decoded_Source_destination;
     }
 

@@ -1,8 +1,6 @@
 package net.pie;
 
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encode_Mode;
-import net.pie.enums.Pie_Source_Type;
+import net.pie.enums.*;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
@@ -103,7 +101,7 @@ public class Pie_Encode {
             return;
         }
 
-        if (Arrays.asList(Pie_Constants.ZIP_FILE, Pie_Constants.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getSupplemental_files()))
+        if (Arrays.asList(Pie_Supplemental_Files.ZIP_FILE, Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getEncoder_supplemental_files()))
             getDestination().closeZip();
 
         logging(Level.INFO,"Encoding Complete");
@@ -164,7 +162,7 @@ public class Pie_Encode {
         int total_Length = originalArray.length;
 
         if (file_number == 1) {
-            byte[] addon = getUtils().compressBytes(encoding_addon(total_files), Pie_Constants.DEFLATER);
+            byte[] addon = getUtils().compressBytes(encoding_addon(total_files), Pie_Compress.DEFLATER);
             buffer = ByteBuffer.allocate(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
                     addon.length + Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length + total_Length);
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
@@ -399,11 +397,11 @@ public class Pie_Encode {
         Pie_Size image_size = new Pie_Size();
         int size = (int) Math.ceil(Math.sqrt(length / string_mode.length()));
 
-        Pie_Constants shape = getConfig().getEncoder_shape();
+        Pie_Shape shape = getConfig().getEncoder_shape();
         if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
-            shape = Pie_Constants.SHAPE_SQUARE;
+            shape = Pie_Shape.SHAPE_SQUARE;
 
-        if (shape == Pie_Constants.SHAPE_SQUARE) {
+        if (shape == Pie_Shape.SHAPE_SQUARE) {
             image_size.setHeight(size);
             image_size.setWidth(size);
         }else{

@@ -13,21 +13,23 @@ import net.pie.Pie_Decode;
 import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Pie_Test {
-    private String temp_To_Be_Encoded = "background.jpg";
-    private String temp_Encoded_Imaage = "My_Image.png";
-    private String temp_Decode_To = "shared";
+    private ZipOutputStream zos = null;
+    private FileOutputStream fos = null;
 
     public static void main(String[] args) {
-        // int rgbColor = (decimalValue << 16);
-        // int redChannel = (retrievedColor >> 16) & 0xFF; // Extract the red channel
-
-
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
     }
 
@@ -37,6 +39,72 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+        start_Zip_Stream(new File(Pie_Utils.getDesktopPath() + File.separator + "Test.zip"));
+        addZipEntry("image.png", getImage(new File(Pie_Utils.getDesktopPath() + File.separator + "fire2.jpg")));
+        closeZip();
+    }
+
+    private BufferedImage getImage(File ref) {
+            BufferedImage bimg = null;
+            try {
+                bimg = ImageIO.read(ref);
+            } catch (IOException e) { }
+            return  bimg;
+    }
+
+    /** *******************************************************************<br>
+     * create a zip file for additional files
+     * @param zipFilePath (Path to zip file)
+     */
+    private void start_Zip_Stream(File zipFilePath) {
+        if (getFos() != null)
+            return;
+            try {
+                setFos(new FileOutputStream(zipFilePath));
+                setZos(new ZipOutputStream(getFos()));
+            } catch (FileNotFoundException e) {
+                return;
+            }
+    }
+
+    private boolean addZipEntry(String entryName, BufferedImage bi) {
+        if (getZos() != null) {
+            ZipEntry entry = new ZipEntry(entryName);
+            try {
+                getZos().putNextEntry(entry);
+
+                try {
+                    ImageIO.write(bi, "png", getZos());
+                } catch (IOException e) {
+                    return false;
+                }
+
+                getZos().closeEntry();
+            } catch (IOException e) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /** *******************************************************************<br>
+     * close zip files
+     */
+    public void closeZip() {
+        try {
+            if (getZos() != null) {
+                getZos().flush();
+                getZos().close();
+            }
+            if (getFos() != null)
+                getFos().close();
+        } catch (IOException ignored) {  }
+    }
+
+
+    // Combine test
+    private void combine_test() {
         byte[] originalBytes = {102, 71, 78, 118, 99, 109, 86, 119, 99, 109};
 
         // Combine two bytes into one
@@ -58,5 +126,23 @@ public class Pie_Test {
         System.out.println("Original Bytes: " + Arrays.toString(originalBytes));
         System.out.println("Combined Bytes: " + Arrays.toString(combinedBytes));
         System.out.println("Restored Bytes: " + Arrays.toString(restoredBytes));
+    }
+
+
+
+    public ZipOutputStream getZos() {
+        return zos;
+    }
+
+    public void setZos(ZipOutputStream zos) {
+        this.zos = zos;
+    }
+
+    public FileOutputStream getFos() {
+        return fos;
+    }
+
+    public void setFos(FileOutputStream fos) {
+        this.fos = fos;
     }
 }
