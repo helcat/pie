@@ -22,14 +22,34 @@ public class Pie_Encode_Source {
     /** *******************************************************<br>
      * <b>Pie_Encode_Source</b><br>
      * Sets a new instance with a given Pie_Config with custom parameters.<br>
+     * Note, A default config will be set up.
+     * @param encode (Object) Can be String of text or a File
+     */
+    public Pie_Encode_Source(Object encode) {
+        setConfig(new Pie_Config());
+        process(encode);
+    }
+
+    /** *******************************************************<br>
+     * <b>Pie_Encode_Source</b><br>
+     * Sets a new instance with a given Pie_Config with custom parameters.<br>
      * Note, if the config is not entered a default one will be set up.
      * @param config
      * @param encode (Object) Can be String of text or a File
      */
     public Pie_Encode_Source(Pie_Config config, Object encode) {
+        setConfig(config == null ? new Pie_Config() : config);
+        process(encode);
+    }
+
+    /** *******************************************************<br>
+     * <b>process</b><br>
+     * Main processing from Pie_Encode_Source
+     * @param encode (Object) Can be String of text or a File
+     */
+    private void process(Object encode) {
         setInput(null);
         setType(Pie_Source_Type.NONE);
-        setConfig(config == null ? new Pie_Config() : config);
         setUtils(new Pie_Utils(getConfig()));
         setFile_name(null);
 

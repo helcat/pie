@@ -7,6 +7,7 @@ import java.util.Arrays;
  * Constants used in PIE
  **/
 public enum Pie_Constants {
+    Demo_Comment (0, "Pie_Encoded_Demo"),
     MIN_PROTECTED_SIZE (50, "MIN"),
     MAX_PROTECTED_SIZE (15000, "MAX"),
     PARM_SPLIT_TAG (0, "|"),

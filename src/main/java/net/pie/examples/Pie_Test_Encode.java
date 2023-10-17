@@ -37,7 +37,7 @@ public class Pie_Test_Encode {
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
         encoding_config.setEncoder_overwrite_file(true);                                                           // Optional default is false
         encoding_config.setEncoder_Compression_Method(Pie_Compress.DEFLATER);                                      // Optional default is Pie_Compress.DEFLATER
-        encoding_config.setEncoder_supplemental_files(Pie_Supplemental_Files.ZIP_FILE);                             // Optional default is Pie_Supplemental_Files.ZIP_FILE
+        encoding_config.setEncoder_supplemental_files(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY);    // Optional default is Pie_Supplemental_Files.ZIP_FILE
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

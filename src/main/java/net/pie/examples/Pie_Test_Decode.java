@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_tomcat.zip.png";
+    private String temp_Encoded_Imaage = "enc_tomcat.zip";
     private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {

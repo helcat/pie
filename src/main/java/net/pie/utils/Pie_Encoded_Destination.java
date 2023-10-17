@@ -47,7 +47,7 @@ public class Pie_Encoded_Destination {
      **/
     public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, String source_filename) {
         if (getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE) ||
-                getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && file_number == 1) {
+                getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && file_number > 1) {
             if (getFos() == null)
                 start_Zip_Stream(getZip_File_Name(source_filename));
             return addZipEntry(create_File_Name(file_number, source_filename), image);
@@ -96,6 +96,7 @@ public class Pie_Encoded_Destination {
     private boolean addZipEntry(String entryName, BufferedImage bi) {
         if (getZos() != null) {
             ZipEntry entry = new ZipEntry(entryName);
+            entry.setComment(Pie_Constants.Demo_Comment.getParm2());
             try {
                 getZos().putNextEntry(entry);
 
