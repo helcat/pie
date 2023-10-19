@@ -25,8 +25,6 @@ public class Pie_Decode {
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
 
-
-
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
      * Processing for decoding the image back to source.<br>
