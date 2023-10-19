@@ -3,10 +3,7 @@ package net.pie;
 import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
-import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_Decode_Source;
-import net.pie.utils.Pie_Decode_Destination;
-import net.pie.utils.Pie_Utils;
+import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -79,7 +76,7 @@ public class Pie_Decode {
             getConfig().setUpLogging();
         getConfig().logging(Level.INFO,"Started Collecting Mapped Details");
         ByteArrayOutputStream  message = start_Decode(collectImage(processing_file), true, processing_file); // First file decode.
-        try {  Objects.requireNonNull(message).close();   } catch (IOException e) { }
+        try {  Objects.requireNonNull(message).close();   } catch (IOException ignored) { }
         getConfig().logging(Level.INFO,"Finished Collecting Mapped Details");
         return getEncoded_values();
     }
@@ -101,7 +98,7 @@ public class Pie_Decode {
             while (processing_file < getTotal_files()) {
                 save(message);
                 processing_file++;
-                if (processing_file > 0 && processing_file < getTotal_files()) {
+                if (processing_file < getTotal_files()) {
                     getUtils().usedMemory(getMemory_Start(), "Decoding : ");
                     if (getConfig().isRun_gc_after())
                         System.gc();
@@ -144,8 +141,8 @@ public class Pie_Decode {
     private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
         if (buffimage == null)
             return null;
-
-        byte[] message = Base64.getDecoder().decode(readImage(buffimage, processing_file));
+        byte[] message = Pie_Ascii85.decode(new String(readImage(buffimage, processing_file), StandardCharsets.UTF_8));
+        /* byte[] message = Base64.getDecoder().decode(readImage(buffimage, processing_file)); */
         if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0] || message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
 
             if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
@@ -175,7 +172,7 @@ public class Pie_Decode {
                 message = Arrays.copyOfRange(message, 1, message.length);
             }
 
-            if (message == null || message.length == 0) {
+            if (message.length == 0) {
                 getConfig().logging(Level.SEVERE, "Decoding Error");
                 return null;
             }
@@ -298,7 +295,7 @@ public class Pie_Decode {
                 getOutputStream().close();
                 setOutputStream(null);
             }
-        } catch (IOException ex) {  }
+        } catch (IOException ignored) {  }
     }
 
       /** *******************************************************************<br>
@@ -318,7 +315,7 @@ public class Pie_Decode {
         try {
             bytes.close();
             bytes = null;
-        } catch (IOException e) {  }
+        } catch (IOException ignored) {  }
     }
 
     /** *******************************************************************<br>
@@ -359,7 +356,7 @@ public class Pie_Decode {
                 }
             }
 
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     /** *******************************************************************<br>

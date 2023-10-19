@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
@@ -40,6 +41,14 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+
+        String test = "qwertyuiopasdfghjklzxcvbnm1234567890";
+
+        String test2 = Base64.encodeASCII85(test.getBytes(StandardCharsets.UTF_8));
+
+        byte[] bytes = test2.getBytes(StandardCharsets.UTF_8);
+
+
         int x = 11;
         int y = 14;
         int z = combine(x, y);
