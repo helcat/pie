@@ -44,7 +44,7 @@ public class Pie_Test {
 
         String test = "qwertyuiopasdfghjklzxcvbnm1234567890";
 
-        String test2 = Base64.encodeASCII85(test.getBytes(StandardCharsets.UTF_8));
+        String test2 = Pie_Ascii85.encode(test.getBytes(StandardCharsets.UTF_8));
 
         byte[] bytes = test2.getBytes(StandardCharsets.UTF_8);
 
