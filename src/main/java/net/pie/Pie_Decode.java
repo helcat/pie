@@ -326,6 +326,7 @@ public class Pie_Decode {
      * @param add_on_bytes (byte[])
      */
     private void collect_encoded_parms(byte[] add_on_bytes, boolean map_values) {
+        getConfig().setSupplemental_zip_name(null);
         getSource().setAddon_Files(null);
         if (getDecoded_Source_destination() == null)
             setDecoded_Source_destination(new Pie_Decode_Destination());
@@ -334,12 +335,12 @@ public class Pie_Decode {
             int parm = 0;
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
-                getDecoded_Source_destination().setFile_name(parts[parm ++]);
-                getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));
-                getConfig().setEncoder_Add_Encryption(parts[parm ++].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));
-                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));
+                getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
+                getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));  // 1
+                getConfig().setEncoder_Add_Encryption(parts[parm ++].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));   // 2
+                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 3
 
-                String files = parts[parm ++];
+                String files = parts[parm ++];                                                                          // 4
                 if (!files.isEmpty()) {
                     if (files.contains("*"))
                         getSource().setAddon_Files(files.split("\\*", 0));
@@ -347,7 +348,8 @@ public class Pie_Decode {
                         getSource().setAddon_Files(new String[]{files});
                 }
 
-                getConfig().setEncoder_Compression_Method(Pie_Compress.get(parts[parm ++]));
+                getConfig().setEncoder_Compression_Method(Pie_Compress.get(parts[parm ++]));                            // 5
+                getConfig().setSupplemental_zip_name(parts[parm ++].isEmpty() ? null : parts[parm ++]);                 // 6
 
                 if (map_values) {
                     setEncoded_values(new HashMap<>());

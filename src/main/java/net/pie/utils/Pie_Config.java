@@ -32,6 +32,7 @@ public class Pie_Config {
     private boolean show_Memory_Usage_In_Logs = false;
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
+    private String supplemental_zip_name = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -303,6 +304,14 @@ public class Pie_Config {
                 getEncoder_Maximum_Image().getWidth() == 0)
             return false;
         return true;
+    }
+
+    public String getSupplemental_zip_name() {
+        return supplemental_zip_name;
+    }
+
+    public void setSupplemental_zip_name(String supplemental_zip_name) {
+        this.supplemental_zip_name = supplemental_zip_name;
     }
 
     /** ******************************************************************<br>

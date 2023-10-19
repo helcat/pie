@@ -14,7 +14,10 @@ import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,8 +29,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class Pie_Test {
-    private ZipOutputStream zos = null;
-    private FileOutputStream fos = null;
 
     public static void main(String[] args) {
         new Pie_Test(args != null && args.length != 0 ?  args[0] : null);
@@ -39,110 +40,34 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        start_Zip_Stream(new File(Pie_Utils.getDesktopPath() + File.separator + "Test.zip"));
-        addZipEntry("image.png", getImage(new File(Pie_Utils.getDesktopPath() + File.separator + "fire2.jpg")));
-        closeZip();
+        int x = 11;
+        int y = 14;
+        int z = combine(x, y);
+        System.out.println("The combined number is " + z);
+
+        int x1 = extractFirst(z);
+        int y1 = extractSecond(z);
+
+        System.out.println("The first number is " + x1);
+        System.out.println("The second number is " + y1);
     }
 
-    private BufferedImage getImage(File ref) {
-            BufferedImage bimg = null;
-            try {
-                bimg = ImageIO.read(ref);
-            } catch (IOException e) { }
-            return  bimg;
+    // Combine two numbers into one
+    public static int combine(int x, int y) {
+// Shift x left by 8 bits and or it with y
+        return (x << 8) | y;
     }
 
-    /** *******************************************************************<br>
-     * create a zip file for additional files
-     * @param zipFilePath (Path to zip file)
-     */
-    private void start_Zip_Stream(File zipFilePath) {
-        if (getFos() != null)
-            return;
-            try {
-                setFos(new FileOutputStream(zipFilePath));
-                setZos(new ZipOutputStream(getFos()));
-            } catch (FileNotFoundException e) {
-                return;
-            }
+    // Extract the first number from the combined one
+    public static int extractFirst(int z) {
+// Right shift z by 8 bits
+        return z >> 8;
     }
 
-    private boolean addZipEntry(String entryName, BufferedImage bi) {
-        if (getZos() != null) {
-            ZipEntry entry = new ZipEntry(entryName);
-            try {
-                getZos().putNextEntry(entry);
-
-                try {
-                    ImageIO.write(bi, "png", getZos());
-                } catch (IOException e) {
-                    return false;
-                }
-
-                getZos().closeEntry();
-            } catch (IOException e) {
-                return false;
-            }
-            return true;
-        }
-        return false;
+    // Extract the second number from the combined one
+    public static int extractSecond(int z) {
+// And z with 0xFF
+        return z & 0xFF;
     }
 
-    /** *******************************************************************<br>
-     * close zip files
-     */
-    public void closeZip() {
-        try {
-            if (getZos() != null) {
-                getZos().flush();
-                getZos().close();
-            }
-            if (getFos() != null)
-                getFos().close();
-        } catch (IOException ignored) {  }
-    }
-
-
-    // Combine test
-    private void combine_test() {
-        byte[] originalBytes = {102, 71, 78, 118, 99, 109, 86, 119, 99, 109};
-
-        // Combine two bytes into one
-        byte[] combinedBytes = new byte[originalBytes.length / 2];
-        for (int i = 0, j = 0; i < originalBytes.length; i += 2, j++) {
-            byte combinedByte = (byte) ((originalBytes[i] << 4) | (originalBytes[i + 1] & 0xFF));
-            combinedBytes[j] = combinedByte;
-        }
-
-        // Restore the original bytes
-        byte[] restoredBytes = new byte[originalBytes.length];
-        for (int i = 0, j = 0; i < combinedBytes.length; i++, j += 2) {
-            byte combinedByte = combinedBytes[i];
-            restoredBytes[j] = (byte) ((combinedByte >> 4) & 0x0F);
-            restoredBytes[j + 1] = (byte) (combinedByte & 0x0F);
-        }
-
-        // Print the results
-        System.out.println("Original Bytes: " + Arrays.toString(originalBytes));
-        System.out.println("Combined Bytes: " + Arrays.toString(combinedBytes));
-        System.out.println("Restored Bytes: " + Arrays.toString(restoredBytes));
-    }
-
-
-
-    public ZipOutputStream getZos() {
-        return zos;
-    }
-
-    public void setZos(ZipOutputStream zos) {
-        this.zos = zos;
-    }
-
-    public FileOutputStream getFos() {
-        return fos;
-    }
-
-    public void setFos(FileOutputStream fos) {
-        this.fos = fos;
-    }
 }

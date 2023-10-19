@@ -4,18 +4,13 @@ import net.pie.enums.*;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.logging.Level;
 
 public class Pie_Encode {
@@ -101,7 +96,8 @@ public class Pie_Encode {
             return;
         }
 
-        if (Arrays.asList(Pie_Supplemental_Files.ZIP_FILE, Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getEncoder_supplemental_files()))
+        if (Arrays.asList(Pie_Supplemental_Files.ZIP_FILE, Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .
+                contains(getConfig().getEncoder_supplemental_files()))
             getDestination().closeZip();
 
         logging(Level.INFO,"Encoding Complete");
@@ -128,7 +124,8 @@ public class Pie_Encode {
         long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
         long milliseconds = elapsedTime % 1000;
 
-        logging(Level.INFO,"Elapsed time: " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
+        logging(Level.INFO,"Elapsed time: " + hours + " hours, " +
+                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
     }
 
     /** *********************************************************<br>
@@ -157,8 +154,9 @@ public class Pie_Encode {
         }
 
         ByteBuffer buffer = null;
-        originalArray = getUtils().compressBytes(getConfig().isEncoder_Add_Encryption() ? getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray,
-                getConfig().getEncoder_Compression_Method());
+        originalArray = getUtils().compressBytes(getConfig().isEncoder_Add_Encryption() ?
+                        getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray,
+                        getConfig().getEncoder_Compression_Method());
         int total_Length = originalArray.length;
 
         if (file_number == 1) {
@@ -232,7 +230,6 @@ public class Pie_Encode {
      */
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
         logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
-        Integer x =0, y = 0;
         int image_type = BufferedImage.TYPE_INT_RGB;
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
@@ -440,12 +437,12 @@ public class Pie_Encode {
      * @return String.
      */
     private byte[] encoding_addon(int total_files) {
-        String addon_files = "";
+        StringBuilder addon_files = new StringBuilder();
         if (total_files > 1) {
             for (int i = 2; i <= total_files; i++) {
-                if (!addon_files.isEmpty())
-                    addon_files = addon_files + "*";
-                addon_files = addon_files + getDestination().create_File_Name(i, getSource().getFile_name());
+                if (addon_files.length() > 0)
+                    addon_files.append("*");
+                addon_files.append(getDestination().create_File_Name(i, getSource().getFile_name()));
             }
         }
 
@@ -461,7 +458,11 @@ public class Pie_Encode {
             addon_files +                                                                                                       // 4 File Names
             "?" +
             getConfig().getEncoder_Compression_Method().getParm2() +                                                            // 5 Compression Type
-            "?";
+            "?" +
+            (getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && total_files > 1  ?
+            getDestination().getZip_File_Name(getSource().getFile_name()) : "") +                                               // 6 Supplemental File Container
+            "?"
+            ;
 
         return  addon.getBytes(StandardCharsets.UTF_8) ;
     }

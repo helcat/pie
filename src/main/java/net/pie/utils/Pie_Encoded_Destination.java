@@ -49,7 +49,7 @@ public class Pie_Encoded_Destination {
         if (getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE) ||
                 getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && file_number > 1) {
             if (getFos() == null)
-                start_Zip_Stream(getZip_File_Name(source_filename));
+                start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename)));
             return addZipEntry(create_File_Name(file_number, source_filename), image);
         }else {
             // Single Files Only Or Beginning of Zip
@@ -173,13 +173,20 @@ public class Pie_Encoded_Destination {
      * Zip file name
      * @param source_filename (int)
      */
-    private File getZip_File_Name(String source_filename) {
+    public String getZip_File_Name(String source_filename) {
         String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
         if (!name.toLowerCase().endsWith(".zip"))
             name = name + ".zip";
+        return name;
+    }
 
+    /** *******************************************************************<br>
+     * Create Zip file
+     * @param name (int)
+     */
+    private File create_Zip_File(String name) {
         File file = new File(
                 getLocal_file().isDirectory() ?
                         getLocal_file().getAbsolutePath() + File.separator + name
