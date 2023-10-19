@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Encode {
@@ -175,9 +176,10 @@ public class Pie_Encode {
         buffer.rewind();
 
         try {
-            originalArray = Pie_Ascii85.encode(   //Base64.encodeASCII85 (  //Base64.getEncoder().encode (
-                            buffer.array()
-            ).getBytes(StandardCharsets.UTF_8);
+
+            //originalArray = Base64.getEncoder().encode ( buffer.array() );
+
+            originalArray = Pie_Ascii85.encode( buffer.array() );
 
             total_Length = originalArray.length;
         } catch (Exception e) {

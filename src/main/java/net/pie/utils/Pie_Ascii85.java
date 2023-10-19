@@ -25,7 +25,7 @@ public class Pie_Ascii85 {
     private Pie_Ascii85() {
     }
 
-    public static String encode(byte[] payload) {
+    public static byte[] encode(byte[] payload) {
         if (payload == null) {
             throw new IllegalArgumentException("You must provide a non-null input");
         }
@@ -62,7 +62,7 @@ public class Pie_Ascii85 {
             }
         }
 
-        return stringBuff.toString();
+        return stringBuff.toString().getBytes();
     }
 
     private static char[] encodeChunk(int value) {
@@ -179,7 +179,4 @@ public class Pie_Ascii85 {
                 (byte) (value)
         };
     }
-
-
-
 }
