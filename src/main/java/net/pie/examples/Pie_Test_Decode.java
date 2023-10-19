@@ -11,6 +11,7 @@ import net.pie.Pie_Decode;
 import net.pie.utils.*;
 
 import java.io.File;
+import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
