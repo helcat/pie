@@ -22,14 +22,21 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+        byte[] bytes = new byte[256];
+        int count = 1;
+        bytes[0] = (byte) 0;
 
-        String test = "qwertyuiopasdfghjklzxcvbnm1234567890";
+        for (int i = -127; i < 128; i++)
+            bytes[count++] = (byte) i;
 
-        //String test2 = Pie_Ascii85.encode(test.getBytes(StandardCharsets.UTF_8));
+        System.out.println(new String (bytes));
 
-        //byte[] bytes = test2.getBytes(StandardCharsets.UTF_8);
+    }
 
 
+
+
+    private void combineNumbers() {
         int x = 11;
         int y = 14;
         int z = combine(x, y);

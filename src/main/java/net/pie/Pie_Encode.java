@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 
 public class Pie_Encode {
@@ -216,7 +216,8 @@ public class Pie_Encode {
         // Process the image - send to destination if required
         if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number, getSource().getFile_name()))
             logging(Level.SEVERE,"Encoding image was not saved");
-
+        data_image = null;
+        buffImg = null;
     }
 
     /** ******************************************************<br>
