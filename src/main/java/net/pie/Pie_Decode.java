@@ -1,5 +1,6 @@
 package net.pie;
 
+import net.pie.enums.Pie_Base;
 import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
@@ -139,44 +140,41 @@ public class Pie_Decode {
     private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
         if (buffimage == null)
             return null;
-        byte[] message = Pie_Ascii85.decode(new String(readImage(buffimage, processing_file), StandardCharsets.UTF_8));
-        /* byte[] message = Base64.getDecoder().decode(readImage(buffimage, processing_file)); */
-        if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0] || message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+        byte[] message =
+            getConfig().getBase().equals(Pie_Base.BASE64) ?
+                Base64.getDecoder().decode(readImage(buffimage, processing_file)) :
+                Pie_Ascii85.decode(new String(readImage(buffimage, processing_file), StandardCharsets.UTF_8));
 
-            if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-                setDecoding_process_started(true);
-                int count = 1;
-                boolean found = false;
-                for (byte b : message) {
-                    if (count > 1 && b == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-                        found = true;
-                        break;
-                    }
-                    count++;
+        if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+            setDecoding_process_started(true);
+            int count = 1;
+            boolean found = false;
+            for (byte b : message) {
+                if (count > 1 && b == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+                    found = true;
+                    break;
                 }
-                if (!found) {
-                    getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
-                    return null;
-                }
-
-                collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Compress.DEFLATER), map_values);
-                message = Arrays.copyOfRange(message, count, message.length);
-
-            } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-                if (!isDecoding_process_started()) {
-                    getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
-                    return null;
-                }
-                message = Arrays.copyOfRange(message, 1, message.length);
+                count++;
             }
-
-            if (message.length == 0) {
-                getConfig().logging(Level.SEVERE, "Decoding Error");
+            if (!found) {
+                getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
                 return null;
             }
-        }else{
-            getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
-            return null;
+
+            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Compress.DEFLATER), map_values);
+            message = Arrays.copyOfRange(message, count, message.length);
+
+        } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+            if (!isDecoding_process_started()) {
+                getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+                return null;
+            }
+            message = Arrays.copyOfRange(message, 1, message.length);
+        }
+
+        if (message.length == 0) {
+                getConfig().logging(Level.SEVERE, "Decoding Error");
+                return null;
         }
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();

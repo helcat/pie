@@ -17,8 +17,8 @@ import java.util.zip.Deflater;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "The Fall Guy S00E01.mkv";
-    private String temp_Encoded_Image = "The Fall Guy S00E01.mkv";
+    private String temp_To_Be_Encoded = "coreprint.png";
+    private String temp_Encoded_Image = "coreprint.png";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);

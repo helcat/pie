@@ -15,8 +15,8 @@ import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_The Fall Guy S00E01.mkv.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Encoded_Imaage = "enc_coreprint.png";
+    private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();

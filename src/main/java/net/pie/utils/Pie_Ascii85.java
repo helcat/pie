@@ -1,12 +1,37 @@
 package net.pie.utils;
 
-/** https://github.com/fzakaria/ascii85 **/
-
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.regex.Pattern;
+
+/**
+ * Copyright [yyyy] [Farid Zakaria]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * https://github.com/fzakaria/ascii85
+ * A very simple class that helps encode/decode for Ascii85 / base85
+ * The version that is likely most similar that is implemented here would be the Adobe version.<br>
+ * <b>Pie_Author Note</b><br>
+ * This class was added, but with conflicting results.<br>
+ * Using this encoding uses less pixels in the image and is faster, however the file size is larger.
+ * Using Base64 encoding uses more pixels and a little slower not much, but the file size is smaller.
+ * Was going to leave out but decided to leave that up to the coder using the library.
+ * @see <a href="https://en.wikipedia.org/wiki/Ascii85">Ascii85</a>
+ */
 
 public class Pie_Ascii85 {
 
@@ -26,9 +51,9 @@ public class Pie_Ascii85 {
     }
 
     public static byte[] encode(byte[] payload) {
-        if (payload == null) {
-            throw new IllegalArgumentException("You must provide a non-null input");
-        }
+        if (payload == null)
+           return null;
+
         //By using five ASCII characters to represent four bytes of binary data the encoded size ¹⁄₄ is larger than the original
         StringBuilder stringBuff = new StringBuilder(payload.length * 5/4);
         //We break the payload into int (4 bytes)
@@ -84,9 +109,9 @@ public class Pie_Ascii85 {
      * @return The binary data decoded from the input
      */
     public static byte[] decode(String chars) {
-        if (chars == null) {
-            throw new IllegalArgumentException("You must provide a non-null input");
-        }
+        if (chars == null)
+            return null;
+
         // Because we perform compression when encoding four bytes of zeros to a single 'z', we need
         // to scan through the input to compute the target length, instead of just subtracting 20% of
         // the encoded text length.
@@ -118,7 +143,11 @@ public class Pie_Ascii85 {
             //and an all-zero group is encoded as a single character "z" instead of "!!!!!".
             if (currByte == 'z') {
                 if (chunkIndex > 0) {
-                    throw new IllegalArgumentException("The payload is not base 85 encoded.");
+                    try {
+                        return Base64.getDecoder().decode(chars);
+                    }catch (Exception e) {
+                        return null;
+                    }
                 }
                 chunk[chunkIndex++] = '!';
                 chunk[chunkIndex++] = '!';

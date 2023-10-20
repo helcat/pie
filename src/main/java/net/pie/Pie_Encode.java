@@ -176,11 +176,7 @@ public class Pie_Encode {
         buffer.rewind();
 
         try {
-
-            //originalArray = Base64.getEncoder().encode ( buffer.array() );
-
-            originalArray = Pie_Ascii85.encode( buffer.array() );
-
+            originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode ( buffer.array() ) : Pie_Ascii85.encode( buffer.array() );
             total_Length = originalArray.length;
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
