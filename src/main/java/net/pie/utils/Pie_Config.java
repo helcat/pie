@@ -61,6 +61,7 @@ public class Pie_Config {
             setCustomHandler(new ConsoleHandler());
             getCustomHandler().setFormatter(new Pie_Logging_Format());
             getLog().addHandler(getCustomHandler());
+            getLog().setLevel(getLog_level());
         }
     }
 
