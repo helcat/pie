@@ -10,7 +10,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.List;
 import java.util.logging.Level;
 
 public class Pie_Encode {
@@ -96,9 +95,7 @@ public class Pie_Encode {
             return;
         }
 
-        if (Arrays.asList(Pie_Supplemental_Files.ZIP_FILE, Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .
-                contains(getConfig().getEncoder_supplemental_files()))
-            getDestination().closeZip();
+        getDestination().closeZip();    // If required
 
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
@@ -214,7 +211,7 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number, getSource().getFile_name()))
+        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number, total_files, getSource().getFile_name()))
             logging(Level.SEVERE,"Encoding image was not saved");
         data_image = null;
         buffImg = null;
@@ -456,9 +453,6 @@ public class Pie_Encode {
             addon_files +                                                                                                       // 4 File Names
             "?" +
             getConfig().getEncoder_Compression_Method().getParm2() +                                                            // 5 Compression Type
-            "?" +
-            (getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && total_files > 1  ?
-            getDestination().getZip_File_Name(getSource().getFile_name()) : "") +                                               // 6 Supplemental File Container
             "?"
             ;
 

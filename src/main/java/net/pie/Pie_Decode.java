@@ -7,6 +7,8 @@ import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -1,11 +1,15 @@
 package net.pie.utils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.zip.ZipInputStream;
 
 /** *******************************************************<br>
  * <b>Pie_Decode_Source</b><br>
@@ -15,6 +19,7 @@ public class Pie_Decode_Source {
     private Object decode_object;
     private Pie_Config config;
     private String[] addon_Files = null;
+    private boolean isZipped = false;
 
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
@@ -45,16 +50,6 @@ public class Pie_Decode_Source {
 
         }else if (decode instanceof URL || decode instanceof InputStream || decode instanceof Pie_URL) {
             setDecode_object(decode);
-
-        }else if (decode instanceof List<?>) {
-            List<?> list = (List<?>) decode;
-            if (list.isEmpty()) {
-                getConfig().logging(Level.SEVERE,"No Decode Object Found");
-                getConfig().exit();
-            }else{
-                setDecode_object(decode);
-            }
-            return;
         }
     }
 
@@ -74,7 +69,13 @@ public class Pie_Decode_Source {
             getConfig().logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
             try {
                 if (getAddon_Files() == null || processing_file == 0) {
-                    setInput(new FileInputStream((File) getDecode_object()));
+                    setZipped(new ZipInputStream(new FileInputStream((File) getDecode_object())).getNextEntry() != null);
+                    if (!isZipped()) {
+                        setInput(new FileInputStream((File) getDecode_object()));
+                    }else{
+                        // do zip entry here
+                        System.out.println("unzip me");
+                    }
                 }else{
                     Path path = Paths.get(((File) getDecode_object()).toURI());
                     File nf = new File (path.getParent() + File.separator + getAddon_Files()[processing_file - 1]);
@@ -87,8 +88,8 @@ public class Pie_Decode_Source {
                 }
             } catch (FileNotFoundException e) {
                 getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+                return;
             }
-            return;
 
         }else if (getDecode_object() instanceof Pie_URL) {
             Pie_URL u = (Pie_URL) getDecode_object();
@@ -101,8 +102,6 @@ public class Pie_Decode_Source {
             }
             setInput(u.getInput());
 
-            return;
-
         }else if (getDecode_object() instanceof URL) {
             URL u = (URL) getDecode_object();
             getConfig().logging(Level.INFO,"Downloading File ");
@@ -111,42 +110,13 @@ public class Pie_Decode_Source {
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
             }
-            return;
 
         }else if (getDecode_object() instanceof InputStream) {
             InputStream is = (InputStream) getDecode_object();
             getConfig().logging(Level.INFO,"Using Input-stream ");
             setInput(is);
-            return;
-
-        }else if (getDecode_object() instanceof List<?>) {
-            List<?> list = (List<?>) getDecode_object();
-            if (list.get(processing_file) instanceof File) {
-                File f = (File) list.get(processing_file);
-                getConfig().logging(Level.INFO,"Loading File " + f.getName());
-                try {
-                    setInput(new FileInputStream((File) getDecode_object()));
-                } catch (FileNotFoundException e) {
-                    getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                }
-
-            }else if (list.get(processing_file) instanceof URL) {
-                URL u = (URL) list.get(processing_file);
-                getConfig().logging(Level.INFO,"Downloading File " +u.toString());
-                try {
-                    setInput(u.openStream());
-                } catch (IOException e) {
-                    getConfig().logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
-                }
-
-            }else if (list.get(processing_file) instanceof InputStream) {
-                InputStream is = (InputStream) list.get(processing_file);
-                getConfig().logging(Level.INFO,"Using inputstream File" );
-                setInput(is);
-            }
-
-            return;
         }
+
     }
 
     /** *******************************************************<br>
@@ -194,6 +164,14 @@ public class Pie_Decode_Source {
 
     public void setAddon_Files(String[] addon_Files) {
         this.addon_Files = addon_Files;
+    }
+
+    public boolean isZipped() {
+        return isZipped;
+    }
+
+    public void setZipped(boolean zipped) {
+        isZipped = zipped;
     }
 }
 

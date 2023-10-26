@@ -5,7 +5,6 @@ import net.pie.enums.*;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.*;
-import java.util.zip.Deflater;
 
 /** *******************************************************************<br>
  * <b>Pie_Config</b><br>
@@ -19,7 +18,7 @@ public class Pie_Config {
     private Pie_Compress encoder_Compression_Method = Pie_Compress.DEFLATER;
     private boolean encoder_Add_Encryption = false;
     private boolean encoder_overwrite_file = true;
-    private Pie_Supplemental_Files encoder_supplemental_files = Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY;
+    private Pie_Zip encoder_storage = new Pie_Zip();
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private int max_encoded_image_mb = 200;
@@ -82,7 +81,7 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (level.equals(Level.OFF))
+        if (getLog_level().equals(Level.OFF))
             return;
         if (getLog() == null)
             return;
@@ -104,7 +103,11 @@ public class Pie_Config {
      * Level.SEVERE (Default)<br>
      */
     public void setLog_level(Level log_level) {
+        if (log_level == null)
+            log_level = Level.SEVERE;
         this.log_level = log_level;
+        if (getLog() != null)
+            getLog().setLevel(this.log_level);
     }
 
     public boolean isError() {
@@ -221,21 +224,31 @@ public class Pie_Config {
         return encoder_shape;
     }
 
-    public Pie_Supplemental_Files getEncoder_supplemental_files() {
-        return encoder_supplemental_files;
+    public Pie_Zip getEncoder_storage() {
+        return encoder_storage;
     }
 
     /** ***************************************************************<br>
-     * Sets what happens to any supplemental files.<br>
-     * Pie_Supplemental_Files.ZIP_FILE will place all files into a zip file. (Default)<br>
-     * Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY  will place all supplemental files into a zip file. (Default)<br>
-     * Pie_Supplemental_Files.SINGLE_ENTRIES will create supplemental files.<br>
-     * @param encoder_supplemental_files (Pie_Constants)
+     * Sets the storage type<br>
+     * Pie_Storage.ZIP_FILE will place all files into a zip file. (Default)<br>
+     * Pie_Storage.SINGLE_ENTRIES will create image files only.<br>
+     * Pie_Storage.ZIP_ON_SPLIT_FILE will create a zip file only when splitting the original file.
+     * @param encoder_storage (Pie_Storage)
      */
-    public void setEncoder_supplemental_files(Pie_Supplemental_Files encoder_supplemental_files) {
-        if (encoder_supplemental_files == null || !Pie_Supplemental_Files.getSupplementals().contains(encoder_supplemental_files))
-            encoder_supplemental_files = Pie_Supplemental_Files.ZIP_FILE;
-        this.encoder_supplemental_files = encoder_supplemental_files;
+    public void setEncoder_storage(Pie_Storage encoder_storage) {
+        if (encoder_storage == null || encoder_storage.equals(Pie_Storage.ZIP_FILE))
+            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.ALWAYS);
+        else if (encoder_storage.equals(Pie_Storage.SINGLE_FILES))
+            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.NEVER);
+        else if (encoder_storage.equals(Pie_Storage.ZIP_ON_SPLIT_FILE))
+            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
+    }
+    /** ***************************************************************<br>
+     * Sets the storage type using a Pie_Zip object<br>
+     * @param encoder_storage (Pie_Zip)
+     */
+    public void setEncoder_storage(Pie_Zip encoder_storage) {
+        this.encoder_storage = encoder_storage;
     }
 
     public boolean isShow_Timings_In_Logs() {
