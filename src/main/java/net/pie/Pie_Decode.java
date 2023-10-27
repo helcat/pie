@@ -1,14 +1,11 @@
 package net.pie;
 
 import net.pie.enums.Pie_Base;
-import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +24,7 @@ public class Pie_Decode {
     private int total_files = 0;
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
+    private long startTime = 0;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -36,6 +34,7 @@ public class Pie_Decode {
      * @param decoded_Source_destination Image to be decrypted
      **/
     public Pie_Decode(Pie_Decode_Source source, Pie_Decode_Destination decoded_Source_destination) {
+        setStartTime(System.currentTimeMillis());
         ImageIO.setUseCache(false);
         setTotal_files(0);
         setDecoding_process_started(false);
@@ -132,6 +131,7 @@ public class Pie_Decode {
         if (getConfig().isRun_gc_after())
             System.gc();
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
+        logTime();
         getConfig().exit();
         getSource().close();
     }
@@ -142,7 +142,7 @@ public class Pie_Decode {
     private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
         if (buffimage == null)
             return null;
-        byte[] message =
+        byte[] message = //readImage(buffimage, processing_file);
             getConfig().getBase().equals(Pie_Base.BASE64) ?
                 Base64.getDecoder().decode(readImage(buffimage, processing_file)) :
                 Pie_Ascii85.decode(new String(readImage(buffimage, processing_file), StandardCharsets.UTF_8));
@@ -163,7 +163,7 @@ public class Pie_Decode {
                 return null;
             }
 
-            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count), Pie_Compress.DEFLATER), map_values);
+            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count)), map_values);
             message = Arrays.copyOfRange(message, count, message.length);
 
         } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
@@ -181,7 +181,7 @@ public class Pie_Decode {
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try {
-            bytes.write(getUtils().decompress_return_bytes(message, getConfig().getEncoder_Compression_Method()));
+            bytes.write(getUtils().decompress_return_bytes(message));
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE, "Writing Error " + e.getMessage());
             return null;
@@ -221,41 +221,30 @@ public class Pie_Decode {
     private byte[] readImage(BufferedImage buffimage, int processing_file) {
         getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? (processing_file + 1) + " / " + getTotal_files() : "" ));
         int pixelColor;
-        int retrievedAlpha;
-        int retrievedRed;
-        int retrievedGreen;
-        int retrievedBlue;
+        int[] value = new int[4];
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
+                value = new int[4];
                 pixelColor = buffimage.getRGB(x, y);
-                retrievedRed = (pixelColor >> 16) & 0xFF;
-                retrievedGreen = (pixelColor >> 8) & 0xFF;
-                retrievedBlue = pixelColor & 0xFF;
-                retrievedAlpha = (pixelColor >> 24) & 0xFF;
+                value[0] = (pixelColor >> 16) & 0xFF;
+                value[1] = (pixelColor >> 8) & 0xFF;
+                value[2] = pixelColor & 0xFF;
+                value[3] = (pixelColor >> 24) & 0xFF;
 
-                if (retrievedRed == 0 && retrievedGreen == 0 && retrievedBlue == 0)
-                    continue;
+                if (Arrays.stream(value).sum() == 0)
+                    break;
 
-                if (retrievedRed > 0)
-                    bytes.write((byte) retrievedRed);
-                if (retrievedGreen > 0)
-                    bytes.write((byte) retrievedGreen);
-                if (retrievedBlue > 0)
-                    bytes.write((byte) retrievedBlue);
-                if (retrievedAlpha > 0 && retrievedAlpha < 255)
-                    bytes.write((byte) retrievedAlpha);
+                for (int v : value)
+                    bytes.write((byte) v);
             }
         }
 
         // clear down
         buffimage = null;
         pixelColor = 0;
-        retrievedAlpha = 0;
-        retrievedRed= 0;
-        retrievedGreen = 0;
-        retrievedBlue = 0;
+        value = null;
 
         try {
             bytes.close();
@@ -343,9 +332,6 @@ public class Pie_Decode {
                         getSource().setAddon_Files(new String[]{files});
                 }
 
-                getConfig().setEncoder_Compression_Method(Pie_Compress.get(parts[parm ++]));                            // 5
-                getConfig().setSupplemental_zip_name(parts[parm ++].isEmpty() ? null : parts[parm ++]);                 // 6
-
                 if (map_values) {
                     setEncoded_values(new HashMap<>());
                     getEncoded_values().put("total_files", getTotal_files());
@@ -355,6 +341,25 @@ public class Pie_Decode {
             }
 
         } catch (Exception ignored) {}
+    }
+
+    /** *********************************************************<br>
+     * Log how log it takes to encode
+     */
+    private void logTime() {
+        if (!getConfig().isShow_Timings_In_Logs())
+            return;
+
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - getStartTime();
+
+        long hours = elapsedTime / 3600000;
+        long minutes = (elapsedTime % 3600000) / 60000;
+        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
+        long milliseconds = elapsedTime % 1000;
+
+        getConfig().logging(Level.INFO,"Elapsed time: " + hours + " hours, " +
+                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
     }
 
     /** *******************************************************************<br>
@@ -446,5 +451,13 @@ public class Pie_Decode {
 
     private void setEncoded_values(Map<String, Object> encoded_values) {
         this.encoded_values = encoded_values;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 }

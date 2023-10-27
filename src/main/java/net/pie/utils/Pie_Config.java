@@ -15,7 +15,6 @@ public class Pie_Config {
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    private Pie_Compress encoder_Compression_Method = Pie_Compress.DEFLATER;
     private boolean encoder_Add_Encryption = false;
     private boolean encoder_overwrite_file = true;
     private Pie_Zip encoder_storage = new Pie_Zip();
@@ -128,23 +127,6 @@ public class Pie_Config {
 
     public void setEncoder_Add_Encryption(boolean encoder_Add_Encryption) {
         this.encoder_Add_Encryption = encoder_Add_Encryption;
-    }
-
-    public Pie_Compress getEncoder_Compression_Method() {
-        return encoder_Compression_Method;
-    }
-
-    /** ***************************************************************<br>
-     * <b>Allowed Values</b><br>
-     * Pie_Constants.ZIP<br>
-     * Pie_Constants.GZIP<br>
-     * Pie_Constants.DEFLATER (Default) <br>
-     * @param encoder_Compression_Method (int)
-     */
-    public void setEncoder_Compression_Method(Pie_Compress encoder_Compression_Method) {
-        if (encoder_Compression_Method == null || !Arrays.asList(Pie_Compress.DEFLATER, Pie_Compress.GZIP, Pie_Compress.ZIP).contains(encoder_Compression_Method))
-            encoder_Compression_Method = Pie_Compress.DEFLATER;
-        this.encoder_Compression_Method = encoder_Compression_Method;
     }
 
     public boolean isRun_gc_after() {

@@ -14,8 +14,8 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_fire2.jpg.png";
-    private String temp_Decode_To = "batch";
+    private String temp_Encoded_Imaage = "enc_background.jpg.png";
+    private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -29,6 +29,8 @@ public class Pie_Test_Decode {
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config();
         decoding_config.setLog_level(Level.INFO);
+        decoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
+        decoding_config.setShow_Timings_In_Logs(true);
 
         // Tell the decoder where to store the decoded file
         Pie_Decode_Destination decoded_Source_destination = new Pie_Decode_Destination();

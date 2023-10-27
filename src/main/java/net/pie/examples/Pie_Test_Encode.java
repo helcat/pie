@@ -16,8 +16,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "fire2.jpg";
-    private String temp_Encoded_Image = "fire2.jpg";
+    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_Encoded_Image = "background.jpg";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -30,12 +30,11 @@ public class Pie_Test_Encode {
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
         encoding_config.setEncoder_Add_Encryption(false);                                                           // Optional default is true
-        encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_RGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
+        encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(true);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
         encoding_config.setEncoder_overwrite_file(true);                                                           // Optional default is false
-        encoding_config.setEncoder_Compression_Method(Pie_Compress.DEFLATER);                                      // Optional default is Pie_Compress.DEFLATER
         encoding_config.setEncoder_storage(Pie_Storage.SINGLE_FILES);                                                   // Optional default is Pie_Storage.ZIP_ON_SPLIT_FILE
         encoding_config.setBase(Pie_Base.BASE64);
 

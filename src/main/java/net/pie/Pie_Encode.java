@@ -107,7 +107,7 @@ public class Pie_Encode {
 
     /** *********************************************************<br>
      * Log how log it takes to encode
-     * @param startTime
+     * @param startTime (long)
      */
     private void logTime(long startTime) {
         if (!getConfig().isShow_Timings_In_Logs())
@@ -152,12 +152,11 @@ public class Pie_Encode {
 
         ByteBuffer buffer = null;
         originalArray = getUtils().compressBytes(getConfig().isEncoder_Add_Encryption() ?
-                        getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray,
-                        getConfig().getEncoder_Compression_Method());
+                        getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray);
         int total_Length = originalArray.length;
 
         if (file_number == 1) {
-            byte[] addon = getUtils().compressBytes(encoding_addon(total_files), Pie_Compress.DEFLATER);
+            byte[] addon = getUtils().compressBytes(encoding_addon(total_files));
             buffer = ByteBuffer.allocate(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
                     addon.length + Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length + total_Length);
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
@@ -171,10 +170,11 @@ public class Pie_Encode {
 
         buffer.put(originalArray);
         buffer.rewind();
-
+        Pie_Size image_size = null;
         try {
+            //originalArray = buffer.array();
             originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode ( buffer.array() ) : Pie_Ascii85.encode( buffer.array() );
-            total_Length = originalArray.length;
+            image_size = calculate_image_Mode(originalArray.length);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
@@ -183,7 +183,6 @@ public class Pie_Encode {
         buffer.clear();
         buffer = null;
 
-        Pie_Size image_size = calculate_image_Mode(total_Length);
         if (image_size == null) { // all else fails quit
             originalArray = null;
             getConfig().exit();
@@ -246,6 +245,7 @@ public class Pie_Encode {
         rbg = rbg.replace("T", "");
 
         int[] store = null;
+        Color new_color = null;
 
         for (int i : originalArray) {
             if (store == null)
@@ -261,12 +261,21 @@ public class Pie_Encode {
 
             store_count = 0;
             count = 0;
-            data_image.setRGB(x++, y,
-                    hasAlpha ?
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
-                            transparent ?
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++): 0).getRGB());
+            new_color = hasAlpha ?
+                    new Color(rbg.contains("R") ? checker(store, count++) : 0,
+                            rbg.contains("G") ? checker(store, count++) : 0,
+                            rbg.contains("B") ? checker(store, count++) : 0,
+                            checkerAlpha(store, count++)) :
+                    transparent ?
+                   new Color(
+                           rbg.contains("R") ? checker(store, count++) : 0,
+                           rbg.contains("G") ? checker(store, count++) : 0,
+                           rbg.contains("B") ? checker(store, count++) : 0, 1) :
+                   new Color(rbg.contains("R") ? checker(store, count++) : 0,
+                           rbg.contains("G") ? checker(store, count++) : 0,
+                           rbg.contains("B") ? checker(store, count++): 0);
+
+            data_image.setRGB(x++, y, new_color.getRGB());
             store = null;
         }
 
@@ -451,8 +460,6 @@ public class Pie_Encode {
             total_files +                                                                                                       // 3 Number of Files
             "?" +
             addon_files +                                                                                                       // 4 File Names
-            "?" +
-            getConfig().getEncoder_Compression_Method().getParm2() +                                                            // 5 Compression Type
             "?"
             ;
 

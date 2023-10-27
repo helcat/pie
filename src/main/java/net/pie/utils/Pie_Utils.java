@@ -1,8 +1,6 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Compress;
 import net.pie.enums.Pie_Constants;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,52 +30,20 @@ public class Pie_Utils {
      * Main functon for compressing.<br>
      * @param bytes (String)
      **/
-    public byte[] compressBytes(byte[] bytes, Pie_Compress method) {
+    public byte[] compressBytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
-
-        switch (method) {
-            case GZIP :
-                try {
-                    GZIPOutputStream gzipOS = new GZIPOutputStream(baos);
-                    gzipOS.write(bytes);
-                    gzipOS.close();
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "GZIP Compression Filed " + e.getMessage());
-                    return bytes;
-                }
-                break;
-
-            case DEFLATER :
-                try {
-                    Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
-                    OutputStream out = new DeflaterOutputStream(baos, compressor);
-                    out.write(bytes);
-                    out.close();
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
-                    return bytes;
-                }
-                break;
-
-            case ZIP :
-                try {
-                    ZipOutputStream zipOS = new ZipOutputStream(baos);
-                    ZipEntry entry = new ZipEntry("data");
-                    entry.setSize(bytes.length);
-                    zipOS.putNextEntry(entry);
-                    zipOS.write(bytes);
-                    zipOS.closeEntry();
-                    zipOS.close();
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "ZIP Compression Filed " + e.getMessage());
-                    return bytes;
-                }
-                break;
+        try {
+            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException e) {
+            getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
+            return bytes;
         }
-
         try {
             baos.close();
-        } catch (IOException e) {  }
+        } catch (IOException ignored) {  }
 
         return baos.toByteArray();
     }
@@ -87,56 +53,16 @@ public class Pie_Utils {
      * @param bytes (byte[])
      * @return ByteArrayOutputStream
      **/
-    public byte[] decompress_return_bytes(byte[] bytes, Pie_Compress method) {
+    public byte[] decompress_return_bytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayInputStream bis = null;
-        switch (method) {
-            case GZIP :
-                bis = new ByteArrayInputStream(bytes);
-                try {
-                    GZIPInputStream gzipIS = new GZIPInputStream(bis);
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = gzipIS.read(buffer)) > 0) {
-                        baos.write(buffer, 0, len);
-                    }
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
-                    return bytes;
-                }
-                break;
-
-            case DEFLATER :
-                try {
-                    Inflater decompressor = new Inflater(true);
-                    OutputStream out = new InflaterOutputStream(baos, decompressor);
-                    out.write(bytes);
-                    out.close();
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
-                    return bytes;
-                }
-                break;
-
-            case ZIP :
-                bis = new ByteArrayInputStream(bytes);
-                try {
-                    ZipInputStream zipIS = new ZipInputStream(bis);
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    ZipEntry entry = null;
-                    while ((entry = zipIS.getNextEntry()) != null)
-                        while ((len = zipIS.read(buffer)) > 0) {
-                            baos.write(buffer, 0, len);
-                        }
-                    bis.close();
-                    zipIS.close();
-                } catch (IOException e) {
-                    getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
-                    return bytes;
-                }
-                break;
-
+        try {
+            Inflater decompressor = new Inflater(true);
+            OutputStream out = new InflaterOutputStream(baos, decompressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException e) {
+            getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
+            return bytes;
         }
         return baos.toByteArray();
     }
@@ -191,7 +117,7 @@ public class Pie_Utils {
     }
 
     public byte[] decrypt(boolean decrypt, String encrypted, String label) {
-        if (encrypted == null || "".equals(encrypted.trim())) {
+        if (encrypted == null || encrypted.trim().isEmpty()) {
             getConfig().logging(Level.INFO,label + " Nothing to decrypt");
             return null;
         }
@@ -275,7 +201,7 @@ public class Pie_Utils {
                     writer.write(byteAsString);
                 }
                 writer.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
