@@ -22,14 +22,16 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+        combineNumbers();
+
         byte[] bytes = new byte[256];
-        int count = 1;
+        int count = 0;
         bytes[0] = (byte) 0;
 
-        for (int i = -127; i < 128; i++)
+        for (int i = 1; i < 128; i++)
             bytes[count++] = (byte) i;
 
-        System.out.println(new String (bytes));
+        System.out.println(new String (bytes, StandardCharsets.UTF_8));
 
     }
 
@@ -37,8 +39,8 @@ public class Pie_Test {
 
 
     private void combineNumbers() {
-        int x = 11;
-        int y = 14;
+        int x = 127;
+        int y = 127;
         int z = combine(x, y);
         System.out.println("The combined number is " + z);
 

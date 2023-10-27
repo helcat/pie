@@ -1,13 +1,11 @@
 package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Supplemental_Files;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -45,11 +43,12 @@ public class Pie_Encoded_Destination {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, String source_filename) {
-        if (getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE) ||
-                getConfig().getEncoder_supplemental_files().equals(Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) && file_number > 1) {
+    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, int total_files, String source_filename) {
+        if (getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ALWAYS) ||
+            getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (getFos() == null)
-                start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename)));
+                if (!start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename))))
+                    return false;
             return addZipEntry(create_File_Name(file_number, source_filename), image);
         }else {
             // Single Files Only Or Beginning of Zip
@@ -74,18 +73,15 @@ public class Pie_Encoded_Destination {
      * create a zip file for additional files
      * @param zipFilePath (Path to zip file)
      */
-    private void start_Zip_Stream(File zipFilePath) {
-        if (getFos() != null)
-            return;
-        if (Arrays.asList(Pie_Supplemental_Files.ZIP_FILE, Pie_Supplemental_Files.ZIP_FILE_SUPPLEMENTAL_FILES_ONLY) .contains(getConfig().getEncoder_supplemental_files())) {
-            try {
-                setFos(new FileOutputStream(zipFilePath));
-                setZos(new ZipOutputStream(getFos()));
-            } catch (FileNotFoundException e) {
-                getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files " + e.getMessage());
-                return;
-            }
+    private boolean start_Zip_Stream(File zipFilePath) {
+        try {
+            setFos(new FileOutputStream(zipFilePath));
+            setZos(new ZipOutputStream(getFos()));
+            return true;
+        } catch (FileNotFoundException e) {
+            getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files " + e.getMessage());
         }
+        return false;
     }
 
     /** *******************************************************************<br>
@@ -96,7 +92,8 @@ public class Pie_Encoded_Destination {
     private boolean addZipEntry(String entryName, BufferedImage bi) {
         if (getZos() != null) {
             ZipEntry entry = new ZipEntry(entryName);
-            entry.setComment(Pie_Constants.Demo_Comment.getParm2());
+            if (getConfig().getEncoder_storage().getZip_comment() != null)
+                entry.setComment(getConfig().getEncoder_storage().getZip_comment());
             try {
                 getZos().putNextEntry(entry);
 
