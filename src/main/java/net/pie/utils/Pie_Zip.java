@@ -1,10 +1,19 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Position;
-
-import java.util.Arrays;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Pie_Zip {
+    private ZipOutputStream zos = null;
+    private FileOutputStream fos = null;
+
     public enum Pie_ZIP_Name {
         AS_IS,
         RANDOM,
@@ -56,6 +65,57 @@ public class Pie_Zip {
         setInternal_name_format(internal_name_format);
         setOption(option);
         setUse_pie_extension(use_pie_extension);
+    }
+    /** *******************************************************************<br>
+     * create a zip file for additional files
+     * @param zipFilePath (Path to zip file)
+     */
+    boolean start_Zip_Stream(File zipFilePath) {
+        try {
+            setFos(new FileOutputStream(zipFilePath));
+            setZos(new ZipOutputStream(getFos()));
+            return true;
+        } catch (FileNotFoundException ignored) { }
+        return false;
+    }
+
+    /** *******************************************************************<br>
+     * close zip files
+     */
+    public void closeZip() {
+        try {
+            if (getZos() != null) {
+                getZos().flush();
+                getZos().close();
+            }
+            if (getFos() != null)
+                getFos().close();
+        } catch (IOException ignored) {  }
+    }
+
+    /** *******************************************************************<br>
+     * Create an entry in the zip file
+     * @param entryName (String)
+     * @param bi (BufferedImage)
+     */
+    boolean addZipEntry(String entryName, BufferedImage bi) {
+        ZipEntry entry = new ZipEntry(entryName);
+        if (getZip_comment() != null)
+            entry.setComment(getZip_comment());
+        try {
+            getZos().putNextEntry(entry);
+
+            try {
+                ImageIO.write(bi, "png", getZos());
+            } catch (IOException e) {
+                return false;
+            }
+
+            getZos().closeEntry();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 
     public Pie_ZIP_Name getInternal_name_format() {
@@ -112,6 +172,22 @@ public class Pie_Zip {
      */
     public void setUse_pie_extension(boolean use_pie_extension) {
         this.use_pie_extension = use_pie_extension;
+    }
+
+    public ZipOutputStream getZos() {
+        return zos;
+    }
+
+    public void setZos(ZipOutputStream zos) {
+        this.zos = zos;
+    }
+
+    public FileOutputStream getFos() {
+        return fos;
+    }
+
+    public void setFos(FileOutputStream fos) {
+        this.fos = fos;
     }
 }
 

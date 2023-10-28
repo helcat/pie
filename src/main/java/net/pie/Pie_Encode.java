@@ -95,7 +95,7 @@ public class Pie_Encode {
             return;
         }
 
-        getDestination().closeZip();    // If required
+        getConfig().getEncoder_storage().closeZip();    // If required
 
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");

@@ -80,9 +80,7 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (getLog_level().equals(Level.OFF))
-            return;
-        if (getLog() == null)
+        if (getLog() == null || getLog_level().equals(Level.OFF))
             return;
         getLog().log(level,  message);
         if (level.equals(Level.SEVERE))
@@ -102,9 +100,7 @@ public class Pie_Config {
      * Level.SEVERE (Default)<br>
      */
     public void setLog_level(Level log_level) {
-        if (log_level == null)
-            log_level = Level.SEVERE;
-        this.log_level = log_level;
+        this.log_level = (log_level == null ? Level.SEVERE : log_level);
         if (getLog() != null)
             getLog().setLevel(this.log_level);
     }
@@ -175,9 +171,7 @@ public class Pie_Config {
     }
 
     public void setBase(Pie_Base base) {
-        if (base == null)
-            base = Pie_Base.BASE64;
-        this.base = base;
+        this.base = (base == null ? Pie_Base.BASE64 : base);
     }
 
     /** *******************************************************************<br>
@@ -197,9 +191,7 @@ public class Pie_Config {
      * @param encoder_shape (Pie_Shape)
      */
     public void setEncoder_shape(Pie_Shape encoder_shape) {
-        if (encoder_shape == null || !Pie_Shape.getShape().contains(encoder_shape))
-            encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
-        this.encoder_shape = encoder_shape;
+        this.encoder_shape = (encoder_shape == null || !Pie_Shape.getShape().contains(encoder_shape) ? Pie_Shape.SHAPE_RECTANGLE : encoder_shape);
     }
 
     public Pie_Shape getEncoder_shape() {
@@ -306,11 +298,9 @@ public class Pie_Config {
      * @return boolean
      */
     public boolean hasEncoder_Maximum_Image() {
-        if (getEncoder_Maximum_Image() == null ||
-                getEncoder_Maximum_Image().getHeight() == 0 ||
-                getEncoder_Maximum_Image().getWidth() == 0)
-            return false;
-        return true;
+        return getEncoder_Maximum_Image() != null &&
+                getEncoder_Maximum_Image().getHeight() != 0 &&
+                getEncoder_Maximum_Image().getWidth() != 0;
     }
 
     public String getSupplemental_zip_name() {

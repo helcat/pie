@@ -20,9 +20,6 @@ public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
     private Pie_Config config = null;
-    private ZipOutputStream zos = null;
-    private FileOutputStream fos = null;
-
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -46,10 +43,13 @@ public class Pie_Encoded_Destination {
     public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, int total_files, String source_filename) {
         if (getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ALWAYS) ||
             getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
-            if (getFos() == null)
-                if (!start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename))))
+            if (getConfig().getEncoder_storage().getFos() == null)
+                if (!getConfig().getEncoder_storage().start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
+                    getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files ");
                     return false;
-            return addZipEntry(create_File_Name(file_number, source_filename), image);
+                }
+
+            return getConfig().getEncoder_storage().addZipEntry(create_File_Name(file_number, source_filename), image);
         }else {
             // Single Files Only Or Beginning of Zip
             File toFile = addFileNumber(file_number, source_filename);
@@ -69,64 +69,7 @@ public class Pie_Encoded_Destination {
         return false;
     }
 
-    /** *******************************************************************<br>
-     * create a zip file for additional files
-     * @param zipFilePath (Path to zip file)
-     */
-    private boolean start_Zip_Stream(File zipFilePath) {
-        try {
-            setFos(new FileOutputStream(zipFilePath));
-            setZos(new ZipOutputStream(getFos()));
-            return true;
-        } catch (FileNotFoundException e) {
-            getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files " + e.getMessage());
-        }
-        return false;
-    }
 
-    /** *******************************************************************<br>
-     * Create an entry in the zip file
-     * @param entryName (String)
-     * @param bi (BufferedImage)
-     */
-    private boolean addZipEntry(String entryName, BufferedImage bi) {
-        if (getZos() != null) {
-            ZipEntry entry = new ZipEntry(entryName);
-            if (getConfig().getEncoder_storage().getZip_comment() != null)
-                entry.setComment(getConfig().getEncoder_storage().getZip_comment());
-            try {
-                getZos().putNextEntry(entry);
-
-                try {
-                    ImageIO.write(bi, "png", getZos());
-                } catch (IOException e) {
-                    getConfig().logging(Level.SEVERE, "Unable to create zip entry " + e.getMessage());
-                    return false;
-                }
-
-                getZos().closeEntry();
-            } catch (IOException e) {
-                getConfig().logging(Level.SEVERE, "Unable to create zip entry for additional files " + e.getMessage());
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /** *******************************************************************<br>
-     * close zip files
-     */
-    public void closeZip() {
-        try {
-            if (getZos() != null) {
-                getZos().flush();
-                getZos().close();
-            }
-            if (getFos() != null)
-                getFos().close();
-        } catch (IOException ignored) {  }
-    }
 
     /** *******************************************************************<br>
      * Create a file name
@@ -233,21 +176,6 @@ public class Pie_Encoded_Destination {
         this.config = config;
     }
 
-    public ZipOutputStream getZos() {
-        return zos;
-    }
-
-    public void setZos(ZipOutputStream zos) {
-        this.zos = zos;
-    }
-
-    public FileOutputStream getFos() {
-        return fos;
-    }
-
-    public void setFos(FileOutputStream fos) {
-        this.fos = fos;
-    }
 }
 
 

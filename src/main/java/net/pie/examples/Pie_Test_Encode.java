@@ -35,7 +35,7 @@ public class Pie_Test_Encode {
         encoding_config.setShow_Timings_In_Logs(true);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
         encoding_config.setEncoder_overwrite_file(true);                                                           // Optional default is false
-        encoding_config.setEncoder_storage(Pie_Storage.SINGLE_FILES);                                                   // Optional default is Pie_Storage.ZIP_ON_SPLIT_FILE
+        encoding_config.setEncoder_storage(Pie_Storage.ZIP_FILE);                                                   // Optional default is Pie_Storage.ZIP_ON_SPLIT_FILE
         encoding_config.setBase(Pie_Base.BASE64);
 
         // Build a Source File
