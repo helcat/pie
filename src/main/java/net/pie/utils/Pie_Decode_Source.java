@@ -5,6 +5,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -20,6 +21,7 @@ public class Pie_Decode_Source {
     private Pie_Config config;
     private String[] addon_Files = null;
     private boolean isZipped = false;
+    private Pie_Zip zip_Object = null;
 
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
@@ -60,22 +62,27 @@ public class Pie_Decode_Source {
     public void next(int processing_file) throws IOException {
         close();
 
-        if (getDecode_object() == null) {
+        if (isZipped()) {
+            setInput(getZip_Object().getNext_File());
+
+        }else if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No object detected to decode");
             return;
 
         }else if (getDecode_object() instanceof File) {
             File f = (File) getDecode_object();
+            setZipped(new ZipInputStream(Files.newInputStream(((File) getDecode_object()).toPath())).getNextEntry() != null);
             getConfig().logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
             try {
-                if (getAddon_Files() == null || processing_file == 0) {
-                    setZipped(new ZipInputStream(new FileInputStream((File) getDecode_object())).getNextEntry() != null);
-                    if (!isZipped()) {
-                        setInput(new FileInputStream((File) getDecode_object()));
-                    }else{
-                        // do zip entry here
-                        System.out.println("unzip me");
+                if (isZipped()) {
+                    if (getZip_Object() == null) {
+                        setZip_Object(new Pie_Zip());
+                        getZip_Object().start_Zip_In_Stream((File) getDecode_object());
                     }
+                    setInput(getZip_Object().getNext_File());
+
+                }else if (getAddon_Files() == null || processing_file == 0) {
+                    setInput(new FileInputStream((File) getDecode_object()));
                 }else{
                     Path path = Paths.get(((File) getDecode_object()).toURI());
                     File nf = new File (path.getParent() + File.separator + getAddon_Files()[processing_file - 1]);
@@ -127,6 +134,7 @@ public class Pie_Decode_Source {
             Pie_URL u = (Pie_URL) getDecode_object();
             u.close();
         }
+
         try {
             if (getInput() != null)
                 getInput().close();
@@ -172,6 +180,14 @@ public class Pie_Decode_Source {
 
     public void setZipped(boolean zipped) {
         isZipped = zipped;
+    }
+
+    public Pie_Zip getZip_Object() {
+        return zip_Object;
+    }
+
+    public void setZip_Object(Pie_Zip zip_Object) {
+        this.zip_Object = zip_Object;
     }
 }
 

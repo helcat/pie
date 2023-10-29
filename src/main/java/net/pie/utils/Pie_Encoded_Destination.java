@@ -44,7 +44,7 @@ public class Pie_Encoded_Destination {
         if (getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ALWAYS) ||
             getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (getConfig().getEncoder_storage().getFos() == null)
-                if (!getConfig().getEncoder_storage().start_Zip_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
+                if (!getConfig().getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
                     getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files ");
                     return false;
                 }

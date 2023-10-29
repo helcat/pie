@@ -2,17 +2,14 @@ package net.pie.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.io.*;
+import java.util.zip.*;
 
 public class Pie_Zip {
     private ZipOutputStream zos = null;
     private FileOutputStream fos = null;
+
+    private ZipFile zip = null;
 
     public enum Pie_ZIP_Name {
         AS_IS,
@@ -66,16 +63,35 @@ public class Pie_Zip {
         setOption(option);
         setUse_pie_extension(use_pie_extension);
     }
+
     /** *******************************************************************<br>
-     * create a zip file for additional files
+     * create a zip out file for additional files
      * @param zipFilePath (Path to zip file)
      */
-    boolean start_Zip_Stream(File zipFilePath) {
-        try {
-            setFos(new FileOutputStream(zipFilePath));
-            setZos(new ZipOutputStream(getFos()));
-            return true;
-        } catch (FileNotFoundException ignored) { }
+    public boolean start_Zip_Out_Stream(File zipFilePath) {
+        if (getZos() == null) {
+            try {
+                setFos(new FileOutputStream(zipFilePath));
+                setZos(new ZipOutputStream(getFos()));
+                return true;
+            } catch (FileNotFoundException ignored) {
+            }
+        }
+        return false;
+    }
+
+    /** *******************************************************************<br>
+     * create a zip in file for additional files
+     * @param zipFilePath (Path to zip file)
+     */
+    public boolean start_Zip_In_Stream(File zipFilePath) {
+        if (getZip() == null) {
+            try {
+                setZip(new ZipFile(zipFilePath));
+                return true;
+            } catch (IOException ignored) {
+            }
+        }
         return false;
     }
 
@@ -90,6 +106,9 @@ public class Pie_Zip {
             }
             if (getFos() != null)
                 getFos().close();
+
+            if (getZip() != null)
+                getZip().close();
         } catch (IOException ignored) {  }
     }
 
@@ -116,6 +135,14 @@ public class Pie_Zip {
             return false;
         }
         return true;
+    }
+
+    public InputStream getNext_File() {
+        try {
+            ZipEntry entry = getZip().entries().nextElement();
+            return getZip().getInputStream(entry);
+        } catch (IOException ignored) { }
+        return null;
     }
 
     public Pie_ZIP_Name getInternal_name_format() {
@@ -188,6 +215,14 @@ public class Pie_Zip {
 
     public void setFos(FileOutputStream fos) {
         this.fos = fos;
+    }
+
+    public ZipFile getZip() {
+        return zip;
+    }
+
+    public void setZip(ZipFile zip) {
+        this.zip = zip;
     }
 }
 
