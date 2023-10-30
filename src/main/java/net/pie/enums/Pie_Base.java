@@ -1,7 +1,5 @@
 package net.pie.enums;
 
-import java.util.Arrays;
-
 /** *******************************************************<br>
  * <b>Pie_Base</b><br>
  * Uses a layer of Base64 or Base85 but this option is not encoded to the file.<br>

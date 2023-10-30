@@ -1,8 +1,6 @@
 package net.pie.utils;
 
 import net.pie.enums.*;
-
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.*;
 

@@ -1,21 +1,15 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.text.CharacterIterator;
-import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.Base64;
 import java.util.logging.Level;
-import java.util.zip.*;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
     private boolean error = false;

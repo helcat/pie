@@ -1,7 +1,5 @@
 package net.pie.enums;
 
-import java.util.Arrays;
-
 /** *******************************************************<br>
  * <b>Pie_Constants</b><br>
  * Constants used in PIE

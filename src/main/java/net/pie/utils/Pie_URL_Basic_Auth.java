@@ -1,13 +1,6 @@
 package net.pie.utils;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.StringTokenizer;
 
 public class Pie_URL_Basic_Auth implements Cloneable {
     public Object clone() {
