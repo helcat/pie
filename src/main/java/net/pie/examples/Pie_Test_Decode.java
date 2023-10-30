@@ -1,6 +1,8 @@
 package net.pie.examples;
 
 /*
+ java -classpath pie-1.2.jar  net.pie.examples.Pie_Test_Decode
+
 git pull origin main
 git add .
 git commit -m "Work Commit"

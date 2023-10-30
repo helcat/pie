@@ -15,7 +15,7 @@ public class Pie_Config {
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    private boolean encoder_Add_Encryption = false;
+    private Pie_Encryption encoder_Add_Encryption = null;
     private boolean encoder_overwrite_file = true;
     private Pie_Zip encoder_storage = new Pie_Zip();
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
@@ -117,11 +117,11 @@ public class Pie_Config {
         return log_level;
     }
 
-    public boolean isEncoder_Add_Encryption() {
+    public Pie_Encryption getEncoder_Add_Encryption() {
         return encoder_Add_Encryption;
     }
 
-    public void setEncoder_Add_Encryption(boolean encoder_Add_Encryption) {
+    public void setEncoder_Add_Encryption(Pie_Encryption encoder_Add_Encryption) {
         this.encoder_Add_Encryption = encoder_Add_Encryption;
     }
 
@@ -211,11 +211,11 @@ public class Pie_Config {
      */
     public void setEncoder_storage(Pie_Storage encoder_storage) {
         if (encoder_storage == null || encoder_storage.equals(Pie_Storage.ZIP_FILE))
-            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.ALWAYS);
+            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.ALWAYS);
         else if (encoder_storage.equals(Pie_Storage.SINGLE_FILES))
-            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.NEVER);
+            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.NEVER);
         else if (encoder_storage.equals(Pie_Storage.ZIP_ON_SPLIT_FILE))
-            this.encoder_storage = new Pie_Zip(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
+            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
     }
     /** ***************************************************************<br>
      * Sets the storage type using a Pie_Zip object<br>

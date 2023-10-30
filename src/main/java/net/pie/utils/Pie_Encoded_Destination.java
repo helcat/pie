@@ -1,6 +1,8 @@
 package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_ZIP_Name;
+import net.pie.enums.Pie_ZIP_Option;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,8 +45,8 @@ public class Pie_Encoded_Destination {
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
     public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, int total_files, String source_filename) {
-        if (getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ALWAYS) ||
-            getConfig().getEncoder_storage().getOption().equals(Pie_Zip.Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
+        if (getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+            getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (getConfig().getEncoder_storage().getFos() == null)
                 if (!getConfig().getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
                     getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files ");
@@ -89,13 +91,13 @@ public class Pie_Encoded_Destination {
         name = name + "." + Pie_Constants.IMAGE_TYPE.getParm2();
 
         if (getConfig().getEncoder_storage() == null || getConfig().getEncoder_storage() != null &&
-            getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.AS_IS)) {
+            getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.AS_IS)) {
             return name;
         }else{
-            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.RANDOM)) {
+            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM)) {
                 return getEncoding_id() + "_" + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
             }
-            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.NUMBER)) {
+            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER)) {
                 return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
             }
         }

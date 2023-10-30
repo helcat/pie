@@ -1,5 +1,8 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_ZIP_Name;
+import net.pie.enums.Pie_ZIP_Option;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -8,21 +11,7 @@ import java.util.zip.*;
 public class Pie_Zip {
     private ZipOutputStream zos = null;
     private FileOutputStream fos = null;
-
     private ZipFile zip = null;
-
-    public enum Pie_ZIP_Name {
-        AS_IS,
-        RANDOM,
-        NUMBER
-    }
-
-    public enum Pie_ZIP_Option {
-        NEVER,
-        ALWAYS,
-        ONLY_WHEN_EXTRA_FILES_REQUIRED
-    }
-
     private Pie_ZIP_Name internal_name_format = Pie_ZIP_Name.AS_IS;
     private Pie_ZIP_Option option = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
     private String zip_comment = null;
@@ -167,7 +156,7 @@ public class Pie_Zip {
         this.option = option;
     }
 
-    public String getZip_comment() {
+    private String getZip_comment() {
         return zip_comment;
     }
 
@@ -175,27 +164,27 @@ public class Pie_Zip {
         this.zip_comment = zip_comment;
     }
 
-    public ZipOutputStream getZos() {
+    private ZipOutputStream getZos() {
         return zos;
     }
 
-    public void setZos(ZipOutputStream zos) {
+    private void setZos(ZipOutputStream zos) {
         this.zos = zos;
     }
 
-    public FileOutputStream getFos() {
+    private FileOutputStream getFos() {
         return fos;
     }
 
-    public void setFos(FileOutputStream fos) {
+    private void setFos(FileOutputStream fos) {
         this.fos = fos;
     }
 
-    public ZipFile getZip() {
+    private ZipFile getZip() {
         return zip;
     }
 
-    public void setZip(ZipFile zip) {
+    private void setZip(ZipFile zip) {
         this.zip = zip;
     }
 }

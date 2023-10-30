@@ -1,6 +1,8 @@
 package net.pie.examples;
 
 /*
+ java -classpath pie-1.2.jar  net.pie.examples.Pie_Test_Encode
+
 git pull origin main
 git add .
 git commit -m "Work Commit"
@@ -37,8 +39,7 @@ public class Pie_Test_Encode {
         encoding_config.setEncoder_overwrite_file(true);
 
         //encoding_config.setEncoder_storage(Pie_Storage.ZIP_FILE);                                                   // Optional default is Pie_Storage.ZIP_ON_SPLIT_FILE
-        encoding_config.setEncoder_storage(new Pie_Zip(Pie_Zip.Pie_ZIP_Name.RANDOM, Pie_Zip.Pie_ZIP_Option.ALWAYS));
-
+        encoding_config.setEncoder_storage(new Pie_Zip(Pie_ZIP_Name.RANDOM, Pie_ZIP_Option.ALWAYS));
         encoding_config.setBase(Pie_Base.BASE64);
 
         // Build a Source File

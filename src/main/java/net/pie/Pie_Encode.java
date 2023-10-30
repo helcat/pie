@@ -151,8 +151,8 @@ public class Pie_Encode {
         }
 
         ByteBuffer buffer = null;
-        originalArray = getUtils().compressBytes(getConfig().isEncoder_Add_Encryption() ?
-                        getUtils().encrypt_to_bytes(originalArray, "Image") : originalArray);
+        originalArray = getUtils().compressBytes(getConfig().getEncoder_Add_Encryption() != null ?
+                getConfig().getEncoder_Add_Encryption().encrypt_to_bytes(originalArray, "Image") : originalArray);
         int total_Length = originalArray.length;
 
         if (file_number == 1) {
@@ -455,7 +455,8 @@ public class Pie_Encode {
             "?" +
             getSource().getType().ordinal() +                                                                                   // 1 Type
             "?" +
-            (getConfig().isEncoder_Add_Encryption() ? Pie_Constants.ENC.getParm2() : Pie_Constants.NO_ENC.getParm2()) +         // 2 Encryption
+            (getConfig().getEncoder_Add_Encryption() != null ?
+                    getConfig().getEncoder_Add_Encryption().getEncryption().ordinal() : "-1") +                                  // Encryption Type                               // 2 Encryption
             "?" +
             total_files +                                                                                                       // 3 Number of Files
             "?" +

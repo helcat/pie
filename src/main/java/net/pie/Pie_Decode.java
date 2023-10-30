@@ -2,6 +2,7 @@ package net.pie;
 
 import net.pie.enums.Pie_Base;
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Encryption_Type;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
@@ -320,7 +321,16 @@ public class Pie_Decode {
                 String[] parts = parms.split("\\?", 0);
                 getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
                 getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));  // 1
-                getConfig().setEncoder_Add_Encryption(parts[parm ++].equalsIgnoreCase(Pie_Constants.ENC.getParm2()));   // 2
+
+                int encryption_type = Integer.parseInt(parts[parm ++]);
+                if(encryption_type >= 0) {
+                    if (getConfig().getEncoder_Add_Encryption() == null) {
+                        getConfig().setEncoder_Add_Encryption(new Pie_Encryption(Pie_Encryption_Type.get(encryption_type))); // 2
+                    }else{
+                        getConfig().getEncoder_Add_Encryption().setEncryption(Pie_Encryption_Type.get(encryption_type));
+                    }
+                }
+
                 setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 3
 
                 String files = parts[parm ++];                                                                          // 4
@@ -334,7 +344,7 @@ public class Pie_Decode {
                 if (map_values) {
                     setEncoded_values(new HashMap<>());
                     getEncoded_values().put("total_files", getTotal_files());
-                    getEncoded_values().put("encrypted", getConfig().isEncoder_Add_Encryption());
+                    getEncoded_values().put("encrypted", getConfig().getEncoder_Add_Encryption() == null);
                     getEncoded_values().put("source_type", getDecoded_Source_destination().getSource_type());
                 }
             }
