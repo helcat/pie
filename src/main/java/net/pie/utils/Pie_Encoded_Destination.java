@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,6 +21,7 @@ public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
     private Pie_Config config = null;
+    private String encoding_id = UUID.randomUUID().toString();
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -69,8 +71,6 @@ public class Pie_Encoded_Destination {
         return false;
     }
 
-
-
     /** *******************************************************************<br>
      * Create a file name
      * @param file_number (int)
@@ -78,15 +78,27 @@ public class Pie_Encoded_Destination {
      * @return String
      */
     public String create_File_Name(int file_number, String source_filename) {
-        String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
+        String name = getLocal_file().isDirectory() ? source_filename : getLocal_file().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
 
         if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
-            name = name.substring(0, name.length() - ("."+Pie_Constants.IMAGE_TYPE.getParm2()).length());
+            name = name.substring(0, name.length() - ("." + Pie_Constants.IMAGE_TYPE.getParm2()).length());
         if (file_number > 1)
             name = name + "_" + file_number;
-        name = name + "."+Pie_Constants.IMAGE_TYPE.getParm2();
+        name = name + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+
+        if (getConfig().getEncoder_storage() == null || getConfig().getEncoder_storage() != null &&
+            getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.AS_IS)) {
+            return name;
+        }else{
+            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.RANDOM)) {
+                return getEncoding_id() + "_" + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+            }
+            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_Zip.Pie_ZIP_Name.NUMBER)) {
+                return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+            }
+        }
         return name;
     }
 
@@ -176,6 +188,13 @@ public class Pie_Encoded_Destination {
         this.config = config;
     }
 
+    public String getEncoding_id() {
+        return encoding_id;
+    }
+
+    public void setEncoding_id(String encoding_id) {
+        this.encoding_id = encoding_id;
+    }
 }
 
 

@@ -262,7 +262,6 @@ public class Pie_Decode {
         }else {
             if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
                 File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
-
                 try {
                     setOutputStream(new FileOutputStream(f));
                 } catch (FileNotFoundException e) {

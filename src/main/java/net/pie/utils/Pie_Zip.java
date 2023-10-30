@@ -25,7 +25,6 @@ public class Pie_Zip {
 
     private Pie_ZIP_Name internal_name_format = Pie_ZIP_Name.AS_IS;
     private Pie_ZIP_Option option = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
-    private boolean use_pie_extension = false;
     private String zip_comment = null;
 
     /** *******************************************************<br>
@@ -39,29 +38,13 @@ public class Pie_Zip {
         setInternal_name_format(internal_name_format);
     }
 
-    public Pie_Zip(Pie_ZIP_Name internal_name_format, boolean use_pie_extension) {
-        setInternal_name_format(internal_name_format);
-        setUse_pie_extension(use_pie_extension);
-    }
-
     public Pie_Zip(Pie_ZIP_Option option) {
         setOption(option);
-    }
-
-    public Pie_Zip(Pie_ZIP_Option option, boolean use_pie_extension) {
-        setOption(option);
-        setUse_pie_extension(use_pie_extension);
     }
 
     public Pie_Zip(Pie_ZIP_Name internal_name_format, Pie_ZIP_Option option) {
         setInternal_name_format(internal_name_format);
         setOption(option);
-    }
-
-    public Pie_Zip(Pie_ZIP_Name internal_name_format, Pie_ZIP_Option option, boolean use_pie_extension) {
-        setInternal_name_format(internal_name_format);
-        setOption(option);
-        setUse_pie_extension(use_pie_extension);
     }
 
     /** *******************************************************************<br>
@@ -137,6 +120,10 @@ public class Pie_Zip {
         return true;
     }
 
+    /** *******************************************************************<br>
+     * getNext_File (Next File in Zip)
+     * @return InputStream
+     */
     public InputStream getNext_File() {
         try {
             ZipEntry entry = getZip().entries().nextElement();
@@ -180,25 +167,12 @@ public class Pie_Zip {
         this.option = option;
     }
 
-    public boolean isUse_pie_extension() {
-        return use_pie_extension;
-    }
-
     public String getZip_comment() {
         return zip_comment;
     }
 
     public void setZip_comment(String zip_comment) {
         this.zip_comment = zip_comment;
-    }
-
-    /** *******************************************************<br>
-     * setUse_pie_extension<br>
-     * when true the zip file extension will become ".pie"<br>
-     * @param use_pie_extension (boolean) (Default is false)
-     */
-    public void setUse_pie_extension(boolean use_pie_extension) {
-        this.use_pie_extension = use_pie_extension;
     }
 
     public ZipOutputStream getZos() {
