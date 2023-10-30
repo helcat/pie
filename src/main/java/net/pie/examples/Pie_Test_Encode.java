@@ -31,7 +31,7 @@ public class Pie_Test_Encode {
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
-        encoding_config.setEncoder_Add_Encryption(false);                                                           // Optional default is true
+        encoding_config.setEncoder_Add_Encryption(null);                                                           // Optional default is true
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(true);                                                             // Optional default is false

@@ -172,7 +172,7 @@ public class Pie_Zip {
         this.zos = zos;
     }
 
-    private FileOutputStream getFos() {
+    FileOutputStream getFos() {
         return fos;
     }
 
