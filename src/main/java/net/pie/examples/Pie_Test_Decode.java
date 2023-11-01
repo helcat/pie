@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_The Fall Guy S01E02.mkv.zip";
+    private String temp_Encoded_Imaage = "enc_zulu.msi.png";
     private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {

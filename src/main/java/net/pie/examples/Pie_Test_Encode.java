@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "The Fall Guy S01E02.mkv";
-    private String temp_Encoded_Image = "The Fall Guy S01E02.mkv";
+    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_Encoded_Image = "background.jpg";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -31,7 +31,10 @@ public class Pie_Test_Encode {
         Pie_Config encoding_config = new Pie_Config();
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
-        encoding_config.setEncoder_Add_Encryption(null);                                                           // Optional default is true
+
+        Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("this a a temp1 2st art gfh fgf again");
+        encoding_config.setEncoder_Add_Encryption(null);
+
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
         encoding_config.setShow_Timings_In_Logs(true);                                                             // Optional default is false
@@ -39,8 +42,8 @@ public class Pie_Test_Encode {
         encoding_config.setEncoder_overwrite_file(true);
 
         //encoding_config.setEncoder_storage(Pie_Storage.ZIP_FILE);                                                   // Optional default is Pie_Storage.ZIP_ON_SPLIT_FILE
-        encoding_config.setEncoder_storage(new Pie_Zip(Pie_ZIP_Name.RANDOM, Pie_ZIP_Option.ALWAYS));
-        encoding_config.setBase(Pie_Base.BASE64);
+        encoding_config.setEncoder_storage(new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED));
+        encoding_config.setBase(Pie_Base.BASE85);
 
         // Build a Source File
         Pie_Encode_Source source = new Pie_Encode_Source( encoding_config, new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded));

@@ -27,6 +27,8 @@ public class Pie_Utils {
      * @param bytes (String)
      **/
     public byte[] compressBytes(byte[] bytes) {
+        if (bytes == null)
+            return null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
         try {
             Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);

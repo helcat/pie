@@ -144,36 +144,51 @@ public class Pie_Encode {
      * @see Pie_Encode_Source Uses Pie_Source to collect the data to be used as pixels.
      **/
     public void encode(byte[] originalArray, int file_number, int total_files) {
-        if (isError()) {
+        if (isError() || originalArray == null) {
             logging(Level.SEVERE,"Encoding FAILED");
             getConfig().exit();
             return;
         }
 
         ByteBuffer buffer = null;
-        originalArray = getUtils().compressBytes(getConfig().getEncoder_Add_Encryption() != null ?
-                getConfig().getEncoder_Add_Encryption().encrypt_to_bytes(originalArray, "Image") : originalArray);
-        int total_Length = originalArray.length;
 
         if (file_number == 1) {
-            byte[] addon = getUtils().compressBytes(encoding_addon(total_files));
-            buffer = ByteBuffer.allocate(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
-                    addon.length + Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length + total_Length);
+            byte[] addon = encoding_addon(total_files);
+            buffer = ByteBuffer.allocate(
+                    Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
+                    addon.length +
+                    Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
+                    originalArray.length);
+
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
             buffer.put(addon);
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
             addon = null;
         }else{
-            buffer = ByteBuffer.allocate((Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length)+  +total_Length);
+            buffer = ByteBuffer.allocate(
+                    Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
+                    originalArray.length);
             buffer.put(Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
         }
 
         buffer.put(originalArray);
         buffer.rewind();
         Pie_Size image_size = null;
+
         try {
-            //originalArray = buffer.array();
-            originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode ( buffer.array() ) : Pie_Ascii85.encode( buffer.array() );
+            originalArray = getUtils().compressBytes(
+                            getConfig().getEncoder_Add_Encryption() != null ?
+                            getConfig().getEncoder_Add_Encryption().encrypt(buffer.array()) : buffer.array()
+                        );
+
+            originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode (originalArray) : Pie_Ascii85.encode( originalArray );
+        }catch (Exception e) {
+            logging(Level.SEVERE,"Error " + e.getMessage());
+            getConfig().exit();
+            return;
+        }
+
+        try {
             image_size = calculate_image_Mode(originalArray.length);
         } catch (Exception e) {
             logging(Level.SEVERE,"Unable to read file " + e.getMessage());
@@ -455,8 +470,7 @@ public class Pie_Encode {
             "?" +
             getSource().getType().ordinal() +                                                                                   // 1 Type
             "?" +
-            (getConfig().getEncoder_Add_Encryption() != null ?
-                    getConfig().getEncoder_Add_Encryption().getEncryption().ordinal() : "-1") +                                  // Encryption Type                               // 2 Encryption
+            (getConfig().getEncoder_Add_Encryption() != null ? "t" : "f") +                                                     // 2 Encryption                               // 2 Encryption
             "?" +
             total_files +                                                                                                       // 3 Number of Files
             "?" +

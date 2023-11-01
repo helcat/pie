@@ -2,7 +2,6 @@ package net.pie;
 
 import net.pie.enums.Pie_Base;
 import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encryption_Type;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
@@ -26,6 +25,7 @@ public class Pie_Decode {
     private OutputStream outputStream = null;
     private Map<String, Object> encoded_values = null;
     private long startTime = 0;
+    private boolean encrypted = false;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -321,16 +321,7 @@ public class Pie_Decode {
                 String[] parts = parms.split("\\?", 0);
                 getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
                 getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));  // 1
-
-                int encryption_type = Integer.parseInt(parts[parm ++]);
-                if(encryption_type >= 0) {
-                    if (getConfig().getEncoder_Add_Encryption() == null) {
-                        getConfig().setEncoder_Add_Encryption(new Pie_Encryption(Pie_Encryption_Type.get(encryption_type))); // 2
-                    }else{
-                        getConfig().getEncoder_Add_Encryption().setEncryption(Pie_Encryption_Type.get(encryption_type));
-                    }
-                }
-
+                setEncrypted(!Objects.equals(parts[parm++], "f"));                                                    // 2
                 setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 3
 
                 String files = parts[parm ++];                                                                          // 4
@@ -468,5 +459,13 @@ public class Pie_Decode {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
 }
