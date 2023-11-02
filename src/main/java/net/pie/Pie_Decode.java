@@ -143,10 +143,31 @@ public class Pie_Decode {
     private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
         if (buffimage == null)
             return null;
-        byte[] message = //readImage(buffimage, processing_file);
-            getConfig().getBase().equals(Pie_Base.BASE64) ?
-                Base64.getDecoder().decode(readImage(buffimage, processing_file)) :
-                Pie_Ascii85.decode(new String(readImage(buffimage, processing_file), StandardCharsets.UTF_8));
+
+        byte[] message = readImage(buffimage, processing_file);
+        if (message == null)
+            return null;
+
+        try {
+            message = getConfig().getBase().equals(Pie_Base.BASE64) ?
+                Base64.getDecoder().decode(message) :
+                Pie_Ascii85.decode(new String(message, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            getConfig().logging(Level.SEVERE, "Base Encoding Error " + e.getMessage());
+            return null;
+        }
+
+        if (message == null)
+            return null;
+
+        message = getUtils().decompress_return_bytes(message);
+        if (message == null)
+            return null;
+
+        message = getConfig().getEncoder_Add_Encryption() != null ?
+                getConfig().getEncoder_Add_Encryption().decrypt(message) : message;
+        if (message == null)
+            return null;
 
         if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
             setDecoding_process_started(true);
@@ -164,7 +185,7 @@ public class Pie_Decode {
                 return null;
             }
 
-            collect_encoded_parms(getUtils().decompress_return_bytes(Arrays.copyOfRange(message, 1, count)), map_values);
+            collect_encoded_parms(Arrays.copyOfRange(message, 1, count), map_values);
             message = Arrays.copyOfRange(message, count, message.length);
 
         } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
@@ -173,6 +194,10 @@ public class Pie_Decode {
                 return null;
             }
             message = Arrays.copyOfRange(message, 1, message.length);
+
+        }else{
+            getConfig().logging(Level.SEVERE, "Invalid Encoded File");
+            return null;
         }
 
         if (message.length == 0) {
@@ -182,7 +207,7 @@ public class Pie_Decode {
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try {
-            bytes.write(getUtils().decompress_return_bytes(message));
+            bytes.write(message);
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE, "Writing Error " + e.getMessage());
             return null;

@@ -9,7 +9,19 @@ git commit -m "Work Commit"
 git push origin main
  */
 
+import net.pie.utils.Pie_Encode_Encryption;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+import java.util.Arrays;
 
 public class Pie_Test {
 
@@ -23,8 +35,83 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        combineNumbers();
 
+        Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
+        byte[] bytes = "this is a dsg £ g hhhhh gfd gtest".getBytes(StandardCharsets.UTF_8);
+        bytes = encryption.encrypt(bytes);
+        bytes = encryption.decrypt(bytes);
+        System.out.println(new String(bytes, StandardCharsets.UTF_8));
+
+
+        /**
+        byte[] bytes = new byte[0];
+        try {
+            bytes = encrypt("this is a dsg g  gfd gtest".getBytes(StandardCharsets.UTF_8), "passkeyqaqaqaqaqdfsdfdsd");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(new String(bytes));
+
+        try {
+            System.out.println(new String(decrypt(bytes, "passkeyqaqaqaqaqdfsdfdsd")));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+         **/
+
+        //combineNumbers();
+        //test_bytes();
+    }
+
+    public static byte[] encrypt(byte[] input, String password) throws Exception {
+        // Generate a random IV (Initialization Vector)
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+        // Create a key based on the password using a Key Derivation Function
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), new byte[16], 65536, 256);
+        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+
+        // Initialize the cipher with the key and IV
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+
+        // Perform the encryption
+        byte[] encrypted = cipher.doFinal(input);
+
+        // Combine IV and encrypted data
+        byte[] combined = new byte[iv.length + encrypted.length];
+        System.arraycopy(iv, 0, combined, 0, iv.length);
+        System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
+
+        return combined;
+    }
+
+    public static byte[] decrypt(byte[] input, String password) throws Exception {
+        // Extract IV from the input
+        byte[] iv = Arrays.copyOfRange(input, 0, 16);
+        byte[] encryptedData = Arrays.copyOfRange(input, 16, input.length);
+
+        // Create a key based on the password using a Key Derivation Function
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), new byte[16], 65536, 256);
+        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+
+        // Initialize the cipher with the key and IV
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+
+        // Perform the decryption
+        return cipher.doFinal(encryptedData);
+    }
+
+
+
+    private void test_bytes() {
         byte[] bytes = new byte[256];
         int count = 0;
         bytes[0] = (byte) 0;
@@ -33,10 +120,7 @@ public class Pie_Test {
             bytes[count++] = (byte) i;
 
         System.out.println(new String (bytes, StandardCharsets.UTF_8));
-
     }
-
-
 
 
     private void combineNumbers() {

@@ -10,13 +10,14 @@ git push origin main
  */
 
 import net.pie.Pie_Decode;
+import net.pie.enums.Pie_Base;
 import net.pie.utils.*;
 
 import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_zulu.msi.png";
+    private String temp_Encoded_Imaage = "enc_background.jpg.png";
     private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
@@ -33,6 +34,10 @@ public class Pie_Test_Decode {
         decoding_config.setLog_level(Level.INFO);
         decoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
         decoding_config.setShow_Timings_In_Logs(true);
+        decoding_config.setBase(Pie_Base.BASE64);
+
+        Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("this a a temp1 2st art gfh fgf again");
+        decoding_config.setEncoder_Add_Encryption(encryption);
 
         // Tell the decoder where to store the decoded file
         Pie_Decode_Destination decoded_Source_destination = new Pie_Decode_Destination();

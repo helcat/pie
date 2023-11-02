@@ -176,14 +176,32 @@ public class Pie_Encode {
         Pie_Size image_size = null;
 
         try {
-            originalArray = getUtils().compressBytes(
-                            getConfig().getEncoder_Add_Encryption() != null ?
-                            getConfig().getEncoder_Add_Encryption().encrypt(buffer.array()) : buffer.array()
-                        );
+            originalArray = getConfig().getEncoder_Add_Encryption() != null ?
+                            getConfig().getEncoder_Add_Encryption().encrypt(buffer.array()) : buffer.array();
+
+            if (originalArray == null) {
+                logging(Level.SEVERE,"Encryption Error");
+                getConfig().exit();
+                return;
+            }
+
+            originalArray = getUtils().compressBytes(originalArray);
+
+            if (originalArray == null) {
+                logging(Level.SEVERE,"Compression Error");
+                getConfig().exit();
+                return;
+            }
 
             originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode (originalArray) : Pie_Ascii85.encode( originalArray );
         }catch (Exception e) {
             logging(Level.SEVERE,"Error " + e.getMessage());
+            getConfig().exit();
+            return;
+        }
+
+        if (originalArray == null) {
+            logging(Level.SEVERE,"Encoding Error");
             getConfig().exit();
             return;
         }
