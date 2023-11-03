@@ -165,7 +165,7 @@ public class Pie_Decode {
             return null;
 
         message = getConfig().getEncoder_Add_Encryption() != null ?
-                getConfig().getEncoder_Add_Encryption().decrypt(message) : message;
+                getConfig().getEncoder_Add_Encryption().decrypt(getConfig(), message) : message;
         if (message == null)
             return null;
 

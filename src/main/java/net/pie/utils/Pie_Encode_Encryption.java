@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 public class Pie_Encode_Encryption {
+    private String password = null;
     private Pie_Config config = null;
 
     private SecretKey key = null;
@@ -23,11 +24,11 @@ public class Pie_Encode_Encryption {
     }
 
     public Pie_Encode_Encryption(String key) {
-        createKey(key);
+        setPassword(key);
     }
 
-    public Pie_Encode_Encryption(byte[] key) {
-        createKey(new String(key, StandardCharsets.UTF_8));
+    public Pie_Encode_Encryption(SecretKey key) {
+        setKey(key);
     }
 
     /** **************************************************<br>
@@ -35,6 +36,8 @@ public class Pie_Encode_Encryption {
      * @return Bytes
      */
     public byte[] keyToBytes() {
+        if (getKey() == null)
+            return null;
         return getKey().getEncoded();
     }
 
@@ -44,17 +47,21 @@ public class Pie_Encode_Encryption {
      * @return (SecretKey)
      */
     public SecretKey keyFromBytes(byte[] keyBytes) {
+        if (keyBytes == null)
+            return null;
         return new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
     }
 
-    public void createKey(String password) {
+    public void createKey() {
         SecretKeyFactory factory = null;
         try {
             factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), new byte[16], 65536, 256);
+            KeySpec spec = new PBEKeySpec(getPassword().toCharArray(), new byte[16], 65536, 256);
             SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
             setKey(key);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored) {  }
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            getConfig().logging(Level.SEVERE, "Encryption Error " + e.getMessage());
+        }
     }
 
     /** **************************************************<br>
@@ -62,7 +69,21 @@ public class Pie_Encode_Encryption {
      * @param input (byte[])
      * @return (byte[])
      */
-    public byte[] encrypt(byte[] input) {
+    public byte[] encrypt(Pie_Config config, byte[] input) {
+        setConfig(config);
+        if (getConfig() == null)
+            return input;
+
+        if (getKey() == null) {
+            if (getPassword() != null && !getPassword().isEmpty())
+                createKey();
+            else
+                return input;
+        }
+
+        if (getKey() == null)
+            return input;
+
         // Generate a random IV (Initialization Vector)
         byte[] iv = new byte[16];
         SecureRandom random = new SecureRandom();
@@ -95,8 +116,21 @@ public class Pie_Encode_Encryption {
      * @param input (byte[])
      * @return (byte[])
      */
-    public byte[] decrypt(byte[] input) {
-        // Extract IV from the input
+    public byte[] decrypt(Pie_Config config, byte[] input) {
+        setConfig(config);
+        if (getConfig() == null)
+            return input;
+
+        if (getKey() == null) {
+            if (getPassword() != null && !getPassword().isEmpty())
+                createKey();
+            else
+                return input;
+        }
+
+        if (getKey() == null)
+            return input;
+
         byte[] iv = Arrays.copyOfRange(input, 0, 16);
         byte[] encryptedData = Arrays.copyOfRange(input, 16, input.length);
 
@@ -125,6 +159,14 @@ public class Pie_Encode_Encryption {
 
     public void setKey(SecretKey key) {
         this.key = key;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 

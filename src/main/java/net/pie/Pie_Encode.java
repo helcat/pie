@@ -177,7 +177,7 @@ public class Pie_Encode {
 
         try {
             originalArray = getConfig().getEncoder_Add_Encryption() != null ?
-                            getConfig().getEncoder_Add_Encryption().encrypt(buffer.array()) : buffer.array();
+                            getConfig().getEncoder_Add_Encryption().encrypt(getConfig(), buffer.array()) : buffer.array();
 
             if (originalArray == null) {
                 logging(Level.SEVERE,"Encryption Error");

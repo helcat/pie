@@ -9,6 +9,7 @@ git commit -m "Work Commit"
 git push origin main
  */
 
+import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Encode_Encryption;
 
 import javax.crypto.Cipher;
@@ -35,11 +36,11 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-
+        Pie_Config config = new Pie_Config();
         Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
         byte[] bytes = "this is a dsg £ g hhhhh gfd gtest".getBytes(StandardCharsets.UTF_8);
-        bytes = encryption.encrypt(bytes);
-        bytes = encryption.decrypt(bytes);
+        bytes = encryption.encrypt(config, bytes);
+        bytes = encryption.decrypt(config, bytes);
         System.out.println(new String(bytes, StandardCharsets.UTF_8));
 
 
