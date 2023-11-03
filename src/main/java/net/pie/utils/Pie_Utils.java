@@ -76,7 +76,11 @@ public class Pie_Utils {
         File file = view.getHomeDirectory();
         return file.getPath();
     }
-
+    public static File getDesktop() {
+        FileSystemView view = FileSystemView.getFileSystemView();
+        File file = view.getHomeDirectory();
+        return file;
+    }
     /** *****************************************************<br>
      * <b>Collects the amount of memory used</b><br>
      * @return

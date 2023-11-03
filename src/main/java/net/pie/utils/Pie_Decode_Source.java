@@ -33,7 +33,6 @@ public class Pie_Decode_Source {
 
         if (decode == null) {
             getConfig().logging(Level.SEVERE,"No Decode Object Found");
-            getConfig().exit();
             return;
 
         }else if (decode instanceof File) {
@@ -42,7 +41,6 @@ public class Pie_Decode_Source {
                 setDecode_object(decode);
             }else{
                 getConfig().logging(Level.SEVERE,"No Decode Object Found");
-                getConfig().exit();
                 return;
             }
 

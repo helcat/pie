@@ -32,10 +32,10 @@ public class Pie_Test_Encode {
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
 
-        //Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("this a a temp1 2st art gfh fgf again");
-        Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("this a a temp1 2st art gfh fgf again");
+        Pie_Encryption encryption = new Pie_Encryption("this a a temp1 2st art gfh fgf again");
+        //Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
 
-        encoding_config.setEncoder_Add_Encryption(encryption);
+        encoding_config.setEncryption(encryption);
 
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false

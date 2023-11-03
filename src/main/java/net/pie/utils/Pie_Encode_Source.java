@@ -55,7 +55,6 @@ public class Pie_Encode_Source {
 
         if (encode == null) {
             getConfig().logging(Level.SEVERE,"No Encoding Object Found");
-            getConfig().exit();
             return;
 
         }else if (encode instanceof InputStream) {
@@ -63,14 +62,12 @@ public class Pie_Encode_Source {
                 setInitial_source_size(((InputStream) encode).available());
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE, "Unable to collect size from source");
-                getConfig().exit();
                 return;
             }
             setInput((InputStream) encode);
             setType(Pie_Source_Type.FILE);
             if (getFile_name() == null) {
                 getConfig().logging(Level.SEVERE, "File name is required for InputStream source");
-                getConfig().exit();
                 return;
             }
 
@@ -80,7 +77,6 @@ public class Pie_Encode_Source {
             setType(Pie_Source_Type.FILE);
             if (getFile_name() == null) {
                 getConfig().logging(Level.SEVERE, "File name is required for byte[] source");
-                getConfig().exit();
                 return;
             }
 
@@ -100,7 +96,6 @@ public class Pie_Encode_Source {
                     setInput(new FileInputStream((File) encode));
                 } catch (FileNotFoundException e) {
                     getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                    getConfig().exit();
                     return;
                 }
                 setType(Pie_Source_Type.FILE);

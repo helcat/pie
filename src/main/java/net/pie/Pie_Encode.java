@@ -37,20 +37,17 @@ public class Pie_Encode {
                 getSource().getType().equals(Pie_Source_Type.NONE)  ||
                 getSource().getInput() == null) {
             logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
-            getConfig().exit();
             return;
         }
 
         if (getSource().getInitial_source_size() == 0) {
             logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
-            getConfig().exit();
             getSource().close();
             return;
         }
 
         if (getDestination() == null) {
             logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
-            getConfig().exit();
             getSource().close();
             return;
         }
@@ -90,7 +87,6 @@ public class Pie_Encode {
 
         } catch (IOException e) {
             logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
-            getConfig().exit();
             getSource().close();
             return;
         }
@@ -100,7 +96,6 @@ public class Pie_Encode {
         logging(Level.INFO,"Encoding Complete");
         getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
         logTime(startTime);
-        getConfig().exit();
         getSource().close();
         if (getConfig().isRun_gc_after()) System.gc();
     }
@@ -146,7 +141,6 @@ public class Pie_Encode {
     public void encode(byte[] originalArray, int file_number, int total_files) {
         if (isError() || originalArray == null) {
             logging(Level.SEVERE,"Encoding FAILED");
-            getConfig().exit();
             return;
         }
 
@@ -176,12 +170,11 @@ public class Pie_Encode {
         Pie_Size image_size = null;
 
         try {
-            originalArray = getConfig().getEncoder_Add_Encryption() != null ?
-                            getConfig().getEncoder_Add_Encryption().encrypt(getConfig(), buffer.array()) : buffer.array();
+            originalArray = getConfig().getEncryption() != null ?
+                            getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
 
             if (originalArray == null) {
                 logging(Level.SEVERE,"Encryption Error");
-                getConfig().exit();
                 return;
             }
 
@@ -189,20 +182,17 @@ public class Pie_Encode {
 
             if (originalArray == null) {
                 logging(Level.SEVERE,"Compression Error");
-                getConfig().exit();
                 return;
             }
 
             originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode (originalArray) : Pie_Ascii85.encode( originalArray );
         }catch (Exception e) {
             logging(Level.SEVERE,"Error " + e.getMessage());
-            getConfig().exit();
             return;
         }
 
         if (originalArray == null) {
             logging(Level.SEVERE,"Encoding Error");
-            getConfig().exit();
             return;
         }
 
@@ -218,7 +208,6 @@ public class Pie_Encode {
 
         if (image_size == null) { // all else fails quit
             originalArray = null;
-            getConfig().exit();
             return;
         }
 
@@ -227,7 +216,6 @@ public class Pie_Encode {
         if (isError() || data_image == null) {
             data_image = null;
             logging(Level.SEVERE,"Encoding FAILED");
-            getConfig().exit();
             return;
         }
 
@@ -488,7 +476,7 @@ public class Pie_Encode {
             "?" +
             getSource().getType().ordinal() +                                                                                   // 1 Type
             "?" +
-            (getConfig().getEncoder_Add_Encryption() != null ? "t" : "f") +                                                     // 2 Encryption                               // 2 Encryption
+            (getConfig().getEncryption() != null ? "t" : "f") +                                                     // 2 Encryption                               // 2 Encryption
             "?" +
             total_files +                                                                                                       // 3 Number of Files
             "?" +

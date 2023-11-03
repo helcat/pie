@@ -4,6 +4,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -14,21 +15,47 @@ import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-public class Pie_Encode_Encryption {
+public class Pie_Encryption {
     private String password = null;
     private Pie_Config config = null;
 
     private SecretKey key = null;
 
-    public Pie_Encode_Encryption() {
+    public Pie_Encryption() {
     }
 
-    public Pie_Encode_Encryption(String key) {
-        setPassword(key);
+    public Pie_Encryption(String key) {
+        if (key != null && key.length() > 7)
+            setPassword(key);
     }
 
-    public Pie_Encode_Encryption(SecretKey key) {
+    public Pie_Encryption(SecretKey key) {
         setKey(key);
+    }
+
+    public Pie_Encryption(File key) {
+        if (key == null || !key.isFile())
+            return;
+
+        String line = null;
+        String key_text = "";
+        try {
+            FileReader fileReader = new FileReader(key);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while ((line = bufferedReader.readLine()) != null) {
+                key_text = key_text + line;
+            }
+            bufferedReader.close();
+            fileReader.close();
+
+        } catch (IOException ex) {
+            return;
+        }
+        byte[] bytes = Pie_Ascii85.decode(key_text);
+        if(bytes == null)
+            return;
+
+        setKey(keyFromBytes(bytes));
     }
 
     /** **************************************************<br>
@@ -53,6 +80,11 @@ public class Pie_Encode_Encryption {
     }
 
     public void createKey() {
+        if (getPassword() != null && !getPassword().isEmpty() && getPassword().length() < 8) {
+            getConfig().logging(Level.WARNING, "Invalid Encryption Key");
+            setKey(null);
+            return;
+        }
         SecretKeyFactory factory = null;
         try {
             factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
@@ -62,6 +94,62 @@ public class Pie_Encode_Encryption {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             getConfig().logging(Level.SEVERE, "Encryption Error " + e.getMessage());
         }
+    }
+
+    /** **************************************************<br>
+     * create Certificate File
+     * @param config (Pie_Config)
+     * @param folder (Save to folder)
+     * @param file_name (String)
+     */
+    public void create_Certificate_File(Pie_Config config, File folder, String file_name) {
+        if (file_name == null || file_name.isEmpty())
+            file_name = "pie_certificate";
+
+        setConfig(config);
+        if (getConfig() == null)
+            return;
+
+        if (folder == null || !folder.isDirectory()) {
+            getConfig().logging(Level.SEVERE, "Invalid folder");
+            return;
+        }
+
+        if (getPassword() == null || getPassword().length() < 8) {
+            getConfig().logging(Level.SEVERE, "Invalid key must be 8 or more");
+            return;
+        }
+
+        createKey();
+        if (getKey() == null) {
+            getConfig().logging(Level.SEVERE, "Unable to create certificate file");
+            return;
+        }
+
+        byte[] keyToBytes = keyToBytes();
+        if (keyToBytes == null) {
+            getConfig().logging(Level.SEVERE, "Unable to create certificate file");
+            return;
+        }
+
+        String str = new String(Pie_Ascii85.encode(keyToBytes), StandardCharsets.UTF_8);
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(new File(folder + File.separator + file_name +".pie"));
+        } catch (IOException e) {
+            getConfig().logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
+            return;
+        }
+        PrintWriter pw = new PrintWriter(fw);
+        pw.println(str);
+        pw.close();
+        try {
+            fw.close();
+        } catch (IOException e) {
+            getConfig().logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
+            return;
+        }
+        getConfig().logging(Level.INFO, "Certificate file created");
     }
 
     /** **************************************************<br>
@@ -140,8 +228,7 @@ public class Pie_Encode_Encryption {
             return cipher.doFinal(encryptedData);
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            getConfig().logging(Level.SEVERE, "Decryption Error " + e.getMessage());
-            return null;
+            return input;
         }
     }
 

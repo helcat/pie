@@ -10,7 +10,8 @@ git push origin main
  */
 
 import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_Encode_Encryption;
+import net.pie.utils.Pie_Encryption;
+import net.pie.utils.Pie_Utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -18,11 +19,13 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public class Pie_Test {
 
@@ -37,12 +40,18 @@ public class Pie_Test {
      **/
     public Pie_Test(String arg) {
         Pie_Config config = new Pie_Config();
-        Pie_Encode_Encryption encryption = new Pie_Encode_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
+        config.setLog_level(Level.INFO);
+        Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
+        encryption.create_Certificate_File(config, Pie_Utils.getDesktop(), "pie_certificate");
+
+        /**
+        Pie_Encryption encryption =
+                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
         byte[] bytes = "this is a dsg £ g hhhhh gfd gtest".getBytes(StandardCharsets.UTF_8);
         bytes = encryption.encrypt(config, bytes);
         bytes = encryption.decrypt(config, bytes);
         System.out.println(new String(bytes, StandardCharsets.UTF_8));
-
+         **/
 
         /**
         byte[] bytes = new byte[0];

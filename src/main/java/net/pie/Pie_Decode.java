@@ -48,13 +48,11 @@ public class Pie_Decode {
 
         if (getSource() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source required");
-            getConfig().exit();
             return;
         }
 
         if (getDecoded_Source_destination() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source destination required");
-            getConfig().exit();
             return;
         }
     }
@@ -112,28 +110,11 @@ public class Pie_Decode {
             try {  if (message != null) message.close();   } catch (IOException ignored) { }
         }
 
-        /**
-        try {
-            String message_txt = collect_encoded_parms(new String(message, StandardCharsets.UTF_8).trim());
-            if (message_txt == null || message_txt.isEmpty()) {
-                getConfig().logging(Level.SEVERE,"Decoding Error");
-                getConfig().exit();
-                return;
-            }
-            save(getUtils().decrypt(getConfig().isEncoder_Add_Encryption(), message_txt, "Main Decoding : "));
-        } catch (Exception e) {
-            getConfig().logging(Level.SEVERE,"Decoding Error " + e.getMessage());
-            getConfig().exit();
-            return;
-        }
-         **/
-
         getUtils().usedMemory(getMemory_Start(), "Decoding : ");
         if (getConfig().isRun_gc_after())
             System.gc();
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
         logTime();
-        getConfig().exit();
         getSource().close();
     }
 
@@ -145,7 +126,7 @@ public class Pie_Decode {
             return null;
 
         byte[] message = readImage(buffimage, processing_file);
-        if (message == null)
+        if (message.length == 0)
             return null;
 
         try {
@@ -164,8 +145,8 @@ public class Pie_Decode {
         if (message == null)
             return null;
 
-        message = getConfig().getEncoder_Add_Encryption() != null ?
-                getConfig().getEncoder_Add_Encryption().decrypt(getConfig(), message) : message;
+        message = getConfig().getEncryption() != null ?
+                getConfig().getEncryption().decrypt(getConfig(), message) : message;
         if (message == null)
             return null;
 
@@ -186,11 +167,14 @@ public class Pie_Decode {
             }
 
             collect_encoded_parms(Arrays.copyOfRange(message, 1, count), map_values);
+            if (getConfig().isError())
+                return null;
+
             message = Arrays.copyOfRange(message, count, message.length);
 
         } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
             if (!isDecoding_process_started()) {
-                getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+                getConfig().logging(Level.SEVERE, "Invalid Encoded File");
                 return null;
             }
             message = Arrays.copyOfRange(message, 1, message.length);
@@ -346,7 +330,7 @@ public class Pie_Decode {
                 String[] parts = parms.split("\\?", 0);
                 getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
                 getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));  // 1
-                setEncrypted(!Objects.equals(parts[parm++], "f"));                                                    // 2
+                setEncrypted(parts[parm++].equalsIgnoreCase("t"));                                                    // 2
                 setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 3
 
                 String files = parts[parm ++];                                                                          // 4
@@ -360,7 +344,7 @@ public class Pie_Decode {
                 if (map_values) {
                     setEncoded_values(new HashMap<>());
                     getEncoded_values().put("total_files", getTotal_files());
-                    getEncoded_values().put("encrypted", getConfig().getEncoder_Add_Encryption() == null);
+                    getEncoded_values().put("encrypted", getConfig().getEncryption() == null);
                     getEncoded_values().put("source_type", getDecoded_Source_destination().getSource_type());
                 }
             }

@@ -13,7 +13,7 @@ public class Pie_Config {
     // Encoder Only
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    private Pie_Encode_Encryption encoder_Add_Encryption = null;
+    private Pie_Encryption encryption = null;
     private boolean encoder_overwrite_file = true;
     private Pie_Zip encoder_storage = new Pie_Zip();
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
@@ -65,7 +65,7 @@ public class Pie_Config {
      * <b>Logging Exit</b><br>
      * Remove the custom Handler from the logging
      **/
-    public void exit() {
+    public void exit_Logging() {
         if (getLog() != null)
             getLog().removeHandler(getCustomHandler());
         setLog(null);
@@ -115,14 +115,14 @@ public class Pie_Config {
         return log_level;
     }
 
-    public Pie_Encode_Encryption getEncoder_Add_Encryption() {
-        return encoder_Add_Encryption;
+    public Pie_Encryption getEncryption() {
+        return encryption;
     }
 
-    public void setEncoder_Add_Encryption(Pie_Encode_Encryption encoder_Add_Encryption) {
-        this.encoder_Add_Encryption = encoder_Add_Encryption;
-        if (this.encoder_Add_Encryption != null)
-            this.encoder_Add_Encryption.setConfig(this);
+    public void setEncryption(Pie_Encryption encryption) {
+        this.encryption = encryption;
+        if (this.encryption != null)
+            this.encryption.setConfig(this);
     }
 
     public boolean isRun_gc_after() {
