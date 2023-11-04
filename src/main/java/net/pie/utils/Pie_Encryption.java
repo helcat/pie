@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
 
 public class Pie_Encryption {
@@ -51,7 +52,7 @@ public class Pie_Encryption {
         } catch (IOException ex) {
             return;
         }
-        byte[] bytes = Pie_Ascii85.decode(key_text);
+        byte[] bytes = Base64.getDecoder().decode(key_text);
         if(bytes == null)
             return;
 
@@ -132,7 +133,7 @@ public class Pie_Encryption {
             return;
         }
 
-        String str = new String(Pie_Ascii85.encode(keyToBytes), StandardCharsets.UTF_8);
+        String str = new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8);
         FileWriter fw = null;
         try {
             fw = new FileWriter(new File(folder + File.separator + file_name +".pie"));

@@ -29,7 +29,6 @@ public class Pie_Config {
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
     private String supplemental_zip_name = null;
-    private Pie_Base base = Pie_Base.BASE64;
 
     /** *******************************************************************<br>
      * <b>Pie_Config - Configuration</b><br>
@@ -164,14 +163,6 @@ public class Pie_Config {
 
     public int getMax_encoded_image_mb() {
         return max_encoded_image_mb;
-    }
-
-    public Pie_Base getBase() {
-        return base;
-    }
-
-    public void setBase(Pie_Base base) {
-        this.base = (base == null ? Pie_Base.BASE64 : base);
     }
 
     /** *******************************************************************<br>

@@ -2,11 +2,6 @@ package net.pie.examples;
 
 /*
 java -classpath pie-1.2.jar Pie_Test
-
-git pull origin main
-git add .
-git commit -m "Work Commit"
-git push origin main
  */
 
 import net.pie.utils.Pie_Config;

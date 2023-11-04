@@ -130,9 +130,7 @@ public class Pie_Decode {
             return null;
 
         try {
-            message = getConfig().getBase().equals(Pie_Base.BASE64) ?
-                Base64.getDecoder().decode(message) :
-                Pie_Ascii85.decode(new String(message, StandardCharsets.UTF_8));
+            message = Base64.getDecoder().decode(message);
         } catch (Exception e) {
             getConfig().logging(Level.SEVERE, "Base Encoding Error " + e.getMessage());
             return null;

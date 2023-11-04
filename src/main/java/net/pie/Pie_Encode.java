@@ -185,7 +185,7 @@ public class Pie_Encode {
                 return;
             }
 
-            originalArray = getConfig().getBase().equals(Pie_Base.BASE64) ? Base64.getEncoder().encode (originalArray) : Pie_Ascii85.encode( originalArray );
+            originalArray = Base64.getEncoder().encode (originalArray);
         }catch (Exception e) {
             logging(Level.SEVERE,"Error " + e.getMessage());
             return;
