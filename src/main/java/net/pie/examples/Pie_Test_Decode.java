@@ -35,8 +35,8 @@ public class Pie_Test_Decode {
         decoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
         decoding_config.setShow_Timings_In_Logs(true);
 
-        Pie_Encryption encryption = new Pie_Encryption("this a a temp1 2st art gfh fgf again");
-        //Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
+        //Pie_Encryption encryption = new Pie_Encryption("thdis a a temp1 2st art gfh fgf again");
+        Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
         decoding_config.setEncryption(encryption);
 
         // Tell the decoder where to store the decoded file
