@@ -316,7 +316,6 @@ public class Pie_Decode {
      * @param add_on_bytes (byte[])
      */
     private void collect_encoded_parms(byte[] add_on_bytes, boolean map_values) {
-        getConfig().setSupplemental_zip_name(null);
         getSource().setAddon_Files(null);
         if (getDecoded_Source_destination() == null)
             setDecoded_Source_destination(new Pie_Decode_Destination());

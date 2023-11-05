@@ -26,7 +26,6 @@ public class Pie_Config {
     private boolean show_Memory_Usage_In_Logs = false;
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
-    private String supplemental_zip_name = null;
 
     /** *******************************************************************<br>
      * Starts a default configuration and sets up logging settings.
@@ -50,7 +49,7 @@ public class Pie_Config {
     }
 
     /** *********************************************************<br>
-     * Remove the custom Handler and logging.<br>
+     * Remove the custom handler and logging.<br>
      * If logging is not required at all, then run this method after building the configuration
      **/
     public void exit_Logging() {
@@ -122,6 +121,7 @@ public class Pie_Config {
     /** ***************************************************************<br>
      * getEncryption - collects the encryption details set by the user
      * @return Pie_Encryption
+     * @see Pie_Encryption
      */
     public Pie_Encryption getEncryption() {
         return encryption;
@@ -276,20 +276,32 @@ public class Pie_Config {
         this.encoder_storage = encoder_storage;
     }
 
+    /** ***************************************************************<br>
+     * Show Timings In Logs, Used internally.
+     * @return boolean
+     */
     public boolean isShow_Timings_In_Logs() {
         return show_Timings_In_Logs;
     }
 
+    /** ***************************************************************<br>
+     * Set Show_Timings_In_Logs, Set by user.
+     * @param show_Timings_In_Logs boolean
+     */
     public void setShow_Timings_In_Logs(boolean show_Timings_In_Logs) {
         this.show_Timings_In_Logs = show_Timings_In_Logs;
     }
 
+    /** ***************************************************************<br>
+     * Encoder overwrite file, Used internally.
+     * @return boolean
+     */
     public boolean isEncoder_overwrite_file() {
         return encoder_overwrite_file;
     }
 
     /** ***************************************************************<br>
-     * Allows newly created encoded files to be overwritten. Default is true.
+     * Allows created encoded files with the same name to be overwritten. Default is true. Set by user.
      * @param encoder_overwrite_file (boolean)
      */
     public void setEncoder_overwrite_file(boolean encoder_overwrite_file) {
@@ -299,8 +311,9 @@ public class Pie_Config {
     /** ***************************************************************<br>
      * <b>setEncoder_mode</b><br>
      * Encode mode allows for different encodings to be put on to the image.<br>
-     * ENCODE_MODE_RGB. is the default. Smaller images. The size of the image can increase depending on the mode selected.
+     * ENCODE_MODE_ARGB. is the default. Smaller images. The size of the image can increase depending on the mode selected.
      * @param encoder_mode (Pie_Encode_Mode)
+     * @see Pie_Encode_Mode
      */
     public void setEncoder_mode(Pie_Encode_Mode encoder_mode) {
         this.encoder_mode = encoder_mode;
@@ -315,6 +328,11 @@ public class Pie_Config {
         this.show_Memory_Usage_In_Logs = show_Memory_Usage_In_Logs;
     }
 
+    /** ***************************************************************<br>
+     * Encoder Minimum Image, Sets a new Pie_Size object containing the area that should be used.
+     * @return Pie_Size
+     * @see Pie_Size
+     */
     public Pie_Size getEncoder_Minimum_Image() {
         return encoder_Minimum_Image;
     }
@@ -323,11 +341,18 @@ public class Pie_Config {
      * <b>setEncoder_Minimum_Image</b><br>
      * Sets the minimum size the encoded image can be. If any of the parameters is zero the size is ignored.
      * @param encoder_Minimum_Image (new Pie_Size)
+     * @see Pie_Size
      **/
     public void setEncoder_Minimum_Image(Pie_Size encoder_Minimum_Image) {
         this.encoder_Minimum_Image = encoder_Minimum_Image;
     }
 
+    /** ***************************************************************<br>
+     * Encoder Maximum Image<br>
+     * Sets the maximum area that should be used.
+     * @return Pie_Size
+     * @see Pie_Size
+     */
     public Pie_Size getEncoder_Maximum_Image() {
         return encoder_Maximum_Image;
     }
@@ -338,6 +363,7 @@ public class Pie_Config {
      * default is 15000, this should stop the application from going out of memory.<br>
      * However, if the application does go out of memory decrease this parameter or increase the memory size.<br>
      * @param encoder_Maximum_Image (new Pie_Size)
+     * @see Pie_Size
      **/
     public void setEncoder_Maximum_Image(Pie_Size encoder_Maximum_Image) {
         this.encoder_Maximum_Image = encoder_Maximum_Image;
@@ -353,18 +379,11 @@ public class Pie_Config {
                 getEncoder_Maximum_Image().getWidth() != 0;
     }
 
-    public String getSupplemental_zip_name() {
-        return supplemental_zip_name;
-    }
-
-    public void setSupplemental_zip_name(String supplemental_zip_name) {
-        this.supplemental_zip_name = supplemental_zip_name;
-    }
-
     /** ******************************************************************<br>
-     * Pie_Logging_Format
+     * Pie_Logging_Format<br>
+     * Used as a custom handler for logging.
      */
-    public class Pie_Logging_Format extends Formatter {
+    public static class Pie_Logging_Format extends Formatter {
         @Override
         public String format(LogRecord record) {
             return record.getLevel() + ": " + record.getMessage() + "\n";
