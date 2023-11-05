@@ -1,8 +1,9 @@
 package net.pie.enums;
 
 /** *******************************************************<br>
- * <b>Pie_Source_Type</b><br>
- * Sets the source type in Pie_source.
+ * <b>Pie Source Type</b><br>
+ * Sets the source type, which is encoded within the final file for decoding.<br>
+ * Only set within the encoding procedure cannot be set by user.
  **/
 public enum Pie_Source_Type {
     NONE,
@@ -11,8 +12,8 @@ public enum Pie_Source_Type {
     DOWNLOAD;
 
     /** *******************************************<br>
-     * <b>get Pie_Source_Type from saved ordinal</b>
-     * @param ordinal
+     * <b>static method for get Pie_Source Type from saved ordinal when decoding</b>
+     * @param ordinal (int) comes from encoded file.
      * @return Pie_Source_Type
      */
     public static Pie_Source_Type get(int ordinal) {

@@ -2,7 +2,7 @@ package net.pie.enums;
 
 /** *******************************************************<br>
  * <b>Pie_Constants</b><br>
- * Constants used in PIE
+ * Constants used internally for default settings.
  **/
 public enum Pie_Constants {
     MIN_PROTECTED_SIZE (50, "MIN"),
@@ -13,50 +13,21 @@ public enum Pie_Constants {
     ;
 
     public int parm1 = 0;
-    public String parm2;
+    public final String parm2;
 
     Pie_Constants(int p1, String p2) {
         parm1 = p1;
         parm2 = p2;
     }
 
-    /** *******************************************<br>
-     * <b>get Pie_Constants from saved ordinal</b>
-     * @param ordinal
-     * @return Pie_Constants
-     */
-    public static Pie_Constants get(int ordinal) {
-        for (Pie_Constants s : Pie_Constants.values())
-            if (s.ordinal() == ordinal)
-                return s;
-        return null;
-    }
-
-    public static Pie_Constants get(String p2) {
-        for (Pie_Constants s : Pie_Constants.values())
-            if (s.getParm2().equals(p2))
-                return s;
-        return null;
-    }
-
-    /** *******************************************************<br>
-     * <b>getters and setters</b><br>
-     **/
     public int getParm1() {
         return parm1;
-    }
-
-    public void setParm1(int parm1) {
-        this.parm1 = parm1;
     }
 
     public String getParm2() {
         return parm2;
     }
 
-    public void setParm2(String parm2) {
-        this.parm2 = parm2;
-    }
 }
 
 

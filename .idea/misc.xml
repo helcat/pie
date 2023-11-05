@@ -4,6 +4,7 @@
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Desktop/shared" />
     <option name="OPTION_SCOPE" value="public" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="false" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">

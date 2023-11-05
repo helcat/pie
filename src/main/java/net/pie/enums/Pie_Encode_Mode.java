@@ -1,6 +1,6 @@
 package net.pie.enums;
 /** *******************************************************<br>
- * <b>Pie_Constants</b><br>
+ * <b>Pie Encode Modes</b><br>
  * Image sizes will increase or decrease depending on the mode selected.
  * The colour of the encoded image will also change. Allowed encodings are :<br>
  * ENCODE_MODE_R. use red channel only - X Large file size<br>
@@ -17,7 +17,7 @@ package net.pie.enums;
  * ENCODE_MODE_RGT. use red and green channels only Fully transparent - Large file size<br>
  * ENCODE_MODE_RGB. use red, green and blue channels - Medium file size <br>
  * ENCODE_MODE_RGBT. use red, green and blue channels Fully transparent - Medium file size <br>
- * ENCODE_MODE_ARGB. use alpha, red, green and blue channels. Small File size.
+ * ENCODE_MODE_ARGB. use alpha, red, green and blue channels. Small File size. (Default Setting)
  **/
 
 public enum Pie_Encode_Mode {
@@ -38,21 +38,14 @@ public enum Pie_Encode_Mode {
     ENCODE_MODE_ARGB ("ARGB"),
     ;
 
-    public String parm1;
+    public final String parm1;
 
     Pie_Encode_Mode(String p1) {
         parm1 = p1;
     }
 
-    /** *******************************************************<br>
-     * <b>getters and setters</b><br>
-     **/
     public String getParm1() {
         return parm1;
-    }
-
-    public void setParm1(String parm1) {
-        this.parm1 = parm1;
     }
 
 }

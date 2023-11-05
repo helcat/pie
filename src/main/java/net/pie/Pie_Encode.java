@@ -137,7 +137,11 @@ public class Pie_Encode {
      * Encodes the data as the image pixel by pixel.<br>
      * After setting Pie_Encode use encode(). Allows for changing settings.
      * @see Pie_Encode_Source Uses Pie_Source to collect the data to be used as pixels.
-     **/
+     * @param originalArray byte[]
+     * @param file_number int
+     * @param total_files int
+     */
+
     public void encode(byte[] originalArray, int file_number, int total_files) {
         if (isError() || originalArray == null) {
             logging(Level.SEVERE,"Encoding FAILED");
@@ -339,10 +343,14 @@ public class Pie_Encode {
                 case MIDDLE_LEFT :
                     return 0;
 
-                case TOP_RIGHT: BOTTOM_RIGHT : MIDDLE_RIGHT :
+                case TOP_RIGHT:
+                case BOTTOM_RIGHT :
+                case MIDDLE_RIGHT :
                     return dim - size;
 
-                case TOP_CENTER : BOTTOM_CENTER : MIDDLE_CENTER :
+                case TOP_CENTER :
+                case BOTTOM_CENTER :
+                case MIDDLE_CENTER :
                     return (dim / 2) - (size / 2);
             }
         }

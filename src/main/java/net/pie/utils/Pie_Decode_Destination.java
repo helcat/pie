@@ -37,7 +37,9 @@ public class Pie_Decode_Destination {
     /** *******************************************************************<br>
      * <b>setLocal_folder</b><br>
      * sets a local folder, where to save the file
-     **/
+     * @param local_folder (File)
+     */
+
     public void setLocal_folder(File local_folder) {
         if (local_folder != null && !local_folder.exists()  ||
             local_folder != null && !local_folder.isDirectory()) {

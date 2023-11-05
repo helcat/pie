@@ -53,8 +53,7 @@ public class Pie_Size {
     public void setDimension(int width, int height, Pie_Position position) {
         setWidth(Math.max(width, 0));
         setHeight(Math.max(height, 0));
-        setPosition(position == null ? Pie_Position.MIDDLE_CENTER :
-                (Pie_Position.getPositionList().contains(position) ? position :  Pie_Position.MIDDLE_CENTER));
+        setPosition(position == null ? Pie_Position.MIDDLE_CENTER : position);
     }
 
     /** *******************************************************<br>
@@ -66,8 +65,7 @@ public class Pie_Size {
     }
 
     public void setPosition(Pie_Position position) {
-        this.position = position == null ? Pie_Position.MIDDLE_CENTER :
-                (Pie_Position.getPositionList().contains(position) ? position :  Pie_Position.MIDDLE_CENTER);
+        this.position = position == null ? Pie_Position.MIDDLE_CENTER : position;
     }
 
     public int getWidth() {

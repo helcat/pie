@@ -63,7 +63,7 @@ public class Pie_Decode {
      * total files required (int) (Tag = total_files)<br>
      * is encrypted (boolean) (Tag = encrypted)<br>
      * source type (Pie_Source_Type) (Tag = source_type)<br>
-     * @return Map<String, Object> (Map of encoded Values)
+     * @return Map String, Object (Map of encoded Values)
      */
     public Map<String, Object> getEncoded_Data_Values() {
         if (getConfig().isError())
