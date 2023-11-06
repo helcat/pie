@@ -8,8 +8,7 @@ package net.pie.enums;
 public enum Pie_Source_Type {
     NONE,
     TEXT,
-    FILE,
-    DOWNLOAD;
+    FILE;
 
     /** *******************************************<br>
      * <b>static method for get Pie_Source Type from saved ordinal when decoding</b>

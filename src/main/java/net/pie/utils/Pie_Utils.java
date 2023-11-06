@@ -144,7 +144,24 @@ public class Pie_Utils {
             throw new RuntimeException(e);
         }
     }
+    /** *********************************************************<br>
+     * Log how log it takes to encode
+     * @param startTime (long)
+     */
+    public String logTime(long startTime) {
+        if (!getConfig().isShow_Timings_In_Logs())
+            return "";
 
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        long hours = elapsedTime / 3600000;
+        long minutes = (elapsedTime % 3600000) / 60000;
+        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
+        long milliseconds = elapsedTime % 1000;
+
+        return "Elapsed time: " + hours + " hours, " +
+                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds";
+    }
     /** *******************************************************<br>
      * <b>getters and setters</b><br>
      * General Getters and Setters

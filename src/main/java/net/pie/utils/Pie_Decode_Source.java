@@ -19,6 +19,11 @@ public class Pie_Decode_Source {
     private boolean isZipped = false;
     private Pie_Zip zip_Object = null;
 
+    public Pie_Decode_Source(Object decode) {
+        setDecode_object(decode);
+        setConfig(new Pie_Config());
+    }
+
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
      * Sets a new instance with a given Pie_Config with custom parameters.<br>
@@ -28,24 +33,34 @@ public class Pie_Decode_Source {
      */
     public Pie_Decode_Source(Pie_Config config, Object decode) {
         setDecode_object(decode);
-        setInput(null);
         setConfig(config == null ? new Pie_Config() : config);
+        processing();
+    }
 
-        if (decode == null) {
+    private void processing() {
+        setInput(null);
+        if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No Decode Object Found");
             return;
 
-        }else if (decode instanceof File) {
-            File f = (File) decode;
-            if (f.isFile()) {
-                setDecode_object(decode);
-            }else{
+        }else if (getDecode_object() instanceof File) {
+            if (!((File) getDecode_object()).isFile()) {
                 getConfig().logging(Level.SEVERE,"No Decode Object Found");
                 return;
             }
+            getConfig().logging(Level.INFO,"Preparing File For Decoding");
+        }else if (getDecode_object() instanceof URL) {
+            getConfig().logging(Level.INFO,"Preparing URL For Decoding");
 
-        }else if (decode instanceof URL || decode instanceof InputStream || decode instanceof Pie_URL) {
-            setDecode_object(decode);
+        }else if (getDecode_object() instanceof InputStream) {
+            getConfig().logging(Level.INFO,"Preparing InputStream For Decoding");
+
+        }else if (getDecode_object() instanceof Pie_URL) {
+            getConfig().logging(Level.INFO,"Preparing Pie_URL For Decoding");
+
+        }else{
+            setDecode_object(null);
+            getConfig().logging(Level.SEVERE,"Unable to decode object");
         }
     }
 

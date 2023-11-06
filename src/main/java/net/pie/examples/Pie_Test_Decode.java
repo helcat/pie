@@ -51,11 +51,6 @@ public class Pie_Test_Decode {
             );
 
         // Do the decoding : Decodes the image.
-        Pie_Decode decoder = new Pie_Decode(decode_source, decoded_Source_destination);
-
-        //Map<String, Object> values = decoder.getEncoded_Data_Values();
-        //system.out.println(values);
-
-        decoder.process_Decoding();
+        new Pie_Decode(decode_source, decoded_Source_destination);
     }
 }

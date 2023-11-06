@@ -16,38 +16,64 @@ public class Pie_Encode {
     private Pie_Config config;
     private Pie_Encode_Source source;
     private Pie_Encoded_Destination destination;
-    private boolean error = false;
-    private Pie_Utils utils = null;
 
     /** ******************************************************<br>
-     * <b>Pie_Encode</b>
+     * <b>Pie_Encode</b><br>
+     * Encode a file or text from Pie_Source using options from Pie_Config<br>
      * @param source (Send in a Pie_Source object)
      * @param encoded_destination (Pie_Encoded_Destination)
      * @see Pie_Encode_Source Pie_Source to load in the content.
+     * @see Pie_Encoded_Destination Destination of the encoded file
      **/
     public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
+        processing(source, encoded_destination);
+    }
+
+    /** ******************************************************<br>
+     * <b>Pie_Encode</b><br>
+     * Encode a file or text from Pie_Source using options from Pie_Config<br>
+     * A default Pie_Encoded_Destination will be created and the file will be available as a byte array.<br>
+     * To get the array use "getDestination().getBytes()"<br>
+     * @param source (Send in a Pie_Source object)
+     * @see Pie_Encode_Source Pie_Source to load in the content.
+     **/
+    public Pie_Encode(Pie_Encode_Source source) {
+        Pie_Encoded_Destination encoded_destination = new Pie_Encoded_Destination();
+        encoded_destination.setConfig(source.getConfig());
+        processing(source, encoded_destination);
+    }
+
+    private void processing(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
         long startTime = System.currentTimeMillis();
         ImageIO.setUseCache(false);
         setSource(source);
         setDestination(encoded_destination);
+
+        if (getSource().getConfig() == null) {
+            getConfig().logging(Level.SEVERE,"Encoding FAILED : Missing Configuration");
+            getSource().close();
+            return;
+        }
+
         setConfig(source.getConfig());
-        setUtils(new Pie_Utils(getConfig()));
+        Pie_Utils utils = new Pie_Utils(getConfig());
+        long memory_Start = utils.getMemory();
 
         if (getSource() == null ||
                 getSource().getType().equals(Pie_Source_Type.NONE)  ||
                 getSource().getInput() == null) {
-            logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
+            getConfig().logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
             return;
         }
 
         if (getSource().getInitial_source_size() == 0) {
-            logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
+            getConfig().logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
             getSource().close();
             return;
         }
 
         if (getDestination() == null) {
-            logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
+            getConfig().logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
             getSource().close();
             return;
         }
@@ -68,7 +94,7 @@ public class Pie_Encode {
 
             int file_count = 1;
             while ((bytesRead = fis.read(buffer)) != -1) {
-                if (isError()) {
+                if (getConfig().isError()) {
                     getSource().close();
                     return;
                 }
@@ -77,7 +103,7 @@ public class Pie_Encode {
                 outputStream.write(buffer, 0, bytesRead);
 
                 outputStream.close();
-                encode(outputStream.toByteArray(), file_count, files_to_be_created);
+                encode(utils, outputStream.toByteArray(), file_count, files_to_be_created);
                 file_count++;
             }
 
@@ -86,50 +112,21 @@ public class Pie_Encode {
             bytesRead = 0;
 
         } catch (IOException e) {
-            logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
+            getConfig().logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
             getSource().close();
             return;
         }
 
         getConfig().getEncoder_storage().closeZip();    // If required
 
-        logging(Level.INFO,"Encoding Complete");
-        getUtils().usedMemory(getSource().getMemory_Start(), "Encoding : ");
-        logTime(startTime);
+        getConfig().logging(Level.INFO,"Encoding : Complete");
+        utils.usedMemory(memory_Start, "Encoding : ");
+        String time_diff = utils.logTime(startTime);
+        if (!time_diff.isEmpty())
+            getConfig().logging(Level.INFO, time_diff);
+
         getSource().close();
         if (getConfig().isRun_gc_after()) System.gc();
-    }
-
-    /** *********************************************************<br>
-     * Log how log it takes to encode
-     * @param startTime (long)
-     */
-    private void logTime(long startTime) {
-        if (!getConfig().isShow_Timings_In_Logs())
-            return;
-
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-
-        long hours = elapsedTime / 3600000;
-        long minutes = (elapsedTime % 3600000) / 60000;
-        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
-        long milliseconds = elapsedTime % 1000;
-
-        logging(Level.INFO,"Elapsed time: " + hours + " hours, " +
-                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
-    }
-
-    /** *********************************************************<br>
-     * <b>Error</b><br>
-     * Set the log entry and set error if required
-     * @param level (Logging level)
-     * @param message (Logging Message)
-     **/
-    private void logging(Level level, String message) {
-        getConfig().getLog().log(level,  message);
-        if (level.equals(Level.SEVERE))
-            setError(true);
     }
 
     /** ******************************************************<br>
@@ -142,9 +139,9 @@ public class Pie_Encode {
      * @param total_files int
      */
 
-    public void encode(byte[] originalArray, int file_number, int total_files) {
-        if (isError() || originalArray == null) {
-            logging(Level.SEVERE,"Encoding FAILED");
+    public void encode(Pie_Utils utils, byte[] originalArray, int file_number, int total_files) {
+        if (getConfig().isError() || originalArray == null) {
+            getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;
         }
 
@@ -178,32 +175,32 @@ public class Pie_Encode {
                             getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
 
             if (originalArray == null) {
-                logging(Level.SEVERE,"Encryption Error");
+                getConfig().logging(Level.SEVERE,"Encryption Error");
                 return;
             }
 
-            originalArray = getUtils().compressBytes(originalArray);
+            originalArray = utils.compressBytes(originalArray);
 
             if (originalArray == null) {
-                logging(Level.SEVERE,"Compression Error");
+                getConfig().logging(Level.SEVERE,"Compression Error");
                 return;
             }
 
             originalArray = Base64.getEncoder().encode (originalArray);
         }catch (Exception e) {
-            logging(Level.SEVERE,"Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE,"Error " + e.getMessage());
             return;
         }
 
         if (originalArray == null) {
-            logging(Level.SEVERE,"Encoding Error");
+            getConfig().logging(Level.SEVERE,"Encoding Error");
             return;
         }
 
         try {
             image_size = calculate_image_Mode(originalArray.length);
         } catch (Exception e) {
-            logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+            getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
             return;
         }
 
@@ -217,9 +214,9 @@ public class Pie_Encode {
 
         BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
         originalArray = null;
-        if (isError() || data_image == null) {
+        if (getConfig().isError() || data_image == null) {
             data_image = null;
-            logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;
         }
 
@@ -227,7 +224,7 @@ public class Pie_Encode {
         int width = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getWidth() : 0, image_size.getWidth());
         int height = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getHeight() : 0, image_size.getHeight());
         if (width > image_size.getWidth() || height > image_size.getHeight()) {
-            logging(Level.INFO,"Extending Encoded Image");
+            getConfig().logging(Level.INFO,"Extending Encoded Image");
             buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D gd = buffImg.createGraphics();
             gd.drawImage(data_image, null,dataImageOffset(image_size.getWidth(), width), dataImageOffset(image_size.getHeight(), height));
@@ -235,8 +232,8 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, getUtils(), file_number, total_files, getSource().getFile_name()))
-            logging(Level.SEVERE,"Encoding image was not saved");
+        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, utils, file_number, total_files, getSource().getFile_name()))
+            getConfig().logging(Level.SEVERE,"Encoding image was not saved");
         data_image = null;
         buffImg = null;
     }
@@ -248,7 +245,7 @@ public class Pie_Encode {
      * @return BufferedImage
      */
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
-        logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
+        getConfig().logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
         int image_type = BufferedImage.TYPE_INT_RGB;
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
@@ -287,18 +284,18 @@ public class Pie_Encode {
             store_count = 0;
             count = 0;
             new_color = hasAlpha ?
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0,
-                            rbg.contains("G") ? checker(store, count++) : 0,
-                            rbg.contains("B") ? checker(store, count++) : 0,
-                            checkerAlpha(store, count++)) :
+                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0,
+                            rbg.contains("G") ? checker(store, count++, 0) : 0,
+                            rbg.contains("B") ? checker(store, count++, 0) : 0,
+                            checker(store, count++, 1)) :
                     transparent ?
                    new Color(
-                           rbg.contains("R") ? checker(store, count++) : 0,
-                           rbg.contains("G") ? checker(store, count++) : 0,
-                           rbg.contains("B") ? checker(store, count++) : 0, 1) :
-                   new Color(rbg.contains("R") ? checker(store, count++) : 0,
-                           rbg.contains("G") ? checker(store, count++) : 0,
-                           rbg.contains("B") ? checker(store, count++): 0);
+                           rbg.contains("R") ? checker(store, count++, 0) : 0,
+                           rbg.contains("G") ? checker(store, count++, 0) : 0,
+                           rbg.contains("B") ? checker(store, count++, 0) : 0, 1) :
+                   new Color(rbg.contains("R") ? checker(store, count++, 0) : 0,
+                           rbg.contains("G") ? checker(store, count++, 0) : 0,
+                           rbg.contains("B") ? checker(store, count++, 0): 0);
 
             data_image.setRGB(x++, y, new_color.getRGB());
             store = null;
@@ -313,10 +310,10 @@ public class Pie_Encode {
             count = 0;
             data_image.setRGB(x, y,
                     hasAlpha ?
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, checkerAlpha(store, count++)).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0, checker(store, count++,1)).getRGB() :
                             transparent ?
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0, 1).getRGB() :
-                    new Color(rbg.contains("R") ? checker(store, count++) : 0, rbg.contains("G") ? checker(store, count++) : 0, rbg.contains("B") ? checker(store, count++) : 0).getRGB());
+                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0, 1).getRGB() :
+                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0).getRGB());
         }
 
         size = null; store = null; x =0; y = 0; count = 0; store_count = 0; // Save every byte of memory possible.
@@ -331,7 +328,7 @@ public class Pie_Encode {
      * @return offset (int)
      **/
     private int dataImageOffset(int size, int dim) {
-        logging(Level.INFO,"Encoding Offset");
+        getConfig().logging(Level.INFO,"Encoding Offset");
         if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
             switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
                 case TOP_LEFT :
@@ -403,14 +400,14 @@ public class Pie_Encode {
 
         if (getConfig().hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
-                logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
+                getConfig().logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
                 ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
                 " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
                 "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
             }
         }else{
-            logging(Level.WARNING,"Maximum Image Size Is Not Set");
+            getConfig().logging(Level.WARNING,"Maximum Image Size Is Not Set");
         }
 
         return image_size;
@@ -424,21 +421,16 @@ public class Pie_Encode {
      */
     private Pie_Size getPieSize(double length, Pie_Encode_Mode mode) {
         String string_mode = mode.getParm1().replace("T", "");
-        Pie_Size image_size = new Pie_Size();
         int size = (int) Math.ceil(Math.sqrt(length / string_mode.length()));
 
         Pie_Shape shape = getConfig().getEncoder_shape();
         if (size * 2 > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight())
             shape = Pie_Shape.SHAPE_SQUARE;
 
-        if (shape == Pie_Shape.SHAPE_SQUARE) {
-            image_size.setHeight(size);
-            image_size.setWidth(size);
-        }else{
-            image_size.setWidth((int) Math.ceil(size * 1.25));
-            image_size.setHeight((int) Math.ceil(size / 1.25));
-        }
-        return image_size;
+        if (shape == Pie_Shape.SHAPE_SQUARE)
+            return new Pie_Size(size,size);
+
+        return new Pie_Size((int) Math.ceil(size * 1.25), (int) Math.ceil(size / 1.25));
     }
 
     /** ******************************************************<br>
@@ -447,21 +439,9 @@ public class Pie_Encode {
      * @param position (position of stored byte)
      * @return int
      **/
-    private int checker(int[] store, int position) {
+    private int checker(int[] store, int position, int min) {
         if (store.length > position)
-            return Math.max(store[position], 0);
-        return 0;
-    }
-
-    /** ******************************************************<br>
-     * <b>Checks the number to make sure its above zero.</b><br>
-     * @param store (stored bytes)
-     * @param position (position of stored byte)
-     * @return int
-     **/
-    private int checkerAlpha(int[] store, int position) {
-        if (store.length > position)
-            return Math.max(store[position], 1);
+            return Math.max(store[position], min);
         return 0;
     }
 
@@ -482,23 +462,15 @@ public class Pie_Encode {
         String addon =
             (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +   // 0 Source Name
             "?" +
-            getSource().getType().ordinal() +                                                                                   // 1 Type
+            total_files +                                                                                                       // 1 Number of Files
             "?" +
-            (getConfig().getEncryption() != null ? "t" : "f") +                                                     // 2 Encryption                               // 2 Encryption
-            "?" +
-            total_files +                                                                                                       // 3 Number of Files
-            "?" +
-            addon_files +                                                                                                       // 4 File Names
+            addon_files +                                                                                                       // 2 File Names
             "?"
             ;
 
         return  addon.getBytes(StandardCharsets.UTF_8) ;
     }
 
-    /** *******************************************************<br>
-     * <b>getters and setters</b><br>
-     * General Getters and Setters
-     **/
     private void setConfig(Pie_Config config) {
         this.config = config;
     }
@@ -506,35 +478,19 @@ public class Pie_Encode {
         return config;
     }
 
-    public Pie_Encode_Source getSource() {
+    private Pie_Encode_Source getSource() {
         return source;
     }
 
-    public void setSource(Pie_Encode_Source source) {
+    private void setSource(Pie_Encode_Source source) {
         this.source = source;
     }
 
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public Pie_Utils getUtils() {
-        return utils;
-    }
-
-    public void setUtils(Pie_Utils utils) {
-        this.utils = utils;
-    }
-
-    public Pie_Encoded_Destination getDestination() {
+    private Pie_Encoded_Destination getDestination() {
         return destination;
     }
 
-    public void setDestination(Pie_Encoded_Destination destination) {
+    private void setDestination(Pie_Encoded_Destination destination) {
         this.destination = destination;
     }
 

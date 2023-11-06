@@ -54,6 +54,6 @@ public class Pie_Test_Encode {
         encoded_destination.setLocal_file(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Image));
 
         // Do Encoding, Will create the image and put it in the destination
-        new Pie_Encode(source, encoded_destination);     // Optional Config
+        new Pie_Encode(source, encoded_destination);
     }
 }

@@ -15,8 +15,6 @@ public class Pie_Encode_Source {
     private Pie_Config config;
     private String file_name = null;
     private InputStream input = null;
-    private Pie_Utils utils = null;
-    private long memory_Start = 0;
     private int initial_source_size;
 
     /** *******************************************************<br>
@@ -50,7 +48,6 @@ public class Pie_Encode_Source {
     private void process(Object encode) {
         setInput(null);
         setType(Pie_Source_Type.NONE);
-        setUtils(new Pie_Utils(getConfig()));
         setFile_name(null);
 
         if (encode == null) {
@@ -137,31 +134,15 @@ public class Pie_Encode_Source {
         return file_name;
     }
 
-    public void setFile_name(String file_name) {
+    private void setFile_name(String file_name) {
         this.file_name = file_name;
-    }
-
-    public Pie_Utils getUtils() {
-        return utils;
-    }
-
-    public void setUtils(Pie_Utils utils) {
-        this.utils = utils;
-    }
-
-    public long getMemory_Start() {
-        return memory_Start;
-    }
-
-    public void setMemory_Start(long memory_Start) {
-        this.memory_Start = memory_Start;
     }
 
     public InputStream getInput() {
         return input;
     }
 
-    public void setInput(InputStream input) {
+    private void setInput(InputStream input) {
         this.input = input;
     }
 
@@ -169,7 +150,7 @@ public class Pie_Encode_Source {
         return initial_source_size;
     }
 
-    public void setInitial_source_size(int initial_source_size) {
+    private void setInitial_source_size(int initial_source_size) {
         this.initial_source_size = initial_source_size;
     }
 }

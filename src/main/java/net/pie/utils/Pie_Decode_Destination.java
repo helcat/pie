@@ -15,7 +15,7 @@ public class Pie_Decode_Destination {
     private File local_folder;
     private URL web_address;
     private String file_name = null;
-    private Pie_Source_Type source_type = null;
+    private byte[] bytes = null;
     private boolean error = false;
     private String error_message = null;
 
@@ -77,14 +77,6 @@ public class Pie_Decode_Destination {
         this.file_name = file_name;
     }
 
-    public Pie_Source_Type getSource_type() {
-        return source_type;
-    }
-
-    public void setSource_type(Pie_Source_Type source_type) {
-        this.source_type = source_type;
-    }
-
     public boolean isError() {
         return error;
     }
@@ -99,6 +91,14 @@ public class Pie_Decode_Destination {
 
     public void setError_message(String error_message) {
         this.error_message = error_message;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 }
 

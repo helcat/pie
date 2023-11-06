@@ -1,7 +1,6 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
@@ -12,19 +11,11 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class Pie_Decode {
-    private boolean  decoding_process_started = false;
-    private String decoded_Message;
     private Pie_Config config;
-    private ByteArrayOutputStream decoded_bytes;
-    private Pie_Utils utils = null;
-    private long memory_Start = 0;
     private Pie_Decode_Destination decoded_Source_destination;
     private Pie_Decode_Source source = null;
     private int total_files = 0;
     private OutputStream outputStream = null;
-    private Map<String, Object> encoded_values = null;
-    private long startTime = 0;
-    private boolean encrypted = false;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -34,55 +25,39 @@ public class Pie_Decode {
      * @param decoded_Source_destination Image to be decrypted
      **/
     public Pie_Decode(Pie_Decode_Source source, Pie_Decode_Destination decoded_Source_destination) {
-        setStartTime(System.currentTimeMillis());
         ImageIO.setUseCache(false);
         setTotal_files(0);
-        setDecoding_process_started(false);
-        setConfig(source.getConfig());
-        setUtils(new Pie_Utils(getConfig()));
-        setMemory_Start(getUtils().getMemory());
-        setDecoded_Source_destination(decoded_Source_destination);
-        setSource(source);
-        setOutputStream(null);
 
-        if (getSource() == null) {
+        if (source == null || source.getDecode_object() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source required");
             return;
         }
+
+        if (source.getConfig() == null) {
+            getConfig().logging(Level.SEVERE, "Decoding FAILED : Missing Configuration");
+            return;
+        }
+
+        setSource(source);
+        setConfig(source.getConfig());
+        setDecoded_Source_destination(decoded_Source_destination);
+        setOutputStream(null);
 
         if (getDecoded_Source_destination() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source destination required");
             return;
         }
-    }
-
-    /** *********************************************************<br>
-     * Process Image but only return the encoded values.<br>
-     * Note the image will still be processed. But only the encoded values will be returned.
-     * returns<br>
-     * total files required (int) (Tag = total_files)<br>
-     * is encrypted (boolean) (Tag = encrypted)<br>
-     * source type (Pie_Source_Type) (Tag = source_type)<br>
-     * @return Map String, Object (Map of encoded Values)
-     */
-    public Map<String, Object> getEncoded_Data_Values() {
-        if (getConfig().isError())
-            return null;
-
-        int processing_file = 0;
-        if (getConfig().getLog() == null)
-            getConfig().setUpLogging();
-        getConfig().logging(Level.INFO,"Started Collecting Mapped Details");
-        ByteArrayOutputStream  message = start_Decode(collectImage(processing_file), true, processing_file); // First file decode.
-        try {  Objects.requireNonNull(message).close();   } catch (IOException ignored) { }
-        getConfig().logging(Level.INFO,"Finished Collecting Mapped Details");
-        return getEncoded_values();
+        process_Decoding();
     }
 
     /** *********************************************************<br>
      * Process : Decode the image/s
      */
-    public void process_Decoding() {
+    private void process_Decoding() {
+        Pie_Utils utils = new Pie_Utils(getConfig());
+        long startTime = System.currentTimeMillis();
+        long memory_Start = utils.getMemory();
+
         if (getConfig().isError())
             return;
 
@@ -90,17 +65,17 @@ public class Pie_Decode {
             getConfig().setUpLogging();
 
         int processing_file = 0;
-        ByteArrayOutputStream  message = start_Decode(collectImage(processing_file), false, processing_file); // First file decode.
+        ByteArrayOutputStream  message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
             setUpOutFile(getDecoded_Source_destination().getFile_name());
             while (processing_file < getTotal_files()) {
                 save(message);
                 processing_file++;
                 if (processing_file < getTotal_files()) {
-                    getUtils().usedMemory(getMemory_Start(), "Decoding : ");
+                    utils.usedMemory(memory_Start, "Decoding : ");
                     if (getConfig().isRun_gc_after())
                         System.gc();
-                    message = start_Decode(collectImage(processing_file), false, processing_file);
+                    message = start_Decode(utils, collectImage(processing_file));
                     if (message == null)
                         break;
                 }
@@ -109,22 +84,26 @@ public class Pie_Decode {
             try {  if (message != null) message.close();   } catch (IOException ignored) { }
         }
 
-        getUtils().usedMemory(getMemory_Start(), "Decoding : ");
+        utils.usedMemory(memory_Start, "Decoding : ");
         if (getConfig().isRun_gc_after())
             System.gc();
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
-        logTime();
+
+        String time_diff = utils.logTime(startTime);
+        if (!time_diff.isEmpty())
+            getConfig().logging(Level.INFO, time_diff);
+
         getSource().close();
     }
 
     /** *********************************************************<br>
      * Start Main Decodin
      */
-    private ByteArrayOutputStream start_Decode(BufferedImage buffimage, boolean map_values, int processing_file) {
+    private ByteArrayOutputStream start_Decode(Pie_Utils utils, BufferedImage buffimage) {
         if (buffimage == null)
             return null;
 
-        byte[] message = readImage(buffimage, processing_file);
+        byte[] message = readImage(buffimage);
         if (message.length == 0)
             return null;
 
@@ -138,7 +117,7 @@ public class Pie_Decode {
         if (message == null)
             return null;
 
-        message = getUtils().decompress_return_bytes(message);
+        message = utils.decompress_return_bytes(message);
         if (message == null)
             return null;
 
@@ -148,7 +127,6 @@ public class Pie_Decode {
             return null;
 
         if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-            setDecoding_process_started(true);
             int count = 1;
             boolean found = false;
             for (byte b : message) {
@@ -163,17 +141,13 @@ public class Pie_Decode {
                 return null;
             }
 
-            collect_encoded_parms(Arrays.copyOfRange(message, 1, count), map_values);
+            collect_encoded_parms(Arrays.copyOfRange(message, 1, count));
             if (getConfig().isError())
                 return null;
 
             message = Arrays.copyOfRange(message, count, message.length);
 
         } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
-            if (!isDecoding_process_started()) {
-                getConfig().logging(Level.SEVERE, "Invalid Encoded File");
-                return null;
-            }
             message = Arrays.copyOfRange(message, 1, message.length);
 
         }else{
@@ -225,8 +199,7 @@ public class Pie_Decode {
      * @param buffimage (BufferedImage)
      * @return ByteArrayOutputStream
      */
-    private byte[] readImage(BufferedImage buffimage, int processing_file) {
-        getConfig().logging(Level.INFO, "Decode : Starting process for file " + (getTotal_files() > 0 ? (processing_file + 1) + " / " + getTotal_files() : "" ));
+    private byte[] readImage(BufferedImage buffimage) {
         int pixelColor;
         int[] value = new int[4];
 
@@ -265,16 +238,13 @@ public class Pie_Decode {
      * @param file_name (String)
      */
     private void setUpOutFile(String file_name) {
-        if (getDecoded_Source_destination().getSource_type() == Pie_Source_Type.TEXT) {
-        }else {
-            if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-                File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
-                try {
-                    setOutputStream(new FileOutputStream(f));
-                } catch (FileNotFoundException e) {
-                    setOutputStream(null);
-                    getConfig().logging(Level.SEVERE, "Creating stream Error : " + e.getMessage());
-                }
+        if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
+            File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
+            try {
+                setOutputStream(new FileOutputStream(f));
+            } catch (FileNotFoundException e) {
+                setOutputStream(null);
+                getConfig().logging(Level.SEVERE, "Creating stream Error : " + e.getMessage());
             }
         }
     }
@@ -315,7 +285,7 @@ public class Pie_Decode {
      * <b>Collect any parameters that have been encoded</b>
      * @param add_on_bytes (byte[])
      */
-    private void collect_encoded_parms(byte[] add_on_bytes, boolean map_values) {
+    private void collect_encoded_parms(byte[] add_on_bytes) {
         getSource().setAddon_Files(null);
         if (getDecoded_Source_destination() == null)
             setDecoded_Source_destination(new Pie_Decode_Destination());
@@ -325,46 +295,18 @@ public class Pie_Decode {
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
                 getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
-                getDecoded_Source_destination().setSource_type(Pie_Source_Type.get(Integer.parseInt(parts[parm ++])));  // 1
-                setEncrypted(parts[parm++].equalsIgnoreCase("t"));                                                    // 2
-                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 3
+                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 1
 
-                String files = parts[parm ++];                                                                          // 4
+                String files = parts[parm ++];                                                                          // 2
                 if (!files.isEmpty()) {
                     if (files.contains("*"))
                         getSource().setAddon_Files(files.split("\\*", 0));
                     else
                         getSource().setAddon_Files(new String[]{files});
                 }
-
-                if (map_values) {
-                    setEncoded_values(new HashMap<>());
-                    getEncoded_values().put("total_files", getTotal_files());
-                    getEncoded_values().put("encrypted", getConfig().getEncryption() == null);
-                    getEncoded_values().put("source_type", getDecoded_Source_destination().getSource_type());
-                }
             }
 
         } catch (Exception ignored) {}
-    }
-
-    /** *********************************************************<br>
-     * Log how log it takes to encode
-     */
-    private void logTime() {
-        if (!getConfig().isShow_Timings_In_Logs())
-            return;
-
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - getStartTime();
-
-        long hours = elapsedTime / 3600000;
-        long minutes = (elapsedTime % 3600000) / 60000;
-        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
-        long milliseconds = elapsedTime % 1000;
-
-        getConfig().logging(Level.INFO,"Elapsed time: " + hours + " hours, " +
-                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds");
     }
 
     /** *******************************************************************<br>
@@ -374,40 +316,8 @@ public class Pie_Decode {
     private void setConfig(Pie_Config config) {
         this.config = config;
     }
-    public Pie_Config getConfig() {
+    private Pie_Config getConfig() {
         return config;
-    }
-
-    private String getDecoded_Message() {
-        return decoded_Message;
-    }
-
-    private void setDecoded_Message(String decoded_Message) {
-        this.decoded_Message = decoded_Message;
-    }
-
-    private ByteArrayOutputStream getDecoded_bytes() {
-        return decoded_bytes;
-    }
-
-    private void setDecoded_bytes(ByteArrayOutputStream decoded_bytes) {
-        this.decoded_bytes = decoded_bytes;
-    }
-
-    private Pie_Utils getUtils() {
-        return utils;
-    }
-
-    private void setUtils(Pie_Utils utils) {
-        this.utils = utils;
-    }
-
-    private long getMemory_Start() {
-        return memory_Start;
-    }
-
-    private void setMemory_Start(long memory_Start) {
-        this.memory_Start = memory_Start;
     }
 
     private Pie_Decode_Destination getDecoded_Source_destination() {
@@ -426,14 +336,6 @@ public class Pie_Decode {
         this.source = source;
     }
 
-    private boolean isDecoding_process_started() {
-        return decoding_process_started;
-    }
-
-    private void setDecoding_process_started(boolean decoding_process_started) {
-        this.decoding_process_started = decoding_process_started;
-    }
-
     private int getTotal_files() {
         return total_files;
     }
@@ -448,29 +350,5 @@ public class Pie_Decode {
 
     private void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
-    }
-
-    private Map<String, Object> getEncoded_values() {
-        return encoded_values;
-    }
-
-    private void setEncoded_values(Map<String, Object> encoded_values) {
-        this.encoded_values = encoded_values;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public boolean isEncrypted() {
-        return encrypted;
-    }
-
-    public void setEncrypted(boolean encrypted) {
-        this.encrypted = encrypted;
     }
 }
