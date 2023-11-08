@@ -6,8 +6,6 @@ import java.io.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.logging.Level;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
@@ -21,30 +19,6 @@ public class Pie_Utils {
         setConfig(config);
     }
 
-    /** *******************************************************<br>
-     * <b>compress</b><br>
-     * Main functon for compressing.<br>
-     * @param bytes (String)
-     **/
-    public byte[] compressBytes(byte[] bytes) {
-        if (bytes == null)
-            return null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
-        try {
-            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
-            OutputStream out = new DeflaterOutputStream(baos, compressor);
-            out.write(bytes);
-            out.close();
-        } catch (IOException e) {
-            getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
-            return bytes;
-        }
-        try {
-            baos.close();
-        } catch (IOException ignored) {  }
-
-        return baos.toByteArray();
-    }
     /** *******************************************************<br>
      * <b>decompress_return_Baos</b><br>
      * Main functon for decompressing.<br>
@@ -62,6 +36,9 @@ public class Pie_Utils {
             getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
             return bytes;
         }
+        try {
+            baos.close();
+        } catch (IOException ignored) { }
         return baos.toByteArray();
     }
 
@@ -72,14 +49,10 @@ public class Pie_Utils {
      * Simple function that gets the path to the desktop. Can be used when saving files.
      **/
     public static String getDesktopPath() {
-        FileSystemView view = FileSystemView.getFileSystemView();
-        File file = view.getHomeDirectory();
-        return file.getPath();
+        return FileSystemView.getFileSystemView().getHomeDirectory().getPath();
     }
     public static File getDesktop() {
-        FileSystemView view = FileSystemView.getFileSystemView();
-        File file = view.getHomeDirectory();
-        return file;
+        return FileSystemView.getFileSystemView().getHomeDirectory();
     }
     /** *****************************************************<br>
      * <b>Collects the amount of memory used</b><br>
@@ -92,9 +65,7 @@ public class Pie_Utils {
         if (!getConfig().isShow_Memory_Usage_In_Logs())
             return;
         getConfig().logging(Level.INFO,label + " Memory Used : " +
-                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory) +
-                " : Available : " + humanReadableBytes(runtime.maxMemory()) +
-                " : Total : " + humanReadableBytes(runtime.totalMemory())
+                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)
         );
     }
 /*

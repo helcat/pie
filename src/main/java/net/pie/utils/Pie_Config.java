@@ -27,6 +27,9 @@ public class Pie_Config {
     private boolean show_Timings_In_Logs = false;
     private Logger log = null;
 
+    private Pie_Encode_Source encoder_source = null;
+    private Pie_Encoded_Destination encoder_destination  = null;
+
     /** *******************************************************************<br>
      * Starts a default configuration and sets up logging settings.
      **/
@@ -377,6 +380,41 @@ public class Pie_Config {
         return getEncoder_Maximum_Image() != null &&
                 getEncoder_Maximum_Image().getHeight() != 0 &&
                 getEncoder_Maximum_Image().getWidth() != 0;
+    }
+
+    /** ******************************************************************<br>
+     * Source for file or text to be encoded.
+     * @return Pie_Encode_Source
+     * @see Pie_Encode_Source
+     */
+    public Pie_Encode_Source getEncoder_source() {
+        return encoder_source;
+    }
+
+    /** ******************************************************************<br>
+     * Set the Source for file or text to be encoded.
+     * @param encoder_source (Pie_Encode_Source)
+     * @see Pie_Encode_Source
+     */
+    public void setEncoder_source(Pie_Encode_Source encoder_source) {
+        this.encoder_source = encoder_source;
+    }
+
+    /** ******************************************************************<br>
+     * get the file or destination, where to send the final file.
+     * @see Pie_Encoded_Destination
+     */
+    public Pie_Encoded_Destination getEncoder_destination() {
+        return encoder_destination;
+    }
+
+    /** ******************************************************************<br>
+     * Set where the file will be sent or saved to
+     * @param encoder_destination (Pie_Encoded_Destination)
+     * @see Pie_Encoded_Destination
+     */
+    public void setEncoder_destination(Pie_Encoded_Destination encoder_destination) {
+        this.encoder_destination = encoder_destination;
     }
 
     /** ******************************************************************<br>

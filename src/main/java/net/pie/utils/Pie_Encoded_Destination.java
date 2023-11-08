@@ -20,7 +20,6 @@ import java.util.logging.Level;
 public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
-    private Pie_Config config = null;
     private String encoding_id = UUID.randomUUID().toString();
 
     /** *******************************************************************<br>
@@ -42,33 +41,31 @@ public class Pie_Encoded_Destination {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image(BufferedImage image, Pie_Utils utils, int file_number, int total_files, String source_filename) {
-        if (getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
-            getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
-            if (getConfig().getEncoder_storage().getFos() == null)
-                if (!getConfig().getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
-                    getConfig().logging(Level.SEVERE, "Unable to create zip flie for additional files ");
+    public boolean save_Encoded_Image(Pie_Config config, BufferedImage image, int file_number, int total_files, String source_filename) {
+        if (config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+            config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
+            if (config.getEncoder_storage().getFos() == null)
+                if (!config.getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(config, getZip_File_Name(source_filename)))) {
+                    config.logging(Level.SEVERE, "Unable to create zip flie for additional files ");
                     return false;
                 }
 
-            return getConfig().getEncoder_storage().addZipEntry(create_File_Name(file_number, source_filename), image);
+            return config.getEncoder_storage().addZipEntry(create_File_Name(config, file_number, source_filename), image);
         }else {
             // Single Files Only Or Beginning of Zip
-            File toFile = addFileNumber(file_number, source_filename);
-            if (toFile != null) {
-                if (toFile.exists() && !getConfig().isEncoder_overwrite_file()) {
-                    getConfig().logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
-                    return false;
-                }
+            File toFile = addFileNumber(config, file_number, source_filename);
+            if (toFile.exists() && !config.isEncoder_overwrite_file()) {
+                config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
+                return false;
+            }
 
-                try {
-                    return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            try {
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
+            } catch (IOException e) {
+                config.logging(Level.SEVERE, "Unable to write encoded image " + e.getMessage());
+                return false;
             }
         }
-        return false;
     }
 
     /** *******************************************************************<br>
@@ -77,7 +74,7 @@ public class Pie_Encoded_Destination {
      * @param source_filename (String)
      * @return String
      */
-    public String create_File_Name(int file_number, String source_filename) {
+    public String create_File_Name(Pie_Config config, int file_number, String source_filename) {
         String name = getLocal_file().isDirectory() ? source_filename : getLocal_file().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
@@ -88,14 +85,14 @@ public class Pie_Encoded_Destination {
             name = name + "_" + file_number;
         name = name + "." + Pie_Constants.IMAGE_TYPE.getParm2();
 
-        if (getConfig().getEncoder_storage() == null || getConfig().getEncoder_storage() != null &&
-            getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.AS_IS)) {
+        if (config.getEncoder_storage() == null || config.getEncoder_storage() != null &&
+            config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.AS_IS)) {
             return name;
         }else{
-            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM)) {
+            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM)) {
                 return getEncoding_id() + "_" + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
             }
-            if (getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER)) {
+            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER)) {
                 return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
             }
         }
@@ -107,8 +104,8 @@ public class Pie_Encoded_Destination {
      * @param file_number (int)
      * @param source_filename (String)
      */
-    private File addFileNumber(int file_number, String source_filename) {
-        String name = create_File_Name(file_number, source_filename);
+    private File addFileNumber(Pie_Config config, int file_number, String source_filename) {
+        String name = create_File_Name(config, file_number, source_filename);
         File file = new File(
             getLocal_file().isDirectory() ?
             getLocal_file().getAbsolutePath() + File.separator + name
@@ -116,7 +113,7 @@ public class Pie_Encoded_Destination {
             getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
-            getConfig().logging(Level.WARNING,"File Exists : " + file.getName() + (getConfig().isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+            config.logging(Level.WARNING,"File Exists : " + file.getName() + (config.isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
 
         return file;
     }
@@ -138,7 +135,7 @@ public class Pie_Encoded_Destination {
      * Create Zip file
      * @param name (int)
      */
-    private File create_Zip_File(String name) {
+    private File create_Zip_File(Pie_Config config, String name) {
         File file = new File(
                 getLocal_file().isDirectory() ?
                         getLocal_file().getAbsolutePath() + File.separator + name
@@ -146,7 +143,7 @@ public class Pie_Encoded_Destination {
                         getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
-            getConfig().logging(Level.WARNING,"File Exists : " + file.getName() + (getConfig().isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+            config.logging(Level.WARNING,"File Exists : " + file.getName() + (config.isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
 
         return file;
     }
@@ -178,14 +175,6 @@ public class Pie_Encoded_Destination {
 
     public void setWeb_address(URL web_address) {
         this.web_address = web_address;
-    }
-
-    public Pie_Config getConfig() {
-        return config;
-    }
-
-    public void setConfig(Pie_Config config) {
-        this.config = config;
     }
 
     public String getEncoding_id() {

@@ -11,83 +11,54 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 public class Pie_Encode {
     private Pie_Config config;
-    private Pie_Encode_Source source;
-    private Pie_Encoded_Destination destination;
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
      * Encode a file or text from Pie_Source using options from Pie_Config<br>
-     * @param source (Send in a Pie_Source object)
-     * @param encoded_destination (Pie_Encoded_Destination)
-     * @see Pie_Encode_Source Pie_Source to load in the content.
-     * @see Pie_Encoded_Destination Destination of the encoded file
+     * Send in Pie_Config.<br>
+     * @param config (Pie_Config)
+     * @see Pie_Config
      **/
-    public Pie_Encode(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
-        processing(source, encoded_destination);
+
+    public Pie_Encode (Pie_Config config) {
+        if (config == null || config.getEncoder_source() == null || config.getEncoder_source().getInput() == null)
+            return;
+
+        setConfig(config);
+
+        if (getConfig().getEncoder_destination() == null)
+            getConfig().setEncoder_destination(new Pie_Encoded_Destination());
+
+        processing();
     }
 
-    /** ******************************************************<br>
-     * <b>Pie_Encode</b><br>
-     * Encode a file or text from Pie_Source using options from Pie_Config<br>
-     * A default Pie_Encoded_Destination will be created and the file will be available as a byte array.<br>
-     * To get the array use "getDestination().getBytes()"<br>
-     * @param source (Send in a Pie_Source object)
-     * @see Pie_Encode_Source Pie_Source to load in the content.
-     **/
-    public Pie_Encode(Pie_Encode_Source source) {
-        Pie_Encoded_Destination encoded_destination = new Pie_Encoded_Destination();
-        encoded_destination.setConfig(source.getConfig());
-        processing(source, encoded_destination);
-    }
-
-    private void processing(Pie_Encode_Source source, Pie_Encoded_Destination encoded_destination) {
+    private void processing() {
         long startTime = System.currentTimeMillis();
         ImageIO.setUseCache(false);
-        setSource(source);
-        setDestination(encoded_destination);
 
-        if (getSource().getConfig() == null) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED : Missing Configuration");
-            getSource().close();
-            return;
-        }
-
-        setConfig(source.getConfig());
         Pie_Utils utils = new Pie_Utils(getConfig());
         long memory_Start = utils.getMemory();
 
-        if (getSource() == null ||
-                getSource().getType().equals(Pie_Source_Type.NONE)  ||
-                getSource().getInput() == null) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED : Nothing to encode");
-            return;
-        }
-
-        if (getSource().getInitial_source_size() == 0) {
+        if (getConfig().getEncoder_source().getSource_size() == 0) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
-            getSource().close();
+            close();
             return;
         }
-
-        if (getDestination() == null) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED : No Destination set.");
-            getSource().close();
-            return;
-        }
-        getDestination().setConfig(getConfig());
 
         int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
-        if (bufferSize > getSource().getInitial_source_size())
-            bufferSize = getSource().getInitial_source_size();
+        if (bufferSize > getConfig().getEncoder_source().getSource_size())
+            bufferSize = getConfig().getEncoder_source().getSource_size();
 
-        int files_to_be_created = Math.toIntExact(getSource().getInitial_source_size() / bufferSize);
-        files_to_be_created = files_to_be_created + (getSource().getInitial_source_size() % bufferSize > 0  ? 1 :0);
+        int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
+        files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
 
         try {
-            InputStream fis = getSource().getInput();
+            InputStream fis = getConfig().getEncoder_source().getInput();
             byte[] buffer = new byte[bufferSize];
             int bytesRead;
             ByteArrayOutputStream outputStream = null;
@@ -95,7 +66,7 @@ public class Pie_Encode {
             int file_count = 1;
             while ((bytesRead = fis.read(buffer)) != -1) {
                 if (getConfig().isError()) {
-                    getSource().close();
+                    close();
                     return;
                 }
 
@@ -103,7 +74,7 @@ public class Pie_Encode {
                 outputStream.write(buffer, 0, bytesRead);
 
                 outputStream.close();
-                encode(utils, outputStream.toByteArray(), file_count, files_to_be_created);
+                encode(outputStream.toByteArray(), file_count, files_to_be_created);
                 file_count++;
             }
 
@@ -113,7 +84,7 @@ public class Pie_Encode {
 
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
-            getSource().close();
+            close();
             return;
         }
 
@@ -125,7 +96,7 @@ public class Pie_Encode {
         if (!time_diff.isEmpty())
             getConfig().logging(Level.INFO, time_diff);
 
-        getSource().close();
+        close();
         if (getConfig().isRun_gc_after()) System.gc();
     }
 
@@ -138,8 +109,7 @@ public class Pie_Encode {
      * @param file_number int
      * @param total_files int
      */
-
-    public void encode(Pie_Utils utils, byte[] originalArray, int file_number, int total_files) {
+    public void encode(byte[] originalArray, int file_number, int total_files) {
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;
@@ -179,14 +149,25 @@ public class Pie_Encode {
                 return;
             }
 
-            originalArray = utils.compressBytes(originalArray);
-
-            if (originalArray == null) {
-                getConfig().logging(Level.SEVERE,"Compression Error");
+            // Compress
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(originalArray.length);
+            try {
+                Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+                OutputStream out = new DeflaterOutputStream(baos, compressor);
+                out.write(originalArray);
+                out.close();
+            } catch (IOException e) {
+                getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
                 return;
             }
+            try {
+                baos.close();
+            } catch (IOException ignored) {  }
 
-            originalArray = Base64.getEncoder().encode (originalArray);
+            // Base 64
+            originalArray = Base64.getEncoder().encode (baos.toByteArray());
+            baos = null;
+
         }catch (Exception e) {
             getConfig().logging(Level.SEVERE,"Error " + e.getMessage());
             return;
@@ -232,10 +213,36 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getDestination().save_Encoded_Image(buffImg != null ? buffImg : data_image, utils, file_number, total_files, getSource().getFile_name()))
+        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), buffImg != null ? buffImg : data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name()))
             getConfig().logging(Level.SEVERE,"Encoding image was not saved");
+
         data_image = null;
         buffImg = null;
+    }
+
+    /** ******************************************************<br>
+     * compressBytes
+     * @param bytes (byte[])
+     * @return (byte[])
+     */
+    private byte[] compressBytes(byte[] bytes) {
+        if (bytes == null)
+            return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+        try {
+            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException e) {
+            getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
+            return bytes;
+        }
+        try {
+            baos.close();
+        } catch (IOException ignored) {  }
+
+        return baos.toByteArray();
     }
 
     /** ******************************************************<br>
@@ -359,7 +366,7 @@ public class Pie_Encode {
      * @param length (int)
      * @return Pie_Size
      */
-    public Pie_Size calculate_image_Mode(int length) {
+    private Pie_Size calculate_image_Mode(int length) {
         Pie_Size image_size = null;
         if (getConfig().getEncoder_mode().getParm1().length() == 4)
             return calculate_image_Size(length, getConfig().getEncoder_mode());
@@ -395,7 +402,7 @@ public class Pie_Encode {
      * @param mode (Pie_Encode_Mode)
      * @return Pie_Size
      */
-    public Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
+    private Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
         Pie_Size image_size = getPieSize((double) length, mode);
 
         if (getConfig().hasEncoder_Maximum_Image()) {
@@ -455,12 +462,12 @@ public class Pie_Encode {
             for (int i = 2; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");
-                addon_files.append(getDestination().create_File_Name(i, getSource().getFile_name()));
+                addon_files.append(getConfig().getEncoder_destination().create_File_Name(getConfig(), i, getConfig().getEncoder_source().getFile_name()));
             }
         }
 
         String addon =
-            (getSource().getFile_name() != null && !getSource().getFile_name().isEmpty() ? getSource().getFile_name() : "") +   // 0 Source Name
+            (getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "") +   // 0 Source Name
             "?" +
             total_files +                                                                                                       // 1 Number of Files
             "?" +
@@ -468,7 +475,17 @@ public class Pie_Encode {
             "?"
             ;
 
-        return  addon.getBytes(StandardCharsets.UTF_8) ;
+        return addon.getBytes(StandardCharsets.UTF_8) ;
+    }
+
+    /** *******************************************************<br>
+     * Close the source input stream
+     */
+    private void close() {
+        try {
+            if (getConfig().getEncoder_source().getInput() != null)
+                getConfig().getEncoder_source().getInput().close();
+        } catch (IOException ignored) {}
     }
 
     private void setConfig(Pie_Config config) {
@@ -476,22 +493,6 @@ public class Pie_Encode {
     }
     private Pie_Config getConfig() {
         return config;
-    }
-
-    private Pie_Encode_Source getSource() {
-        return source;
-    }
-
-    private void setSource(Pie_Encode_Source source) {
-        this.source = source;
-    }
-
-    private Pie_Encoded_Destination getDestination() {
-        return destination;
-    }
-
-    private void setDestination(Pie_Encoded_Destination destination) {
-        this.destination = destination;
     }
 
 }
