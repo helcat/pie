@@ -1,6 +1,7 @@
 package net.pie;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Option;
 import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
@@ -89,9 +90,11 @@ public class Pie_Decode {
             System.gc();
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
 
-        String time_diff = utils.logTime(startTime);
-        if (!time_diff.isEmpty())
-            getConfig().logging(Level.INFO, time_diff);
+        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
+            String time_diff = utils.logTime(startTime);
+            if (!time_diff.isEmpty())
+                getConfig().logging(Level.INFO, time_diff);
+        }
 
         getSource().close();
     }

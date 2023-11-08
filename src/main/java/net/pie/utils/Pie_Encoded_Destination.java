@@ -1,6 +1,7 @@
 package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_ZIP_Name;
 import net.pie.enums.Pie_ZIP_Option;
 
@@ -54,7 +55,7 @@ public class Pie_Encoded_Destination {
         }else {
             // Single Files Only Or Beginning of Zip
             File toFile = addFileNumber(config, file_number, source_filename);
-            if (toFile.exists() && !config.isEncoder_overwrite_file()) {
+            if (toFile.exists() && !config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE)) {
                 config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
                 return false;
             }
@@ -105,6 +106,7 @@ public class Pie_Encoded_Destination {
      * @param source_filename (String)
      */
     private File addFileNumber(Pie_Config config, int file_number, String source_filename) {
+        boolean overwrite = config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE);
         String name = create_File_Name(config, file_number, source_filename);
         File file = new File(
             getLocal_file().isDirectory() ?
@@ -113,7 +115,7 @@ public class Pie_Encoded_Destination {
             getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
-            config.logging(Level.WARNING,"File Exists : " + file.getName() + (config.isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+            config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
 
         return file;
     }
@@ -136,6 +138,7 @@ public class Pie_Encoded_Destination {
      * @param name (int)
      */
     private File create_Zip_File(Pie_Config config, String name) {
+        boolean overwrite = config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE);
         File file = new File(
                 getLocal_file().isDirectory() ?
                         getLocal_file().getAbsolutePath() + File.separator + name
@@ -143,7 +146,7 @@ public class Pie_Encoded_Destination {
                         getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
-            config.logging(Level.WARNING,"File Exists : " + file.getName() + (config.isEncoder_overwrite_file() ? " (Overwriting File)" : ""));
+            config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
 
         return file;
     }

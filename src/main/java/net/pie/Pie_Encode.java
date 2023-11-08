@@ -24,11 +24,9 @@ public class Pie_Encode {
      * @param config (Pie_Config)
      * @see Pie_Config
      **/
-
     public Pie_Encode (Pie_Config config) {
         if (config == null || config.getEncoder_source() == null || config.getEncoder_source().getInput() == null)
             return;
-
         setConfig(config);
 
         if (getConfig().getEncoder_destination() == null)
@@ -92,9 +90,12 @@ public class Pie_Encode {
 
         getConfig().logging(Level.INFO,"Encoding : Complete");
         utils.usedMemory(memory_Start, "Encoding : ");
-        String time_diff = utils.logTime(startTime);
-        if (!time_diff.isEmpty())
-            getConfig().logging(Level.INFO, time_diff);
+        
+        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
+            String time_diff = utils.logTime(startTime);
+            if (!time_diff.isEmpty())
+                getConfig().logging(Level.INFO, time_diff);
+        }
 
         close();
         if (getConfig().isRun_gc_after()) System.gc();
@@ -109,7 +110,7 @@ public class Pie_Encode {
      * @param file_number int
      * @param total_files int
      */
-    public void encode(byte[] originalArray, int file_number, int total_files) {
+    private void encode(byte[] originalArray, int file_number, int total_files) {
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;

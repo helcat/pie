@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "The Fall Guy S00E01.mkv";
-    private String temp_Encoded_Image = "The Fall Guy S00E01.mkv";
+    private String temp_To_Be_Encoded = "coreprint.png";
+    private String temp_Encoded_Image = "coreprint.png";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -28,14 +28,15 @@ public class Pie_Test_Encode {
     public Pie_Test_Encode(String arg) {
 
         // Build a config file for encoding.
-        Pie_Config encoding_config = new Pie_Config();
+        Pie_Config encoding_config = new Pie_Config(
+                Pie_Option.ENC_OVERWRITE_FILE,
+                Pie_Option.SHOW_PROCESSING_TIME
+        );
         encoding_config.setLog_level(Level.INFO);                                                                   // Optional default is Level.SEVERE
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
         encoding_config.setEncoder_mode(Pie_Encode_Mode.ENCODE_MODE_ARGB);                                          // Optional default is Pie_Encode_Mode.ENCODE_MODE_ARGB
         encoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
-        encoding_config.setShow_Timings_In_Logs(true);                                                             // Optional default is false
         encoding_config.setRun_gc_after(true);                                                                      // Optional default is false
-        encoding_config.setEncoder_overwrite_file(true);
 
         //Pie_Encryption encryption = new Pie_Encryption("this a a temp1 2st art gfh fgf again");
         Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));

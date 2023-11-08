@@ -31,8 +31,7 @@ public class Pie_Test_Decode {
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config();
         decoding_config.setLog_level(Level.INFO);
-        decoding_config.setShow_Memory_Usage_In_Logs(true);                                                        // Optional default is false
-        decoding_config.setShow_Timings_In_Logs(true);
+        decoding_config.setShow_Memory_Usage_In_Logs(true);
 
         //Pie_Encryption encryption = new Pie_Encryption("thdis a a temp1 2st art gfh fgf again");
         Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));

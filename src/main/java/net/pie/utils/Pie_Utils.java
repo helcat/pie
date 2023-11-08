@@ -120,9 +120,6 @@ public class Pie_Utils {
      * @param startTime (long)
      */
     public String logTime(long startTime) {
-        if (!getConfig().isShow_Timings_In_Logs())
-            return "";
-
         long endTime = System.currentTimeMillis();
         long elapsedTime = endTime - startTime;
         long hours = elapsedTime / 3600000;

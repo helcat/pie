@@ -1,6 +1,10 @@
 package net.pie.utils;
 
 import net.pie.enums.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.*;
 
@@ -10,11 +14,10 @@ import java.util.logging.*;
  * If not built or included, a new instance is automatically created with default settings when encoding or decoding.
  **/
 public class Pie_Config {
-
+    private List<Pie_Option> options = new ArrayList<>();
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
-    private boolean encoder_overwrite_file = true;
     private Pie_Zip encoder_storage = new Pie_Zip();
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
@@ -24,7 +27,6 @@ public class Pie_Config {
     private boolean error = false;
     private ConsoleHandler customHandler = null;
     private boolean show_Memory_Usage_In_Logs = false;
-    private boolean show_Timings_In_Logs = false;
     private Logger log = null;
 
     private Pie_Encode_Source encoder_source = null;
@@ -33,7 +35,14 @@ public class Pie_Config {
     /** *******************************************************************<br>
      * Starts a default configuration and sets up logging settings.
      **/
-    public Pie_Config() {
+    public Pie_Config(Object... options) {
+        setOptions(new ArrayList<>());
+        if (options != null) {
+            for (Object o : options) {
+                if (o != null && o instanceof Pie_Option)
+                    getOptions().add((Pie_Option) o);
+            }
+        }
         setUpLogging();
     }
 
@@ -280,38 +289,6 @@ public class Pie_Config {
     }
 
     /** ***************************************************************<br>
-     * Show Timings In Logs, Used internally.
-     * @return boolean
-     */
-    public boolean isShow_Timings_In_Logs() {
-        return show_Timings_In_Logs;
-    }
-
-    /** ***************************************************************<br>
-     * Set Show_Timings_In_Logs, Set by user.
-     * @param show_Timings_In_Logs boolean
-     */
-    public void setShow_Timings_In_Logs(boolean show_Timings_In_Logs) {
-        this.show_Timings_In_Logs = show_Timings_In_Logs;
-    }
-
-    /** ***************************************************************<br>
-     * Encoder overwrite file, Used internally.
-     * @return boolean
-     */
-    public boolean isEncoder_overwrite_file() {
-        return encoder_overwrite_file;
-    }
-
-    /** ***************************************************************<br>
-     * Allows created encoded files with the same name to be overwritten. Default is true. Set by user.
-     * @param encoder_overwrite_file (boolean)
-     */
-    public void setEncoder_overwrite_file(boolean encoder_overwrite_file) {
-        this.encoder_overwrite_file = encoder_overwrite_file;
-    }
-
-    /** ***************************************************************<br>
      * <b>setEncoder_mode</b><br>
      * Encode mode allows for different encodings to be put on to the image.<br>
      * ENCODE_MODE_ARGB. is the default. Smaller images. The size of the image can increase depending on the mode selected.
@@ -415,6 +392,14 @@ public class Pie_Config {
      */
     public void setEncoder_destination(Pie_Encoded_Destination encoder_destination) {
         this.encoder_destination = encoder_destination;
+    }
+
+    public List<Pie_Option> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<Pie_Option> options) {
+        this.options = options;
     }
 
     /** ******************************************************************<br>
