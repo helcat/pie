@@ -62,9 +62,6 @@ public class Pie_Decode {
         if (getConfig().isError())
             return;
 
-        if (getConfig().getLog() == null)
-            getConfig().setUpLogging();
-
         int processing_file = 0;
         ByteArrayOutputStream  message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
@@ -74,7 +71,7 @@ public class Pie_Decode {
                 processing_file++;
                 if (processing_file < getTotal_files()) {
                     utils.usedMemory(memory_Start, "Decoding : ");
-                    if (getConfig().isRun_gc_after())
+                    if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
                         System.gc();
                     message = start_Decode(utils, collectImage(processing_file));
                     if (message == null)
@@ -86,7 +83,7 @@ public class Pie_Decode {
         }
 
         utils.usedMemory(memory_Start, "Decoding : ");
-        if (getConfig().isRun_gc_after())
+        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
             System.gc();
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
 

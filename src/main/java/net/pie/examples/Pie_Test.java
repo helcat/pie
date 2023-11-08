@@ -34,10 +34,8 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        Pie_Config config = new Pie_Config();
-        config.setLog_level(Level.INFO);
         Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
-        encryption.create_Certificate_File(config, Pie_Utils.getDesktop(), "pie_certificate");
+        encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
 
         /**
         Pie_Encryption encryption =

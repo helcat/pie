@@ -4,10 +4,14 @@ package net.pie.enums;
  * <b>Pie Option</b><br>
  * Settings for encoding and Decoding.<br>
  * ENC_OVERWRITE_FILE : Allows created encoded files with the same name to be overwritten.<br>
- * SHOW_PROCESSING_TIME : Show the amount of time taken to process the file or Object
+ * RUN_GC_AFTER_PROCESSING : Run garbage collection after processing<br>
+ * SHOW_MEMORY_USAGE : Show memory usage in logs when available<br>
+ * SHOW_PROCESSING_TIME : Show the amount of time taken to process the file or Object, in logs<br
  **/
 public enum Pie_Option {
     ENC_OVERWRITE_FILE,
+    RUN_GC_AFTER_PROCESSING,
+    SHOW_MEMORY_USAGE,
     SHOW_PROCESSING_TIME
     ;
 

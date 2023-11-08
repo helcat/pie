@@ -1,5 +1,7 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Option;
+
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -62,7 +64,7 @@ public class Pie_Utils {
         return runtime.totalMemory() - runtime.freeMemory();
     }
     public void usedMemory(long previous_Menory, String label) {
-        if (!getConfig().isShow_Memory_Usage_In_Logs())
+        if (!getConfig().getOptions().contains(Pie_Option.SHOW_MEMORY_USAGE))
             return;
         getConfig().logging(Level.INFO,label + " Memory Used : " +
                 humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)

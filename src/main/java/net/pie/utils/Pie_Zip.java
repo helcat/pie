@@ -14,21 +14,12 @@ public class Pie_Zip {
     private ZipFile zip = null;
     private Pie_ZIP_Name internal_name_format = Pie_ZIP_Name.AS_IS;
     private Pie_ZIP_Option option = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
-    private String zip_comment = null;
 
     /** *******************************************************<br>
      * <b>Pie_ZIP</b><br>
      * Allows for additional parameters to be set
      **/
     public Pie_Zip() {
-    }
-
-    public Pie_Zip(Pie_ZIP_Name internal_name_format) {
-        setInternal_name_format(internal_name_format);
-    }
-
-    public Pie_Zip(Pie_ZIP_Option option) {
-        setOption(option);
     }
 
     public Pie_Zip(Pie_ZIP_Name internal_name_format, Pie_ZIP_Option option) {
@@ -46,25 +37,23 @@ public class Pie_Zip {
                 setFos(new FileOutputStream(zipFilePath));
                 setZos(new ZipOutputStream(getFos()));
                 return true;
-            } catch (FileNotFoundException ignored) {
-            }
+            } catch (FileNotFoundException ignored) {  }
         }
         return false;
     }
 
-    /** *******************************************************************<br>
+    /**
+     * ******************************************************************<br>
      * create a zip in file for additional files
+     *
      * @param zipFilePath (Path to zip file)
      */
-    public boolean start_Zip_In_Stream(File zipFilePath) {
+    public void start_Zip_In_Stream(File zipFilePath) {
         if (getZip() == null) {
             try {
                 setZip(new ZipFile(zipFilePath));
-                return true;
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
-        return false;
     }
 
     /** *******************************************************************<br>
@@ -91,17 +80,9 @@ public class Pie_Zip {
      */
     boolean addZipEntry(String entryName, BufferedImage bi) {
         ZipEntry entry = new ZipEntry(entryName);
-        if (getZip_comment() != null)
-            entry.setComment(getZip_comment());
         try {
             getZos().putNextEntry(entry);
-
-            try {
-                ImageIO.write(bi, "png", getZos());
-            } catch (IOException e) {
-                return false;
-            }
-
+            ImageIO.write(bi, "png", getZos());
             getZos().closeEntry();
         } catch (IOException e) {
             return false;
@@ -154,14 +135,6 @@ public class Pie_Zip {
         if (option == null)
             option = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
         this.option = option;
-    }
-
-    private String getZip_comment() {
-        return zip_comment;
-    }
-
-    public void setZip_comment(String zip_comment) {
-        this.zip_comment = zip_comment;
     }
 
     private ZipOutputStream getZos() {

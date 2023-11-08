@@ -10,6 +10,7 @@ git push origin main
  */
 
 import net.pie.Pie_Decode;
+import net.pie.enums.Pie_Option;
 import net.pie.utils.*;
 
 import java.io.File;
@@ -29,13 +30,14 @@ public class Pie_Test_Decode {
     public Pie_Test_Decode() {
 
         // Decoding - Decode the image created
-        Pie_Config decoding_config = new Pie_Config();
-        decoding_config.setLog_level(Level.INFO);
-        decoding_config.setShow_Memory_Usage_In_Logs(true);
-
-        //Pie_Encryption encryption = new Pie_Encryption("thdis a a temp1 2st art gfh fgf again");
-        Pie_Encryption encryption = new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
-        decoding_config.setEncryption(encryption);
+        Pie_Config decoding_config = new Pie_Config(
+                Pie_Option.ENC_OVERWRITE_FILE,
+                Pie_Option.SHOW_PROCESSING_TIME,
+                Pie_Option.RUN_GC_AFTER_PROCESSING,
+                Pie_Option.SHOW_MEMORY_USAGE,
+                Level.INFO,
+                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"))
+        );
 
         // Tell the decoder where to store the decoded file
         Pie_Decode_Destination decoded_Source_destination = new Pie_Decode_Destination();

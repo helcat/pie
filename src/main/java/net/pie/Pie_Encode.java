@@ -98,7 +98,9 @@ public class Pie_Encode {
         }
 
         close();
-        if (getConfig().isRun_gc_after()) System.gc();
+
+        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
+            System.gc();
     }
 
     /** ******************************************************<br>

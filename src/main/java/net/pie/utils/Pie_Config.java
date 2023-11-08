@@ -18,44 +18,83 @@ public class Pie_Config {
     private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
-    private Pie_Zip encoder_storage = new Pie_Zip();
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_RGB;
+    private Pie_Zip encoder_storage = null;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private int max_encoded_image_mb = 200;
-    private boolean run_gc_after = false;           // run garbage collector when required.
     private Level log_level = Level.SEVERE;
     private boolean error = false;
-    private ConsoleHandler customHandler = null;
-    private boolean show_Memory_Usage_In_Logs = false;
     private Logger log = null;
-
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination  = null;
 
     /** *******************************************************************<br>
-     * Starts a default configuration and sets up logging settings.
+     * Starts a default configuration and sets up logging and options<br>
+     * Can include Pie_Option, Pie_Shape, Pie_Encode_Mode, Level, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encryption<br>
+     * Add parmeters in any order, or use an object list<br>
+     * The Default is Log level is Level.SEVERE<br>
+     * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
+     * @see Pie_Option
+     * @see Pie_Shape
+     * @see Pie_Encode_Mode
+     * @see Level
+     * @see Pie_ZIP_Option
+     * @see Pie_ZIP_Name
+     * @see Pie_Encryption
      **/
     public Pie_Config(Object... options) {
+        setup(options);
+    }
+    public Pie_Config(List<Object> options) {
+        setup(options.toArray());
+    }
+
+    private void setup(Object[] options) {
+        setUpLogging();
         setOptions(new ArrayList<>());
+        this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
+        this.log_level = Level.SEVERE;
+
         if (options != null) {
             for (Object o : options) {
-                if (o != null && o instanceof Pie_Option)
+                if (o instanceof Pie_Option && !getOptions().contains((Pie_Option) o))
                     getOptions().add((Pie_Option) o);
+
+                else if (o instanceof Pie_Shape)
+                    this.encoder_shape = (Pie_Shape) o;
+
+                else if (o instanceof Pie_Encode_Mode)
+                    this.encoder_mode =  (Pie_Encode_Mode) o;
+
+                else if (o instanceof Pie_ZIP_Option)
+                    this.encoder_storage.setOption((Pie_ZIP_Option) o);
+
+                else if (o instanceof Pie_ZIP_Name)
+                    this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o);
+
+                else if (o instanceof Pie_Encryption)
+                    this.encryption = ((Pie_Encryption) o);
+
+                else if (o instanceof Level) {
+                    this.log_level = (Level) o;
+                    getLog().setLevel(this.log_level);
+                }
             }
         }
-        setUpLogging();
+        if (this.log_level != null && this.log_level == Level.OFF)
+            exit_Logging();
     }
 
     /** *********************************************************<br>
      * Sets up the logging for this class with a random logger name.
      **/
-    public void setUpLogging() {
+    private void setUpLogging() {
         if (getLog() == null) {
             setLog(Logger.getLogger(UUID.randomUUID().toString()));
             getLog().setUseParentHandlers(false);
-            setCustomHandler(new ConsoleHandler());
-            getCustomHandler().setFormatter(new Pie_Logging_Format());
-            getLog().addHandler(getCustomHandler());
+            ConsoleHandler customHandler = new ConsoleHandler();
+            customHandler.setFormatter(new Pie_Logging_Format());
+            getLog().addHandler(customHandler);
             getLog().setLevel(getLog_level());
         }
     }
@@ -65,8 +104,8 @@ public class Pie_Config {
      * If logging is not required at all, then run this method after building the configuration
      **/
     public void exit_Logging() {
-        if (getLog() != null)
-            getLog().removeHandler(getCustomHandler());
+        if (getLog() != null && getLog().getHandlers().length > 0)
+            getLog().removeHandler(getLog().getHandlers()[0]);
         setLog(null);
     }
 
@@ -85,25 +124,6 @@ public class Pie_Config {
             return;
         getLog().log(level,  message);
 
-    }
-
-    /** ***************************************************************<br>
-     * <b>Set Logging Level</b><br>
-     * This can be set by the user via the configuration. Allowed values : The Default is Level.SEVERE<br>
-     * Level.OFF - (Turn off logging)<br>
-     * Level.FINEST<br>
-     * Level.FINER<br>
-     * Level.FINE<br>
-     * Level.CONFIG<br>
-     * Level.INFO<br>
-     * Level.WARNING<br>
-     * Level.SEVERE (Default)<br>
-     * @param log_level (Level)
-     */
-    public void setLog_level(Level log_level) {
-        this.log_level = (log_level == null ? Level.SEVERE : log_level);
-        if (getLog() != null)
-            getLog().setLevel(this.log_level);
     }
 
     /** ***************************************************************<br>
@@ -126,7 +146,7 @@ public class Pie_Config {
      * getLog_Level - For internal use.
      * @return Level
      */
-    public Level getLog_level() {
+    private Level getLog_level() {
         return log_level;
     }
 
@@ -137,34 +157,6 @@ public class Pie_Config {
      */
     public Pie_Encryption getEncryption() {
         return encryption;
-    }
-
-    /** ***************************************************************<br>
-     * Pie_Encryption set by the user
-     * @param encryption (Pie_Encryption)
-     * @see Pie_Encryption
-     */
-    public void setEncryption(Pie_Encryption encryption) {
-        this.encryption = encryption;
-        if (this.encryption != null)
-            this.encryption.setConfig(this);
-    }
-
-    /** ***************************************************************<br>
-     * isRun_gc_after - a garbage collection is processed after the process is finished if set to true.
-     * @return boolean
-     */
-    public boolean isRun_gc_after() {
-        return run_gc_after;
-    }
-
-    /** ***************************************************************<br>
-     * Run the garbage collector<br>
-     * When true, a garbage collection is processed after the process is finished, this should help with any memory issues.
-     * @param run_gc_after (boolean) Default is false.
-     */
-    public void setRun_gc_after(boolean run_gc_after) {
-        this.run_gc_after = run_gc_after;
     }
 
     /** ***************************************************************<br>
@@ -179,37 +171,14 @@ public class Pie_Config {
      * Logger used internally
      * @param log (Logger)
      */
-    public void setLog(Logger log) {
+    private void setLog(Logger log) {
         this.log = log;
-    }
-
-    /** ***************************************************************<br>
-     * getCustomHandler - collect the Custom Handler used internally
-     * @return ConsoleHandler
-     */
-    public ConsoleHandler getCustomHandler() {
-        return customHandler;
-    }
-
-    /** ***************************************************************<br>
-     * Set a ConsoleHandler used internally
-     * @param customHandler (ConsoleHandler)
-     */
-    public void setCustomHandler(ConsoleHandler customHandler) {
-        this.customHandler = customHandler;
-    }
-
-    /** ***************************************************************<br>
-     * Show Memory Usage, In Logging. Can be set by the user
-     * @return boolean
-     */
-    public boolean isShow_Memory_Usage_In_Logs() {
-        return show_Memory_Usage_In_Logs;
     }
 
     /** ***************************************************************<br>
      * Collects the Pie_Encode_Mode for the process.
      * @return Pie_Encode_Mode
+     * @see Pie_Encode_Mode
      */
     public Pie_Encode_Mode getEncoder_mode() {
         return encoder_mode;
@@ -233,18 +202,6 @@ public class Pie_Config {
     }
 
     /** ***************************************************************<br>
-     * Sets the shape of the encoded image, Can be set by the user.<br>
-     * Allowed Values<br>
-     * SHAPE_SQUARE<br>
-     * SHAPE_RECTANGLE (Default) <br>
-     * @param encoder_shape (Pie_Shape)
-     * @see Pie_Shape
-     */
-    public void setEncoder_shape(Pie_Shape encoder_shape) {
-        this.encoder_shape = (encoder_shape == null ? Pie_Shape.SHAPE_RECTANGLE : encoder_shape);
-    }
-
-    /** ***************************************************************<br>
      * Gets the shape of the final encoded image.
      * @return Pie_Shape
      * @see Pie_Shape
@@ -260,52 +217,6 @@ public class Pie_Config {
      */
     public Pie_Zip getEncoder_storage() {
         return encoder_storage;
-    }
-
-    /** ***************************************************************<br>
-     * Sets the storage type<br>
-     * Pie_Storage.ZIP_FILE will place all files into a zip file. (Default)<br>
-     * Pie_Storage.SINGLE_ENTRIES will create image files only.<br>
-     * Pie_Storage.ZIP_ON_SPLIT_FILE will create a zip file only when splitting the original file.
-     * @param encoder_storage (Pie_Storage)
-     * @see Pie_Storage
-     */
-    public void setEncoder_storage(Pie_Storage encoder_storage) {
-        if (encoder_storage == null || encoder_storage.equals(Pie_Storage.ZIP_FILE))
-            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.ALWAYS);
-        else if (encoder_storage.equals(Pie_Storage.SINGLE_FILES))
-            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.NEVER);
-        else if (encoder_storage.equals(Pie_Storage.ZIP_ON_SPLIT_FILE))
-            this.encoder_storage = new Pie_Zip(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
-    }
-
-    /** ***************************************************************<br>
-     * Sets the storage type using a Pie_Zip object<br>
-     * @param encoder_storage (Pie_Zip)
-     * @see Pie_Zip
-     */
-    public void setEncoder_storage(Pie_Zip encoder_storage) {
-        this.encoder_storage = encoder_storage;
-    }
-
-    /** ***************************************************************<br>
-     * <b>setEncoder_mode</b><br>
-     * Encode mode allows for different encodings to be put on to the image.<br>
-     * ENCODE_MODE_ARGB. is the default. Smaller images. The size of the image can increase depending on the mode selected.
-     * @param encoder_mode (Pie_Encode_Mode)
-     * @see Pie_Encode_Mode
-     */
-    public void setEncoder_mode(Pie_Encode_Mode encoder_mode) {
-        this.encoder_mode = encoder_mode;
-    }
-
-    /** ***************************************************************<br>
-     * setShow_Memory_Usage_In_Logs<br>
-     * This can slow down the process, depending on the environment. Only use this when required,
-     * @param show_Memory_Usage_In_Logs (boolean)
-     */
-    public void setShow_Memory_Usage_In_Logs(boolean show_Memory_Usage_In_Logs) {
-        this.show_Memory_Usage_In_Logs = show_Memory_Usage_In_Logs;
     }
 
     /** ***************************************************************<br>
@@ -394,11 +305,15 @@ public class Pie_Config {
         this.encoder_destination = encoder_destination;
     }
 
+    /** ******************************************************************<br>
+     * List of Pie_Option's
+     * @return (List)
+     */
     public List<Pie_Option> getOptions() {
         return options;
     }
 
-    public void setOptions(List<Pie_Option> options) {
+    private void setOptions(List<Pie_Option> options) {
         this.options = options;
     }
 
@@ -406,7 +321,7 @@ public class Pie_Config {
      * Pie_Logging_Format<br>
      * Used as a custom handler for logging.
      */
-    public static class Pie_Logging_Format extends Formatter {
+    private static class Pie_Logging_Format extends Formatter {
         @Override
         public String format(LogRecord record) {
             return record.getLevel() + ": " + record.getMessage() + "\n";

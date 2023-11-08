@@ -18,30 +18,42 @@ import java.util.logging.Level;
 
 public class Pie_Encryption {
     private String password = null;
-    private Pie_Config config = null;
-
     private SecretKey key = null;
 
     public Pie_Encryption() {
     }
 
-    public Pie_Encryption(String key) {
-        if (key != null && key.length() > 7)
-            setPassword(key);
+    /** **************************************************<br>
+     * Start encryption with a password, must be more than 7 long.
+     * @param password
+     */
+    public Pie_Encryption(String password) {
+        if (password != null && password.length() > 7)
+            setPassword(password);
+        setKey(null);
     }
 
+    /** **************************************************<br>
+     * Start encryption with your own SecretKey.
+     * @param key
+     */
     public Pie_Encryption(SecretKey key) {
         setKey(key);
     }
 
-    public Pie_Encryption(File key) {
-        if (key == null || !key.isFile())
+    /** **************************************************<br>
+     * Start encryption with a created Certificate file
+     * @param certificate
+     */
+    public Pie_Encryption(File certificate) {
+        if (certificate == null || !certificate.isFile())
             return;
+        setKey(null);
 
         String line = null;
         String key_text = "";
         try {
-            FileReader fileReader = new FileReader(key);
+            FileReader fileReader = new FileReader(certificate);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while ((line = bufferedReader.readLine()) != null) {
                 key_text = key_text + line;
@@ -56,33 +68,19 @@ public class Pie_Encryption {
         if(bytes == null)
             return;
 
-        setKey(keyFromBytes(bytes));
+        setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
     }
 
     /** **************************************************<br>
-     * Convert Key to bytes
-     * @return Bytes
+     * Create a key
+     * @param config
      */
-    public byte[] keyToBytes() {
-        if (getKey() == null)
-            return null;
-        return getKey().getEncoded();
-    }
+    private void createKey(Pie_Config config) {
+        if (getKey() != null)
+            return; // reuse key
 
-    /** **************************************************<br>
-     * Create key from bytes
-     * @param keyBytes (bytes)
-     * @return (SecretKey)
-     */
-    public SecretKey keyFromBytes(byte[] keyBytes) {
-        if (keyBytes == null)
-            return null;
-        return new SecretKeySpec(keyBytes, 0, keyBytes.length, "AES");
-    }
-
-    public void createKey() {
         if (getPassword() != null && !getPassword().isEmpty() && getPassword().length() < 8) {
-            getConfig().logging(Level.WARNING, "Invalid Encryption Key");
+            config.logging(Level.WARNING, "Invalid Encryption Key");
             setKey(null);
             return;
         }
@@ -93,43 +91,56 @@ public class Pie_Encryption {
             SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
             setKey(key);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            getConfig().logging(Level.SEVERE, "Encryption Error " + e.getMessage());
+            config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
         }
     }
 
     /** **************************************************<br>
      * create Certificate File
-     * @param config (Pie_Config)
-     * @param folder (Save to folder)
-     * @param file_name (String)
+     * @param options (Pie_Config, folder (File - Save to folder), file_name (String)
      */
-    public void create_Certificate_File(Pie_Config config, File folder, String file_name) {
+    public void create_Certificate_File(Object... options) {
+        Pie_Config config = null;
+        File folder = null;
+        String file_name = null;
+
+        if (options == null)
+            return;
+
+        for (Object o : options) {
+            if (o instanceof Pie_Config)
+                config = (Pie_Config) o;
+            else if (o instanceof File)
+                folder = (File) o;
+            else if (o instanceof String)
+                file_name = (String) o;
+        }
+
         if (file_name == null || file_name.isEmpty())
             file_name = "pie_certificate";
 
-        setConfig(config);
-        if (getConfig() == null)
-            return;
+        if (config == null)
+            config = new Pie_Config();
 
         if (folder == null || !folder.isDirectory()) {
-            getConfig().logging(Level.SEVERE, "Invalid folder");
+            config.logging(Level.SEVERE, "Invalid folder");
             return;
         }
 
         if (getPassword() == null || getPassword().length() < 8) {
-            getConfig().logging(Level.SEVERE, "Invalid key must be 8 or more");
+            config.logging(Level.SEVERE, "Invalid key must be 8 or more");
             return;
         }
 
-        createKey();
+        createKey(config);
         if (getKey() == null) {
-            getConfig().logging(Level.SEVERE, "Unable to create certificate file");
+            config.logging(Level.SEVERE, "Unable to create certificate file");
             return;
         }
 
-        byte[] keyToBytes = keyToBytes();
+        byte[] keyToBytes = getKey().getEncoded();
         if (keyToBytes == null) {
-            getConfig().logging(Level.SEVERE, "Unable to create certificate file");
+            config.logging(Level.SEVERE, "Unable to create certificate file");
             return;
         }
 
@@ -138,7 +149,7 @@ public class Pie_Encryption {
         try {
             fw = new FileWriter(new File(folder + File.separator + file_name +".pie"));
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
+            config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
             return;
         }
         PrintWriter pw = new PrintWriter(fw);
@@ -147,10 +158,10 @@ public class Pie_Encryption {
         try {
             fw.close();
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
+            config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
             return;
         }
-        getConfig().logging(Level.INFO, "Certificate file created");
+        config.logging(Level.INFO, "Certificate file created");
     }
 
     /** **************************************************<br>
@@ -159,13 +170,12 @@ public class Pie_Encryption {
      * @return (byte[])
      */
     public byte[] encrypt(Pie_Config config, byte[] input) {
-        setConfig(config);
-        if (getConfig() == null)
-            return input;
+        if (config == null)
+            config = new Pie_Config();
 
         if (getKey() == null) {
             if (getPassword() != null && !getPassword().isEmpty())
-                createKey();
+                createKey(config);
             else
                 return input;
         }
@@ -195,7 +205,7 @@ public class Pie_Encryption {
             return combined;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchPaddingException |
                  IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            getConfig().logging(Level.SEVERE, "Encryption Error " + e.getMessage());
+            config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
             return null;
         }
     }
@@ -206,13 +216,12 @@ public class Pie_Encryption {
      * @return (byte[])
      */
     public byte[] decrypt(Pie_Config config, byte[] input) {
-        setConfig(config);
-        if (getConfig() == null)
-            return input;
+        if (config == null)
+            config = new Pie_Config();
 
         if (getKey() == null) {
             if (getPassword() != null && !getPassword().isEmpty())
-                createKey();
+                createKey(config);
             else
                 return input;
         }
@@ -231,14 +240,6 @@ public class Pie_Encryption {
                  NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
             return input;
         }
-    }
-
-    private Pie_Config getConfig() {
-        return config;
-    }
-
-    public void setConfig(Pie_Config config) {
-        this.config = config;
     }
 
     public SecretKey getKey() {
