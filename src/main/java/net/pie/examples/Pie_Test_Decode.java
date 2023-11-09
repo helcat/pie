@@ -35,6 +35,7 @@ public class Pie_Test_Decode {
                 Pie_Option.SHOW_PROCESSING_TIME,
                 Pie_Option.RUN_GC_AFTER_PROCESSING,
                 Pie_Option.SHOW_MEMORY_USAGE,
+                Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
                 Level.INFO,
                 new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"))
         );

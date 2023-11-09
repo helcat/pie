@@ -94,6 +94,9 @@ public class Pie_Decode {
         }
 
         getSource().close();
+
+        if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
+            getConfig().exit_Logging();
     }
 
     /** *********************************************************<br>

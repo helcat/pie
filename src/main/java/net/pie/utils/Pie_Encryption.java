@@ -24,56 +24,51 @@ public class Pie_Encryption {
     }
 
     /** **************************************************<br>
-     * Start encryption with a password, must be more than 7 long.
-     * @param password
+     * Start encryption
+     * @param parm (Object, can be SecretKey, File (Certificate generated from Pie) or password (must be more than 7 long)
      */
-    public Pie_Encryption(String password) {
-        if (password != null && password.length() > 7)
-            setPassword(password);
-        setKey(null);
-    }
-
-    /** **************************************************<br>
-     * Start encryption with your own SecretKey.
-     * @param key
-     */
-    public Pie_Encryption(SecretKey key) {
-        setKey(key);
-    }
-
-    /** **************************************************<br>
-     * Start encryption with a created Certificate file
-     * @param certificate
-     */
-    public Pie_Encryption(File certificate) {
-        if (certificate == null || !certificate.isFile())
-            return;
+    public Pie_Encryption(Object parm) {
+        setPassword(null);
         setKey(null);
 
-        String line = null;
-        String key_text = "";
-        try {
-            FileReader fileReader = new FileReader(certificate);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((line = bufferedReader.readLine()) != null) {
-                key_text = key_text + line;
+        if (parm instanceof SecretKey) {
+            setKey((SecretKey) parm);
+
+        } else if (parm instanceof File) {
+            if (!((File) parm).isFile())
+                return;
+
+            String line = null;
+            String key_text = "";
+            try {
+                FileReader fileReader = new FileReader(((File) parm));
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                while ((line = bufferedReader.readLine()) != null) {
+                    key_text = key_text + line;
+                }
+                bufferedReader.close();
+                fileReader.close();
+
+            } catch (IOException ex) {
+                return;
             }
-            bufferedReader.close();
-            fileReader.close();
+            byte[] bytes = Base64.getDecoder().decode(key_text);
+            if (bytes == null)
+                return;
 
-        } catch (IOException ex) {
-            return;
+            setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
+
+        } else if (parm instanceof String) {
+            if (((String) parm).length() > 7)
+                setPassword((String) parm);
         }
-        byte[] bytes = Base64.getDecoder().decode(key_text);
-        if(bytes == null)
-            return;
 
-        setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
     }
 
     /** **************************************************<br>
      * Create a key
-     * @param config
+     * @param config (Pie_Config)
+     * @see Pie_Config
      */
     private void createKey(Pie_Config config) {
         if (getKey() != null)
@@ -97,7 +92,7 @@ public class Pie_Encryption {
 
     /** **************************************************<br>
      * create Certificate File
-     * @param options (Pie_Config, folder (File - Save to folder), file_name (String)
+     * @param options (Pie_Config will be created if not entered, folder (File - Save to folder), file_name (String)
      */
     public void create_Certificate_File(Object... options) {
         Pie_Config config = null;

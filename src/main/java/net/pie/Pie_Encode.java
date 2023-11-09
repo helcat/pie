@@ -99,6 +99,9 @@ public class Pie_Encode {
 
         close();
 
+        if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
+            getConfig().exit_Logging();
+
         if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
             System.gc();
     }

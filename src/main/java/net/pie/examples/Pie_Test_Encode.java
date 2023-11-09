@@ -35,6 +35,7 @@ public class Pie_Test_Encode {
                 Pie_Option.SHOW_PROCESSING_TIME,
                 Pie_Option.RUN_GC_AFTER_PROCESSING,
                 Pie_Option.SHOW_MEMORY_USAGE,
+                Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
                 Pie_Shape.SHAPE_RECTANGLE,
                 Pie_Encode_Mode.ENCODE_MODE_ARGB,
                 Pie_ZIP_Name.AS_IS,
@@ -56,7 +57,5 @@ public class Pie_Test_Encode {
 
         // Do Encoding, Will create the image and put it in the destination
         new Pie_Encode(encoding_config);
-
-        encoding_config.exit_Logging();
     }
 }
