@@ -72,8 +72,14 @@ public class Pie_Config {
                 else if (o instanceof Pie_ZIP_Name)
                     this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o);
 
-                else if (o instanceof Pie_Encryption)
+                else if (o instanceof Pie_Encryption) {
                     this.encryption = ((Pie_Encryption) o);
+                    if (this.encryption.getError_code() != null) {
+                        logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
+                        setError(true);
+                        return;
+                    }
+                }
 
                 else if (o instanceof Level) {
                     this.log_level = (Level) o;

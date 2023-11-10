@@ -1,5 +1,7 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Constants;
+
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
@@ -19,6 +21,7 @@ import java.util.logging.Level;
 public class Pie_Encryption {
     private String password = null;
     private SecretKey key = null;
+    private Integer error_code = null;
 
     public Pie_Encryption() {
     }
@@ -30,13 +33,16 @@ public class Pie_Encryption {
     public Pie_Encryption(Object parm) {
         setPassword(null);
         setKey(null);
+        setError_code(null);
 
         if (parm instanceof SecretKey) {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File) {
-            if (!((File) parm).isFile())
+            if (!((File) parm).isFile()) {
+                setError_code(Pie_Constants.ERROR_CODE_1.ordinal());
                 return;
+            }
 
             String line = null;
             String key_text = "";
@@ -49,18 +55,23 @@ public class Pie_Encryption {
                 bufferedReader.close();
                 fileReader.close();
 
-            } catch (IOException ex) {
-                return;
-            }
-            byte[] bytes = Base64.getDecoder().decode(key_text);
-            if (bytes == null)
-                return;
+                byte[] bytes = Base64.getDecoder().decode(key_text);
+                if (bytes == null) {
+                    setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
+                    return;
+                }
 
-            setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
+                setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
+            } catch (IOException ex) {
+                setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
+            }
 
         } else if (parm instanceof String) {
-            if (((String) parm).length() > 7)
+            if (((String) parm).length() > 7) {
                 setPassword((String) parm);
+            }else{
+                setError_code(Pie_Constants.ERROR_CODE_3.ordinal());
+            }
         }
 
     }
@@ -75,7 +86,7 @@ public class Pie_Encryption {
             return; // reuse key
 
         if (getPassword() != null && !getPassword().isEmpty() && getPassword().length() < 8) {
-            config.logging(Level.WARNING, "Invalid Encryption Key");
+            config.logging(Level.WARNING, "Invalid Encryption Password");
             setKey(null);
             return;
         }
@@ -169,10 +180,15 @@ public class Pie_Encryption {
             config = new Pie_Config();
 
         if (getKey() == null) {
-            if (getPassword() != null && !getPassword().isEmpty())
+            if (getPassword() != null && !getPassword().isEmpty()) {
                 createKey(config);
-            else
+                if (getKey() == null) {
+                    config.logging(Level.WARNING, "Encryption Error - Cannot create key");
+                    return null;
+                }
+            } else {
                 return input;
+            }
         }
 
         if (getKey() == null)
@@ -251,6 +267,14 @@ public class Pie_Encryption {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getError_code() {
+        return error_code;
+    }
+
+    public void setError_code(Integer error_code) {
+        this.error_code = error_code;
     }
 }
 

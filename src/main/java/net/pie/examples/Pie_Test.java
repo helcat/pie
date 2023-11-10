@@ -14,13 +14,18 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.logging.Level;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 public class Pie_Test {
 
@@ -34,8 +39,23 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
-        encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < 10000; i++)
+            text.append("W");
+
+        FileWriter f = null;
+        try {
+            f = new FileWriter(new File(Pie_Utils.getDesktop() + File.separator + "test.txt"));
+            f.write(Arrays.toString(compress(text.toString().getBytes())));
+            //f.write(Arrays.toString(text.toString().getBytes()));
+            //f.write(String.valueOf(text));
+            f.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
+        //encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
 
         /**
         Pie_Encryption encryption =
@@ -112,7 +132,21 @@ public class Pie_Test {
         return cipher.doFinal(encryptedData);
     }
 
+    private byte[] compress(byte[] originalArray) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(originalArray.length);
+        try {
+            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(originalArray);
+            out.close();
+        } catch (IOException e) {
+        }
+        try {
+            baos.close();
+        } catch (IOException ignored) {  }
 
+        return baos.toByteArray();
+    }
 
     private void test_bytes() {
         byte[] bytes = new byte[256];

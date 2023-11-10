@@ -25,7 +25,7 @@ public class Pie_Encode {
      * @see Pie_Config
      **/
     public Pie_Encode (Pie_Config config) {
-        if (config == null || config.getEncoder_source() == null || config.getEncoder_source().getInput() == null)
+        if (config == null || config.getEncoder_source() == null || config.getEncoder_source().getInput() == null || config.isError())
             return;
         setConfig(config);
 
@@ -86,18 +86,13 @@ public class Pie_Encode {
             return;
         }
 
-        getConfig().getEncoder_storage().closeZip();    // If required
+        close();
 
         getConfig().logging(Level.INFO,"Encoding : Complete");
         utils.usedMemory(memory_Start, "Encoding : ");
-        
-        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
-            String time_diff = utils.logTime(startTime);
-            if (!time_diff.isEmpty())
-                getConfig().logging(Level.INFO, time_diff);
-        }
 
-        close();
+        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME))
+            getConfig().logging(Level.INFO, utils.logTime(startTime));
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
@@ -224,31 +219,6 @@ public class Pie_Encode {
 
         data_image = null;
         buffImg = null;
-    }
-
-    /** ******************************************************<br>
-     * compressBytes
-     * @param bytes (byte[])
-     * @return (byte[])
-     */
-    private byte[] compressBytes(byte[] bytes) {
-        if (bytes == null)
-            return null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
-        try {
-            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
-            OutputStream out = new DeflaterOutputStream(baos, compressor);
-            out.write(bytes);
-            out.close();
-        } catch (IOException e) {
-            getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
-            return bytes;
-        }
-        try {
-            baos.close();
-        } catch (IOException ignored) {  }
-
-        return baos.toByteArray();
     }
 
     /** ******************************************************<br>
@@ -488,6 +458,7 @@ public class Pie_Encode {
      * Close the source input stream
      */
     private void close() {
+        getConfig().getEncoder_storage().closeZip();    // If required
         try {
             if (getConfig().getEncoder_source().getInput() != null)
                 getConfig().getEncoder_source().getInput().close();

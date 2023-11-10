@@ -10,6 +10,9 @@ public enum Pie_Constants {
     PARM_SPLIT_TAG (0, "|"),
     PARM_START_TAG (0, ">"),
     IMAGE_TYPE (0, "png"),
+    ERROR_CODE_1 (1, "Encryption Certificate is not a file"),
+    ERROR_CODE_2 (2, "Unable to read Encryption Certificate"),
+    ERROR_CODE_3(3, "Invalid Encryption Password")
     ;
 
     public int parm1 = 0;
