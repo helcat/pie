@@ -49,9 +49,8 @@ public class Pie_Encryption {
             try {
                 FileReader fileReader = new FileReader(((File) parm));
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
-                while ((line = bufferedReader.readLine()) != null) {
+                while ((line = bufferedReader.readLine()) != null)
                     key_text = key_text + line;
-                }
                 bufferedReader.close();
                 fileReader.close();
 
@@ -198,13 +197,12 @@ public class Pie_Encryption {
         byte[] iv = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
-        IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
         // Create a key based on the password using a Key Derivation Function
         try {
             // Initialize the cipher with the key and IV
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, getKey(), ivSpec);
+            cipher.init(Cipher.ENCRYPT_MODE, getKey(), new IvParameterSpec(iv));
 
             // Perform the encryption
             byte[] encrypted = cipher.doFinal(input);

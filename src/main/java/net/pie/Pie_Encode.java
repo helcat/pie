@@ -48,45 +48,39 @@ public class Pie_Encode {
             return;
         }
 
-        int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
-        if (bufferSize > getConfig().getEncoder_source().getSource_size())
-            bufferSize = getConfig().getEncoder_source().getSource_size();
-
-        int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
-        files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
+        byte[] buffer = new byte[Math.min((getConfig().getMax_encoded_image_mb() * 1024 * 1024), getConfig().getEncoder_source().getSource_size())];
+        int files_to_be_created =  Math.toIntExact(getConfig().getEncoder_source().getSource_size() / buffer.length) +
+                (getConfig().getEncoder_source().getSource_size() % buffer.length > 0  ? 1 :0);
 
         try {
             InputStream fis = getConfig().getEncoder_source().getInput();
-            byte[] buffer = new byte[bufferSize];
-            int bytesRead;
-            ByteArrayOutputStream outputStream = null;
+            if (getConfig().isError())
+                return;
 
             int file_count = 1;
-            while ((bytesRead = fis.read(buffer)) != -1) {
+            while (fis.read(buffer) != -1) {
                 if (getConfig().isError()) {
                     close();
                     return;
                 }
 
-                outputStream = new ByteArrayOutputStream();
-                outputStream.write(buffer, 0, bytesRead);
-
-                outputStream.close();
-                encode(outputStream.toByteArray(), file_count, files_to_be_created);
+                encode(buffer, file_count, files_to_be_created);
                 file_count++;
             }
 
             fis.close();
             buffer = null;
-            bytesRead = 0;
 
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
-            close();
-            return;
         }
 
         close();
+
+        if (getConfig().isError()) {
+            getConfig().logging(Level.SEVERE,"Encoding FAILED");
+            return;
+        }
 
         getConfig().logging(Level.INFO,"Encoding : Complete");
         utils.usedMemory(memory_Start, "Encoding : ");
@@ -244,14 +238,11 @@ public class Pie_Encode {
      * @return BufferedImage
      */
     private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
-        int x =0, y = 0, count = 0, store_count = 0;
-        boolean hasAlpha = rbg.contains("A");
+        int x =0, y = 0, store_count = 0;
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
 
         int[] store = null;
-        Color new_color = null;
-
         for (int i : originalArray) {
             if (store == null)
                 store = new int[rbg.length()];
@@ -265,22 +256,7 @@ public class Pie_Encode {
             }
 
             store_count = 0;
-            count = 0;
-            new_color = hasAlpha ?
-                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0,
-                            rbg.contains("G") ? checker(store, count++, 0) : 0,
-                            rbg.contains("B") ? checker(store, count++, 0) : 0,
-                            checker(store, count++, 1)) :
-                    transparent ?
-                   new Color(
-                           rbg.contains("R") ? checker(store, count++, 0) : 0,
-                           rbg.contains("G") ? checker(store, count++, 0) : 0,
-                           rbg.contains("B") ? checker(store, count++, 0) : 0, 1) :
-                   new Color(rbg.contains("R") ? checker(store, count++, 0) : 0,
-                           rbg.contains("G") ? checker(store, count++, 0) : 0,
-                           rbg.contains("B") ? checker(store, count++, 0): 0);
-
-            data_image.setRGB(x++, y, new_color.getRGB());
+            data_image.setRGB(x++, y, buildColor(rbg, store, transparent).getRGB());
             store = null;
         }
 
@@ -290,17 +266,27 @@ public class Pie_Encode {
                 x = 0;
                 y++;
             }
-            count = 0;
-            data_image.setRGB(x, y,
-                    hasAlpha ?
-                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0, checker(store, count++,1)).getRGB() :
-                            transparent ?
-                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0, 1).getRGB() :
-                    new Color(rbg.contains("R") ? checker(store, count++, 0) : 0, rbg.contains("G") ? checker(store, count++, 0) : 0, rbg.contains("B") ? checker(store, count++, 0) : 0).getRGB());
+            data_image.setRGB(x, y, buildColor(rbg, store, transparent).getRGB());
         }
 
-        size = null; store = null; x =0; y = 0; count = 0; store_count = 0; // Save every byte of memory possible.
+        size = null; store = null; x =0; y = 0; store_count = 0; // Save every byte of memory possible.
         return data_image;
+    }
+
+    /** ******************************************************<br>
+     * build Color
+     * @param rbg (String)
+     * @param store (int[])
+     * @param transparent (boolean)
+     * @return (Color)
+     */
+    private Color buildColor(String rbg, int[] store, boolean transparent) {
+        int count = 0;
+        int r = rbg.contains("R") ? checker(store, count++, 0) :  0;
+        int g = rbg.contains("G") ? checker(store, count++, 0) :  0;
+        int b = rbg.contains("B") ? checker(store, count++, 0) :  0;
+        return  rbg.contains("A") ? new Color(r, g, b, checker(store, count++, 1)) :
+                transparent ? new Color( r, g, b, 1) : new Color(r, g, b);
     }
 
     /** ******************************************************<br>
@@ -316,18 +302,14 @@ public class Pie_Encode {
             switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
                 case TOP_LEFT :
                     return 0;
-
                 case BOTTOM_LEFT :
                     return 0;
-
                 case MIDDLE_LEFT :
                     return 0;
-
                 case TOP_RIGHT:
                 case BOTTOM_RIGHT :
                 case MIDDLE_RIGHT :
                     return dim - size;
-
                 case TOP_CENTER :
                 case BOTTOM_CENTER :
                 case MIDDLE_CENTER :
@@ -433,8 +415,12 @@ public class Pie_Encode {
      * @return String.
      */
     private byte[] encoding_addon(int total_files) {
+        boolean zip =
+            config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+            config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
+
         StringBuilder addon_files = new StringBuilder();
-        if (total_files > 1) {
+        if (!zip && total_files > 1) {
             for (int i = 2; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");

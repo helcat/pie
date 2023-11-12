@@ -220,7 +220,8 @@ public class Pie_Decode {
                     break;
 
                 for (int v : value)
-                    bytes.write((byte) v);
+                    if (v > 0 && v < 255)
+                        bytes.write((byte) v);
             }
         }
 
