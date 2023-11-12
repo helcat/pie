@@ -63,23 +63,30 @@ public class Pie_Decode {
             return;
 
         int processing_file = 0;
-        ByteArrayOutputStream  message = start_Decode(utils, collectImage(processing_file)); // First file decode.
+        byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
             setUpOutFile(getDecoded_Source_destination().getFile_name());
-            while (processing_file < getTotal_files()) {
-                save(message);
-                processing_file++;
-                if (processing_file < getTotal_files()) {
-                    utils.usedMemory(memory_Start, "Decoding : ");
-                    if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-                        System.gc();
-                    message = start_Decode(utils, collectImage(processing_file));
-                    if (message == null)
+            if (!getConfig().isError()) {
+                while (processing_file < getTotal_files()) {
+                    try {
+                        getOutputStream().write(message);
+                    } catch (IOException e) {
+                        getConfig().logging(Level.SEVERE, "Writing to stream error : " + e.getMessage());
                         break;
+                    }
+                    processing_file++;
+                    if (processing_file < getTotal_files()) {
+                        utils.usedMemory(memory_Start, "Decoding : ");
+                        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
+                            System.gc();
+                        message = start_Decode(utils, collectImage(processing_file));
+                        if (message == null)
+                            break;
+                    }
                 }
             }
             closeOutFile();
-            try {  if (message != null) message.close();   } catch (IOException ignored) { }
+            message = null;
         }
 
         utils.usedMemory(memory_Start, "Decoding : ");
@@ -102,7 +109,7 @@ public class Pie_Decode {
     /** *********************************************************<br>
      * Start Main Decodin
      */
-    private ByteArrayOutputStream start_Decode(Pie_Utils utils, BufferedImage buffimage) {
+    private byte[] start_Decode(Pie_Utils utils, BufferedImage buffimage) {
         if (buffimage == null)
             return null;
 
@@ -124,8 +131,7 @@ public class Pie_Decode {
         if (message == null)
             return null;
 
-        message = getConfig().getEncryption() != null ?
-                getConfig().getEncryption().decrypt(getConfig(), message) : message;
+        message = getConfig().getEncryption() != null ? getConfig().getEncryption().decrypt(getConfig(), message) : message;
         if (message == null)
             return null;
 
@@ -153,24 +159,17 @@ public class Pie_Decode {
         } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
             message = Arrays.copyOfRange(message, 1, message.length);
 
-        }else{
+        } else {
             getConfig().logging(Level.SEVERE, "Invalid Encoded File");
             return null;
         }
 
         if (message.length == 0) {
-                getConfig().logging(Level.SEVERE, "Decoding Error");
-                return null;
-        }
-
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try {
-            bytes.write(message);
-        } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Writing Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE, "Decoding Error");
             return null;
         }
-        return bytes;
+
+        return message;
     }
 
     /** *******************************************************************<br>
@@ -204,18 +203,13 @@ public class Pie_Decode {
      */
     private byte[] readImage(BufferedImage buffimage) {
         int pixelColor;
-        int[] value = new int[4];
+        int[] value = null;
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
-                value = new int[4];
                 pixelColor = buffimage.getRGB(x, y);
-                value[0] = (pixelColor >> 16) & 0xFF;
-                value[1] = (pixelColor >> 8) & 0xFF;
-                value[2] = pixelColor & 0xFF;
-                value[3] = (pixelColor >> 24) & 0xFF;
-
+                value = new int[]{(pixelColor >> 16) & 0xFF, (pixelColor >> 8) & 0xFF, pixelColor & 0xFF, (pixelColor >> 24) & 0xFF};
                 if (Arrays.stream(value).sum() == 0)
                     break;
 
@@ -262,26 +256,6 @@ public class Pie_Decode {
                 getOutputStream().close();
                 setOutputStream(null);
             }
-        } catch (IOException ignored) {  }
-    }
-
-      /** *******************************************************************<br>
-     * <b>save the decoded bytes for the client to decide what to do with them</b>
-     * @param bytes ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-     */
-    private void save(ByteArrayOutputStream bytes) {
-        if (getOutputStream() == null)
-            return;
-
-        try {
-            bytes.writeTo(outputStream);
-        } catch (IOException e) {
-            getConfig().logging(Level.SEVERE,"Writing to stream error : " + e.getMessage());
-        }
-
-        try {
-            bytes.close();
-            bytes = null;
         } catch (IOException ignored) {  }
     }
 

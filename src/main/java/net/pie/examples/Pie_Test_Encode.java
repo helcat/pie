@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "background.jpg";
-    private String temp_Encoded_Image = "background.jpg";
+    private String temp_To_Be_Encoded = "The Fall Guy S01E02.mkv";
+    private String temp_Encoded_Image = "The Fall Guy S01E02.mkv";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);

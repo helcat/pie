@@ -116,9 +116,9 @@ public class Pie_Encode {
             byte[] addon = encoding_addon(total_files);
             buffer = ByteBuffer.allocate(
                     Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
-                    addon.length +
-                    Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
-                    originalArray.length);
+                            addon.length +
+                            Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
+                            originalArray.length);
 
             buffer.put(Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
             buffer.put(addon);
@@ -127,7 +127,7 @@ public class Pie_Encode {
         }else{
             buffer = ByteBuffer.allocate(
                     Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8).length +
-                    originalArray.length);
+                            originalArray.length);
             buffer.put(Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8));
         }
 
@@ -137,7 +137,7 @@ public class Pie_Encode {
 
         try {
             originalArray = getConfig().getEncryption() != null ?
-                            getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
+                    getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
 
             if (originalArray == null) {
                 getConfig().logging(Level.SEVERE,"Encryption Error");
@@ -366,9 +366,9 @@ public class Pie_Encode {
         if (getConfig().hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
                 getConfig().logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
-                ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
-                " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
-                "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
+                        ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
+                        " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
+                        "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
                 return null;
             }
         }else{
@@ -416,8 +416,8 @@ public class Pie_Encode {
      */
     private byte[] encoding_addon(int total_files) {
         boolean zip =
-            config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
-            config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
+                config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+                        config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
 
         StringBuilder addon_files = new StringBuilder();
         if (!zip && total_files > 1) {
@@ -429,13 +429,13 @@ public class Pie_Encode {
         }
 
         String addon =
-            (getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "") +   // 0 Source Name
-            "?" +
-            total_files +                                                                                                       // 1 Number of Files
-            "?" +
-            addon_files +                                                                                                       // 2 File Names
-            "?"
-            ;
+                (getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "") +   // 0 Source Name
+                        "?" +
+                        total_files +                                                                                                       // 1 Number of Files
+                        "?" +
+                        addon_files +                                                                                                       // 2 File Names
+                        "?"
+                ;
 
         return addon.getBytes(StandardCharsets.UTF_8) ;
     }
