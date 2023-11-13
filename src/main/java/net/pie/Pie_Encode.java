@@ -48,31 +48,35 @@ public class Pie_Encode {
             return;
         }
 
-        byte[] buffer = new byte[Math.min((getConfig().getMax_encoded_image_mb() * 1024 * 1024), getConfig().getEncoder_source().getSource_size())];
-        int files_to_be_created =  Math.toIntExact(getConfig().getEncoder_source().getSource_size() / buffer.length) +
-                (getConfig().getEncoder_source().getSource_size() % buffer.length > 0  ? 1 :0);
+        int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
+        if (bufferSize > getConfig().getEncoder_source().getSource_size())
+            bufferSize = getConfig().getEncoder_source().getSource_size();
+
+        int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
+        files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
 
         try {
             InputStream fis = getConfig().getEncoder_source().getInput();
-            if (getConfig().isError())
-                return;
-
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
             int file_count = 1;
-            while (fis.read(buffer) != -1) {
+            while ((bytesRead = fis.read(buffer)) != -1) {
                 if (getConfig().isError()) {
                     close();
                     return;
                 }
-
-                encode(buffer, file_count, files_to_be_created);
+                encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created);
                 file_count++;
             }
 
             fis.close();
             buffer = null;
+            bytesRead = 0;
 
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
+            close();
+            return;
         }
 
         close();
@@ -417,10 +421,15 @@ public class Pie_Encode {
     private byte[] encoding_addon(int total_files) {
         boolean zip =
                 config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
-                        config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
+                config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
+
+        String filename = getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "";
 
         StringBuilder addon_files = new StringBuilder();
-        if (!zip && total_files > 1) {
+        if (zip)
+            addon_files.append(filename);
+
+        if (total_files > 1) {
             for (int i = 2; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");
@@ -429,12 +438,12 @@ public class Pie_Encode {
         }
 
         String addon =
-                (getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "") +   // 0 Source Name
-                        "?" +
-                        total_files +                                                                                                       // 1 Number of Files
-                        "?" +
-                        addon_files +                                                                                                       // 2 File Names
-                        "?"
+                filename +   // 0 Source Name
+                "?" +
+                total_files +                                                                                                       // 1 Number of Files
+                "?" +
+                addon_files +                                                                                                       // 2 File Names
+                "?"
                 ;
 
         return addon.getBytes(StandardCharsets.UTF_8) ;

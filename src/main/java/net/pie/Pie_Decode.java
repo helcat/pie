@@ -76,9 +76,6 @@ public class Pie_Decode {
                     }
                     processing_file++;
                     if (processing_file < getTotal_files()) {
-                        utils.usedMemory(memory_Start, "Decoding : ");
-                        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-                            System.gc();
                         message = start_Decode(utils, collectImage(processing_file));
                         if (message == null)
                             break;

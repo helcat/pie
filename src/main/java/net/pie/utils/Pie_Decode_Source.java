@@ -72,7 +72,7 @@ public class Pie_Decode_Source {
         close();
 
         if (isZipped()) {
-            setInput(getZip_Object().getNext_File());
+            setInput(getZip_Object().getNext_File(getAddon_Files()[processing_file]));
 
         }else if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No object detected to decode");
@@ -88,7 +88,7 @@ public class Pie_Decode_Source {
                         setZip_Object(new Pie_Zip());
                         getZip_Object().start_Zip_In_Stream((File) getDecode_object());
                     }
-                    setInput(getZip_Object().getNext_File());
+                    setInput(getZip_Object().getNext_File()); // Get first file.
 
                 }else if (getAddon_Files() == null || processing_file == 0) {
                     setInput(new FileInputStream((File) getDecode_object()));

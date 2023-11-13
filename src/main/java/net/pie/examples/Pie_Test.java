@@ -39,6 +39,10 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+        //for (int i = 0; i < 50; i++)
+            //System.out.println(((int) Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000));
+
+        /**
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < 10000; i++)
             text.append("W");
@@ -53,18 +57,19 @@ public class Pie_Test {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+         **/
 
-        //Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
-        //encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
-
+        Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
+        encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
         /**
+        Pie_Config config = new Pie_Config();
         Pie_Encryption encryption =
                 new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
         byte[] bytes = "this is a dsg £ g hhhhh gfd gtest".getBytes(StandardCharsets.UTF_8);
         bytes = encryption.encrypt(config, bytes);
         bytes = encryption.decrypt(config, bytes);
         System.out.println(new String(bytes, StandardCharsets.UTF_8));
-         **/
+        **/
 
         /**
         byte[] bytes = new byte[0];

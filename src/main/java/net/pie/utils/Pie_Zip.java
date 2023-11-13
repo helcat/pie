@@ -102,6 +102,20 @@ public class Pie_Zip {
         return null;
     }
 
+    /** *******************************************************************<br>
+     * getNext_File (Next File in Zip)
+     * @param filename (String)
+     * @return (InputStream)
+     */
+
+    public InputStream getNext_File(String filename) {
+        try {
+            ZipEntry entry = getZip().getEntry(filename);
+            return getZip().getInputStream(entry);
+        } catch (IOException ignored) { }
+        return null;
+    }
+
     public Pie_ZIP_Name getInternal_name_format() {
         return internal_name_format;
     }
