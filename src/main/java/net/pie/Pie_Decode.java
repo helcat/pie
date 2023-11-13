@@ -270,7 +270,7 @@ public class Pie_Decode {
             if (parms.lastIndexOf("?") != -1) {
                 String[] parts = parms.split("\\?", 0);
                 getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
-                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("[^\\d]", "")));            // 1
+                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("\\D", "")));                 // 1
 
                 String files = parts[parm ++];                                                                          // 2
                 if (!files.isEmpty()) {

@@ -23,9 +23,6 @@ public class Pie_Encryption {
     private SecretKey key = null;
     private Integer error_code = null;
 
-    public Pie_Encryption() {
-    }
-
     /** **************************************************<br>
      * Start encryption
      * @param parm (Object, can be SecretKey, File (Certificate generated from Pie) or password (must be more than 7 long)
@@ -45,16 +42,16 @@ public class Pie_Encryption {
             }
 
             String line = null;
-            String key_text = "";
+            StringBuilder key_text = new StringBuilder();
             try {
                 FileReader fileReader = new FileReader(((File) parm));
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 while ((line = bufferedReader.readLine()) != null)
-                    key_text = key_text + line;
+                    key_text.append(line);
                 bufferedReader.close();
                 fileReader.close();
 
-                byte[] bytes = Base64.getDecoder().decode(key_text);
+                byte[] bytes = Base64.getDecoder().decode(key_text.toString());
                 if (bytes == null) {
                     setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
                     return;
@@ -89,12 +86,9 @@ public class Pie_Encryption {
             setKey(null);
             return;
         }
-        SecretKeyFactory factory = null;
         try {
-            factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(getPassword().toCharArray(), new byte[16], 65536, 256);
-            SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-            setKey(key);
+            setKey(new SecretKeySpec(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(
+                    new PBEKeySpec(getPassword().toCharArray(), new byte[16], 65536, 256)).getEncoded(), "AES"));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
         }
@@ -149,7 +143,6 @@ public class Pie_Encryption {
             return;
         }
 
-        String str = new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8);
         FileWriter fw = null;
         try {
             fw = new FileWriter(new File(folder + File.separator + file_name +".pie"));
@@ -158,9 +151,9 @@ public class Pie_Encryption {
             return;
         }
         PrintWriter pw = new PrintWriter(fw);
-        pw.println(str);
-        pw.close();
+        pw.println(new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8));
         try {
+            pw.close();
             fw.close();
         } catch (IOException e) {
             config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
@@ -195,8 +188,7 @@ public class Pie_Encryption {
 
         // Generate a random IV (Initialization Vector)
         byte[] iv = new byte[16];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(iv);
+        new SecureRandom().nextBytes(iv);
 
         // Create a key based on the password using a Key Derivation Function
         try {

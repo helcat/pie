@@ -57,8 +57,8 @@ public class Pie_Utils {
         return FileSystemView.getFileSystemView().getHomeDirectory();
     }
     /** *****************************************************<br>
-     * <b>Collects the amount of memory used</b><br>
-     * @return
+     * Collects the amount of memory used<br>
+     * @return long
      */
     public long getMemory() {
         return runtime.totalMemory() - runtime.freeMemory();
@@ -100,10 +100,9 @@ public class Pie_Utils {
     /** *****************************************************<br>
      * Write bytes to a text file, Used to debug.
      * @param message (Byte[])
-     * @param file_name (String)
+     * @param out (File)
      */
-    public void write_Bytes_To_File (byte[] message, String file_name) {
-        File out = new File(getDesktopPath() + File.separator + file_name);
+    public void write_Bytes_To_File (byte[] message, File out) {
         try (FileWriter writer = new FileWriter(out)) {
             try {
                 for (byte b : message) {
