@@ -29,7 +29,6 @@ public class Pie_Encode_Source {
      * @param encode (InputStream)
      * @param size (int)
      */
-
     public Pie_Encode_Source(InputStream encode, int size) {
         process(encode, size);
     }

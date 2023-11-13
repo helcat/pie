@@ -41,7 +41,6 @@ public class Pie_Decode_Source {
         setInput(null);
         if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No Decode Object Found");
-            return;
 
         }else if (getDecode_object() instanceof File) {
             if (!((File) getDecode_object()).isFile()) {
@@ -49,6 +48,7 @@ public class Pie_Decode_Source {
                 return;
             }
             getConfig().logging(Level.INFO,"Preparing File For Decoding");
+
         }else if (getDecode_object() instanceof URL) {
             getConfig().logging(Level.INFO,"Preparing URL For Decoding");
 
@@ -76,7 +76,6 @@ public class Pie_Decode_Source {
 
         }else if (getDecode_object() == null) {
             getConfig().logging(Level.SEVERE,"No object detected to decode");
-            return;
 
         }else if (getDecode_object() instanceof File) {
             File f = (File) getDecode_object();
@@ -99,12 +98,10 @@ public class Pie_Decode_Source {
                         setInput(new FileInputStream(nf));
                     }else{
                         getConfig().logging(Level.SEVERE,"File " + nf.getName() + " is missing. Unable to continue.");
-                        return;
                     }
                 }
             } catch (FileNotFoundException e) {
                 getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
-                return;
             }
 
         }else if (getDecode_object() instanceof Pie_URL) {

@@ -80,12 +80,22 @@ public class Pie_Config {
                     }
                 }
 
+                else if (o instanceof Pie_Encode_Source) {
+                    this.encoder_source = (Pie_Encode_Source) o;
+                }
+
                 else if (o instanceof Level) {
                     this.log_level = (Level) o;
                     getLog().setLevel(this.log_level);
                 }
             }
         }
+
+        if (this.encoder_source == null) {
+            logging(Level.SEVERE, "Error no source to encode");
+            setError(true);
+        }
+
         if (this.log_level != null && this.log_level == Level.OFF)
             exit_Logging();
     }
@@ -289,7 +299,7 @@ public class Pie_Config {
      * @param encoder_source (Pie_Encode_Source)
      * @see Pie_Encode_Source
      */
-    public void setEncoder_source(Pie_Encode_Source encoder_source) {
+    private void setEncoder_source(Pie_Encode_Source encoder_source) {
         this.encoder_source = encoder_source;
     }
 
