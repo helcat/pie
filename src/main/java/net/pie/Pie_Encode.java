@@ -29,9 +29,6 @@ public class Pie_Encode {
             return;
         setConfig(config);
 
-        if (getConfig().getEncoder_destination() == null)
-            getConfig().setEncoder_destination(new Pie_Encoded_Destination());
-
         processing();
     }
 

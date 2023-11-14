@@ -23,6 +23,7 @@ public class Pie_Encoded_Destination {
     private URL web_address;
     private String encoding_id = UUID.randomUUID().toString();
 
+
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
      * With no parameters, Pie_Encoded_Destination allows for custom parameters.

@@ -2,19 +2,32 @@ package net.pie.utils;
 
 import net.pie.enums.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.*;
+import java.util.logging.Formatter;
+import java.util.stream.Collectors;
 
 /** *******************************************************************<br>
- * <b>Pie_Config - Configuration</b><br>
- * Holds all the optional data for encoding / decoding default settings.<br>
- * If not built or included, a new instance is automatically created with default settings when encoding or decoding.
+ * Starts a default configuration and sets up logging and options<br>
+ * Both encoding and decoding options. Pie_Option, Level, Pie_Encryption
+ * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encode_Source, Pie_Encoded_Destination<br>
+ * Add parmeters in any order, or use an object list<br>
+ * The Default is Log level is Level.SEVERE<br>
+ * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
+ * @see Pie_Option
+ * @see Pie_Shape
+ * @see Pie_Encode_Mode
+ * @see Level
+ * @see Pie_ZIP_Option
+ * @see Pie_ZIP_Name
+ * @see Pie_Encryption
+ * @see Pie_Encode_Source
+ * @see Pie_Encoded_Destination
+ *
  **/
 public class Pie_Config {
     private List<Pie_Option> options = new ArrayList<>();
-    private Pie_Size encoder_Minimum_Image = new Pie_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
+    private Pie_Encode_Min_Size encoder_Minimum_Image = new Pie_Encode_Min_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
     private Pie_Zip encoder_storage = null;
@@ -27,20 +40,6 @@ public class Pie_Config {
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination  = null;
 
-    /** *******************************************************************<br>
-     * Starts a default configuration and sets up logging and options<br>
-     * Can include Pie_Option, Pie_Shape, Pie_Encode_Mode, Level, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encryption<br>
-     * Add parmeters in any order, or use an object list<br>
-     * The Default is Log level is Level.SEVERE<br>
-     * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
-     * @see Pie_Option
-     * @see Pie_Shape
-     * @see Pie_Encode_Mode
-     * @see Level
-     * @see Pie_ZIP_Option
-     * @see Pie_ZIP_Name
-     * @see Pie_Encryption
-     **/
     public Pie_Config(Object... options) {
         setup(options);
     }
@@ -50,48 +49,65 @@ public class Pie_Config {
 
     private void setup(Object[] options) {
         setUpLogging();
-        setOptions(new ArrayList<>());
+        if (options == null) {
+            logging(Level.SEVERE, "Error no configuration options");
+            setError(true);
+            return;
+        }
+
+        setOptions(Arrays.stream(options)
+                .filter(option -> option instanceof Pie_Option)
+                .map(option -> (Pie_Option) option)
+                .collect(Collectors.toList()));
+
         this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
         this.log_level = Level.SEVERE;
 
-        if (options != null) {
-            for (Object o : options) {
-                if (o instanceof Pie_Option && !getOptions().contains((Pie_Option) o))
-                    getOptions().add((Pie_Option) o);
+        for (Object o : options) {
+            if (o instanceof Pie_Shape)
+                this.encoder_shape = (Pie_Shape) o;
 
-                else if (o instanceof Pie_Shape)
-                    this.encoder_shape = (Pie_Shape) o;
+            else if (o instanceof Pie_Encode_Mode)
+                this.encoder_mode =  (Pie_Encode_Mode) o;
 
-                else if (o instanceof Pie_Encode_Mode)
-                    this.encoder_mode =  (Pie_Encode_Mode) o;
+            else if (o instanceof Pie_ZIP_Option)
+                this.encoder_storage.setOption((Pie_ZIP_Option) o);
 
-                else if (o instanceof Pie_ZIP_Option)
-                    this.encoder_storage.setOption((Pie_ZIP_Option) o);
+            else if (o instanceof Pie_ZIP_Name)
+                this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o);
 
-                else if (o instanceof Pie_ZIP_Name)
-                    this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o);
-
-                else if (o instanceof Pie_Encryption) {
-                    this.encryption = ((Pie_Encryption) o);
-                    if (this.encryption.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
-                        setError(true);
-                        return;
-                    }
-                }
-
-                else if (o instanceof Pie_Encode_Source)
-                    this.encoder_source = (Pie_Encode_Source) o;
-
-                else if (o instanceof Pie_Encoded_Destination)
-                    this.encoder_destination = (Pie_Encoded_Destination) o;
-
-                else if (o instanceof Level) {
-                    this.log_level = (Level) o;
-                    getLog().setLevel(this.log_level);
+            else if (o instanceof Pie_Encryption) {
+                this.encryption = ((Pie_Encryption) o);
+                if (this.encryption.getError_code() != null) {
+                    logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
+                    setError(true);
+                    return;
                 }
             }
+
+            else if (o instanceof Pie_Encode_Min_Size)
+                this.encoder_Minimum_Image = (Pie_Encode_Min_Size) o;
+
+            else if (o instanceof Pie_Encode_Source) {
+                this.encoder_source = (Pie_Encode_Source) o;
+                if (this.encoder_source.getError_code() != null) {
+                    logging(Level.SEVERE, Pie_Constants.values()[this.encoder_source.getError_code()].getParm2());
+                    setError(true);
+                    return;
+                }
+            }
+
+            else if (o instanceof Pie_Encoded_Destination)
+                this.encoder_destination = (Pie_Encoded_Destination) o;
+
+            else if (o instanceof Level) {
+                this.log_level = (Level) o;
+                getLog().setLevel(this.log_level);
+            }
         }
+
+        if (this.encoder_destination == null)
+            this.encoder_destination = new Pie_Encoded_Destination();
 
         if (this.encoder_source == null) {
             logging(Level.SEVERE, "Error no source to encode");
@@ -237,22 +253,12 @@ public class Pie_Config {
     }
 
     /** ***************************************************************<br>
-     * Encoder Minimum Image, Sets a new Pie_Size object containing the area that should be used.
-     * @return Pie_Size
-     * @see Pie_Size
+     * Encoder Minimum Image, Sets a new Pie_Encode_Min_Size object containing the area that should be used.
+     * @return Pie_Encode_Min_Size
+     * @see Pie_Encode_Min_Size
      */
-    public Pie_Size getEncoder_Minimum_Image() {
+    public Pie_Encode_Min_Size getEncoder_Minimum_Image() {
         return encoder_Minimum_Image;
-    }
-
-    /** *******************************************************************<br>
-     * <b>setEncoder_Minimum_Image</b><br>
-     * Sets the minimum size the encoded image can be. If any of the parameters is zero the size is ignored.
-     * @param encoder_Minimum_Image (new Pie_Size)
-     * @see Pie_Size
-     **/
-    public void setEncoder_Minimum_Image(Pie_Size encoder_Minimum_Image) {
-        this.encoder_Minimum_Image = encoder_Minimum_Image;
     }
 
     /** ***************************************************************<br>
@@ -297,29 +303,11 @@ public class Pie_Config {
     }
 
     /** ******************************************************************<br>
-     * Set the Source for file or text to be encoded.
-     * @param encoder_source (Pie_Encode_Source)
-     * @see Pie_Encode_Source
-     */
-    private void setEncoder_source(Pie_Encode_Source encoder_source) {
-        this.encoder_source = encoder_source;
-    }
-
-    /** ******************************************************************<br>
      * get the file or destination, where to send the final file.
      * @see Pie_Encoded_Destination
      */
     public Pie_Encoded_Destination getEncoder_destination() {
         return encoder_destination;
-    }
-
-    /** ******************************************************************<br>
-     * Set where the file will be sent or saved to
-     * @param encoder_destination (Pie_Encoded_Destination)
-     * @see Pie_Encoded_Destination
-     */
-    public void setEncoder_destination(Pie_Encoded_Destination encoder_destination) {
-        this.encoder_destination = encoder_destination;
     }
 
     /** ******************************************************************<br>

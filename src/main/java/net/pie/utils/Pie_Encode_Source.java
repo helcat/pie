@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import java.io.*;
 
@@ -13,6 +14,7 @@ public class Pie_Encode_Source {
     private String file_name = null;
     private InputStream input = null;
     private int source_size;
+    private Integer error_code = null;
 
     /** *******************************************************<br>
      * <b>Pie_Encode_Source</b><br>
@@ -38,33 +40,38 @@ public class Pie_Encode_Source {
      * @param encode (Object) Can be String of text or a File
      */
     private void process(Object encode, int size) {
+        setError_code(null);
         setInput(null);
         setType(Pie_Source_Type.NONE);
         setFile_name(null);
         setSource_size(0);
 
         if (encode == null) {
-            return;
+            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
 
         }else if (encode instanceof InputStream) {
-            if (size < 1)
+            if (size < 1) {
+                setError_code(Pie_Constants.ERROR_CODE_5.ordinal());
                 return;
+            }
             setSource_size(size);
             setInput((InputStream) encode);
             setType(Pie_Source_Type.FILE);
-            if (getFile_name() == null) {
-                return;
-            }
+            if (getFile_name() == null || getFile_name().isEmpty())
+                setError_code(Pie_Constants.ERROR_CODE_6.ordinal());
 
         }else if (encode instanceof byte[]) {
             setSource_size(((byte[]) encode).length);
             setInput(new ByteArrayInputStream(((byte[]) encode)));
             setType(Pie_Source_Type.FILE);
-            if (getFile_name() == null) {
-                return;
-            }
+            if (getFile_name() == null || getFile_name().isEmpty())
+                setError_code(Pie_Constants.ERROR_CODE_7.ordinal());
 
         }else if (encode instanceof String) {
+            if (((String) encode).isEmpty()) {
+                setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
+                return;
+            }
             setSource_size(((String) encode).getBytes().length);
             setInput(new ByteArrayInputStream(((String) encode).getBytes()));
             setType(Pie_Source_Type.TEXT);
@@ -78,10 +85,17 @@ public class Pie_Encode_Source {
                     setSource_size((int) f.length());
                     setType(Pie_Source_Type.FILE);
                 } catch (FileNotFoundException e) {
+                    setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
                     return;
                 }
+            }else{
+                setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
+                return;
             }
         }
+
+        if (getInput() == null)
+            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
     }
 
     /** *******************************************************<br>
@@ -120,6 +134,13 @@ public class Pie_Encode_Source {
         this.source_size = source_size;
     }
 
+    public Integer getError_code() {
+        return error_code;
+    }
+
+    private void setError_code(Integer error_code) {
+        this.error_code = error_code;
+    }
 }
 
 
