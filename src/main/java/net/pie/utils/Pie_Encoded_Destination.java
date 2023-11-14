@@ -124,7 +124,7 @@ public class Pie_Encoded_Destination {
      * Zip file name
      * @param source_filename (int)
      */
-    public String getZip_File_Name(String source_filename) {
+    private String getZip_File_Name(String source_filename) {
         String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
@@ -162,7 +162,7 @@ public class Pie_Encoded_Destination {
      * Local file name extension will be added or changed if required.<br>
      * Extension should be ".png".
      **/
-    public void setLocal_file(File local_file) {
+    private void setLocal_file(File local_file) {
         if (local_file != null) {
             if (local_file.exists() && local_file.isFile())
                 local_file.delete();
@@ -176,7 +176,7 @@ public class Pie_Encoded_Destination {
         return web_address;
     }
 
-    public void setWeb_address(URL web_address) {
+    private void setWeb_address(URL web_address) {
         this.web_address = web_address;
     }
 
@@ -184,7 +184,7 @@ public class Pie_Encoded_Destination {
         return encoding_id;
     }
 
-    public void setEncoding_id(String encoding_id) {
+    private void setEncoding_id(String encoding_id) {
         this.encoding_id = encoding_id;
     }
 }

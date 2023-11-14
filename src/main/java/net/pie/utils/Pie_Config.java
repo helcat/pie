@@ -80,9 +80,11 @@ public class Pie_Config {
                     }
                 }
 
-                else if (o instanceof Pie_Encode_Source) {
+                else if (o instanceof Pie_Encode_Source)
                     this.encoder_source = (Pie_Encode_Source) o;
-                }
+
+                else if (o instanceof Pie_Encoded_Destination)
+                    this.encoder_destination = (Pie_Encoded_Destination) o;
 
                 else if (o instanceof Level) {
                     this.log_level = (Level) o;

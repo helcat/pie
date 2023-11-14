@@ -42,15 +42,11 @@ public class Pie_Test_Encode {
                 Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
                 Level.INFO,
                 new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
-                new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded))
+                new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)),
+                new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Image))
         );
 
         encoding_config.setEncoder_Minimum_Image(new Pie_Size(0, 0, Pie_Position.MIDDLE_CENTER));    // Optional default is 0,0, Pie_Position.MIDDLE_CENTER
-
-        // Tell the encoder where to store the encoded image
-        Pie_Encoded_Destination encoded_destination = new Pie_Encoded_Destination();
-        encoded_destination.setLocal_file(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Image));
-        encoding_config.setEncoder_destination(encoded_destination);
 
         // Do Encoding, Will create the image and put it in the destination
         new Pie_Encode(encoding_config);
