@@ -69,7 +69,6 @@ public class Pie_Encryption {
                 setError_code(Pie_Constants.ERROR_CODE_3.ordinal());
             }
         }
-
     }
 
     /** **************************************************<br>
@@ -121,7 +120,10 @@ public class Pie_Encryption {
         if (config == null)
             config = new Pie_Config();
 
-        if (folder == null || !folder.isDirectory()) {
+        if (folder == null)
+            folder = Pie_Utils.getDesktop();
+
+        if (!folder.isDirectory()) {
             config.logging(Level.SEVERE, "Invalid folder");
             return;
         }
@@ -145,7 +147,7 @@ public class Pie_Encryption {
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(new File(folder + File.separator + file_name +".pie"));
+            fw = new FileWriter(new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie")));
         } catch (IOException e) {
             config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
             return;

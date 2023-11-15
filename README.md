@@ -2,9 +2,9 @@
 PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, then decode back again.
 When encoding the file, its size should remain the same, however this depends on the options used to when encoding the file.
 
-The PIE library does not have any dependencies and should integrate into almost any application. 
-Due to not having any dependencies, wrappers can be created for other programming languages. 
-Although libraries for other languages will be available in the future.
+The PIE library is lightweight and does not have any dependencies. This should make it easier to integrate into almost any application. 
+To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Due to not having any dependencies, 
+wrappers can be created for other programming languages. Although libraries for other languages will be available in the future.
 
 Practical applications would include but not limited to chat servers, hiding files or text in plain sight, storing images or files on a cloud server and 
 passing information across to any server, network or computer system to bypass security. When the file or text is encoded the end result is just an image.
@@ -71,10 +71,21 @@ Example
 * `new Pie_Encryption("My Pass Phrase Goes Here");`
 * `new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "certificate_name"))`
 
-To add encryption, enter one of the above as a parameter into the configuration. Note either the pass phrase or certificate is encoded in the file created.
-you will need these keys to decrypt the encoded file. if you lose your keys the file will remain locked. The pass phrase can be a string value, or you can 
-create a certificate file to hold the encryption key. A certificate should make it easier to decode the files later on. Files with encryption might be a little 
-larger than the original but not much. It is highly recommended to use a USB drive to store and save the certificate.
+To add encryption, enter one of the above as a parameter into the configuration. Neither the pass phrase nor the certificate is encoded in the file created.
+You will need a key to decrypt the encoded file. if you lose your key the file will remain locked. The pass phrase can be a string value, or you can 
+create a certificate file, to hold the encryption key. A certificate should make it easier to decode and share the files with other people. Files with 
+encryption might be a little larger than the original but not much. It is highly recommended to use a USB drive to store the certificate.
+
+To create a certificate use this standalone command.
+
+        Pie_Encryption encryption = new Pie_Encryption("123456789 £ ABCDEFGHIJ abcdefghij -> More");
+        encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
+
+First create a "Pie_Encryption" object with a pass phrase. The Phrase must be longer than 7 characters. Next create the certificate using the "create_Certificate_File" method.
+Parameters for the method are as follows, please note you can add them in any order.
+* `Pie_Config` Optional. If not entered a default configuration will be used.
+* `File` Optional. A folder to store the certificate. If not entered the desktop will be used.
+* `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the name.
 
 #### Pie_Encode_Source *** This is a required parameter
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
