@@ -29,6 +29,9 @@ public class Pie_Test_Decode {
      **/
     public Pie_Test_Decode() {
 
+        //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
+        //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
+
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config(
                 Pie_Option.ENC_OVERWRITE_FILE,
@@ -37,22 +40,11 @@ public class Pie_Test_Decode {
                 Pie_Option.SHOW_MEMORY_USAGE,
                 Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
                 Level.INFO,
-                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"))
+                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
+                new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage)),
+                new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
         );
 
-        // Tell the decoder where to store the decoded file
-        Pie_Decode_Destination decoded_Source_destination = new Pie_Decode_Destination();
-        decoded_Source_destination.setLocal_folder(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To));
-
-        // Source file. (Image which was encoded)
-        Pie_Decode_Source decode_source = new Pie_Decode_Source(
-                    decoding_config,
-                    //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
-                    //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_coreprint.png")
-                    new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage)
-            );
-
-        // Do the decoding : Decodes the image.
-        new Pie_Decode(decode_source, decoded_Source_destination);
+        new Pie_Decode(decoding_config);
     }
 }

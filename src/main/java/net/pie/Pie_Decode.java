@@ -10,11 +10,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Pie_Decode {
     private Pie_Config config;
-    private Pie_Decode_Destination decoded_Source_destination;
-    private Pie_Decode_Source source = null;
     private int total_files = 0;
     private OutputStream outputStream = null;
 
@@ -22,29 +23,24 @@ public class Pie_Decode {
      * <b>Pie_Decode</b><br>
      * Processing for decoding the image back to source.<br>
      * A new default configuration will be created.<br>
-     * @param source Image file which was encoded
-     * @param decoded_Source_destination Image to be decrypted
+     * @param Pie_Config Image file which was encoded
      **/
-    public Pie_Decode(Pie_Decode_Source source, Pie_Decode_Destination decoded_Source_destination) {
+    public Pie_Decode(Pie_Config config) {
+        if (config == null || config.isError())
+            return;
+        setConfig(config);
+
         ImageIO.setUseCache(false);
         setTotal_files(0);
 
-        if (source == null || source.getDecode_object() == null) {
+        if (getConfig().getDecode_source() == null || getConfig().getDecode_source().getDecode_object() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source required");
             return;
         }
 
-        if (source.getConfig() == null) {
-            getConfig().logging(Level.SEVERE, "Decoding FAILED : Missing Configuration");
-            return;
-        }
-
-        setSource(source);
-        setConfig(source.getConfig());
-        setDecoded_Source_destination(decoded_Source_destination);
         setOutputStream(null);
 
-        if (getDecoded_Source_destination() == null) {
+        if (getConfig().getDecoded_Source_destination() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source destination required");
             return;
         }
@@ -65,7 +61,7 @@ public class Pie_Decode {
         int processing_file = 0;
         byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
-            setUpOutFile(getDecoded_Source_destination().getFile_name());
+            setUpOutFile(getConfig().getDecoded_Source_destination().getFile_name());
             if (!getConfig().isError()) {
                 while (processing_file < getTotal_files()) {
                     try {
@@ -89,6 +85,7 @@ public class Pie_Decode {
         utils.usedMemory(memory_Start, "Decoding : ");
         if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
             System.gc();
+
         getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
 
         if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
@@ -97,7 +94,7 @@ public class Pie_Decode {
                 getConfig().logging(Level.INFO, time_diff);
         }
 
-        getSource().close();
+        getConfig().getDecode_source().close();
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
@@ -177,14 +174,14 @@ public class Pie_Decode {
         BufferedImage buffimage = null;
         try {
             getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
-            getSource().next(processing_file);
-            if (!getConfig().isError() && getSource().getInput() != null )
-                buffimage = ImageIO.read(getSource().getInput());
+            getConfig().getDecode_source().next(processing_file);
+            if (!getConfig().isError() && getConfig().getDecode_source().getInput() != null )
+                buffimage = ImageIO.read(getConfig().getDecode_source().getInput());
         } catch (IOException e) {
             getConfig().logging(Level.SEVERE, "Invalid Encoded Image " + e.getMessage());
             return null;
         }
-        getSource().close();
+        getConfig().getDecode_source().close();
 
         if (buffimage == null) {
             getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
@@ -233,8 +230,8 @@ public class Pie_Decode {
      * @param file_name (String)
      */
     private void setUpOutFile(String file_name) {
-        if (getDecoded_Source_destination().getLocal_folder() != null && getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-            File f = new File(getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
+        if (getConfig().getDecoded_Source_destination().getLocal_folder() != null && getConfig().getDecoded_Source_destination().getLocal_folder().isDirectory()) {
+            File f = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
             try {
                 setOutputStream(new FileOutputStream(f));
             } catch (FileNotFoundException e) {
@@ -261,68 +258,45 @@ public class Pie_Decode {
      * @param add_on_bytes (byte[])
      */
     private void collect_encoded_parms(byte[] add_on_bytes) {
-        getSource().setAddon_Files(null);
-        if (getDecoded_Source_destination() == null)
-            setDecoded_Source_destination(new Pie_Decode_Destination());
+        getConfig().getDecode_source().setAddon_Files(null);
         try {
             String parms = new String(add_on_bytes, StandardCharsets.UTF_8);
             int parm = 0;
-            if (parms.lastIndexOf("?") != -1) {
-                String[] parts = parms.split("\\?", 0);
-                getDecoded_Source_destination().setFile_name(parts[parm ++]);                                           // 0
-                setTotal_files(Integer.parseInt(parts[parm ++].replaceAll("\\D", "")));                 // 1
+            if (parms.contains("?")) {
+                Stream<String> stream = Pattern.compile("\\?").splitAsStream(parms);
+                List<String> partsList = stream.collect(Collectors.toList());
 
-                String files = parts[parm ++];                                                                          // 2
+                getConfig().getDecoded_Source_destination().setFile_name(partsList.get(parm ++));                               // 0
+                setTotal_files(Integer.parseInt(partsList.get(parm ++).replaceAll("\\D", "")));    // 1
+                String files = partsList.get(parm ++);                                                              // 2
                 if (!files.isEmpty()) {
                     if (files.contains("*"))
-                        getSource().setAddon_Files(files.split("\\*", 0));
+                        getConfig().getDecode_source().setAddon_Files(files.split("\\*", 0));
                     else
-                        getSource().setAddon_Files(new String[]{files});
+                        getConfig().getDecode_source().setAddon_Files(new String[]{files});
                 }
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            getConfig().logging(Level.SEVERE, "Security Error");
+        }
     }
 
-    /** *******************************************************************<br>
-     * <b>getters and setters</b><br>
-     * General Getters and Setters
-     **/
     private void setConfig(Pie_Config config) {
         this.config = config;
     }
     private Pie_Config getConfig() {
         return config;
     }
-
-    private Pie_Decode_Destination getDecoded_Source_destination() {
-        return decoded_Source_destination;
-    }
-
-    private void setDecoded_Source_destination(Pie_Decode_Destination decoded_Source_destination) {
-        this.decoded_Source_destination = decoded_Source_destination;
-    }
-
-    private Pie_Decode_Source getSource() {
-        return source;
-    }
-
-    private void setSource(Pie_Decode_Source source) {
-        this.source = source;
-    }
-
     private int getTotal_files() {
         return total_files;
     }
-
     private void setTotal_files(int total_files) {
         this.total_files = total_files;
     }
-
     private OutputStream getOutputStream() {
         return outputStream;
     }
-
     private void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
     }

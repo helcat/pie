@@ -38,7 +38,9 @@ public class Pie_Config {
     private boolean error = false;
     private Logger log = null;
     private Pie_Encode_Source encoder_source = null;
-    private Pie_Encoded_Destination encoder_destination  = null;
+    private Pie_Encoded_Destination encoder_destination = null;
+    private Pie_Decode_Source decode_source = null;
+    private Pie_Decode_Destination  decoded_Source_destination = null;
 
     public Pie_Config(Object... options) {
         setup(options);
@@ -104,15 +106,28 @@ public class Pie_Config {
                 this.log_level = (Level) o;
                 getLog().setLevel(this.log_level);
             }
+
+            else if (o instanceof Pie_Decode_Source) {
+                this.decode_source = (Pie_Decode_Source) o;
+                if (this.decode_source.getError_code() != null) {
+                    logging(Level.SEVERE, Pie_Constants.values()[this.decode_source.getError_code()].getParm2());
+                    setError(true);
+                    return;
+                }
+            }
+
+            else if (o instanceof Pie_Decode_Destination) {
+                this.decoded_Source_destination = (Pie_Decode_Destination) o;
+                if (this.decoded_Source_destination.getError_code() != null) {
+                    logging(Level.SEVERE, Pie_Constants.values()[this.decoded_Source_destination.getError_code()].getParm2());
+                    setError(true);
+                    return;
+                }
+            }
         }
 
         if (this.encoder_destination == null)
             this.encoder_destination = new Pie_Encoded_Destination();
-
-        if (this.encoder_source == null) {
-            logging(Level.SEVERE, "Error no source to encode");
-            setError(true);
-        }
 
         if (this.log_level != null && this.log_level == Level.OFF)
             exit_Logging();
@@ -322,6 +337,14 @@ public class Pie_Config {
         this.options = options;
     }
 
+    public Pie_Decode_Destination getDecoded_Source_destination() {
+        return decoded_Source_destination;
+    }
+
+    private void setDecoded_Source_destination(Pie_Decode_Destination decoded_Source_destination) {
+        this.decoded_Source_destination = decoded_Source_destination;
+    }
+
     /** ******************************************************************<br>
      * Pie_Logging_Format<br>
      * Used as a custom handler for logging.
@@ -331,6 +354,18 @@ public class Pie_Config {
         public String format(LogRecord record) {
             return record.getLevel() + ": " + record.getMessage() + "\n";
         }
+    }
+
+    /** ******************************************************************<br>
+     * Pie_Decode_Source<br>
+     * set a decoder source - Image which was encoded.
+     */
+    public Pie_Decode_Source getDecode_source() {
+        return decode_source;
+    }
+
+    private void setDecode_source(Pie_Decode_Source decode_source) {
+        this.decode_source = decode_source;
     }
 }
 

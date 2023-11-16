@@ -16,6 +16,7 @@ public class Pie_Decode_Destination {
     private byte[] bytes = null;
     private boolean error = false;
     private String error_message = null;
+    private Integer error_code = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encode_Destination</b><br>
@@ -38,7 +39,7 @@ public class Pie_Decode_Destination {
      * @param local_folder (File)
      */
 
-    public void setLocal_folder(File local_folder) {
+    private void setLocal_folder(File local_folder) {
         if (local_folder != null && !local_folder.exists()  ||
             local_folder != null && !local_folder.isDirectory()) {
             setError(true);
@@ -97,6 +98,14 @@ public class Pie_Decode_Destination {
 
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
+    }
+
+    public Integer getError_code() {
+        return error_code;
+    }
+
+    public void setError_code(Integer error_code) {
+        this.error_code = error_code;
     }
 }
 

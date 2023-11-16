@@ -66,6 +66,11 @@ Example
 #### Level : This is a standard java logging parameter .
 * `Level.SEVERE` is the default.
 
+### Utilities 
+These methods are available for ease of use and are not required for encoding or decoding.
+* `Pie_Utils.getDesktop()` gets the desktop as a file object.
+* `Pie_Utils.getDesktopPath()` gets the desktop as a string path.
+
 ### Object options.
 #### Pie_Encryption *** Optional
 * `new Pie_Encryption("My Pass Phrase Goes Here");`

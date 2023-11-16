@@ -18,6 +18,7 @@ public class Pie_Decode_Source {
     private String[] addon_Files = null;
     private boolean isZipped = false;
     private Pie_Zip zip_Object = null;
+    private Integer error_code = null;
 
     public Pie_Decode_Source(Object decode) {
         setDecode_object(decode);
@@ -194,6 +195,14 @@ public class Pie_Decode_Source {
 
     public void setZip_Object(Pie_Zip zip_Object) {
         this.zip_Object = zip_Object;
+    }
+
+    public Integer getError_code() {
+        return error_code;
+    }
+
+    public void setError_code(Integer error_code) {
+        this.error_code = error_code;
     }
 }
 

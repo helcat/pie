@@ -25,9 +25,15 @@ public class Pie_Encode {
      * @see Pie_Config
      **/
     public Pie_Encode (Pie_Config config) {
-        if (config == null || config.getEncoder_source() == null || config.getEncoder_source().getInput() == null || config.isError())
+        if (config == null || config.isError())
             return;
         setConfig(config);
+
+        if (config.getEncoder_source() == null || config.getEncoder_source().getInput() == null) {
+            config.logging(Level.SEVERE, "Error no source to encode");
+            config.setError(true);
+            return;
+        }
 
         processing();
     }
