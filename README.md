@@ -6,8 +6,15 @@ The PIE library is lightweight and does not have any dependencies. This should m
 To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Due to not having any dependencies, 
 wrappers can be created for other programming languages. Although libraries for other languages will be available in the future.
 
-Practical applications would include but not limited to chat servers, hiding files or text in plain sight, storing images or files on a cloud server and 
-passing information across to any server, network or computer system to bypass security. When the file or text is encoded the end result is just an image.
+#### Practical applications 
+Would include but not limited to 
+* Chat servers (Passing encoded images (text to image) from one client to another).
+* Hiding files or text in plain sight.
+* Storing images or files on a cloud server. 
+* Passing information across to any server, network or computer system to bypass security.
+* Stop AI models from using your images or files for training.
+
+When the file or text is encoded the end result is just an image.
 Any inspection of the file will pass as an image and unless the security denies images will pass through. When the file is decoded the file or text will be
 intact. Even the metadata of the file is restored. Any file can be encoded for example Images, Movies, Documents, already compressed files including zip and 
 even Exe or Application files.
@@ -19,7 +26,7 @@ overridden.
 `Pie_Config encoding_config = new Pie_Config();`
 
 Next you can add options to the configuration. 
-These "options" are not required, defaults will be used if not entered into the configuration.
+These "options" are not required and can be used for encoding and decoding, defaults will be used if not entered into the configuration.
 You do not have to place the "options" or any parameters in any order, enter them as needed.
 * `Pie_Option.ENC_OVERWRITE_FILE` : will overwrite any already encoded file. Default false.
 * `Pie_Option.SHOW_PROCESSING_TIME` : will show how long the process took. Default false.
@@ -32,11 +39,11 @@ Example
 `new Pie_Config(Pie_Option.ENC_OVERWRITE_FILE, Pie_Option.SHOW_PROCESSING_TIME);`
 
 ### Other options with more detail.
-#### Pie_Shape : Changes the shape of the image. Values allowed are :
+#### Pie_Shape : *** Encoding only. (Optional) Changes the shape of the image. Values allowed are :
 * `SHAPE_RECTANGLE` : default.
 * `SHAPE_SQUARE`
 
-#### Pie_Encode_Mode : Changes the type of encoding to be used. Values allowed are :
+#### Pie_Encode_Mode : *** Encoding only. (Optional) Changes the type of encoding to be used. Values allowed are :
 * `ENCODE_MODE_R` Image will be red - X Large file size<br>
 * `ENCODE_MODE_G` Image will be green - X Large file size<br>
 * `ENCODE_MODE_B` Image will be blue - X Large file size<br>
@@ -53,33 +60,40 @@ Example
 * `ENCODE_MODE_RGBT` use red, green and blue channels Fully transparent - Medium file size <br>
 * `ENCODE_MODE_ARGB` full encoding. Small File size. (Default Setting)
 
-#### Pie_ZIP_Name : sets a custom name format
+#### Pie_ZIP_Name : *** Encoding only. (Optional) sets a custom name format
 * `AS_IS` Default. Leaves the name alone, however if multiple files are needed, a number is added.
 * `RANDOM` generates a random name to hide the real file name when decoding.
 * `NUMBER` issues an incremental number as a file name.
 
-#### Pie_ZIP_Option : sets when a zip file should be used.
+#### Pie_ZIP_Option : *** Encoding only. (Optional) sets when a zip file should be used.
 * `NEVER` a zip file is never used. Any files will be created as is.
 * `ALWAYS` a zip file is always used.
 * `ONLY_WHEN_EXTRA_FILES_REQUIRED` Default. Only creates a zip file when needed.
 
-#### Level : This is a standard java logging parameter .
+#### Level : *** Encoding and Decoding. (Optional) This is a standard java logging parameter .
 * `Level.SEVERE` is the default.
 
-### Utilities 
+### Utilities *** Encoding and Decoding.
 These methods are available for ease of use and are not required for encoding or decoding.
 * `Pie_Utils.getDesktop()` gets the desktop as a file object.
 * `Pie_Utils.getDesktopPath()` gets the desktop as a string path.
 
 ### Object options.
-#### Pie_Encryption *** Optional
+
+#### Pie_Encode_Source *** Encoding only. (Optional) This is a required parameter
+* `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
+
+Add a source file to the configuration. This is the file you want encoded.
+
+#### Pie_Encryption *** Optional Encoding and Decoding.
 * `new Pie_Encryption("My Pass Phrase Goes Here");`
 * `new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "certificate_name"))`
 
-To add encryption, enter one of the above as a parameter into the configuration. Neither the pass phrase nor the certificate is encoded in the file created.
+If encryption on encoding used, then you must add this to the decoding process. if the encoding does not have encryption and this parameter is used, the decryption process is ignored.
+To add encryption, enter one of the above parameters into the configuration. Neither the pass phrase nor the certificate is encoded in the file created.
 You will need a key to decrypt the encoded file. if you lose your key the file will remain locked. The pass phrase can be a string value, or you can 
-create a certificate file, to hold the encryption key. A certificate should make it easier to decode and share the files with other people. Files with 
-encryption might be a little larger than the original but not much. It is highly recommended to use a USB drive to store the certificate.
+create a certificate file to hold the encryption key. A certificate should make it easier to decode and share the files with others. Files with 
+encryption might be a little larger than the original but not much (only a few bytes longer). It is highly recommended to use a USB drive to store the certificate.
 
 To create a certificate use this standalone command.
 
@@ -90,12 +104,7 @@ First create a "Pie_Encryption" object with a pass phrase. The Phrase must be lo
 Parameters for the method are as follows, please note you can add them in any order.
 * `Pie_Config` Optional. If not entered a default configuration will be used.
 * `File` Optional. A folder to store the certificate. If not entered the desktop will be used.
-* `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the name.
-
-#### Pie_Encode_Source *** This is a required parameter
-* `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
-
-Add a source file to the configuration. This is the file you want encoded.
+* `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the file name.
 
 #### Pie_Encoded_Destination *** Optional 
 * `new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + "my_encoded_file"))`
@@ -126,3 +135,7 @@ The default position is "Pie_Position.MIDDLE_CENTER" however you can use any of 
                 new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + "i_have_been_encoded")),
         );
         new Pie_Encode(encoding_config);
+
+## Decoding - Getting started
+Create a configuration file first. This will store all the defaults and options for the decoding process. A lot of the options have already been defaulted but can be
+overridden.

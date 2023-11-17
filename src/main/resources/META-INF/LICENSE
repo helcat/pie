@@ -1,0 +1,35 @@
+PIE (Pixel to Image Encoding) Software Library License Agreement
+
+This PIE (Pixel to Image Encoding) software library ("the Software") is provided by Terence Clarke ("the Licensor") under the following terms and conditions:
+
+"Contributor" shall mean Licensor and any individual or Legal Entity on behalf of whom a Contribution has been received by Licensor and subsequently incorporated within the Work.
+
+1. Grant of License:
+   1.1. The Licensor grants subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.
+   1.2. The Licensee may not modify, reverse engineer, decompile, or disassemble the Software without explicit permission from the Licensor.
+1.3. You must give any other recipients of the Work or Derivative Works a copy of this License.
+1.4. Trademarks. This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor,
+
+2. Ownership:
+   2.1. The Licensor retains all intellectual property rights, including copyright, patents, and trademarks, to the Software.
+   2.2. The Licensee acknowledges that this license does not grant any ownership or rights other than those explicitly stated herein.
+
+3. No Warranty; Limitation of Liability:
+   3.1. The Software is provided "as is" without warranty of any kind, either express or implied, including, but not limited to, the implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
+   3.2. The Licensor shall not be liable for any damages, including but not limited to direct, indirect, special, or consequential damages arising out of the use or inability to use the Software.
+
+
+4. Attribution:
+   4.1. The Licensee agrees to give appropriate credit to the Licensor for any use of the Software in their projects or derivative works.
+   4.2. Attribution should be given in a visible and easily accessible manner within the Licensee's projects, acknowledging the use of the PIE Software Library.
+
+5. General:
+   5.1. This license is effective until terminated by the Licensor or by the Licensee upon breach of any term herein.
+   5.2. This Agreement constitutes the entire understanding between the parties concerning the Software and supersedes any prior agreements or understandings, whether written or oral.
+
+By using the PIE Software Library, the Licensee agrees to be bound by the terms and conditions of this Agreement.
+
+For permissions beyond the scope of this license, contact the Licensor at terry.clarke@gmail.com.
+
+Terence Clarke
+1th April 2023
