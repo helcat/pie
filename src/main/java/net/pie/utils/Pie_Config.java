@@ -57,72 +57,57 @@ public class Pie_Config {
             return;
         }
 
-        setOptions(Arrays.stream(options)
-                .filter(option -> option instanceof Pie_Option)
-                .map(option -> (Pie_Option) option)
-                .collect(Collectors.toList()));
+        setOptions(new ArrayList<>());
+        //        Arrays.stream(options)
+        //        .filter(option -> option instanceof Pie_Option)
+        //        .map(option -> (Pie_Option) option)
+        //        .collect(Collectors.toList()));
 
         this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
         this.log_level = Level.SEVERE;
 
         for (Object o : options) {
-            if (o instanceof Pie_Shape)
-                this.encoder_shape = (Pie_Shape) o;
-
-            else if (o instanceof Pie_Encode_Mode)
-                this.encoder_mode =  (Pie_Encode_Mode) o;
-
-            else if (o instanceof Pie_ZIP_Option)
-                this.encoder_storage.setOption((Pie_ZIP_Option) o);
-
-            else if (o instanceof Pie_ZIP_Name)
-                this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o);
-
-            else if (o instanceof Pie_Encryption) {
-                this.encryption = ((Pie_Encryption) o);
-                if (this.encryption.getError_code() != null) {
-                    logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
-                    setError(true);
-                    return;
-                }
-            }
-
-            else if (o instanceof Pie_Encode_Min_Size)
-                this.encoder_Minimum_Image = (Pie_Encode_Min_Size) o;
-
-            else if (o instanceof Pie_Encode_Source) {
-                this.encoder_source = (Pie_Encode_Source) o;
-                if (this.encoder_source.getError_code() != null) {
-                    logging(Level.SEVERE, Pie_Constants.values()[this.encoder_source.getError_code()].getParm2());
-                    setError(true);
-                    return;
-                }
-            }
-
-            else if (o instanceof Pie_Encoded_Destination)
-                this.encoder_destination = (Pie_Encoded_Destination) o;
-
-            else if (o instanceof Level) {
-                this.log_level = (Level) o;
-                getLog().setLevel(this.log_level);
-            }
-
-            else if (o instanceof Pie_Decode_Source) {
-                this.decode_source = (Pie_Decode_Source) o;
-                if (this.decode_source.getError_code() != null) {
-                    logging(Level.SEVERE, Pie_Constants.values()[this.decode_source.getError_code()].getParm2());
-                    setError(true);
-                    return;
-                }
-            }
-
-            else if (o instanceof Pie_Decode_Destination) {
-                this.decoded_Source_destination = (Pie_Decode_Destination) o;
-                if (this.decoded_Source_destination.getError_code() != null) {
-                    logging(Level.SEVERE, Pie_Constants.values()[this.decoded_Source_destination.getError_code()].getParm2());
-                    setError(true);
-                    return;
-                }
+            switch (o.getClass().getSimpleName()) {
+                case "Pie_Option": getOptions().add((Pie_Option) o); break;
+                case "Pie_Shape": this.encoder_shape = (Pie_Shape) o; break;
+                case "Pie_Encode_Mode": this.encoder_mode = (Pie_Encode_Mode) o; break;
+                case "Pie_ZIP_Option": this.encoder_storage.setOption((Pie_ZIP_Option) o); break;
+                case "Pie_ZIP_Name": this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o); break;
+                case "Pie_Encryption":
+                    this.encryption = ((Pie_Encryption) o);
+                    if (this.encryption.getError_code() != null) {
+                        logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
+                        setError(true);
+                        return;
+                    }
+                    break;
+                case "Pie_Encode_Min_Size": this.encoder_Minimum_Image = (Pie_Encode_Min_Size) o; break;
+                case "Pie_Encode_Source":
+                    this.encoder_source = (Pie_Encode_Source) o;
+                    if (this.encoder_source.getError_code() != null) {
+                        logging(Level.SEVERE, Pie_Constants.values()[this.encoder_source.getError_code()].getParm2());
+                        setError(true);
+                        return;
+                    }
+                    break;
+                case "Pie_Encoded_Destination": this.encoder_destination = (Pie_Encoded_Destination) o; break;
+                case "Level": this.log_level = (Level) o; getLog().setLevel(this.log_level); break;
+                case "Pie_Decode_Source":
+                    this.decode_source = (Pie_Decode_Source) o;
+                    if (this.decode_source.getError_code() != null) {
+                        logging(Level.SEVERE, Pie_Constants.values()[this.decode_source.getError_code()].getParm2());
+                        setError(true);
+                        return;
+                    }
+                    break;
+                case "Pie_Decode_Destination":
+                    this.decoded_Source_destination = (Pie_Decode_Destination) o;
+                    if (this.decoded_Source_destination.getError_code() != null) {
+                        logging(Level.SEVERE, Pie_Constants.values()[this.decoded_Source_destination.getError_code()].getParm2());
+                        setError(true);
+                        return;
+                    }
+                    break;
             }
         }
 

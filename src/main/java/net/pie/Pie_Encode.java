@@ -307,12 +307,6 @@ public class Pie_Encode {
         getConfig().logging(Level.INFO,"Encoding Offset");
         if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
             switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
-                case TOP_LEFT :
-                    return 0;
-                case BOTTOM_LEFT :
-                    return 0;
-                case MIDDLE_LEFT :
-                    return 0;
                 case TOP_RIGHT:
                 case BOTTOM_RIGHT :
                 case MIDDLE_RIGHT :
