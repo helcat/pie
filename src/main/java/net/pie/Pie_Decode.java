@@ -22,8 +22,7 @@ public class Pie_Decode {
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
      * Processing for decoding the image back to source.<br>
-     * A new default configuration will be created.<br>
-     * @param Pie_Config Image file which was encoded
+     * @param config configuration file
      **/
     public Pie_Decode(Pie_Config config) {
         if (config == null || config.isError())
@@ -174,7 +173,7 @@ public class Pie_Decode {
         BufferedImage buffimage = null;
         try {
             getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
-            getConfig().getDecode_source().next(processing_file);
+            getConfig().getDecode_source().next(getConfig(), processing_file);
             if (!getConfig().isError() && getConfig().getDecode_source().getInput() != null )
                 buffimage = ImageIO.read(getConfig().getDecode_source().getInput());
         } catch (IOException e) {

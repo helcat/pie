@@ -18,7 +18,9 @@ public enum Pie_Constants {
     ERROR_CODE_6 (6, "File name is required with input stream"),
     ERROR_CODE_7 (7, "File name is required with byte[]"),
     ERROR_CODE_8 (8, "Encoding String is required"),
-    ERROR_CODE_9 (9, "Invalid File")
+    ERROR_CODE_9 (9, "Invalid File"),
+    ERROR_CODE_10 (10, "No Decode Object Found"),
+    ERROR_CODE_11 (11, "Unable to decode object")
     ;
 
     public int parm1 = 0;

@@ -5,7 +5,6 @@ import net.pie.enums.*;
 import java.util.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
-import java.util.stream.Collectors;
 
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>
@@ -67,6 +66,9 @@ public class Pie_Config {
         this.log_level = Level.SEVERE;
 
         for (Object o : options) {
+            if (o == null)
+                continue;
+
             switch (o.getClass().getSimpleName()) {
                 case "Pie_Option": getOptions().add((Pie_Option) o); break;
                 case "Pie_Shape": this.encoder_shape = (Pie_Shape) o; break;

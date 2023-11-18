@@ -48,50 +48,53 @@ public class Pie_Encode_Source {
 
         if (encode == null) {
             setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
-
-        }else if (encode instanceof InputStream) {
-            if (size < 1) {
-                setError_code(Pie_Constants.ERROR_CODE_5.ordinal());
-                return;
-            }
-            setSource_size(size);
-            setInput((InputStream) encode);
-            setType(Pie_Source_Type.FILE);
-            if (getFile_name() == null || getFile_name().isEmpty())
-                setError_code(Pie_Constants.ERROR_CODE_6.ordinal());
-
-        }else if (encode instanceof byte[]) {
-            setSource_size(((byte[]) encode).length);
-            setInput(new ByteArrayInputStream(((byte[]) encode)));
-            setType(Pie_Source_Type.FILE);
-            if (getFile_name() == null || getFile_name().isEmpty())
-                setError_code(Pie_Constants.ERROR_CODE_7.ordinal());
-
-        }else if (encode instanceof String) {
-            if (((String) encode).isEmpty()) {
-                setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
-                return;
-            }
-            setSource_size(((String) encode).getBytes().length);
-            setInput(new ByteArrayInputStream(((String) encode).getBytes()));
-            setType(Pie_Source_Type.TEXT);
-
-        }else if (encode instanceof File) {
-            File f = (File) encode;
-            if (f.isFile()) {
-                try {
-                    setInput(new FileInputStream((File) encode));
-                    setFile_name(f.getName());
-                    setSource_size((int) f.length());
-                    setType(Pie_Source_Type.FILE);
-                } catch (FileNotFoundException e) {
+            return;
+        }
+        switch (encode.getClass().getSimpleName()) {
+            case "InputStream" :
+                if (size < 1) {
+                    setError_code(Pie_Constants.ERROR_CODE_5.ordinal());
+                    return;
+                }
+                setSource_size(size);
+                setInput((InputStream) encode);
+                setType(Pie_Source_Type.FILE);
+                if (getFile_name() == null || getFile_name().isEmpty())
+                    setError_code(Pie_Constants.ERROR_CODE_6.ordinal());
+                break;
+            case "byte[]" :
+                setSource_size(((byte[]) encode).length);
+                setInput(new ByteArrayInputStream(((byte[]) encode)));
+                setType(Pie_Source_Type.FILE);
+                if (getFile_name() == null || getFile_name().isEmpty())
+                    setError_code(Pie_Constants.ERROR_CODE_7.ordinal());
+                break;
+            case "String" :
+                if (((String) encode).isEmpty()) {
+                    setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
+                    return;
+                }
+                setSource_size(((String) encode).getBytes().length);
+                setInput(new ByteArrayInputStream(((String) encode).getBytes()));
+                setType(Pie_Source_Type.TEXT);
+                break;
+            case "File" :
+                File f = (File) encode;
+                if (f.isFile()) {
+                    try {
+                        setInput(new FileInputStream((File) encode));
+                        setFile_name(f.getName());
+                        setSource_size((int) f.length());
+                        setType(Pie_Source_Type.FILE);
+                    } catch (FileNotFoundException e) {
+                        setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
+                        return;
+                    }
+                }else{
                     setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
                     return;
                 }
-            }else{
-                setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
-                return;
-            }
+                break;
         }
 
         if (getInput() == null)

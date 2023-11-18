@@ -327,32 +327,30 @@ public class Pie_Encode {
      */
     private Pie_Size calculate_image_Mode(int length) {
         Pie_Size image_size = null;
-        if (getConfig().getEncoder_mode().getParm1().length() == 4)
-            return calculate_image_Size(length, getConfig().getEncoder_mode());
+        switch (getConfig().getEncoder_mode().getParm1().length()) {
+            case 1 :
+                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
+                if (image_size == null)
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_GB); // try 2
+                if (image_size == null)
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB); // try 3
+                break;
+            case 2 :
+                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
+                if (image_size == null)
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB);
+                break;
+            case 3 :
+                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
+                if (image_size == null)
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_ARGB); // try 4
+                break;
 
-        if (getConfig().getEncoder_mode().getParm1().length() == 3) {
-            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
-            if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_ARGB); // try 4
-            return image_size;
+            case 4 : image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
+                break;
         }
 
-        if (getConfig().getEncoder_mode().getParm1().length() == 1) {
-            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
-            if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_GB); // try 2
-            if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB); // try 3
-            return image_size;
-        }
-
-        if (getConfig().getEncoder_mode().getParm1().length() == 2) {
-            image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
-            if (image_size == null)
-                image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB);
-            return image_size;
-        }
-        return null;
+        return image_size;
     }
 
     /** ******************************************************<br>
