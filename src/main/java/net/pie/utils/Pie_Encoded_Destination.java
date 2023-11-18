@@ -7,7 +7,8 @@ import net.pie.enums.Pie_ZIP_Option;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.logging.Level;

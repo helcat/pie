@@ -2,9 +2,10 @@ package net.pie.utils;
 
 import net.pie.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.*;
-import java.util.logging.Formatter;
 
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>

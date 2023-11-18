@@ -13,7 +13,7 @@ import net.pie.Pie_Encode;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
-import java.io.*;
+import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Encode {
@@ -27,7 +27,7 @@ public class Pie_Test_Encode {
 
     public Pie_Test_Encode(String arg) {
 
-        //Pie_Encryption encryption = new Pie_Encryption("this a a temp1 2st art gfh fgf again");
+        //Pie_Encryption encryption = new Pie_Encryption("this a temp1 2st art gfh fgf again");
 
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config(

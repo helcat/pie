@@ -6,7 +6,9 @@ import net.pie.enums.Pie_ZIP_Option;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class Pie_Zip {
     private ZipOutputStream zos = null;
