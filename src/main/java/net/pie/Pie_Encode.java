@@ -59,7 +59,7 @@ public class Pie_Encode {
             return;
         }
 
-        int bufferSize = getConfig().getMax_encoded_image_mb() * 1024 * 1024; // MAx MB buffer size
+        int bufferSize = getConfig().getMax_mb().getMb() * 1024 * 1024; // MAx MB buffer size
         if (bufferSize > getConfig().getEncoder_source().getSource_size())
             bufferSize = getConfig().getEncoder_source().getSource_size();
 

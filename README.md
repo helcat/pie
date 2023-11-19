@@ -15,9 +15,9 @@ This is not a part of the encryption, it's a stand able feature to protect the i
 Would include but not limited to 
 * Chat servers (Passing encoded images (text to image) from one client to another).
 * Hiding files or text in plain sight.
-* Storing images or files on a cloud server. 
+* Storing images or other files on a cloud server. 
 * Passing information across to any server, network or computer system to bypass security.
-* Stop AI models from using your images or files for training.
+* Stop AI models from using your images or other files for training.
 
 When the file or text is encoded the end result is just an image.
 Any inspection of the file will pass as an image and unless the security denies images will pass through. When the file is decoded the file or text will be
@@ -89,6 +89,13 @@ These methods are available for ease of use and are not required for encoding or
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
 
 Add a source file to the configuration. This is the file you want encoded.
+
+#### Pie_Encode_Max_MB *** Encoding only. (Optional)
+You can set the Maximum MB for the encoding. If the file exceeds this, the file will be split. Default is 200mb.
+* `new Pie_Encode_Max_MB(200)`
+Important note. Pie_Encode_Max_MB is just one method of protecting the library. There is a "MAX_PROTECTED_SIZE" which cannot be changed. 
+Is this an image height and width the encoded image can not exceed. This is hardcoded to 15000 x 15000. This limitation will be removed in version 2 of the library
+in the future.
 
 #### Pie_Encryption *** Optional Encoding and Decoding.
 * `new Pie_Encryption("My Pass Phrase Goes Here");`

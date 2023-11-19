@@ -30,10 +30,10 @@ public class Pie_Config {
     private Pie_Encode_Min_Size encoder_Minimum_Image = new Pie_Encode_Min_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
+    private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB(200);
     private Pie_Zip encoder_storage = null;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
-    private int max_encoded_image_mb = 200;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private Logger log = null;
@@ -94,6 +94,7 @@ public class Pie_Config {
                     }
                     break;
                 case "Pie_Encoded_Destination": this.encoder_destination = (Pie_Encoded_Destination) o; break;
+                case "Pie_Encode_Max_MB": this.max_mb = (Pie_Encode_Max_MB) o; break;
                 case "Level": this.log_level = (Level) o; getLog().setLevel(this.log_level); break;
                 case "Pie_Decode_Source":
                     this.decode_source = (Pie_Decode_Source) o;
@@ -221,23 +222,6 @@ public class Pie_Config {
     }
 
     /** ***************************************************************<br>
-     * get the Maximum encoded image size in mb.
-     * @return int
-     */
-    public int getMax_encoded_image_mb() {
-        return max_encoded_image_mb;
-    }
-
-    /** ***************************************************************<br>
-     * Maximum Mb of a file before it is split into new files.<br>
-     * Default is 200mb but can be increased depending on the memory of the encoding and decoding devices. Can be set by the user.
-     * @param max_encoded_image_mb (int)
-     */
-    public void setMax_encoded_image_mb(int max_encoded_image_mb) {
-        this.max_encoded_image_mb = max_encoded_image_mb;
-    }
-
-    /** ***************************************************************<br>
      * Gets the shape of the final encoded image.
      * @return Pie_Shape
      * @see Pie_Shape
@@ -331,6 +315,14 @@ public class Pie_Config {
 
     private void setDecoded_Source_destination(Pie_Decode_Destination decoded_Source_destination) {
         this.decoded_Source_destination = decoded_Source_destination;
+    }
+
+    public Pie_Encode_Max_MB getMax_mb() {
+        return max_mb;
+    }
+
+    private void setMax_mb(Pie_Encode_Max_MB max_mb) {
+        this.max_mb = max_mb;
     }
 
     /** ******************************************************************<br>
