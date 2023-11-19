@@ -200,12 +200,23 @@ public class Pie_Decode {
     private byte[] readImage(BufferedImage buffimage) {
         int pixelColor;
         int[] value = null;
-
+        int[] modulate = new int[]{0,0,0,0};
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
                 pixelColor = buffimage.getRGB(x, y);
-                value = new int[]{(pixelColor >> 16) & 0xFF, (pixelColor >> 8) & 0xFF, pixelColor & 0xFF, (pixelColor >> 24) & 0xFF};
+                value = new int[]{
+                        ((pixelColor >> 16) & 0xFF) - modulate[0],
+                        ((pixelColor >> 8) & 0xFF) - modulate[1],
+                        (pixelColor & 0xFF) - modulate[2],
+                        ((pixelColor >> 24) & 0xFF) - modulate[3]
+                };
+
+                if (x == 0 && y == 0) {
+                    modulate = value;
+                    continue;
+                }
+
                 if (Arrays.stream(value).sum() == 0)
                     break;
 
@@ -267,7 +278,6 @@ public class Pie_Decode {
             if (parms.contains("?")) {
                 Stream<String> stream = Pattern.compile("\\?").splitAsStream(parms);
                 List<String> partsList = stream.collect(Collectors.toList());
-
                 getConfig().getDecoded_Source_destination().setFile_name(partsList.get(parm ++));                               // 0
                 setTotal_files(Integer.parseInt(partsList.get(parm ++).replaceAll("\\D", "")));    // 1
                 String files = partsList.get(parm ++);                                                              // 2
@@ -302,4 +312,5 @@ public class Pie_Decode {
     private void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
     }
+
 }

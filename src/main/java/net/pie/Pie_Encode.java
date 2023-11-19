@@ -23,6 +23,7 @@ import java.util.zip.DeflaterOutputStream;
 
 public class Pie_Encode {
     private Pie_Config config;
+    private int[] modulate = new int[]{0,0,0,0};
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
@@ -204,7 +205,7 @@ public class Pie_Encode {
 
         BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
         originalArray = null;
-        if (getConfig().isError() || data_image == null) {
+        if (getConfig().isError()) {
             data_image = null;
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;
@@ -255,6 +256,15 @@ public class Pie_Encode {
         int x =0, y = 0, store_count = 0;
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
+
+        setModulate(new int[]{
+                (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                0});
+
+        // Set Modulation
+        data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
 
         int[] store = null;
         for (int i : originalArray) {
@@ -412,7 +422,7 @@ public class Pie_Encode {
      **/
     private int checker(int[] store, int position, int min) {
         if (store.length > position)
-            return Math.max(store[position], min);
+            return Math.max(store[position], min) + getModulate()[position];
         return 0;
     }
 
@@ -439,16 +449,13 @@ public class Pie_Encode {
             }
         }
 
-        String addon =
-                filename +   // 0 Source Name
-                "?" +
-                total_files +                                                                                                       // 1 Number of Files
-                "?" +
-                addon_files +                                                                                                       // 2 File Names
-                "?"
+        return
+                new StringBuilder().append(
+                        filename).append("?").
+                        append(total_files).append("?").
+                        append(addon_files).append("?").
+                        toString().getBytes(StandardCharsets.UTF_8)
                 ;
-
-        return addon.getBytes(StandardCharsets.UTF_8) ;
     }
 
     /** *******************************************************<br>
@@ -469,4 +476,11 @@ public class Pie_Encode {
         return config;
     }
 
+    private int[] getModulate() {
+        return modulate;
+    }
+
+    private void setModulate(int[] modulate) {
+        this.modulate = modulate;
+    }
 }

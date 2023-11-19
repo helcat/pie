@@ -1,10 +1,15 @@
 # PIE (Pixel Image Encoding)
-PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, then decode back again.
-When encoding the file, its size should remain the same, however this depends on the options used to when encoding the file.
+PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, 
+then decode back again when required. When encoding the file, its size should remain the same, however this depends on the options used to when encoding.
 
 The PIE library is lightweight and does not have any dependencies. This should make it easier to integrate into almost any application. 
-To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Due to not having any dependencies, 
-wrappers can be created for other programming languages. Although libraries for other languages will be available in the future.
+To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Although written in Java libraries for 
+other languages will be available in the future.
+
+#### Image modulation
+In order to stop security applications and systems from detecting what the encoding is generating. Like calculating a hash or interrogating the image. 
+Every image produced has modulation. Which means Every image is completely different. No matter how large or small the image is or how many parts there are. 
+This is not a part of the encryption, it's a stand able feature to protect the image generation.
 
 #### Practical applications 
 Would include but not limited to 
