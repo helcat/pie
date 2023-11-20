@@ -9,10 +9,7 @@ import net.pie.utils.Pie_Utils;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,25 +32,21 @@ public class Pie_Encode {
      * @see Pie_Config
      **/
     public Pie_Encode (Pie_Config config) {
+        ImageIO.setUseCache(false);
+        long startTime = System.currentTimeMillis();
+
         if (config == null || config.isError())
             return;
         setConfig(config);
+
+        Pie_Utils utils = new Pie_Utils(getConfig());
+        long memory_Start = utils.getMemory();
 
         if (config.getEncoder_source() == null || config.getEncoder_source().getInput() == null) {
             config.logging(Level.SEVERE, "Error no source to encode");
             config.setError(true);
             return;
         }
-
-        processing();
-    }
-
-    private void processing() {
-        long startTime = System.currentTimeMillis();
-        ImageIO.setUseCache(false);
-
-        Pie_Utils utils = new Pie_Utils(getConfig());
-        long memory_Start = utils.getMemory();
 
         if (getConfig().getEncoder_source().getSource_size() == 0) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
@@ -63,7 +56,7 @@ public class Pie_Encode {
 
         int bufferSize = getConfig().getMax_mb().getMb() * 1024 * 1024; // MAx MB buffer size
         if (bufferSize > getConfig().getEncoder_source().getSource_size())
-            bufferSize = getConfig().getEncoder_source().getSource_size();
+            bufferSize = (int) getConfig().getEncoder_source().getSource_size();
 
         int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
         files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);

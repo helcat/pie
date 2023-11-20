@@ -14,7 +14,7 @@ public class Pie_Encode_Source {
     private Pie_Source_Type type = Pie_Source_Type.NONE;
     private String file_name = null;
     private InputStream input = null;
-    private int source_size;
+    private long source_size;
     private Integer error_code = null;
 
     /** *******************************************************<br>
@@ -130,11 +130,11 @@ public class Pie_Encode_Source {
         this.input = input;
     }
 
-    public int getSource_size() {
+    public long getSource_size() {
         return source_size;
     }
 
-    private void setSource_size(int source_size) {
+    private void setSource_size(long source_size) {
         this.source_size = source_size;
     }
 
