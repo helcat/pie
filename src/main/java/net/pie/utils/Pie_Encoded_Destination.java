@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -23,7 +25,7 @@ public class Pie_Encoded_Destination {
     private File local_file;
     private URL web_address;
     private String encoding_id = UUID.randomUUID().toString();
-
+    private List<String> encoded_file_list = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encoded_Destination</b><br>
@@ -45,6 +47,9 @@ public class Pie_Encoded_Destination {
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
     public boolean save_Encoded_Image(Pie_Config config, BufferedImage image, int file_number, int total_files, String source_filename) {
+        if (getEncoded_file_list() == null)
+            setEncoded_file_list(new ArrayList<>());
+
         if (config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
             config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (config.getEncoder_storage().getFos() == null)
@@ -61,7 +66,7 @@ public class Pie_Encoded_Destination {
                 config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
                 return false;
             }
-
+            getEncoded_file_list().add(toFile.getPath());
             try {
                 return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
             } catch (IOException e) {
@@ -188,6 +193,14 @@ public class Pie_Encoded_Destination {
 
     private void setEncoding_id(String encoding_id) {
         this.encoding_id = encoding_id;
+    }
+
+    public List<String> getEncoded_file_list() {
+        return encoded_file_list;
+    }
+
+    private void setEncoded_file_list(List<String> encoded_file_list) {
+        this.encoded_file_list = encoded_file_list;
     }
 }
 

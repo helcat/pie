@@ -21,6 +21,7 @@ public class Pie_Decode {
     private Pie_Config config;
     private int total_files = 0;
     private OutputStream outputStream = null;
+    private String decoded_file_path = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -31,7 +32,6 @@ public class Pie_Decode {
         if (config == null || config.isError())
             return;
         setConfig(config);
-
         ImageIO.setUseCache(false);
         setTotal_files(0);
 
@@ -47,6 +47,15 @@ public class Pie_Decode {
             return;
         }
         process_Decoding();
+
+        if (getConfig().isError() && !getConfig().getOptions().contains(Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR)) {
+            if (getDecoded_file_path() != null && !getDecoded_file_path().isEmpty()) {
+                File f = new File(getDecoded_file_path());
+                if (f.isFile() && f.delete())
+                    getConfig().logging(Level.SEVERE, "Destination File Deleted " + f.getName());
+            }
+            setDecoded_file_path(null);
+        }
     }
 
     /** *********************************************************<br>
@@ -247,6 +256,7 @@ public class Pie_Decode {
             File f = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
             try {
                 setOutputStream(new FileOutputStream(f));
+                setDecoded_file_path(f.getPath());
             } catch (FileNotFoundException e) {
                 setOutputStream(null);
                 getConfig().logging(Level.SEVERE, "Creating stream Error : " + e.getMessage());
@@ -294,6 +304,15 @@ public class Pie_Decode {
         }
     }
 
+    /** *******************************************************************<br>
+     * isDecoding_Error<br>
+     * Not used in Pie. Can be used by user to see if an error occurred without checking the logs.
+     * @return boolean
+     */
+    public boolean isDecoding_Error() {
+        return  getConfig().isError();
+    }
+
     private void setConfig(Pie_Config config) {
         this.config = config;
     }
@@ -313,4 +332,16 @@ public class Pie_Decode {
         this.outputStream = outputStream;
     }
 
+    /** *******************************************************************<br>
+     * getDecoded_file_path<br>
+     * returns the location of the decoded file path to use in your own application if required.<br>
+     * @return String
+     */
+    public String getDecoded_file_path() {
+        return decoded_file_path;
+    }
+
+    private void setDecoded_file_path(String decoded_file_path) {
+        this.decoded_file_path = decoded_file_path;
+    }
 }

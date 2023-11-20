@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "background.jpg";
-    private String temp_Encoded_Image = "background.jpg";
+    private String temp_To_Be_Encoded = "fire2.jpg";
+    private String temp_Encoded_Image = "fire2.jpg";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -48,6 +48,8 @@ public class Pie_Test_Encode {
         );
 
         // Do Encoding, Will create the image and put it in the destination
-        new Pie_Encode(encoding_config);
+        Pie_Encode encode = new Pie_Encode(encoding_config);
+        System.out.println(encode.isEncoding_Error());
+        encode.getEncoded_file_list().forEach(System.out::println);
     }
 }

@@ -17,8 +17,8 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_background.jpg.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Encoded_Imaage = "enc_fire2.jpg.png";
+    private String temp_Decode_To = "batch";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -45,6 +45,8 @@ public class Pie_Test_Decode {
                 new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
         );
 
-        new Pie_Decode(decoding_config);
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        System.out.println(decoded.getDecoded_file_path());
+        System.out.println(decoded.isDecoding_Error());
     }
 }

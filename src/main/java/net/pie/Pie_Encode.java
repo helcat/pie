@@ -15,8 +15,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -450,12 +452,28 @@ public class Pie_Encode {
         }
 
         return
-                new StringBuilder().append(
-                        filename).append("?").
-                        append(total_files).append("?").
-                        append(addon_files).append("?").
-                        toString().getBytes(StandardCharsets.UTF_8)
+                (filename + "?" +
+                        total_files + "?" +
+                        addon_files + "?").getBytes(StandardCharsets.UTF_8)
                 ;
+    }
+
+    /** *******************************************************************<br>
+     * getEncoded_file_list<br>
+     * returns a list of the files created, does not include files stored in a zip file.<br>
+     * @return ist<String>
+     */
+    public List<String> getEncoded_file_list() {
+        return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() : getConfig().getEncoder_destination().getEncoded_file_list();
+    }
+
+    /** *******************************************************************<br>
+     * isEncoding_Error<br>
+     * Not used in Pie. Can be used by user to see if an error occurred without checking the logs.
+     * @return boolean
+     */
+    public boolean isEncoding_Error() {
+        return  getConfig().isError();
     }
 
     /** *******************************************************<br>
@@ -483,4 +501,5 @@ public class Pie_Encode {
     private void setModulate(int[] modulate) {
         this.modulate = modulate;
     }
+
 }

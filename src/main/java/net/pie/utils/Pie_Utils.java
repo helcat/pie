@@ -51,11 +51,28 @@ public class Pie_Utils {
      * Simple function that gets the path to the desktop. Can be used when saving files.
      **/
     public static String getDesktopPath() {
-        return FileSystemView.getFileSystemView().getHomeDirectory().getPath();
+        return getDesktop().getPath();
     }
     public static File getDesktop() {
         return FileSystemView.getFileSystemView().getHomeDirectory();
     }
+
+    public static String getTempFolderPath() {
+        File f = getTempFolder();
+        if (f == null)
+            return "";
+        return f.getPath();
+    }
+    public static File getTempFolder() {
+        String tempPath = System.getProperty("java.io.tmpdir");
+        if (tempPath.startsWith(File.separator+"var"+File.separator+"folders"+ File.separator))
+            tempPath = File.separator+"tmp"+File.separator; // a fix to handle the path the Mac JVM returns
+        File tmp = new File(tempPath);
+        if (tmp.exists())
+            return tmp;
+        return null;
+    }
+
     /** *****************************************************<br>
      * Collects the amount of memory used<br>
      * @return long

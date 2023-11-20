@@ -1,5 +1,7 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Constants;
+
 import java.io.File;
 import java.net.URL;
 
@@ -14,8 +16,6 @@ public class Pie_Decode_Destination {
     private URL web_address;
     private String file_name = null;
     private byte[] bytes = null;
-    private boolean error = false;
-    private String error_message = null;
     private Integer error_code = null;
 
     /** *******************************************************************<br>
@@ -23,33 +23,30 @@ public class Pie_Decode_Destination {
      * With no parameters, Pie_Encoded_Destination allows for custom parameters.
      **/
     public Pie_Decode_Destination() {
+        setLocal_folder(Pie_Utils.getDesktop());
     }
 
     /** *******************************************************************<br>
      * <b>Pie_Encode_Destination</b><br>
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/
-    public Pie_Decode_Destination(File folder) {
-        setLocal_folder(folder);
-    }
-
-    /** *******************************************************************<br>
-     * <b>setLocal_folder</b><br>
-     * sets a local folder, where to save the file
-     * @param local_folder (File)
-     */
-
-    private void setLocal_folder(File local_folder) {
-        if (local_folder != null && !local_folder.exists()  ||
-            local_folder != null && !local_folder.isDirectory()) {
-            setError(true);
-            if (!local_folder.exists())
-                setError_message("Decoder Destination Folder Does Not Exist : " + local_folder);
-            else if (!local_folder.isDirectory())
-                setError_message("Decoder Destination Folder Is Invalid : " + local_folder);
-            local_folder = null;
+    public Pie_Decode_Destination(Object o) {
+        if (o == null) {
+            setLocal_folder(Pie_Utils.getDesktop());
+            return;
         }
-        this.local_folder = local_folder;
+
+        switch (o.getClass().getSimpleName()) {
+            case "File":
+                if (((File) o).exists() && ((File) o).isDirectory()) {
+                    setLocal_folder((File) o);
+                    return;
+                }
+        }
+
+        setError_code(Pie_Constants.ERROR_CODE_12.ordinal());
+        setLocal_folder(null);
+
     }
 
     /** *******************************************************************<br>
@@ -68,28 +65,16 @@ public class Pie_Decode_Destination {
         return local_folder;
     }
 
+    public void setLocal_folder(File local_folder) {
+        this.local_folder = local_folder;
+    }
+
     public String getFile_name() {
         return file_name;
     }
 
     public void setFile_name(String file_name) {
         this.file_name = file_name;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public String getError_message() {
-        return error_message;
-    }
-
-    public void setError_message(String error_message) {
-        this.error_message = error_message;
     }
 
     public byte[] getBytes() {

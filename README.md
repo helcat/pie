@@ -1,4 +1,4 @@
-# PIE (Pixel Image Encoding)
+# <span style='color:CornflowerBlue'>PIE (Pixel Image Encoding)</span>
 PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, 
 then decode back again when required. When encoding the file, its size should remain the same, however this depends on the options used to when encoding.
 
@@ -6,25 +6,26 @@ The PIE library is lightweight and does not have any dependencies. This should m
 To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Although written in Java libraries for 
 other languages will be available in the future.
 
-#### Image modulation
-In order to stop security applications and systems from detecting what the encoding is generating. Like calculating a hash or interrogating the image. 
-Every image produced has modulation. Which means Every image is completely different. No matter how large or small the image is or how many parts there are. 
-This is not a part of the encryption, it's a stand able feature to protect the image generation.
+#### <span style='color:MediumSeaGreen'>Image modulation</span>
+In order to stop security applications and systems from detecting what was encoded by calculating a hash or interrogating the image. 
+Every image produced has modulation. Which means Every image is completely different. No matter the content, how large / small the image is or how many parts there are. 
+This is not a part of the encryption, it's a standalone feature to protect the image generation.
 
-#### Practical applications 
+#### <span style='color:MediumSeaGreen'>Practical applications</span> 
 Would include but not limited to 
-* Chat servers (Passing encoded images (text to image) from one client to another).
+* Chat servers (Passing encoded images (text to image and back again) from one client to another).
 * Hiding files or text in plain sight.
 * Storing images or other files on a cloud server. 
-* Passing information across to any server, network or computer system to bypass security.
+* Passing information across to any server, network or computer system to bypass security and middle men.
 * Stop AI models from using your images or other files for training.
+* and many more....
 
 When the file or text is encoded the end result is just an image.
 Any inspection of the file will pass as an image and unless the security denies images will pass through. When the file is decoded the file or text will be
-intact. Even the metadata of the file is restored. Any file can be encoded for example Images, Movies, Documents, already compressed files including zip and 
-even Exe or Application files.
+intact. Even the metadata of the file is restored. Any file can be encoded for example but not limited to Images, Movies, Documents, already compressed files including zip, 
+Exe or Application files and even already encrypted files.
 
-## Encoding - Getting started
+## <span style='color:CornflowerBlue'>Encoding - Getting started</span>
 Create a configuration file first. This will store all the defaults and options for the encoding. A lot of the options have already been defaulted but can be 
 overridden.
 
@@ -38,66 +39,69 @@ You do not have to place the "options" or any parameters in any order, enter the
 * `Pie_Option.RUN_GC_AFTER_PROCESSING` : will run garbage collection after processing. Default false.
 * `Pie_Option.SHOW_MEMORY_USAGE` : shows approximate memory usage. Default false.
 * `Pie_Option.TERMINATE_LOG_AFTER_PROCESSING` : will terminate the logging. Default false.
+* `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR` : will override the default of deleting the file if an error has occurred.
 
 Example
 
 `new Pie_Config(Pie_Option.ENC_OVERWRITE_FILE, Pie_Option.SHOW_PROCESSING_TIME);`
 
-### Other options with more detail.
-#### Pie_Shape : *** Encoding only. (Optional) Changes the shape of the image. Values allowed are :
-* `SHAPE_RECTANGLE` : default.
-* `SHAPE_SQUARE`
+### <span style='color:CornflowerBlue'>Other options with more detail. Add these to the "`new Pie_Config(....)`"</span>
+#### <span style='color:MediumSeaGreen'>Pie_Shape : *** Encoding only. (Optional) Changes the shape of the image. Values allowed are :</span>
+* `Pie_Shape.SHAPE_RECTANGLE` : Default.
+* `Pie_Shape.SHAPE_SQUARE`
 
-#### Pie_Encode_Mode : *** Encoding only. (Optional) Changes the type of encoding to be used. Values allowed are :
-* `ENCODE_MODE_R` Image will be red - X Large file size<br>
-* `ENCODE_MODE_G` Image will be green - X Large file size<br>
-* `ENCODE_MODE_B` Image will be blue - X Large file size<br>
-* `ENCODE_MODE_RT` use red channel only Fully transparent - X Large file size<br>
-* `ENCODE_MODE_GT` use green channel only Fully transparent - X Large file size<br>
-* `ENCODE_MODE_BT` use blue channel only Fully transparent - X Large file size<br>
-* `ENCODE_MODE_GB` Image will be green and blue - Large file size<br>
-* `ENCODE_MODE_RB` Image will be red and blue - Large file size<br>
-* `ENCODE_MODE_RG` Image will be red and green - Large file size<br>
-* `ENCODE_MODE_GBT` use green and blue channels only Fully transparent - Large file size<br>
-* `ENCODE_MODE_RBT` use red and blue channels only Fully transparent - Large file size<br>
-* `ENCODE_MODE_RGT` use red and green channels only Fully transparent - Large file size<br>
-* `ENCODE_MODE_RGB` Image will be red, green and blue - Medium file size <br>
-* `ENCODE_MODE_RGBT` use red, green and blue channels Fully transparent - Medium file size <br>
-* `ENCODE_MODE_ARGB` full encoding. Small File size. (Default Setting)
+#### <span style='color:MediumSeaGreen'>Pie_Encode_Mode : *** Encoding only. (Optional) Changes the type of encoding to be used. Values allowed are :</span>
+* `Pie_Encode_Mode.ENCODE_MODE_R` Image will be red - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_G` Image will be green - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_B` Image will be blue - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RT` use red channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_GT` use green channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_BT` use blue channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_GB` Image will be green and blue - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RB` Image will be red and blue - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RG` Image will be red and green - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_GBT` use green and blue channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RBT` use red and blue channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RGT` use red and green channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.ENCODE_MODE_RGB` Image will be red, green and blue - Medium file size
+* `Pie_Encode_Mode.ENCODE_MODE_RGBT` use red, green and blue channels Fully transparent - Medium file size
+* `Pie_Encode_Mode.ENCODE_MODE_ARGB` full encoding. Small File size. Default.
 
-#### Pie_ZIP_Name : *** Encoding only. (Optional) sets a custom name format
-* `AS_IS` Default. Leaves the name alone, however if multiple files are needed, a number is added.
-* `RANDOM` generates a random name to hide the real file name when decoding.
-* `NUMBER` issues an incremental number as a file name.
+#### <span style='color:MediumSeaGreen'>Pie_ZIP_Name : *** Encoding only. (Optional) sets a custom name format</span>
+* `Pie_ZIP_Name.AS_IS` Leaves the name alone, however if multiple files are needed, a number is added. Default.
+* `Pie_ZIP_Name.RANDOM` generates a random name to hide the real file name when decoding.
+* `Pie_ZIP_Name.NUMBER` issues an incremental number as a file name.
 
-#### Pie_ZIP_Option : *** Encoding only. (Optional) sets when a zip file should be used.
-* `NEVER` a zip file is never used. Any files will be created as is.
-* `ALWAYS` a zip file is always used.
-* `ONLY_WHEN_EXTRA_FILES_REQUIRED` Default. Only creates a zip file when needed.
+#### <span style='color:MediumSeaGreen'>Pie_ZIP_Option : *** Encoding only. (Optional) sets when a zip file should be used.</span>
+* `Pie_ZIP_Option.NEVER` a zip file is never used. Any files will be created as is.
+* `Pie_ZIP_Option.ALWAYS` a zip file is always used.
+* `Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED` Only creates a zip file when needed. Default.
 
-#### Level : *** Encoding and Decoding. (Optional) This is a standard java logging parameter .
+#### <span style='color:MediumSeaGreen'>Level : *** Encoding and Decoding. (Optional) This is a standard java logging parameter .</span>
 * `Level.SEVERE` is the default.
 
-### Utilities *** Encoding and Decoding.
+### <span style='color:CornflowerBlue'>Utilities *** Encoding and Decoding.</span>
 These methods are available for ease of use and are not required for encoding or decoding.
 * `Pie_Utils.getDesktop()` gets the desktop as a file object.
 * `Pie_Utils.getDesktopPath()` gets the desktop as a string path.
+* `Pie_Utils.getTempFolder()` gets the temporary folder as a file object. Also handles the OSX Path.
+* `Pie_Utils.getTempFolderPath()` gets the temporary folder as a string path. Also handles the OSX Path.
 
-### Object options.
+### <span style='color:CornflowerBlue'>Object options.</span>
 
-#### Pie_Encode_Source *** Encoding only. (Optional) This is a required parameter
+#### <span style='color:MediumSeaGreen'>Pie_Encode_Source *** Encoding only. This is a required parameter</span>
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
 
 Add a source file to the configuration. This is the file you want encoded.
 
-#### Pie_Encode_Max_MB *** Encoding only. (Optional)
+#### <span style='color:MediumSeaGreen'>Pie_Encode_Max_MB *** Encoding only. (Optional)</span>
 You can set the Maximum MB for the encoding. If the file exceeds this, the file will be split. Default is 200mb.
 * `new Pie_Encode_Max_MB(200)`
 Important note. Pie_Encode_Max_MB is just one method of protecting the library. There is a "MAX_PROTECTED_SIZE" which cannot be changed. 
 Is this an image height and width the encoded image can not exceed. This is hardcoded to 15000 x 15000. This limitation will be removed in version 2 of the library
 in the future.
 
-#### Pie_Encryption *** Optional Encoding and Decoding.
+#### <span style='color:MediumSeaGreen'>Pie_Encryption *** Optional Encoding and Decoding.</span>
 * `new Pie_Encryption("My Pass Phrase Goes Here");`
 * `new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "certificate_name"))`
 
@@ -118,13 +122,13 @@ Parameters for the method are as follows, please note you can add them in any or
 * `File` Optional. A folder to store the certificate. If not entered the desktop will be used.
 * `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the file name.
 
-#### Pie_Encoded_Destination *** Optional 
+#### <span style='color:MediumSeaGreen'>Pie_Encoded_Destination *** Optional</span>
 * `new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + "my_encoded_file"))`
 
 Add a destination to the configuration. This is where you want the encoded file to be stored. Optional, you can give the new file a name. "png" or "zip" will be added
 when required so an extension is not required.
 
-#### Pie_Encode_Min_Size *** Optional
+#### <span style='color:MediumSeaGreen'>Pie_Encode_Min_Size *** Optional</span>
 * `new Pie_Encode_Min_Size(100, 100, Pie_Position.MIDDLE_CENTER)`
 
 If the encoded image is tiny, and you want the end file to be a certain size, you can add a minimum size parameter to the configuration with an offset positional layout.
@@ -140,7 +144,7 @@ The default position is "Pie_Position.MIDDLE_CENTER" however you can use any of 
 * `BOTTOM_CENTER`
 * `BOTTOM_RIGHT`
 
-### Encoding example
+### <span style='color:CornflowerBlue'>Encoding example</span>
         Pie_Config encoding_config = new Pie_Config(
                 new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate")),
                 new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "my_movie.avi")),
@@ -148,6 +152,52 @@ The default position is "Pie_Position.MIDDLE_CENTER" however you can use any of 
         );
         new Pie_Encode(encoding_config);
 
-## Decoding - Getting started
+### <span style='color:CornflowerBlue'>Useful Encoding methods for after processing</span>
+#### <span style='color:MediumSeaGreen'>isEncoding_Error *** Encoding only. (Optional)</span>
+Will return true or false to indicate if the encoding process failed.
+
+        Pie_Encode encode = new Pie_Encode(encoding_config);
+        System.out.println(encode.isEncoding_Error());
+
+#### <span style='color:MediumSeaGreen'>getEncoded_file_list *** Encoding only. (Optional)</span>
+Will return the path to the encoded files, so you can use this in your own source.
+
+        Pie_Encode encode = new Pie_Encode(encoding_config);
+        encode.getEncoded_file_list().forEach(System.out::println);
+
+
+## <span style='color:CornflowerBlue'>Decoding - Getting started</span>
 Create a configuration file first. This will store all the defaults and options for the decoding process. A lot of the options have already been defaulted but can be
 overridden.
+
+### <span style='color:CornflowerBlue'>Decoding example</span>
+        Pie_Config decoding_config = new Pie_Config(
+                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate")),
+                new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + my_encoded_file.png")),
+                new Pie_Decode_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + "my_folder")),
+        );
+        new Pie_Decode(decoding_config);
+
+#### <span style='color:MediumSeaGreen'>Pie_Decode_Source *** Decoding only. This is a required parameter</span>
+* `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` : Using a file object. This is the file you want decoded.
+
+Add a source file to the configuration. 
+
+#### <span style='color:MediumSeaGreen'>Pie_Decode_Destination *** Decoding only. (Optional). Desktop will be used if no destination entered.</span>
+* `new Pie_Decode_Destination(new File(Pie_Utils.getDesktop()))` : Using a file object. Directory only, the file name is embedded in the encoded file.
+
+Add a destination for the decoded source.
+
+### <span style='color:CornflowerBlue'>Useful Decoding methods for after processing</span>
+#### <span style='color:MediumSeaGreen'>getDecoded_file_path *** Decoding only. (Optional)</span>
+Will return the path to the decoded file, so you can use this in your own source. By default, if an error has occurred the destination file will be deleted and 
+getDecoded_file_path will return null. You can override this by using `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR`.
+
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        System.out.println(decoded.getDecoded_file_path());
+
+#### <span style='color:MediumSeaGreen'>isDecoding_Error *** Decoding only. (Optional)</span>
+Will return true or false to indicate if the decoding process failed.
+
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        System.out.println(decoded.isDecoding_Error());

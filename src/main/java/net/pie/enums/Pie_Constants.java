@@ -20,7 +20,9 @@ public enum Pie_Constants {
     ERROR_CODE_8 (8, "Encoding String is required"),
     ERROR_CODE_9 (9, "Invalid File"),
     ERROR_CODE_10 (10, "No Decode Object Found"),
-    ERROR_CODE_11 (11, "Unable to decode object")
+    ERROR_CODE_11 (11, "Unable to decode object"),
+    ERROR_CODE_12 (12, "Invalid Decoding destination"),
+    ERROR_CODE_13 (13, "Decoder Destination Folder Does Not Exist");
     ;
 
     public int parm1 = 0;
