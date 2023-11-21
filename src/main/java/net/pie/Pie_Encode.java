@@ -61,6 +61,11 @@ public class Pie_Encode {
         int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
         files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
 
+        if (files_to_be_created > Pie_Constants.MAX_PROTCTED_CREATED_FILES.getParm1()) {
+            getConfig().logging(Level.SEVERE,"System protection. Max files exceeded");
+            return;
+        }
+
         try {
             InputStream fis = getConfig().getEncoder_source().getInput();
             byte[] buffer = new byte[bufferSize];
@@ -117,6 +122,10 @@ public class Pie_Encode {
     private void encode(byte[] originalArray, int file_number, int total_files) {
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
+            return;
+        }
+        if (file_number > total_files) {
+            getConfig().logging(Level.SEVERE,"System protection. Unexpected file count.");
             return;
         }
 
@@ -457,6 +466,8 @@ public class Pie_Encode {
      * @return ist<String>
      */
     public List<String> getEncoded_file_list() {
+        if (getConfig() == null)
+            return new ArrayList<>();
         return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() : getConfig().getEncoder_destination().getEncoded_file_list();
     }
 
@@ -466,7 +477,7 @@ public class Pie_Encode {
      * @return boolean
      */
     public boolean isEncoding_Error() {
-        return  getConfig().isError();
+        return  getConfig() == null || getConfig().isError();
     }
 
     /** *******************************************************<br>

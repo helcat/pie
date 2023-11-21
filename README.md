@@ -1,30 +1,41 @@
 # <span style='color:CornflowerBlue'>PIE (Pixel Image Encoding)</span>
 PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, 
-then decode back again when required. When encoding the file, its size should remain the same, however this depends on the options used to when encoding.
+then decode back again when required. When encoding the file, its size should remain the same however, depends on the options used to when encoding.
 
 The PIE library is lightweight and does not have any dependencies. This should make it easier to integrate into almost any application. 
-To make sure there is no confusion and for compatibility all methods in the library are prefixed with `"Pie_"`. Although written in Java libraries for 
+To make sure there is no confusion and for compatibility all classes in the library are prefixed with `"Pie_"`. Although written in Java libraries for 
 other languages will be available in the future.
 
 #### <span style='color:MediumSeaGreen'>Image modulation</span>
-In order to stop security applications and systems from detecting what was encoded by calculating a hash or interrogating the image. 
-Every image produced has modulation. Which means Every image is completely different. No matter the content, how large / small the image is or how many parts there are. 
-This is not a part of the encryption, it's a standalone feature to protect the image generation.
+Every image produced has modulation. Which means Every image is completely different even if it's the same content being encoded. 
+Note this is not a part of any encryption process.
 
 #### <span style='color:MediumSeaGreen'>Practical applications</span> 
 Would include but not limited to 
-* Chat servers (Passing encoded images (text to image and back again) from one client to another).
+* Chat servers . Ideally to pass a text encoded image from one client to another.
+  * Process :  Text "Hello World" -> encode -> send to client -> decode -> view. Any one observing will only see an image nothing else.
 * Hiding files or text in plain sight.
+  * Process : Document -> encode -> store for later. Any sensitive files can be stored. If stolen or hacked the files will be locked.
 * Storing images or other files on a cloud server. 
-* Passing information across to any server, network or computer system to bypass security and middle men.
-* Stop AI models from using your images or other files for training.
+  * Process : Image -> encode -> Upload. Store any encoded file online and never worry about intrusions even if someone gets your password.
+* Passing information across to any server, network or computer system.
+  * Process : Sensitive Text / File / Command -> encode / encrypt -> send. Any one observing will only see an image nothing else.
 * and many more....
 
-When the file or text is encoded the end result is just an image.
+When the file or text is encoded the end result is just a plain "png" image.
 Any inspection of the file will pass as an image and unless the security denies images will pass through. When the file is decoded the file or text will be
-intact. Even the metadata of the file is restored. Any file can be encoded for example but not limited to Images, Movies, Documents, already compressed files including zip, 
-Exe or Application files and even already encrypted files.
+intact. Even the metadata of the file is restored. Any file can be encoded for example but not limited to Images, Movies, Documents, Zips, Exe, Application 
+and even already encrypted files.
 
+#### <span style='color:MediumSeaGreen'>Known Limitations</span>
+* Can be a little slow depending on the device used to encode and or encrypt large files over 600mb.
+* Splitting files, each file is split to 200mb. Can be overridden using "Pie_Encode_Max_MB" but make sure you have enough memory.
+* Splitting files, the number of files that can be produced is 30. Which is about 6gb.
+* When using urls to download files. if the "getContentLengthLong" is not available the file will not be downloaded. In this case download the file yourself and 
+ use the inputstream and size method.
+
+These limitations can be sorted out by adding dependencies and if you have the source code.
+ 
 ## <span style='color:CornflowerBlue'>Encoding - Getting started</span>
 Create a configuration file first. This will store all the defaults and options for the encoding. A lot of the options have already been defaulted but can be 
 overridden.
@@ -91,12 +102,26 @@ These methods are available for ease of use and are not required for encoding or
 
 #### <span style='color:MediumSeaGreen'>Pie_Encode_Source *** Encoding only. This is a required parameter</span>
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
+  * File : Add a local file to be encoded. `new File("....")`
+  * URL : Use url to download a file. `new URL("https..../myfile.jpg")`
+  * HttpURLConnection or HttpsURLConnection : Use your own connection to download the file. 
+  * `new Pie_Text("This is some text to encode")` Encode text using "Pie_Text". 
 
+When using an online source, make sure the file name is included either as a header or on the end of the url.
 Add a source file to the configuration. This is the file you want encoded.
+
+#### <span style='color:MediumSeaGreen'>Pie_Text *** Encoding only. (Optional) use with "Pie_Encode_Source"</span>
+Can only be used with "Pie_Encode_Source". There are two parameters "text to encode" and "file name". 
+File name will not be used if a "file object" is used however if a string of text is entered, "Text.txt" will be used unless file name is entered. 
+Arabic and Cyrillic can also be encoded.
+
+* `new Pie_Encode_Source(new Pie_Text("مرحبا هذا اختبار للفطيرة", "myfile.png"))` Using plain text.
+* `new Pie_Encode_Source(new Pie_Text(new File(...."my_text_file.txt"), "myfile.png"))` Using a text file. Must end with ".txt".
 
 #### <span style='color:MediumSeaGreen'>Pie_Encode_Max_MB *** Encoding only. (Optional)</span>
 You can set the Maximum MB for the encoding. If the file exceeds this, the file will be split. Default is 200mb.
 * `new Pie_Encode_Max_MB(200)`
+
 Important note. Pie_Encode_Max_MB is just one method of protecting the library. There is a "MAX_PROTECTED_SIZE" which cannot be changed. 
 Is this an image height and width the encoded image can not exceed. This is hardcoded to 15000 x 15000. This limitation will be removed in version 2 of the library
 in the future.
@@ -124,9 +149,10 @@ Parameters for the method are as follows, please note you can add them in any or
 
 #### <span style='color:MediumSeaGreen'>Pie_Encoded_Destination *** Optional</span>
 * `new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + "my_encoded_file"))`
+* `new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath()))`
 
-Add a destination to the configuration. This is where you want the encoded file to be stored. Optional, you can give the new file a name. "png" or "zip" will be added
-when required so an extension is not required.
+Add a destination to the configuration. Enter a folder, this is where you want the encoded file to be stored. You can give the new file a name, but if one is not entered the 
+name of the file to encoded will be used. "png" or "zip" will be added so an extension is not required.
 
 #### <span style='color:MediumSeaGreen'>Pie_Encode_Min_Size *** Optional</span>
 * `new Pie_Encode_Min_Size(100, 100, Pie_Position.MIDDLE_CENTER)`

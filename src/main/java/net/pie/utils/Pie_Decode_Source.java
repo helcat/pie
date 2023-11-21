@@ -41,7 +41,6 @@ public class Pie_Decode_Source {
                     break;
             case "URL":
             case "InputStream":
-            case "Pie_URL":
                 break;
             default:
                 setDecode_object(null);
@@ -94,17 +93,6 @@ public class Pie_Decode_Source {
                     config.logging(Level.SEVERE,"Unable to read file " + e.getMessage());
                 }
                 break;
-            case "Pie_URL":
-                Pie_URL pu = (Pie_URL) getDecode_object();
-                config.logging(Level.INFO,"Downloading File ");
-                pu.receive();
-                if (pu.getInput() == null || pu.getError_message() != null) {
-                    config.logging(Level.SEVERE,"Pie_URL Failed " +(pu.getError_message() != null ? pu.getError_message() : ""));
-                    pu.close();
-                    return;
-                }
-                setInput(pu.getInput());
-                break;
             case "URL":
                 URL u = (URL) getDecode_object();
                 config.logging(Level.INFO,"Downloading File ");
@@ -127,11 +115,6 @@ public class Pie_Decode_Source {
      * Close the input stream
      */
     public void close() {
-        if (getDecode_object() instanceof Pie_URL) {
-            Pie_URL u = (Pie_URL) getDecode_object();
-            u.close();
-        }
-
         try {
             if (getInput() != null)
                 getInput().close();

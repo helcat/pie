@@ -17,8 +17,8 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_background.jpg1.png";
-    private String temp_Decode_To = "shared";
+    private String temp_Encoded_Imaage = "enc_LICENSE.txt.png";
+    private String temp_Decode_To = "test";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -41,8 +41,8 @@ public class Pie_Test_Decode {
                 Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
                 Level.INFO,
                 new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
-                new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Imaage)),
-                new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
+                new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  "test" + File.separator + temp_Encoded_Imaage)),
+                new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + File.separator + temp_Decode_To))
         );
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);

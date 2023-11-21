@@ -310,7 +310,7 @@ public class Pie_Decode {
      * @return boolean
      */
     public boolean isDecoding_Error() {
-        return  getConfig().isError();
+        return  getConfig() == null || getConfig().isError();
     }
 
     private void setConfig(Pie_Config config) {
@@ -338,7 +338,7 @@ public class Pie_Decode {
      * @return String
      */
     public String getDecoded_file_path() {
-        return decoded_file_path;
+        return decoded_file_path == null ? "" : decoded_file_path;
     }
 
     private void setDecoded_file_path(String decoded_file_path) {

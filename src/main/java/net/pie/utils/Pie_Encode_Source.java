@@ -3,7 +3,12 @@ package net.pie.utils;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.StringTokenizer;
+import java.util.zip.GZIPInputStream;
 
 /** *******************************************************<br>
  * <b>Pie_Encode_Source</b><br>
@@ -52,31 +57,23 @@ public class Pie_Encode_Source {
             return;
         }
         switch (encode.getClass().getSimpleName()) {
-            case "InputStream" :
-                if (size < 1) {
-                    setError_code(Pie_Constants.ERROR_CODE_5.ordinal());
+            case "URL" :
+            case "HttpURLConnection" :
+            case "HttpsURLConnection" :
+                receive(encode);
+                if (getError_code() != null)
                     return;
-                }
-                setSource_size(size);
-                setInput((InputStream) encode);
                 setType(Pie_Source_Type.FILE);
-                if (getFile_name() == null || getFile_name().isEmpty())
-                    setError_code(Pie_Constants.ERROR_CODE_6.ordinal());
                 break;
-            case "byte[]" :
-                setSource_size(((byte[]) encode).length);
-                setInput(new ByteArrayInputStream(((byte[]) encode)));
-                setType(Pie_Source_Type.FILE);
-                if (getFile_name() == null || getFile_name().isEmpty())
-                    setError_code(Pie_Constants.ERROR_CODE_7.ordinal());
-                break;
-            case "String" :
-                if (((String) encode).isEmpty()) {
+            case "Pie_Text" :
+                Pie_Text text = (Pie_Text) encode;
+                if (text.getText() == null || text.getText().isEmpty()) {
                     setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
                     return;
                 }
-                setSource_size(((String) encode).getBytes().length);
-                setInput(new ByteArrayInputStream(((String) encode).getBytes()));
+                setSource_size(text.getText().getBytes().length);
+                setInput(new ByteArrayInputStream(text.getText().getBytes()));
+                setFile_name(text.getFile_name());
                 setType(Pie_Source_Type.TEXT);
                 break;
             case "File" :
@@ -100,6 +97,145 @@ public class Pie_Encode_Source {
 
         if (getInput() == null)
             setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+    }
+
+    /** *********************************************************<br>
+     * receive from online<br>
+     * HttpURLConnection, HttpsURLConnection, URL
+     * @param o (Object)
+     */
+
+    private void receive(Object o) {
+        if (o == null) {
+            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            return;
+        }
+        boolean setup = false;
+        HttpURLConnection http = null;
+        try {
+            switch (o.getClass().getSimpleName()) {
+                case "HttpURLConnection":
+                    http = (HttpURLConnection) o; break;
+                case "HttpsURLConnection":
+                    http = (HttpsURLConnection) o; break;
+                case "URL" :
+                    setup = true;
+                    URL url = (URL) o;
+                    if (url.getHost().toLowerCase().startsWith("https://"))
+                        http = ((HttpsURLConnection) url.openConnection());
+                    else
+                        http = ((HttpURLConnection) url.openConnection());
+                    break;
+            }
+        } catch (IOException ignored) {  }
+        if (http == null) {
+            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            return;
+        }
+ 
+        try {
+            if (setup) {
+                http.setRequestMethod("GET");
+                http.setReadTimeout(15000);
+                http.setConnectTimeout(15000);
+                http.setDoInput(true);
+                http.setDoOutput(true);
+                http.setUseCaches(true);
+            }
+
+            if (http.getResponseCode() > 299) {
+                setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+                http.disconnect();
+                return;
+            }
+
+            if (http.getInputStream() != null) {
+                InputStream is = (isGZipped(http.getInputStream(), http.getContentEncoding()));
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096]; // Buffer size can be adjusted as needed
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1)
+                    baos.write(buffer, 0, bytesRead);
+                byte[] data = baos.toByteArray();
+                baos.close();
+                is.close();
+                setInput(new ByteArrayInputStream(data));
+            }else{
+                setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+                http.disconnect();
+                return;
+            }
+
+            String filename = getFileName(http);
+            if (filename == null || filename.trim().isEmpty()) {
+                setError_code(Pie_Constants.ERROR_CODE_15.ordinal());
+                http.disconnect();
+                return;
+            }else {
+                setFile_name(filename);
+            }
+
+            setSource_size(http.getContentLengthLong());
+            if (getSource_size() < 1)
+                setError_code(Pie_Constants.ERROR_CODE_16.ordinal());
+
+        } catch (IOException e) {
+            setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+        }
+
+    }
+
+    /** *********************************************************<br>
+     * if compressed return normal stream<br>
+     * @param stream (original stream in)
+     * @param contentEncodin (is compressed)
+     * @return InputStream
+     */
+    private InputStream isGZipped(InputStream stream, String contentEncodin) {
+        if (contentEncodin != null && contentEncodin.equalsIgnoreCase("gzip")) {
+            InputStream inputStream = null;
+            try {
+                inputStream = new GZIPInputStream(stream);
+                stream.close();
+            } catch (IOException ignored) {
+            }
+            return inputStream;
+        }
+        return stream;
+    }
+
+    /** *********************************************************<br>
+     * getFileName
+     * @return File Name (String)
+     */
+    private String getFileName(HttpURLConnection http) {
+        String fileName = null;
+        String contentDisposition = http.getHeaderField("content-disposition");
+        if (contentDisposition != null) {
+            fileName = extractFileNameFromContentDisposition(contentDisposition);
+        }
+
+        if (fileName == null) {
+            StringTokenizer st = new StringTokenizer(http.getURL().getFile(), "/");
+            while (st.hasMoreTokens())
+                fileName = st.nextToken();
+        }
+
+        return fileName;
+    }
+
+    private String extractFileNameFromContentDisposition(String contentDisposition) {
+        String[] attributes = contentDisposition.split(";");
+        for (String a : attributes) {
+            if (a.toLowerCase().contains("filename")) {
+                try {
+                    return a.substring(a.indexOf('\"') + 1, a.lastIndexOf('\"'));
+                } catch (Exception e) {
+                    return a.substring(a.indexOf('=') + 1);
+                }
+            }
+        }
+        return null;
     }
 
     /** *******************************************************<br>
