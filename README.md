@@ -247,9 +247,11 @@ overridden.
 
 ### Pie Decode Source
 Decoding only. This is a required parameter
-* `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` : Using a file object. This is the file you want decoded.
+* `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` -> Using a file object. 
+* `new Pie_Decode_Source(new URL("https://www.mydomain.com/my_encoded_file.png"))` -> Using a url object. However, you will have to handle the exception: java.net.MalformedURLException.
+* `new Pie_Decode_Source( ** InputStream ** )` -> Using an InputStream, FileInputStream, ByteArrayInputStream, url.openStream() etc.
 
-Add a source file to the configuration.
+Add a source file to where the encoded file was stored to.
 
 ### Pie Decode Destination
 Decoding only. (Optional). Desktop will be used if no destination entered.

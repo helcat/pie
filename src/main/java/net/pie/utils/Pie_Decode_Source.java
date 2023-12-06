@@ -103,6 +103,8 @@ public class Pie_Decode_Source {
                 }
                 break;
             case "InputStream":
+            case "FileInputStream":
+            case "ByteArrayInputStream":
                 InputStream is = (InputStream) getDecode_object();
                 config.logging(Level.INFO,"Using Input-stream ");
                 setInput(is);
