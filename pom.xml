@@ -3,24 +3,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.pie</groupId>
-    <artifactId>pie</artifactId>
-    <version>1.3</version>
-    <packaging>jar</packaging>
-    <name>PIE (Pixel to Image Encoding Library)</name>
-    <url>https://github.com/helcat/easy-freetools</url>
-
-    <organization>
-        <name>Terry Clarke</name>
-        <url>https://github.com/helcat/easy-freetools</url>
-    </organization>
-
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <pie.title>PIE (Pixel to Image Encoding Library)</pie.title>
+        <written.by>Terry Clarke</written.by>
+        <pie.url>https://github.com/helcat/easy-freetools</pie.url>
+        <pie.version>1.3</pie.version>
     </properties>
+
+    <groupId>net.pie</groupId>
+    <artifactId>pie</artifactId>
+    <version>${pie.version}</version>
+    <packaging>jar</packaging>
+    <name>${pie.title}</name>
+
+    <url>${pie.url}</url>
+
+    <organization>
+        <name>${written.by}</name>
+        <url>${pie.url}</url>
+    </organization>
 
     <dependencies>
         <!-- Add your dependencies here -->
@@ -42,7 +47,7 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <Built-By>Terry Clarke</Built-By>
+                            <Built-By>${written.by}</Built-By>
                         </manifestEntries>
                     </archive>
                  </configuration>
