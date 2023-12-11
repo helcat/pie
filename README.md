@@ -35,6 +35,7 @@
 * [Useful Decoding Methods For After Processing](#useful-decoding-methods-for-after-processing)
   * [getDecoded file path](#getdecoded-file-path)
   * [isDecoding Error](#isdecoding-error)
+  * [getDecoding_Error_Message](#getDecoding-Error-Message)
 
 PIE is a file encoding and encryption library for java 8+ (encryption is optional). PIE's purpose is to encode a file or plain text in to an image, 
 then decode back again when required. When encoding the file, its size should remain the same however, depends on the options used to when encoding.
@@ -42,7 +43,7 @@ then decode back again when required. When encoding the file, its size should re
 The PIE library is lightweight and has no dependencies. This should make it easy to integrate into almost any application. 
 To make sure there is no compatibility issues all classes in the library are prefixed with `"Pie_"`.
 
-Every image produced has modulation. Which means Every image is completely different even if it's the same content being encoded. 
+Every image produced has modulation by default however, this can be turned off. Which means Every image is completely different even if it's the same content being encoded. 
 
 Practical applications Would include but not limited to 
 * Chat servers . Ideally to pass a text encoded image from one client to another.
@@ -84,6 +85,7 @@ You do not have to place the "options" or any parameters in any order, enter the
 * `Pie_Option.SHOW_MEMORY_USAGE` : shows approximate memory usage. Default false.
 * `Pie_Option.TERMINATE_LOG_AFTER_PROCESSING` : will terminate the logging. Default false.
 * `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR` : will override the default of deleting the file if an error has occurred.
+* `Pie_Option.MODULATION_OFF` : will turn off modulation. Not recommended, only turn off if necessary.
 
 Example
 
@@ -285,7 +287,7 @@ Will return true or false to indicate if the decoding process failed. A failure 
         Pie_Decode decoded = new Pie_Decode(decoding_config);
         System.out.println(decoded.isDecoding_Error());
 
-### getDecoding_Error_Message
+### getDecoding Error Message
 Decoding only. (Optional)
 Will return the last error message occurred, but only if isDecoding_Error is true. 
 

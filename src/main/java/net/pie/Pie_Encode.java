@@ -263,11 +263,14 @@ public class Pie_Encode {
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
 
-        setModulate(new int[]{
-                (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                0});
+        if (getConfig().getOptions().contains(Pie_Option.MODULATION_OFF))
+            setModulate(new int[]{0,0,0,0});
+        else
+            setModulate(new int[]{
+                    (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                    (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                    (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+                    0});
 
         // Set Modulation
         data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
