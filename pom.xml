@@ -4,10 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <pie.java>1.8</pie.java>
+        <pie.encoding>UTF-8</pie.encoding>
+        <maven.compiler.source>${pie.java}</maven.compiler.source>
+        <maven.compiler.target>${pie.java}</maven.compiler.target>
+        <project.build.sourceEncoding>${pie.encoding}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>>${pie.encoding}</project.reporting.outputEncoding>
         <pie.title>PIE (Pixel to Image Encoding Library)</pie.title>
         <written.by>Terry Clarke</written.by>
         <pie.url>https://github.com/helcat/easy-freetools</pie.url>
