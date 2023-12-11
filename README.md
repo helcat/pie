@@ -243,10 +243,11 @@ Will return the path to the encoded files, so you can use this in your own sourc
 
 ## Decoding - Getting started
 Create a configuration file first. This will store all the defaults and options for the decoding process. A lot of the options have already been defaulted but can be
-overridden.
+overridden. If the encoded file has encryption and "Pie_Encryption" is not set an error will occur. To Decrypt an encoding supply the "Pie_Encryption" option with the 
+correct information.
 
 ### Pie Decode Source
-Decoding only. This is a required parameter
+Decoding only. Required parameter
 * `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` -> Using a file object. 
 * `new Pie_Decode_Source(new URL("https://www.mydomain.com/my_encoded_file.png"))` -> Using a url object. However, you will have to handle the exception: java.net.MalformedURLException.
 * `new Pie_Decode_Source( ** InputStream ** )` -> Using an InputStream, FileInputStream, ByteArrayInputStream, url.openStream() etc.
@@ -279,7 +280,17 @@ getDecoded_file_path will return null. You can override this by using `Pie_Optio
 
 ### isDecoding Error
 Decoding only. (Optional)
-Will return true or false to indicate if the decoding process failed.
+Will return true or false to indicate if the decoding process failed. A failure is only considered if Level.SEVERE is issued from the decoding process.
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);
         System.out.println(decoded.isDecoding_Error());
+
+### getDecoding_Error_Message
+Decoding only. (Optional)
+Will return the last error message occurred, but only if isDecoding_Error is true. 
+
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        if (decoded.isDecoding_Error())
+            System.out.println(decoded.getDecoding_Error_Message());
+          
+

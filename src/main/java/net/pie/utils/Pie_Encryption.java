@@ -21,6 +21,7 @@ public class Pie_Encryption {
     private String password = null;
     private SecretKey key = null;
     private Integer error_code = null;
+    private boolean was_Encrypted = false;
 
     /** **************************************************<br>
      * Start encryption
@@ -169,6 +170,7 @@ public class Pie_Encryption {
      * @return (byte[])
      */
     public byte[] encrypt(Pie_Config config, byte[] input) {
+        setWas_Encrypted(false);
         if (config == null)
             config = new Pie_Config();
 
@@ -177,7 +179,7 @@ public class Pie_Encryption {
                 createKey(config);
                 if (getKey() == null) {
                     config.logging(Level.WARNING, "Encryption Error - Cannot create key");
-                    return null;
+                    return input;
                 }
             } else {
                 return input;
@@ -204,11 +206,12 @@ public class Pie_Encryption {
             byte[] combined = new byte[iv.length + encrypted.length];
             System.arraycopy(iv, 0, combined, 0, iv.length);
             System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
+            setWas_Encrypted(true);
             return combined;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchPaddingException |
                  IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
             config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
-            return null;
+            return input;
         }
     }
 
@@ -266,6 +269,14 @@ public class Pie_Encryption {
 
     public void setError_code(Integer error_code) {
         this.error_code = error_code;
+    }
+
+    public boolean isWas_Encrypted() {
+        return was_Encrypted;
+    }
+
+    public void setWas_Encrypted(boolean was_Encrypted) {
+        this.was_Encrypted = was_Encrypted;
     }
 }
 

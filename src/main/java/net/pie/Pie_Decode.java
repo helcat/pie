@@ -22,6 +22,7 @@ public class Pie_Decode {
     private int total_files = 0;
     private OutputStream outputStream = null;
     private String decoded_file_path = null;
+    private boolean encrypted = false;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -34,6 +35,7 @@ public class Pie_Decode {
         setConfig(config);
         ImageIO.setUseCache(false);
         setTotal_files(0);
+        setEncrypted(false);
 
         if (getConfig().getDecode_source() == null || getConfig().getDecode_source().getDecode_object() == null) {
             getConfig().logging(Level.SEVERE, "Decoding FAILED : Source required");
@@ -121,6 +123,11 @@ public class Pie_Decode {
         byte[] message = readImage(buffimage);
         if (message.length == 0)
             return null;
+
+        if (isEncrypted() && getConfig().getEncryption() == null) {
+            getConfig().logging(Level.SEVERE, "Decryption Required");
+            return null;
+        }
 
         try {
             message = Base64.getDecoder().decode(message);
@@ -226,6 +233,11 @@ public class Pie_Decode {
                     continue;
                 }
 
+                if (x == 1 && y == 0) {
+                    check_Options(value, modulate);
+                    continue;
+                }
+
                 if (Arrays.stream(value).sum() == 0)
                     break;
 
@@ -245,6 +257,15 @@ public class Pie_Decode {
         } catch (IOException ignored) { }
 
         return bytes.toByteArray();
+    }
+
+    /** *******************************************************************<br>
+     * Check options
+     * @param options int[]
+     */
+    private void check_Options(int[] options, int[] modulate) {
+        if ((options[0] - modulate[0]) != 0)
+            setEncrypted(true);
     }
 
     /** *******************************************************************<br>
@@ -312,6 +333,9 @@ public class Pie_Decode {
     public boolean isDecoding_Error() {
         return  getConfig() == null || getConfig().isError();
     }
+    public String getDecoding_Error_Message() {
+        return  getConfig() != null && getConfig().isError() ? getConfig().getError_message() : null;
+    }
 
     private void setConfig(Pie_Config config) {
         this.config = config;
@@ -343,5 +367,13 @@ public class Pie_Decode {
 
     private void setDecoded_file_path(String decoded_file_path) {
         this.decoded_file_path = decoded_file_path;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
 }

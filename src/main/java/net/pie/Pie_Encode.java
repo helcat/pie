@@ -120,6 +120,7 @@ public class Pie_Encode {
      * @param total_files int
      */
     private void encode(byte[] originalArray, int file_number, int total_files) {
+        boolean has_Been_Encrypted = false;
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
             return;
@@ -157,7 +158,7 @@ public class Pie_Encode {
         try {
             originalArray = getConfig().getEncryption() != null ?
                     getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
-
+            has_Been_Encrypted = getConfig().getEncryption() != null && getConfig().getEncryption().isWas_Encrypted();
             if (originalArray == null) {
                 getConfig().logging(Level.SEVERE,"Encryption Error");
                 return;
@@ -207,7 +208,7 @@ public class Pie_Encode {
             return;
         }
 
-        BufferedImage data_image = buildImage_Mode1(image_size, originalArray);
+        BufferedImage data_image = buildImage_Mode1(image_size, originalArray, has_Been_Encrypted);
         originalArray = null;
         if (getConfig().isError()) {
             data_image = null;
@@ -240,13 +241,13 @@ public class Pie_Encode {
      * @param originalArray (byte[])
      * @return BufferedImage
      */
-    private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray ) {
+    private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray, boolean has_Been_Encrypted ) {
         getConfig().logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
         int image_type = BufferedImage.TYPE_INT_RGB;
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
         BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type);
-        return buildImage(data_image, image_size, originalArray, getConfig().getEncoder_mode().getParm1() );
+        return buildImage(data_image, image_size, originalArray, getConfig().getEncoder_mode().getParm1(), has_Been_Encrypted );
     }
 
     /** *********************************************************<br>
@@ -256,7 +257,8 @@ public class Pie_Encode {
      * @param rbg (String)
      * @return BufferedImage
      */
-    private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg) {
+    private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg,
+            boolean has_Been_Encrypted) {
         int x =0, y = 0, store_count = 0;
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
@@ -269,6 +271,14 @@ public class Pie_Encode {
 
         // Set Modulation
         data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
+
+        // Options
+        data_image.setRGB(x++, y, new Color(
+                has_Been_Encrypted ? 1 + getModulate()[0] : 0,  // Encrypted Yes - No
+                getModulate()[1],                               // Spare
+                getModulate()[2],                               // Spare
+                getModulate()[3]                                // Spare
+                ).getRGB());
 
         int[] store = null;
         for (int i : originalArray) {

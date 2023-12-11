@@ -36,6 +36,7 @@ public class Pie_Config {
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
+    private String error_message = null;
     private Logger log = null;
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
@@ -154,8 +155,10 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (level.equals(Level.SEVERE))
+        if (level.equals(Level.SEVERE)) {
             setError(true);
+            setError_message(message);
+        }
 
         if (getLog() == null || getLog_level().equals(Level.OFF))
             return;
@@ -323,6 +326,15 @@ public class Pie_Config {
 
     private void setMax_mb(Pie_Encode_Max_MB max_mb) {
         this.max_mb = max_mb;
+    }
+
+    public String getError_message() {
+        return error_message;
+    }
+
+    public void setError_message(String error_message) {
+        if (this.isError())
+            this.error_message = error_message;
     }
 
     /** ******************************************************************<br>
