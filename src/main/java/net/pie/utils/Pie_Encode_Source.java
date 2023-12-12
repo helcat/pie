@@ -58,6 +58,7 @@ public class Pie_Encode_Source {
         }
         switch (encode.getClass().getSimpleName()) {
             case "URL" :
+            case "Pie_URL" :
             case "HttpURLConnection" :
             case "HttpsURLConnection" :
                 receive(encode);
@@ -119,8 +120,19 @@ public class Pie_Encode_Source {
                 case "HttpsURLConnection":
                     http = (HttpsURLConnection) o; break;
                 case "URL" :
+                case "Pie_URL" :
                     setup = true;
-                    URL url = (URL) o;
+                    URL url = null;
+                    if (o.getClass().getSimpleName().equalsIgnoreCase("URL") )
+                        url = (URL) o;
+                    if (o.getClass().getSimpleName().equalsIgnoreCase("Pie_URL") ) {
+                        Pie_URL pu = (Pie_URL) o;
+                        if (pu.getError_message() != null && !pu.getError_message().isEmpty()) {
+                            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+                            return;
+                        }
+                        url = pu.getUrl();
+                    }
                     if (url.getHost().toLowerCase().startsWith("https://"))
                         http = ((HttpsURLConnection) url.openConnection());
                     else

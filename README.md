@@ -14,12 +14,13 @@
   * [Pie Shape](#pie-shape)
   * [Pie ZIP Name](#pie-zip-name)
   * [Pie ZIP Option](#pie-zip-option)
-  * [Encoding Example](encoding-example)
+  * [Encoding Example](#encoding-example)
 
 
 * [Encoding and Decoding Options](#encoding-and-decoding-options)
   * [Level (Java Logging)](#level)
   * [Pie Encryption](#pie-encryption)
+  * [Pie URL](#Pie-URL)
   * [Utilities](#utilities)
   * [Useful Encoding methods for after processing](#useful-encoding-methods-for-after-processing)
     * [isEncoding_Error](#isencoding-error)
@@ -47,13 +48,13 @@ Every image produced has modulation by default however, this can be turned off. 
 
 Practical applications Would include but not limited to 
 * Chat servers . Ideally to pass a text encoded image from one client to another.
-  * Process :  Text "Hello World" -> encode -> send to client -> decode -> view. Any one observing will only see an image nothing else.
+  * Process :  Text "Hello World" --> encode --> send to client --> decode --> view. Any one observing will only see an image nothing else.
 * Hiding files or text in plain sight.
-  * Process : Document -> encode -> store for later. Any sensitive files can be stored. If stolen or hacked the files will be locked.
+  * Process : Document --> encode --> store for later. Any sensitive files can be stored. If stolen or hacked the files will be locked.
 * Storing images or other files on a cloud server. 
-  * Process : Image -> encode -> Upload. Store any encoded file online and never worry about intrusions even if someone gets your password.
+  * Process : Image --> encode --> Upload. Store any encoded file online and never worry about intrusions even if someone gets your password.
 * Passing information across to any server, network or computer system.
-  * Process : Sensitive Text / File / Command -> encode / encrypt -> send. Any one observing will only see an image nothing else.
+  * Process : Sensitive Text / File / Command --> encode / encrypt --> send. Any one observing will only see an image nothing else.
 * and many more....
 
 When the file or text is encoded the end result is just a plain "png" image.
@@ -65,8 +66,8 @@ Known Limitations
 * Can be a little slow depending on the device used to encode and or encrypt large files over 600mb.
 * Splitting files, each file is split to 200mb. Can be overridden using "Pie_Encode_Max_MB" but make sure you have enough memory.
 * Splitting files, the number of files that can be produced is 30. Which is about 6gb.
-* When using urls to download files. if the "getContentLengthLong" is not available the file will not be downloaded. In this case download the file yourself and 
- use the inputstream and size method.
+* When using urls to download files for encoding only. if the "getContentLengthLong" is not available the file will not be downloaded. In this case download the file yourself and 
+ use the inputstream and size method. Decoding does not need to know the size of a file.
 
 These limitations can be fixed by adding dependencies and if you have the source code.
  
@@ -97,14 +98,13 @@ Add these to "`new Pie_Config(....)`"
 ### Pie Encode Source
 Encoding only. **This is a required parameter**
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
-  * File : Add a local file to be encoded. `new File("....")`
-  * URL : Use url to download a file. `new URL("https..../myfile.jpg")`
-  * HttpURLConnection or HttpsURLConnection : Use your own connection to download the file.
-  * `new Pie_Text("This is some text to encode")` Encode text using "Pie_Text".
+* `new Pie_Encode_Source(new Pie_URL("https..../myfile.jpg"))`
+* `new Pie_Encode_Source(new URL("https..../myfile.jpg"))`
+* `new Pie_Encode_Source( *** HttpURLConnection or HttpsURLConnection))` : Use your own connection to download the file.
+* `new Pie_Encode_Source(new Pie_Text("This is some text to encode"))` Encode text using "Pie_Text". ** Pie_Text can also handle a file.
 
 When using an online source, make sure the file name is included either as a header or on the end of the url.
 Add a source file to the configuration. This is the file you want encoded.
-
 
 #### Pie Text
 Encoding only. (Optional)</span> 
@@ -221,6 +221,13 @@ Parameters for the method are as follows, please note you can add them in any or
 * `File` Optional. A folder to store the certificate. If not entered the desktop will be used.
 * `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the file name.
 
+### Pie URL
+Optional Encoding and Decoding.
+* `new Pie_Encode_Source(new Pie_URL("https://www.mydomain.com/my_to_be_encoded_file.exe"))`
+* `new Pie_Decode_Source(new Pie_URL("https://www.mydomain.com/my_encoded_file.png"))`
+
+"Pie_URL" is a helpful class which allows a file to be downloaded without handling any errors. Can be used with "Pie_Encode_Source" or "Pie_Decode_Source" 
+
 ### Utilities
 These methods are available for ease of use and are not required for encoding or decoding.
 * `Pie_Utils.getDesktop()` gets the desktop as a file object.
@@ -250,9 +257,10 @@ correct information.
 
 ### Pie Decode Source
 Decoding only. Required parameter
-* `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` -> Using a file object. 
-* `new Pie_Decode_Source(new URL("https://www.mydomain.com/my_encoded_file.png"))` -> Using a url object. However, you will have to handle the exception: java.net.MalformedURLException.
-* `new Pie_Decode_Source( ** InputStream ** )` -> Using an InputStream, FileInputStream, ByteArrayInputStream, url.openStream() etc.
+* `new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Encoded_Image.png"))` : Using a file. 
+* `new Pie_Decode_Source(new URL("https://www.mydomain.com/my_encoded_file.png"))` : Use a URL. However, you will have to handle the exception: java.net.MalformedURLException.
+* `new Pie_Decode_Source(new Pie_URL("https://www.mydomain.com/my_encoded_file.png"))` : Use a URL with Pie_URL. you do not have to handle the exception. See Pie_URL for more details.
+* `new Pie_Decode_Source( ** InputStream ** )` : Using an InputStream, FileInputStream, ByteArrayInputStream, url.openStream() etc.
 
 Add a source file to where the encoded file was stored to.
 
@@ -282,14 +290,14 @@ getDecoded_file_path will return null. You can override this by using `Pie_Optio
 
 ### isDecoding Error
 Decoding only. (Optional)
-Will return true or false to indicate if the decoding process failed. A failure is only considered if Level.SEVERE is issued from the decoding process.
+Will return true or false to indicate if the decoding process failed. A failure is only considered if "Level.SEVERE" is issued from the decoding process.
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);
         System.out.println(decoded.isDecoding_Error());
 
 ### getDecoding Error Message
 Decoding only. (Optional)
-Will return the last error message occurred, but only if isDecoding_Error is true. 
+Will return the last error message occurred, but only if "isDecoding_Error" is true. 
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);
         if (decoded.isDecoding_Error())

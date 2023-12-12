@@ -266,11 +266,7 @@ public class Pie_Encode {
         if (getConfig().getOptions().contains(Pie_Option.MODULATION_OFF))
             setModulate(new int[]{0,0,0,0});
         else
-            setModulate(new int[]{
-                    (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                    (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                    (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
-                    0});
+            setModulate(getRandom_Value(rbg, 99));
 
         // Set Modulation
         data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
@@ -310,8 +306,34 @@ public class Pie_Encode {
             data_image.setRGB(x, y, buildColor(rbg, store, transparent).getRGB());
         }
 
+        // Stopper
+        if (x < size.getWidth())
+            data_image.setRGB(x++, y,new Color(0, 0, 0, 0).getRGB());
+        else
+            return data_image;
+
+        // Filler
+        if (y > 0) {
+            int w = x;
+            for (; w < size.getWidth(); w++)
+                data_image.setRGB(w, y, data_image.getRGB(w, 0));
+        }
+
         size = null; store = null; x =0; y = 0; store_count = 0; // Save every byte of memory possible.
         return data_image;
+    }
+
+    /** ******************************************************<br>
+     * Return a random Value
+     * @param rbg
+     * @return int[]
+     */
+    private int[] getRandom_Value(String rbg, int max_number) {
+        return new int[]{
+            (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
+            (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
+            (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
+            0};
     }
 
     /** ******************************************************<br>
@@ -466,11 +488,7 @@ public class Pie_Encode {
             }
         }
 
-        return
-                (filename + "?" +
-                        total_files + "?" +
-                        addon_files + "?").getBytes(StandardCharsets.UTF_8)
-                ;
+        return (filename + "?" + total_files + "?" + addon_files + "?").getBytes(StandardCharsets.UTF_8);
     }
 
     /** *******************************************************************<br>

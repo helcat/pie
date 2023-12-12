@@ -40,6 +40,7 @@ public class Pie_Decode_Source {
                 if (((File) getDecode_object()).isFile())
                     break;
             case "URL":
+            case "Pie_URL":
             case "InputStream":
                 break;
             default:
@@ -101,6 +102,17 @@ public class Pie_Decode_Source {
                 } catch (IOException e) {
                     config.logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
                 }
+                break;
+            case "Pie_URL":
+                Pie_URL pu = (Pie_URL) getDecode_object();
+                if (pu.getError_message() != null && !pu.getError_message().isEmpty()) {
+                    config.logging(Level.SEVERE,pu.getError_message());
+                    break;
+                }
+                config.logging(Level.INFO,"Downloading File ");
+                setInput(pu.process_url());
+                if (pu.getError_message() != null && !pu.getError_message().isEmpty())
+                    config.logging(Level.SEVERE,pu.getError_message());
                 break;
             case "InputStream":
             case "FileInputStream":

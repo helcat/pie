@@ -95,22 +95,31 @@ public class Pie_Decode {
             message = null;
         }
 
-        utils.usedMemory(memory_Start, "Decoding : ");
-        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-            System.gc();
+        // Error
+        if (getConfig().isError()) {
+            if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
+                System.gc();
+        }else {
 
-        getConfig().logging(getConfig().isError() ? Level.SEVERE : Level.INFO,"Decoding " + (getConfig().isError()  ? "Process FAILED" : "Complete"));
+            // OK
+            utils.usedMemory(memory_Start, "Decoding : ");
+            if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
+                System.gc();
 
-        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
-            String time_diff = utils.logTime(startTime);
-            if (!time_diff.isEmpty())
-                getConfig().logging(Level.INFO, time_diff);
+            getConfig().logging(Level.INFO, "Decoding Complete");
+
+            if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
+                String time_diff = utils.logTime(startTime);
+                if (!time_diff.isEmpty())
+                    getConfig().logging(Level.INFO, time_diff);
+            }
         }
 
         getConfig().getDecode_source().close();
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
+
     }
 
     /** *********************************************************<br>
@@ -121,7 +130,7 @@ public class Pie_Decode {
             return null;
 
         byte[] message = readImage(buffimage);
-        if (message.length == 0)
+        if (message == null || message.length == 0 || getConfig().isError())
             return null;
 
         if (isEncrypted() && getConfig().getEncryption() == null) {
@@ -234,8 +243,9 @@ public class Pie_Decode {
                 }
 
                 if (x == 1 && y == 0) {
-                    check_Options(value, modulate);
-                    continue;
+                    if (check_Options(value, modulate))
+                        continue;
+                    return null;
                 }
 
                 if (Arrays.stream(value).sum() == 0)
@@ -263,9 +273,14 @@ public class Pie_Decode {
      * Check options
      * @param options int[]
      */
-    private void check_Options(int[] options, int[] modulate) {
+    private boolean check_Options(int[] options, int[] modulate) {
         if ((options[0] - modulate[0]) != 0)
             setEncrypted(true);
+        if (isEncrypted() && getConfig().getEncryption() == null) {
+            getConfig().logging(Level.SEVERE, "Decryption Required");
+            return false;
+        }
+        return true;
     }
 
     /** *******************************************************************<br>
