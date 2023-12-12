@@ -8,10 +8,19 @@ public class Pie_Text {
     private String text = null;
     private String file_name = "text.txt";
 
+    /** *****************************************<br>
+     * Pie_Text Text or File only
+     * @param encode (File or text)
+     */
     public Pie_Text(Object encode) {
         process_object(encode);
     }
 
+    /** *****************************************<br>
+     * Pie_Text Text or File only and a file name
+     * @param text (File or text)
+     * @param file_name (String)
+     */
     public Pie_Text(Object text, String file_name) {
         process_object(text);
         if (file_name != null && file_name.isEmpty())

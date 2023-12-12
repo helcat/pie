@@ -28,6 +28,7 @@
 
 
 * [Decoding - Getting started](#decoding---getting-started)
+  * [Decoding Pie Options](#Decoding-Pie-Options)
   * [Pie Decode Source Pie](#pie-decode-source)
   * [Pie Decode Destination](#pie-decode-destination)
   * [Decoding Example](#decoding-example)
@@ -107,13 +108,20 @@ When using an online source, make sure the file name is included either as a hea
 Add a source file to the configuration. This is the file you want encoded.
 
 #### Pie Text
-Encoding only. (Optional)</span> 
-Can only be used with "Pie_Encode_Source". There are two parameters "text to encode" and "file name".
-File name will not be used if a "file object" (new File(...)) is used however if a string of text is entered, "Text.txt" will be used unless file name is entered.
-Arabic and Cyrillic can also be encoded.
+Encoding only. (Optional). Can only be used with "Pie_Encode_Source"
 
-* `new Pie_Encode_Source(new Pie_Text("مرحبا هذا اختبار للفطيرة", "myfile.png"))` Using plain text.
-* `new Pie_Encode_Source(new Pie_Text(new File(...."my_text_file.txt"), "myfile.png"))` Using a text file. Must end with ".txt".
+* `new Pie_Encode_Source(new Pie_Text("Привет, это тест"))` Using plain text.
+* `new Pie_Encode_Source(new Pie_Text("مرحبا هذا اختبار للفطيرة", "myfile.txt"))` Using plain text and assigning a file name.
+* `new Pie_Encode_Source(new Pie_Text(new File(...."my_text_file.txt")))` Using a text file and using the text file name.
+* `new Pie_Encode_Source(new Pie_Text(new File(...."my_text_file.txt"), "myfile.png"))` Using a text file and assigning a file name.
+
+If using a text file, the file Must end with ".txt". The text inside will be encoded directly, Arabic and Cyrillic can also be used.
+* Option 1, Text to encode. A file name of "Text.txt" will be used.
+* Option 2, Text to encode and you can assign a file name.
+* Option 3, Use a text file. The file will not be embedded but the name will be assigned.
+* Option 4, Use a text file and you can assign a file name.
+
+File names are used in the encoded image, Just in case the end client wants to export the text to a file. However, the end result can be a direct to variable output.
 
 ### Pie Encode Mode
 Encoding only. (Optional) Changes the type of encoding to be used. Values allowed are :</span>
@@ -254,6 +262,9 @@ Will return the path to the encoded files, so you can use this in your own sourc
 Create a configuration file first. This will store all the defaults and options for the decoding process. A lot of the options have already been defaulted but can be
 overridden. If the encoded file has encryption and "Pie_Encryption" is not set an error will occur. To Decrypt an encoding supply the "Pie_Encryption" option with the 
 correct information.
+
+### Decoding Pie Options
+* `Pie_Option.DECODE_TEXT_TO_VARIABLE` : If the encoded file contains text only. This option will set the text to output. See Decoding to variable.
 
 ### Pie Decode Source
 Decoding only. Required parameter
