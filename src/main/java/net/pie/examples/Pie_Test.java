@@ -6,6 +6,7 @@ java -classpath pie-1.2.jar Pie_Test
 
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Encryption;
+import net.pie.utils.Pie_URL;
 import net.pie.utils.Pie_Utils;
 
 import javax.crypto.Cipher;
@@ -16,6 +17,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -37,8 +39,8 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
-        for (int i = 0; i < 50; i++)
-            System.out.println(((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1));
+        //for (int i = 0; i < 50; i++)
+        //    System.out.println(((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1));
 
         /**
         StringBuilder text = new StringBuilder();

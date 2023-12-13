@@ -110,7 +110,7 @@ public class Pie_Decode_Source {
                     break;
                 }
                 config.logging(Level.INFO,"Downloading File ");
-                setInput(pu.process_url());
+                setInput(pu.getInputStream());
                 if (pu.getError_message() != null && !pu.getError_message().isEmpty())
                     config.logging(Level.SEVERE,pu.getError_message());
                 break;

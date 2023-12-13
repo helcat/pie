@@ -234,7 +234,11 @@ Optional Encoding and Decoding.
 * `new Pie_Encode_Source(new Pie_URL("https://www.mydomain.com/my_to_be_encoded_file.exe"))`
 * `new Pie_Decode_Source(new Pie_URL("https://www.mydomain.com/my_encoded_file.png"))`
 
-"Pie_URL" is a helpful class which allows a file to be downloaded without handling any errors. Can be used with "Pie_Encode_Source" or "Pie_Decode_Source" 
+"Pie_URL" is a helpful class which allows a file to be downloaded without handling any errors. Can be used with "Pie_Encode_Source" or "Pie_Decode_Source". 
+Can also be used as a standalone function. Either to collect an inputstream or Launch a website. Not used in PIE but can be useful.
+
+* `InputStream in = new Pie_URL("https://www.mydomain.com/any_file.zip").getInputStream();`
+* `new Pie_URL("https://www.mydomain.com").launch();`
 
 ### Utilities
 These methods are available for ease of use and are not required for encoding or decoding.
