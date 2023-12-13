@@ -101,7 +101,7 @@ Encoding only. **This is a required parameter**
 * `new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + "My_Document.doc"))`
 * `new Pie_Encode_Source(new Pie_URL("https..../myfile.jpg"))`
 * `new Pie_Encode_Source(new URL("https..../myfile.jpg"))`
-* `new Pie_Encode_Source( *** HttpURLConnection or HttpsURLConnection))` : Use your own connection to download the file.
+* `new Pie_Encode_Source( *** HttpURLConnection or HttpsURLConnection *** ))` : Use your own connection to download the file.
 * `new Pie_Encode_Source(new Pie_Text("This is some text to encode"))` Encode text using "Pie_Text". ** Pie_Text can also handle a file.
 
 When using an online source, make sure the file name is included either as a header or on the end of the url.
@@ -173,7 +173,7 @@ Optional
 * `new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath()))`
 
 Add a destination to the configuration. Enter a folder, this is where you want the encoded file to be stored. You can give the new file a name, but if one is not entered the
-name of the file to encoded will be used. "png" or "zip" will be added so an extension is not required.
+name of the file to encoded will be used. "png" or "zip" will be added so an extension is not required. If "Pie_Encoded_Destination" is not used the "desktop" path with be used.
 
 ### Pie Shape
 Encoding only. (Optional) Changes the shape of the image. Values allowed are :
@@ -209,7 +209,7 @@ Encoding only. (Optional) sets when a zip file should be used.
 
 ### Pie Encryption
 Optional Encoding and Decoding.
-* `new Pie_Encryption("My Pass Phrase Goes Here");`
+* `new Pie_Encryption("My Pass Phrase Goes Here")`
 * `new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "certificate_name"))`
 
 If encryption on encoding used, then you must add this to the decoding process. if the encoding does not have encryption and this parameter is used, the decryption process is ignored.
