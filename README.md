@@ -268,7 +268,27 @@ overridden. If the encoded file has encryption and "Pie_Encryption" is not set a
 correct information.
 
 ### Decoding Pie Options
-* `Pie_Option.DECODE_TEXT_TO_VARIABLE` : If the encoded file contains text only. This option will set the text to output. See Decoding to variable.
+* `Pie_Option.DECODE_TO_VARIABLE`
+The contents of the encoded file can be retrieved using "getOutPut()". Note if the content size is greater than "Pie Encode Max MB" which has a default of 200mb then this 
+option is ignored and a file will be created. Use "getDecoded_file_path()" to find out if a file was created and its location.
+ 
+        Pie_Config decoding_config = new Pie_Config( Pie_Option.DECODE_TO_VARIABLE, .... More options here );
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        if (!decoded.isDecoding_Error()) {
+            Object decoded_object = decoded.getOutPut();
+            switch (decoded_object.getClass().getSimpleName()) {
+                case "String" :
+                    System.out.println((String) decoded_text);
+                    break;
+                case "byte[]" :
+                    // Do something with byte[]
+                default :
+                    if (decoded.getDecoded_file_path() != null)
+                        // Do something with file
+                }
+            }else{
+                System.out.println(decoded.isDecoding_Error());
+            }
 
 ### Pie Decode Source
 Decoding only. Required parameter
@@ -297,7 +317,7 @@ Add a destination for the decoded source.
 
 ### getDecoded file path
 Decoding only. (Optional)
-Will return the path to the decoded file, so you can use this in your own source. By default, if an error has occurred the destination file will be deleted and 
+Will return the path to the decoded file, which you can use in your own source. By default, if an error has occurred the destination file will be deleted and 
 getDecoded_file_path will return null. You can override this by using `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR`.
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);

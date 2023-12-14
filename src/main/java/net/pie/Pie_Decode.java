@@ -24,6 +24,7 @@ public class Pie_Decode {
     private OutputStream outputStream = null;
     private String decoded_file_path = null;
     private boolean encrypted = false;
+    private Object output = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -391,5 +392,13 @@ public class Pie_Decode {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
+    }
+
+    public Object getOutput() {
+        return output;
+    }
+
+    private void setOutput(Object output) {
+        this.output = output;
     }
 }
