@@ -62,7 +62,7 @@ public class Pie_Encoded_Destination {
         }else {
             // Single Files Only Or Beginning of Zip
             File toFile = addFileNumber(config, file_number, source_filename);
-            if (toFile.exists() && !config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE)) {
+            if (toFile.exists() && !config.getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
                 config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
                 return false;
             }
@@ -113,7 +113,7 @@ public class Pie_Encoded_Destination {
      * @param source_filename (String)
      */
     private File addFileNumber(Pie_Config config, int file_number, String source_filename) {
-        boolean overwrite = config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE);
+        boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
         String name = create_File_Name(config, file_number, source_filename);
         File file = new File(
             getLocal_file().isDirectory() ?
@@ -145,7 +145,7 @@ public class Pie_Encoded_Destination {
      * @param name (int)
      */
     private File create_Zip_File(Pie_Config config, String name) {
-        boolean overwrite = config.getOptions().contains(Pie_Option.ENC_OVERWRITE_FILE);
+        boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
         File file = new File(
                 getLocal_file().isDirectory() ?
                         getLocal_file().getAbsolutePath() + File.separator + name

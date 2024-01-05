@@ -263,7 +263,7 @@ public class Pie_Encode {
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
 
-        if (getConfig().getOptions().contains(Pie_Option.MODULATION_OFF))
+        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF))
             setModulate(new int[]{0,0,0,0});
         else
             setModulate(getRandom_Value(rbg, 99));

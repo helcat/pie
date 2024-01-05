@@ -33,7 +33,7 @@ public class Pie_Test_Encode {
 
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config(
-            Pie_Option.ENC_OVERWRITE_FILE,
+            Pie_Option.OVERWRITE_FILE,
             Pie_Option.SHOW_PROCESSING_TIME,
             Pie_Option.RUN_GC_AFTER_PROCESSING,
             Pie_Option.SHOW_MEMORY_USAGE,

@@ -293,6 +293,11 @@ public class Pie_Decode {
         if (getConfig().getDecoded_Source_destination().getLocal_folder() != null && getConfig().getDecoded_Source_destination().getLocal_folder().isDirectory()) {
             File f = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
             try {
+                if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && f.exists()) {
+                    getConfig().logging(Level.SEVERE, "Error : " + file_name + " Already Exists");
+                    return;
+                }
+
                 setOutputStream(new FileOutputStream(f));
                 setDecoded_file_path(f.getPath());
             } catch (FileNotFoundException e) {

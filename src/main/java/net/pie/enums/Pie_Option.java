@@ -10,13 +10,13 @@ package net.pie.enums;
  * DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR : Will not delete the destination file if an error has occurred.<br>
  **/
 public enum Pie_Option {
-    ENC_OVERWRITE_FILE,
+    OVERWRITE_FILE,
     RUN_GC_AFTER_PROCESSING,
     SHOW_MEMORY_USAGE,
     SHOW_PROCESSING_TIME,
     TERMINATE_LOG_AFTER_PROCESSING,
     DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR,
-    MODULATION_OFF,
+    ENC_MODULATION_OFF,
     DECODE_TEXT_TO_VARIABLE
     ;
 

@@ -68,7 +68,7 @@ Known Limitations
 * Splitting files, each file is split to 200mb. Can be overridden using "Pie_Encode_Max_MB" but make sure you have enough memory.
 * Splitting files, the number of files that can be produced is 30. Which is about 6gb.
 * When using urls to download files for encoding only. if the "getContentLengthLong" is not available the file will not be downloaded. In this case download the file yourself and 
- use the inputstream and size method. Decoding does not need to know the size of a file.
+ use the input stream and size method. Decoding does not need to know the size of a file.
 
 These limitations can be fixed by adding dependencies and if you have the source code.
  
@@ -81,17 +81,17 @@ overridden.
 Next you can add options to the configuration. 
 These "options" are not required and can be used for encoding and decoding, defaults will be used if not entered into the configuration.
 You do not have to place the "options" or any parameters in any order, enter them as needed.
-* `Pie_Option.ENC_OVERWRITE_FILE` : will overwrite any already encoded file. Default false.
+* `Pie_Option.OVERWRITE_FILE` : will overwrite any already encoded or to be decoded file. Default false.
 * `Pie_Option.SHOW_PROCESSING_TIME` : will show how long the process took. Default false.
 * `Pie_Option.RUN_GC_AFTER_PROCESSING` : will run garbage collection after processing. Default false.
 * `Pie_Option.SHOW_MEMORY_USAGE` : shows approximate memory usage. Default false.
 * `Pie_Option.TERMINATE_LOG_AFTER_PROCESSING` : will terminate the logging. Default false.
 * `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR` : will override the default of deleting the file if an error has occurred.
-* `Pie_Option.MODULATION_OFF` : will turn off modulation. Not recommended, only turn off if necessary.
+* `Pie_Option.ENC_MODULATION_OFF` : will turn off modulation. Not recommended, only turn off if necessary.
 
 Example
 
-`new Pie_Config(Pie_Option.ENC_OVERWRITE_FILE, Pie_Option.SHOW_PROCESSING_TIME);`
+`new Pie_Config(Pie_Option.OVERWRITE_FILE, Pie_Option.SHOW_PROCESSING_TIME);`
 
 ## Encoding Options
 Add these to "`new Pie_Config(....)`"
