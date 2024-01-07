@@ -10,9 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,6 +23,7 @@ public class Pie_Decode {
     private String decoded_file_path = null;
     private boolean encrypted = false;
     private Object output = null;
+    private Map<Integer, Integer> byte_map = new HashMap<>();
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -34,6 +33,7 @@ public class Pie_Decode {
     public Pie_Decode(Pie_Config config) {
         if (config == null || config.isError())
             return;
+        setByte_map(Pie_Utils.create_Decoding_Byte_Map());
         setConfig(config);
         ImageIO.setUseCache(false);
         setTotal_files(0);
@@ -228,20 +228,38 @@ public class Pie_Decode {
         int pixelColor;
         int[] value = null;
         int[] modulate = new int[]{0,0,0,0};
+        boolean modulation = false;
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+        int r,g,b,a = 0;
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
+
                 pixelColor = buffimage.getRGB(x, y);
-                value = new int[]{
-                        ((pixelColor >> 16) & 0xFF) - modulate[0],
-                        ((pixelColor >> 8) & 0xFF) - modulate[1],
-                        (pixelColor & 0xFF) - modulate[2],
-                        ((pixelColor >> 24) & 0xFF) - modulate[3]
-                };
 
                 if (x == 0 && y == 0) {
+                    value = new int[]{
+                            ((pixelColor >> 16) & 0xFF) - modulate[0],
+                            ((pixelColor >> 8) & 0xFF) - modulate[1],
+                            (pixelColor & 0xFF) - modulate[2],
+                            ((pixelColor >> 24) & 0xFF) - modulate[3]
+                    };
+
                     modulate = value;
+                    if (Arrays.stream(modulate).sum() > 0)
+                        modulation = true;
                     continue;
+                }else{
+                    r = ((pixelColor >> 16) & 0xFF);
+                    g = ((pixelColor >> 8) & 0xFF);
+                    b = (pixelColor & 0xFF);
+                    a = ((pixelColor >> 24) & 0xFF);
+                    value = new int[]{
+                            modulation ? r - modulate[0] : getByte_map().getOrDefault(r, r),
+                            modulation ? g - modulate[1] : getByte_map().getOrDefault(g, g),
+                            modulation ? b - modulate[2] : getByte_map().getOrDefault(b, b),
+                            modulation ? a - modulate[3] : getByte_map().getOrDefault(a, a),
+                    };
                 }
 
                 if (x == 1 && y == 0) {
@@ -405,5 +423,13 @@ public class Pie_Decode {
 
     private void setOutput(Object output) {
         this.output = output;
+    }
+
+    public Map<Integer, Integer> getByte_map() {
+        return byte_map;
+    }
+
+    public void setByte_map(Map<Integer, Integer> byte_map) {
+        this.byte_map = byte_map;
     }
 }

@@ -20,8 +20,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "fire2.jpg";
-    private String temp_Encoded_Image = "cork.jpg";
+    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_Encoded_Image = "background.jpg";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -40,12 +40,13 @@ public class Pie_Test_Encode {
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Pie_Shape.SHAPE_RECTANGLE,
             Pie_Encode_Mode.ENCODE_MODE_ARGB,
+            Pie_Option.ENC_MODULATION_OFF,
             Pie_ZIP_Name.AS_IS,
             Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
             Level.INFO,
             new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
-            new Pie_Encode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/cork.jpg")),
-            //new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)),
+            //new Pie_Encode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/cork.jpg")),
+            new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)),
             //new Pie_Encode_Source(new Pie_Text(new File(Pie_Utils.getDesktopPath() + File.separator +"LICENSE.txt"), "myfile.png")),
             new Pie_Encoded_Destination(new File(Pie_Utils.getDesktopPath() + File.separator + temp_Encoded_Image)),
             new Pie_Encode_Min_Size(0, 0, Pie_Position.MIDDLE_CENTER)

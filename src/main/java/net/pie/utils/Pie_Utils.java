@@ -7,6 +7,8 @@ import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
@@ -133,6 +135,33 @@ public class Pie_Utils {
             throw new RuntimeException(e);
         }
     }
+
+    /** *********************************************************<br>
+     * create Byte Map - Encoding
+     * @return Map<Integer, Integer>
+     */
+    public static Map<Integer, Integer> create_Encoding_Byte_Map() {
+        Map<Integer, Integer> map = new HashMap<>();
+        int new_Value = Byte.MAX_VALUE + 1;
+        for (int i = Byte.MIN_VALUE; i < 0; i++) {
+            map.put(i, new_Value ++);
+        }
+        return map;
+    };
+
+    /** *********************************************************<br>
+     * create Byte Map - Decoding
+     * @return Map<Integer, Integer>
+     */
+    public static Map<Integer, Integer> create_Decoding_Byte_Map() {
+        Map<Integer, Integer> map = new HashMap<>();
+        int new_Value = Byte.MAX_VALUE + 1;
+        for (int i = Byte.MIN_VALUE; i < 0; i++) {
+            map.put(new_Value ++, i);
+        }
+        return map;
+    };
+
     /** *********************************************************<br>
      * Log how log it takes to encode
      * @param startTime (long)

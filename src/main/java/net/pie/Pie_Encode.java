@@ -12,9 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
@@ -24,6 +22,8 @@ public class Pie_Encode {
     private Pie_Config config;
     private int[] modulate = new int[]{0,0,0,0};
 
+    private Map<Integer, Integer> byte_map = new HashMap<>();
+
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
      * Encode a file or text from Pie_Source using options from Pie_Config<br>
@@ -32,6 +32,7 @@ public class Pie_Encode {
      * @see Pie_Config
      **/
     public Pie_Encode (Pie_Config config) {
+        setByte_map(Pie_Utils.create_Encoding_Byte_Map());
         ImageIO.setUseCache(false);
         long startTime = System.currentTimeMillis();
 
@@ -180,16 +181,12 @@ public class Pie_Encode {
             } catch (IOException ignored) {  }
 
             // Base 64
-            originalArray = Base64.getEncoder().encode (baos.toByteArray());
+            if (!getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF))
+                originalArray = Base64.getEncoder().encode (baos.toByteArray());
             baos = null;
 
         }catch (Exception e) {
             getConfig().logging(Level.SEVERE,"Error " + e.getMessage());
-            return;
-        }
-
-        if (originalArray == null) {
-            getConfig().logging(Level.SEVERE,"Encoding Error");
             return;
         }
 
@@ -263,10 +260,13 @@ public class Pie_Encode {
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
 
-        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF))
-            setModulate(new int[]{0,0,0,0});
-        else
+        boolean modulate = false;
+        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF)) {
+            setModulate(new int[]{0, 0, 0, 0});
+        }else {
             setModulate(getRandom_Value(rbg, 99));
+            modulate = true;
+        }
 
         // Set Modulation
         data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
@@ -283,7 +283,7 @@ public class Pie_Encode {
         for (int i : originalArray) {
             if (store == null)
                 store = new int[rbg.length()];
-            store[store_count ++] = i;
+            store[store_count ++] = (modulate ? getByte_map().getOrDefault(i, i) : i);
             if (store_count < rbg.length())
                 continue;
 
@@ -537,4 +537,11 @@ public class Pie_Encode {
         this.modulate = modulate;
     }
 
+    public Map<Integer, Integer> getByte_map() {
+        return byte_map;
+    }
+
+    public void setByte_map(Map<Integer, Integer> byte_map) {
+        this.byte_map = byte_map;
+    }
 }
