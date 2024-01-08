@@ -17,8 +17,8 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_coreprint.png";
-    private String temp_Decode_To = "batch";
+    private String temp_Encoded_Imaage = "enc_background.jpg.png";
+    private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
         new Pie_Test_Decode();

@@ -178,7 +178,7 @@ public class Pie_Encode {
             }
 
             // Base 64
-            if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION)) {
+            if (getConfig().getOptions().contains(Pie_Option.MODULATION)) {
                 originalArray = Base64.getEncoder().encode(baos.toByteArray().length < originalArray.length ? baos.toByteArray() : originalArray);
             }else {
                 if (baos.toByteArray().length < originalArray.length)
@@ -266,7 +266,7 @@ public class Pie_Encode {
         rbg = rbg.replace("T", "");
 
         boolean modulate = false;
-        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION)) {
+        if (getConfig().getOptions().contains(Pie_Option.MODULATION)) {
             setModulate(getRandom_Value(rbg, 99));
             modulate = true;
         }else {

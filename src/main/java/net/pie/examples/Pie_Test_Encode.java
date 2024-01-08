@@ -18,8 +18,8 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "coreprint.png";
-    private String temp_Encoded_Image = "coreprint.png";
+    private String temp_To_Be_Encoded = "background.jpg";
+    private String temp_Encoded_Image = "background.jpg";
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -38,7 +38,7 @@ public class Pie_Test_Encode {
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Pie_Shape.SHAPE_RECTANGLE,
             Pie_Encode_Mode.ENCODE_MODE_ARGB,
-            Pie_Option.ENC_MODULATION,
+            Pie_Option.MODULATION,
             Pie_ZIP_Name.AS_IS,
             Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
             Level.INFO,
