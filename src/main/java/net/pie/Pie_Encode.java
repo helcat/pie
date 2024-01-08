@@ -166,7 +166,7 @@ public class Pie_Encode {
             }
 
             // Compress
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(originalArray.length);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
                 Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
                 OutputStream out = new DeflaterOutputStream(baos, compressor);
@@ -176,14 +176,19 @@ public class Pie_Encode {
                 getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
                 return;
             }
-            try {
-                baos.close();
-            } catch (IOException ignored) {  }
 
             // Base 64
-            if (!getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF))
-                originalArray = Base64.getEncoder().encode (baos.toByteArray());
-            baos = null;
+            if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION)) {
+                originalArray = Base64.getEncoder().encode(baos.toByteArray().length < originalArray.length ? baos.toByteArray() : originalArray);
+            }else {
+                if (baos.toByteArray().length < originalArray.length)
+                    originalArray = baos.toByteArray();
+            }
+
+            try {
+                baos.close();
+                baos = null;
+            } catch (IOException ignored) {  }
 
         }catch (Exception e) {
             getConfig().logging(Level.SEVERE,"Error " + e.getMessage());
@@ -261,11 +266,11 @@ public class Pie_Encode {
         rbg = rbg.replace("T", "");
 
         boolean modulate = false;
-        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION_OFF)) {
-            setModulate(new int[]{0, 0, 0, 0});
-        }else {
+        if (getConfig().getOptions().contains(Pie_Option.ENC_MODULATION)) {
             setModulate(getRandom_Value(rbg, 99));
             modulate = true;
+        }else {
+            setModulate(new int[]{0, 0, 0, 0});
         }
 
         // Set Modulation
@@ -283,7 +288,7 @@ public class Pie_Encode {
         for (int i : originalArray) {
             if (store == null)
                 store = new int[rbg.length()];
-            store[store_count ++] = (modulate ? getByte_map().getOrDefault(i, i) : i);
+            store[store_count ++] = (!modulate ? getByte_map().getOrDefault(i, i) : i);
             if (store_count < rbg.length())
                 continue;
 
@@ -293,7 +298,7 @@ public class Pie_Encode {
             }
 
             store_count = 0;
-            data_image.setRGB(x++, y, buildColor(rbg, store, transparent).getRGB());
+            data_image.setRGB(x++, y, buildColor(modulate, rbg, store, transparent).getRGB());
             store = null;
         }
 
@@ -303,17 +308,17 @@ public class Pie_Encode {
                 x = 0;
                 y++;
             }
-            data_image.setRGB(x, y, buildColor(rbg, store, transparent).getRGB());
+            data_image.setRGB(x, y, buildColor(modulate, rbg, store, transparent).getRGB());
         }
 
         // Stopper
         if (x < size.getWidth())
-            data_image.setRGB(x++, y,new Color(0, 0, 0, 0).getRGB());
+            data_image.setRGB(x++, y,new Color(getModulate()[0], getModulate()[1], getModulate()[2], getModulate()[3]).getRGB());
         else
             return data_image;
 
         // Filler
-        if (y > 0) {
+        if (modulate && y > 0) {
             int w = x;
             for (; w < size.getWidth(); w++)
                 data_image.setRGB(w, y, data_image.getRGB(w, 0));
@@ -343,12 +348,12 @@ public class Pie_Encode {
      * @param transparent (boolean)
      * @return (Color)
      */
-    private Color buildColor(String rbg, int[] store, boolean transparent) {
+    private Color buildColor(boolean modulate, String rbg, int[] store, boolean transparent) {
         int count = 0;
         int r = rbg.contains("R") ? checker(store, count++, 0) :  0;
         int g = rbg.contains("G") ? checker(store, count++, 0) :  0;
         int b = rbg.contains("B") ? checker(store, count++, 0) :  0;
-        return  rbg.contains("A") ? new Color(r, g, b, checker(store, count++, 1)) :
+        return  rbg.contains("A") ? new Color(r, g, b, checker(store, count++, (modulate ? 1 : 0) )) :
                 transparent ? new Color( r, g, b, 1) : new Color(r, g, b);
     }
 

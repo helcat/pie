@@ -45,8 +45,6 @@ then decode back again when required. When encoding the file, its size should re
 The PIE library is lightweight and has no dependencies. This should make it easy to integrate into almost any application. 
 To make sure there is no compatibility issues all classes in the library are prefixed with `"Pie_"`.
 
-Every image produced has modulation by default however, this can be turned off. Which means Every image is completely different even if it's the same content being encoded. 
-
 Practical applications Would include but not limited to 
 * Chat servers . Ideally to pass a text encoded image from one client to another.
   * Process :  Text "Hello World" --> encode --> send to client --> decode --> view. Any one observing will only see an image nothing else.
@@ -87,11 +85,15 @@ You do not have to place the "options" or any parameters in any order, enter the
 * `Pie_Option.SHOW_MEMORY_USAGE` : shows approximate memory usage. Default false.
 * `Pie_Option.TERMINATE_LOG_AFTER_PROCESSING` : will terminate the logging. Default false.
 * `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR` : will override the default of deleting the file if an error has occurred.
-* `Pie_Option.ENC_MODULATION_OFF` : will turn off modulation. Not recommended, only turn off if necessary.
+* `Pie_Option.ENC_MODULATION` : will turn on modulation.
 
 Example
 
 `new Pie_Config(Pie_Option.OVERWRITE_FILE, Pie_Option.SHOW_PROCESSING_TIME);`
+
+When modulation is turned on every encoding will be completely different, even if it's the same content. 
+This will increase the file size but not extensively. When modulation is not used the file size will try and remain depending on the
+encoding and if encryption is used.
 
 ## Encoding Options
 Add these to "`new Pie_Config(....)`"

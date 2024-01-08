@@ -24,6 +24,7 @@ public class Pie_Decode {
     private boolean encrypted = false;
     private Object output = null;
     private Map<Integer, Integer> byte_map = new HashMap<>();
+    private boolean modulation = false;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -141,7 +142,8 @@ public class Pie_Decode {
         }
 
         try {
-            message = Base64.getDecoder().decode(message);
+            if (isModulation())
+                message = Base64.getDecoder().decode(message);
         } catch (Exception e) {
             getConfig().logging(Level.SEVERE, "Base Encoding Error " + e.getMessage());
             return null;
@@ -228,7 +230,7 @@ public class Pie_Decode {
         int pixelColor;
         int[] value = null;
         int[] modulate = new int[]{0,0,0,0};
-        boolean modulation = false;
+        setModulation(false);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
         int r,g,b,a = 0;
@@ -247,7 +249,7 @@ public class Pie_Decode {
 
                     modulate = value;
                     if (Arrays.stream(modulate).sum() > 0)
-                        modulation = true;
+                        setModulation(true);
                     continue;
                 }else{
                     r = ((pixelColor >> 16) & 0xFF);
@@ -255,10 +257,10 @@ public class Pie_Decode {
                     b = (pixelColor & 0xFF);
                     a = ((pixelColor >> 24) & 0xFF);
                     value = new int[]{
-                            modulation ? r - modulate[0] : getByte_map().getOrDefault(r, r),
-                            modulation ? g - modulate[1] : getByte_map().getOrDefault(g, g),
-                            modulation ? b - modulate[2] : getByte_map().getOrDefault(b, b),
-                            modulation ? a - modulate[3] : getByte_map().getOrDefault(a, a),
+                            isModulation() ? r - modulate[0] : getByte_map().getOrDefault(r, r),
+                            isModulation() ? g - modulate[1] : getByte_map().getOrDefault(g, g),
+                            isModulation() ? b - modulate[2] : getByte_map().getOrDefault(b, b),
+                            isModulation() ? a - modulate[3] : getByte_map().getOrDefault(a, a),
                     };
                 }
 
@@ -268,11 +270,11 @@ public class Pie_Decode {
                     return null;
                 }
 
-                if (Arrays.stream(value).sum() == 0)
+                if (isZero(value) || isModulation() && (Arrays.stream(value).sum() == 0))
                     break;
 
                 for (int v : value)
-                    if (v > 0 && v < 255)
+                    if (!isModulation() || isModulation() && v > 0 && v < 255)
                         bytes.write((byte) v);
             }
         }
@@ -287,6 +289,12 @@ public class Pie_Decode {
         } catch (IOException ignored) { }
 
         return bytes.toByteArray();
+    }
+
+    private boolean isZero(int[] value) {
+        if (value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] == 0)
+            return true;
+        return false;
     }
 
     /** *******************************************************************<br>
@@ -431,5 +439,13 @@ public class Pie_Decode {
 
     public void setByte_map(Map<Integer, Integer> byte_map) {
         this.byte_map = byte_map;
+    }
+
+    public boolean isModulation() {
+        return modulation;
+    }
+
+    public void setModulation(boolean modulation) {
+        this.modulation = modulation;
     }
 }
