@@ -85,7 +85,7 @@ You do not have to place the "options" or any parameters in any order, enter the
 * `Pie_Option.SHOW_MEMORY_USAGE` : shows approximate memory usage. Default false.
 * `Pie_Option.TERMINATE_LOG_AFTER_PROCESSING` : will terminate the logging. Default false.
 * `Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR` : will override the default of deleting the file if an error has occurred.
-* `Pie_Option.ENC_MODULATION` : will turn on modulation.
+* `Pie_Option.MODULATION` : will turn on modulation.
 
 Example
 
