@@ -198,7 +198,9 @@ public class Pie_Config {
     public Pie_Encryption getEncryption() {
         return encryption;
     }
-
+    public void setEncryption(Pie_Encryption encryption) {
+        this.encryption = encryption;
+    }
     /** ***************************************************************<br>
      * Logging Used internally
      * @return (Logger)
