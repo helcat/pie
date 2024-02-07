@@ -21,13 +21,36 @@
     <version>${pie.version}</version>
     <packaging>jar</packaging>
     <name>${pie.title}</name>
+    <description>${pie.title}</description>
+    <inceptionYear>2024</inceptionYear>
 
     <url>${pie.url}</url>
+
+    <licenses>
+        <license>
+            <name>Apache Software License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <organization>
         <name>${written.by}</name>
         <url>${pie.url}</url>
     </organization>
+
+    <developers>
+        <developer>
+            <id>TC</id>
+            <name>${written.by}</name>
+            <email>commodoredot64@gmail.com</email>
+            <url>${pie.url}</url>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
+    </developers>
 
     <dependencies>
         <!-- Add your dependencies here -->
