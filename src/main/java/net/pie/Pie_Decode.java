@@ -25,6 +25,8 @@ public class Pie_Decode {
     private Object output = null;
     private Map<Integer, Integer> byte_map = new HashMap<>();
     private boolean modulation = false;
+    private final byte split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
+    private final byte start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -160,11 +162,11 @@ public class Pie_Decode {
         if (message == null)
             return null;
 
-        if (message[0] == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+        if (message[0] == getSplit_tag()) {
             int count = 1;
             boolean found = false;
             for (byte b : message) {
-                if (count > 1 && b == Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+                if (count > 1 && b == getSplit_tag()) {
                     found = true;
                     break;
                 }
@@ -181,7 +183,7 @@ public class Pie_Decode {
 
             message = Arrays.copyOfRange(message, count, message.length);
 
-        } else if (message[0] == Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0]) {
+        } else if (message[0] == getStart_tag()) {
             message = Arrays.copyOfRange(message, 1, message.length);
 
         } else {
@@ -204,7 +206,8 @@ public class Pie_Decode {
     private BufferedImage collectImage(int processing_file) {
         BufferedImage buffimage = null;
         try {
-            getConfig().logging(Level.INFO, "Decode : Collecting file " + (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
+            getConfig().logging(Level.INFO, "Decode : Collecting file " +
+                    (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
             getConfig().getDecode_source().next(getConfig(), processing_file);
             if (!getConfig().isError() && getConfig().getDecode_source().getInput() != null )
                 buffimage = ImageIO.read(getConfig().getDecode_source().getInput());
@@ -447,5 +450,13 @@ public class Pie_Decode {
 
     public void setModulation(boolean modulation) {
         this.modulation = modulation;
+    }
+
+    public byte getSplit_tag() {
+        return split_tag;
+    }
+
+    public byte getStart_tag() {
+        return start_tag;
     }
 }
