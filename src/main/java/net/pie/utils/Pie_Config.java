@@ -67,6 +67,7 @@ public class Pie_Config {
         this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
         this.log_level = Level.SEVERE;
 
+        // Arrays.stream(options).forEach(o -> { // For is faster!
         for (Object o : options) {
             if (o == null)
                 continue;

@@ -248,8 +248,8 @@ public class Pie_Encode {
         int image_type = BufferedImage.TYPE_INT_RGB;
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
-        BufferedImage data_image = new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type);
-        return buildImage(data_image, image_size, originalArray, getConfig().getEncoder_mode().getParm1(), has_Been_Encrypted );
+        return buildImage(new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type),
+                image_size, originalArray, getConfig().getEncoder_mode().getParm1(), has_Been_Encrypted );
     }
 
     /** *********************************************************<br>
