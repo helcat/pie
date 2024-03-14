@@ -23,6 +23,10 @@ public class Pie_Encryption {
     private Integer error_code = null;
     private boolean was_Encrypted = false;
 
+    public Pie_Encryption() {
+
+    }
+
     /** **************************************************<br>
      * Start encryption
      * @param parm (Object, can be SecretKey, File (Certificate generated from Pie) or password (must be more than 7 long)
@@ -36,32 +40,8 @@ public class Pie_Encryption {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File) {
-            if (!((File) parm).isFile()) {
+            if (!((File) parm).isFile() || !read_Certificate(((File) parm)))
                 setError_code(Pie_Constants.ERROR_CODE_1.ordinal());
-                return;
-            }
-
-            String line = null;
-            StringBuilder key_text = new StringBuilder();
-            try {
-                FileReader fileReader = new FileReader(((File) parm));
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                while ((line = bufferedReader.readLine()) != null)
-                    key_text.append(line);
-                bufferedReader.close();
-                fileReader.close();
-
-                byte[] bytes = Base64.getDecoder().decode(key_text.toString());
-                if (bytes == null) {
-                    setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
-                    return;
-                }
-
-                setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
-            } catch (IOException ex) {
-                setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
-            }
-
         } else if (parm instanceof String) {
             if (((String) parm).length() > 7) {
                 setPassword((String) parm);
@@ -69,6 +49,44 @@ public class Pie_Encryption {
                 setError_code(Pie_Constants.ERROR_CODE_3.ordinal());
             }
         }
+    }
+
+    public static boolean verify_Certificate(File file) {
+        return new Pie_Encryption().read_Certificate(file);
+    }
+
+
+    /** **************************************************<br>
+     * read Certificate
+     * @param file (File)
+     * @return (boolean)
+     */
+    public boolean read_Certificate(File file) {
+        if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
+            return false;
+
+        String line = null;
+        StringBuilder key_text = new StringBuilder();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while ((line = bufferedReader.readLine()) != null)
+                key_text.append(line);
+            bufferedReader.close();
+            fileReader.close();
+
+            byte[] bytes = Base64.getDecoder().decode(key_text.toString());
+            if (bytes == null) {
+                setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
+                return false;
+            }
+
+            setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
+        } catch (IllegalArgumentException | IOException ex) {
+            setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
+            return false;
+        }
+        return true;
     }
 
     /** **************************************************<br>
