@@ -98,7 +98,7 @@ public class Pie_Encryption {
         if (getKey() != null)
             return; // reuse key
 
-        if (getPassword() != null && !getPassword().isEmpty() && getPassword().length() < 8) {
+        if (!Pie_Utils.isEmpty(getPassword()) && getPassword().length() < 8) {
             config.logging(Level.WARNING, "Invalid Encryption Password");
             setKey(null);
             return;
@@ -132,7 +132,7 @@ public class Pie_Encryption {
                 file_name = (String) o;
         }
 
-        if (file_name == null || file_name.isEmpty())
+        if (Pie_Utils.isEmpty(file_name))
             file_name = "pie_certificate";
 
         if (config == null)
@@ -193,7 +193,7 @@ public class Pie_Encryption {
             config = new Pie_Config();
 
         if (getKey() == null) {
-            if (getPassword() != null && !getPassword().isEmpty()) {
+            if (!Pie_Utils.isEmpty(getPassword())) {
                 createKey(config);
                 if (getKey() == null) {
                     config.logging(Level.WARNING, "Encryption Error - Cannot create key");
@@ -243,7 +243,7 @@ public class Pie_Encryption {
             config = new Pie_Config();
 
         if (getKey() == null) {
-            if (getPassword() != null && !getPassword().isEmpty())
+            if (!Pie_Utils.isEmpty(getPassword()))
                 createKey(config);
             else
                 return input;

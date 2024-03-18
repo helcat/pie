@@ -68,7 +68,7 @@ public class Pie_Encode_Source {
                 break;
             case "Pie_Text" :
                 Pie_Text text = (Pie_Text) encode;
-                if (text.getText() == null || text.getText().isEmpty()) {
+                if (Pie_Utils.isEmpty(text.getText())) {
                     setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
                     return;
                 }
@@ -127,7 +127,7 @@ public class Pie_Encode_Source {
                         url = (URL) o;
                     if (o.getClass().getSimpleName().equalsIgnoreCase("Pie_URL") ) {
                         Pie_URL pu = (Pie_URL) o;
-                        if (pu.getError_message() != null && !pu.getError_message().isEmpty()) {
+                        if (!Pie_Utils.isEmpty(pu.getError_message())) {
                             setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
                             return;
                         }
@@ -179,7 +179,7 @@ public class Pie_Encode_Source {
             }
 
             String filename = getFileName(http);
-            if (filename == null || filename.trim().isEmpty()) {
+            if (Pie_Utils.isEmpty(filename)) {
                 setError_code(Pie_Constants.ERROR_CODE_15.ordinal());
                 http.disconnect();
                 return;

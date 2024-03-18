@@ -23,7 +23,7 @@ public class Pie_Text {
      */
     public Pie_Text(Object text, String file_name) {
         process_object(text);
-        if (file_name != null && file_name.isEmpty())
+        if (!Pie_Utils.isEmpty(file_name))
             setFile_name(file_name + (file_name.toLowerCase().endsWith(".txt") ? "" : ".txt"));
     }
 
@@ -58,7 +58,7 @@ public class Pie_Text {
     }
 
     public void setFile_name(String file_name) {
-        this.file_name = file_name == null || file_name.isEmpty() ? "Text.txt" : file_name;
+        this.file_name = Pie_Utils.isEmpty(file_name) ? "Text.txt" : file_name;
     }
 }
 

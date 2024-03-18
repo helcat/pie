@@ -1,12 +1,14 @@
 package net.pie.utils;
 
 import net.pie.enums.Pie_Option;
-
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.text.CharacterIterator;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -59,20 +61,110 @@ public class Pie_Utils {
         return FileSystemView.getFileSystemView().getHomeDirectory();
     }
 
-    public static String getTempFolderPath() {
-        File f = getTempFolder();
-        if (f == null)
-            return "";
-        return f.getPath();
+    /** *******************************************************<br>
+     * console out
+     * @param content (String)
+     */
+    public static void console_out(String content) {
+        System.out.println(stringDate() + " : " + content);
     }
-    public static File getTempFolder() {
-        String tempPath = System.getProperty("java.io.tmpdir");
-        if (tempPath.startsWith(File.separator+"var"+File.separator+"folders"+ File.separator))
-            tempPath = File.separator+"tmp"+File.separator; // a fix to handle the path the Mac JVM returns
-        File tmp = new File(tempPath);
-        if (tmp.exists())
-            return tmp;
-        return null;
+
+    /** *******************************************************<br>
+     * string Date
+     * @return (String)
+     */
+    public static String stringDate() {
+        return stringDate(true);
+    }
+    public static String stringDate(boolean as_output) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(as_output ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy_HH-mm-ss");
+            Date date = new Date();
+            return dateFormat.format(date);
+        }catch (Exception ignored) { }
+        return "";
+    }
+
+    public static void setConsole_Out_File(File log_file) {
+        try {
+            if (log_file.exists() && !log_file.delete())
+                return;
+
+            PrintStream out = new PrintStream(new FileOutputStream(log_file, true), true);
+            System.setOut(out);
+        } catch (FileNotFoundException ignored) { }
+
+    }
+
+    /** **************************************************************<br>
+     * get a static folder. Some where files will never be deleted.
+     * @return (File)
+     */
+    public static File create_Static_Folder(String folder_name) {
+        String staticDirPath = System.getProperty("user.home");
+        if (staticDirPath.startsWith(File.separator))
+            staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
+        else
+            staticDirPath = System.getenv("APPDATA");
+
+        if (new File(staticDirPath).exists()) {
+            File folder = new File(file_concat(staticDirPath, folder_name));
+            if (folder.exists())
+                return folder;
+            if (folder.mkdir())
+                return folder;
+        }
+
+        return getTempFolder(folder_name);
+     }
+
+    /** **************************************************************<br>
+     * Get a temp folder
+     * @return (File)
+     */
+     public static File getTempFolder(String folder_name)  {
+         // Use Temp Directory
+         String tempDirPath = System.getProperty("java.io.tmpdir");
+         if (tempDirPath.startsWith(File.separator))
+             tempDirPath = file_concat(tempDirPath, file_concat("tmp", folder_name));
+         else
+             tempDirPath = file_concat(tempDirPath ,folder_name);
+
+         File folder = new File(tempDirPath);
+
+         if (folder.exists())
+             return folder;
+
+         if (folder.mkdirs())
+             return folder;
+
+         return folder;
+     }
+
+    /** **************************************************************<br>
+     * There are no dependancies with this jar so can not use FilenameUtils.concat
+     * @param original (String)
+     * @param addon (String)
+     * @return (String)
+     */
+    public static String file_concat(String original, String addon) {
+        return original +
+                (!isEmpty(addon) ?
+                        (original.endsWith(File.separator) ? "" : File.separator) + (addon.startsWith(File.separator) ? (addon.substring(1)) : addon )
+                        : "");
+    }
+
+    /** **************************************************************<br>
+     * same as file_concat but for urls.
+     * @param original (String)
+     * @param addon (String)
+     * @return (String)
+     */
+    public static String url_concat(String original, String addon) {
+        return original +
+                (!isEmpty(addon) ?
+                        (original.endsWith("/") ? "" : "/") + (addon.startsWith("/") ? (addon.substring(1)) : addon )
+                        : "");
     }
 
     /** *****************************************************<br>
@@ -161,6 +253,15 @@ public class Pie_Utils {
         }
         return map;
     };
+
+    /** *********************************************************<br>
+     * check if a string is empty.
+     * @param content (String)
+     * @return (boolean)
+     */
+    public static boolean isEmpty(String content) {
+        return content != null && content.trim().isEmpty();
+    }
 
     /** *********************************************************<br>
      * Log how log it takes to encode

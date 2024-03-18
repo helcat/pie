@@ -105,13 +105,13 @@ public class Pie_Decode_Source {
                 break;
             case "Pie_URL":
                 Pie_URL pu = (Pie_URL) getDecode_object();
-                if (pu.getError_message() != null && !pu.getError_message().isEmpty()) {
+                if (!Pie_Utils.isEmpty(pu.getError_message())) {
                     config.logging(Level.SEVERE,pu.getError_message());
                     break;
                 }
                 config.logging(Level.INFO,"Downloading File ");
                 setInput(pu.getInputStream());
-                if (pu.getError_message() != null && !pu.getError_message().isEmpty())
+                if (!Pie_Utils.isEmpty(pu.getError_message()))
                     config.logging(Level.SEVERE,pu.getError_message());
                 break;
             case "InputStream":

@@ -29,7 +29,7 @@ public class Pie_URL {
      * @return InputStream
      */
     public InputStream getInputStream() {
-        if (getUrl() != null && (getError_message() == null || getError_message().trim().isEmpty())) {
+        if (getUrl() != null && (Pie_Utils.isEmpty(getError_message()))) {
             try {
                 return getUrl().openStream();
             } catch (IOException e) {
@@ -46,7 +46,7 @@ public class Pie_URL {
      * Not used within PIE.
      */
     public void launch() {
-        if (getUrl() != null && (getError_message() == null || getError_message().trim().isEmpty())) {
+        if (getUrl() != null && (Pie_Utils.isEmpty(getError_message()))) {
             try {
                 if (Utils.isMac()) {
                     Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
