@@ -26,7 +26,8 @@ public enum Pie_Constants {
     ERROR_CODE_13 (13, "Decoder Destination Folder Does Not Exist"),
     ERROR_CODE_14 (14, "Download Failed"),
     ERROR_CODE_15 (15, "Missing file name for download"),
-    ERROR_CODE_16 (16, "No Source Size Available")
+    ERROR_CODE_16 (16, "No Source Size Available"),
+    ERROR_CODE_17 (17, "Unable to create a Certificate must be over 8 long."),
     ;
 
     public int parm1 = 0;

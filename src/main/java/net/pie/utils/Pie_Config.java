@@ -27,8 +27,10 @@ import java.util.logging.*;
  **/
 public class Pie_Config {
     private List<Pie_Option> options = new ArrayList<>();
-    private Pie_Encode_Min_Size encoder_Minimum_Image = new Pie_Encode_Min_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(), Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
-    private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
+    private Pie_Encode_Min_Size encoder_Minimum_Image = new Pie_Encode_Min_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(),
+            Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
+    private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(),
+            Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
     private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB(200);
     private Pie_Zip encoder_storage = null;

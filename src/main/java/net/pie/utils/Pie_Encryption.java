@@ -149,6 +149,7 @@ public class Pie_Encryption {
 
         if (getPassword() == null || getPassword().length() < 8) {
             config.logging(Level.SEVERE, "Invalid key must be 8 or more");
+            setError_code(Pie_Constants.ERROR_CODE_17.ordinal());
             return null;
         }
 
