@@ -223,13 +223,15 @@ encryption might be a little larger than the original but not much (only a few b
 To create a certificate use this standalone command.
 
         Pie_Encryption encryption = new Pie_Encryption("123456789 £ ABCDEFGHIJ abcdefghij -> More");
-        encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
+        File certificate = encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
 
 First create a "Pie_Encryption" object with a pass phrase. The Phrase must be longer than 7 characters. Next create the certificate using the "create_Certificate_File" method.
 Parameters for the method are as follows, please note you can add them in any order.
 * `Pie_Config` Optional. If not entered a default configuration will be used.
 * `File` Optional. A folder to store the certificate. If not entered the desktop will be used.
 * `String` Optional. A file name for the certificate. If not entered "pie_certificate" will be used. An extension is not required ".pie" is added to the file name.
+
+When using this, the certificate file will be returned.
 
 ### Pie URL
 Optional Encoding and Decoding.

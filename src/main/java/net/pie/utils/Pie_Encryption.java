@@ -114,14 +114,15 @@ public class Pie_Encryption {
     /** **************************************************<br>
      * create Certificate File
      * @param options (Pie_Config will be created if not entered, folder (File - Save to folder), file_name (String)
+     * @return (File) Certificate Created
      */
-    public void create_Certificate_File(Object... options) {
+    public File create_Certificate_File(Object... options) {
         Pie_Config config = null;
         File folder = null;
         String file_name = null;
 
         if (options == null)
-            return;
+            return null;
 
         for (Object o : options) {
             if (o instanceof Pie_Config)
@@ -143,32 +144,33 @@ public class Pie_Encryption {
 
         if (!folder.isDirectory()) {
             config.logging(Level.SEVERE, "Invalid folder");
-            return;
+            return null;
         }
 
         if (getPassword() == null || getPassword().length() < 8) {
             config.logging(Level.SEVERE, "Invalid key must be 8 or more");
-            return;
+            return null;
         }
 
         createKey(config);
         if (getKey() == null) {
             config.logging(Level.SEVERE, "Unable to create certificate file");
-            return;
+            return null;
         }
 
         byte[] keyToBytes = getKey().getEncoded();
         if (keyToBytes == null) {
             config.logging(Level.SEVERE, "Unable to create certificate file");
-            return;
+            return null;
         }
 
+        File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"));
         FileWriter fw = null;
         try {
-            fw = new FileWriter(new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie")));
+            fw = new FileWriter(cert);
         } catch (IOException e) {
             config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
-            return;
+            return null;
         }
         PrintWriter pw = new PrintWriter(fw);
         pw.println(new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8));
@@ -177,9 +179,10 @@ public class Pie_Encryption {
             fw.close();
         } catch (IOException e) {
             config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
-            return;
+            return null;
         }
         config.logging(Level.INFO, "Certificate file created");
+        return cert;
     }
 
     /** **************************************************<br>
