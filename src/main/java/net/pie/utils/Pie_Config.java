@@ -44,6 +44,7 @@ public class Pie_Config {
     private Pie_Encoded_Destination encoder_destination = null;
     private Pie_Decode_Source decode_source = null;
     private Pie_Decode_Destination  decoded_Source_destination = null;
+    private boolean demo_mode = false;
 
     public Pie_Config(Object... options) {
         setup(options);
@@ -70,12 +71,18 @@ public class Pie_Config {
         this.log_level = Level.SEVERE;
 
         // Arrays.stream(options).forEach(o -> { // For is faster!
+        Pie_Option opt = null;
         for (Object o : options) {
             if (o == null)
                 continue;
 
             switch (o.getClass().getSimpleName()) {
-                case "Pie_Option": getOptions().add((Pie_Option) o); break;
+                case "Pie_Option":
+                    opt = (Pie_Option) o;
+                    if (opt.equals(Pie_Option.DEMO_MODE))
+                        setDemo_mode(true);
+                    getOptions().add(opt);
+                    break;
                 case "Pie_Shape": this.encoder_shape = (Pie_Shape) o; break;
                 case "Pie_Encode_Mode": this.encoder_mode = (Pie_Encode_Mode) o; break;
                 case "Pie_ZIP_Option": this.encoder_storage.setOption((Pie_ZIP_Option) o); break;
@@ -158,6 +165,11 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
+        if (isDemo_mode()) {
+            System.out.println(level.toString() + " : " + message);
+            return;
+        }
+
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message);
@@ -340,6 +352,14 @@ public class Pie_Config {
     public void setError_message(String error_message) {
         if (this.isError())
             this.error_message = error_message;
+    }
+
+    public boolean isDemo_mode() {
+        return demo_mode;
+    }
+
+    public void setDemo_mode(boolean demo_mode) {
+        this.demo_mode = demo_mode;
     }
 
     /** ******************************************************************<br>
