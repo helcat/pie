@@ -5,7 +5,6 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.text.CharacterIterator;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
@@ -78,9 +77,7 @@ public class Pie_Utils {
     }
     public static String stringDate(boolean as_output) {
         try {
-            DateFormat dateFormat = new SimpleDateFormat(as_output ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy_HH-mm-ss");
-            Date date = new Date();
-            return dateFormat.format(date);
+            return new SimpleDateFormat(as_output ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy_HH-mm-ss").format(new Date());
         }catch (Exception ignored) { }
         return "";
     }
@@ -254,15 +251,10 @@ public class Pie_Utils {
         return map;
     };
 
-    /** *********************************************************<br>
-     * check if a string is empty.
-     * @param content (String)
-     * @return (boolean)
-     */
-    public static boolean isEmpty(String content) {
-        return content != null && content.trim().isEmpty();
-    }
 
+    public static boolean isEmpty(String in) {
+        return in == null || in.trim().isEmpty();
+    }
     /** *********************************************************<br>
      * Log how log it takes to encode
      * @param startTime (long)
