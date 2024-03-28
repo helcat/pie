@@ -63,7 +63,8 @@ public class Pie_Encoded_Destination {
             // Single Files Only Or Beginning of Zip
             File toFile = addFileNumber(config, file_number, source_filename);
             if (toFile.exists() && !config.getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
-                config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() + " Was not created, Set config to overwrite file is required");
+                config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() +
+                        " Was not created, Set config to overwrite file is required");
                 return false;
             }
             getEncoded_file_list().add(toFile.getPath());
@@ -84,6 +85,9 @@ public class Pie_Encoded_Destination {
      */
     public String create_File_Name(Pie_Config config, int file_number, String source_filename) {
         String name = getLocal_file().isDirectory() ? source_filename : getLocal_file().getName();
+        if (name.endsWith(".pie"))
+            return name;
+
         if (name.equals(source_filename))
             name = "enc_" + name;
 
@@ -119,7 +123,8 @@ public class Pie_Encoded_Destination {
             getLocal_file().isDirectory() ?
             getLocal_file().getAbsolutePath() + File.separator + name
             :
-            getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+            getLocal_file().getAbsolutePath().substring(0,
+                    getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
@@ -150,7 +155,8 @@ public class Pie_Encoded_Destination {
                 getLocal_file().isDirectory() ?
                         getLocal_file().getAbsolutePath() + File.separator + name
                         :
-                        getLocal_file().getAbsolutePath().substring(0, getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+                        getLocal_file().getAbsolutePath().substring(0,
+                                getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));

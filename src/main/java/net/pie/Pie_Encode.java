@@ -230,7 +230,8 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), buffImg != null ? buffImg : data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name()))
+        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), buffImg != null ? buffImg : data_image,
+                file_number, total_files, getConfig().getEncoder_source().getFile_name()))
             getConfig().logging(Level.SEVERE,"Encoding image was not saved");
 
         data_image = null;
@@ -424,7 +425,8 @@ public class Pie_Encode {
         Pie_Size image_size = getPieSize((double) length, mode);
 
         if (getConfig().hasEncoder_Maximum_Image()) {
-            if ((image_size.getWidth() * image_size.getHeight()) > getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
+            if ((image_size.getWidth() * image_size.getHeight()) >
+                    getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
                 getConfig().logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
                         ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
                         " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
@@ -479,7 +481,8 @@ public class Pie_Encode {
                 config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
                 config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
 
-        String filename = getConfig().getEncoder_source().getFile_name() != null && !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "";
+        String filename = getConfig().getEncoder_source().getFile_name() != null &&
+                !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "";
 
         StringBuilder addon_files = new StringBuilder();
         if (zip)
@@ -489,7 +492,8 @@ public class Pie_Encode {
             for (int i = 2; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");
-                addon_files.append(getConfig().getEncoder_destination().create_File_Name(getConfig(), i, getConfig().getEncoder_source().getFile_name()));
+                addon_files.append(getConfig().getEncoder_destination().create_File_Name(getConfig(), i,
+                        getConfig().getEncoder_source().getFile_name()));
             }
         }
 
@@ -504,7 +508,8 @@ public class Pie_Encode {
     public List<String> getEncoded_file_list() {
         if (getConfig() == null)
             return new ArrayList<>();
-        return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() : getConfig().getEncoder_destination().getEncoded_file_list();
+        return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() :
+                getConfig().getEncoder_destination().getEncoded_file_list();
     }
 
     /** *******************************************************************<br>

@@ -1,6 +1,10 @@
 package net.pie.utils;
 
+import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Encode_Mode;
+import net.pie.enums.Pie_Option;
+import net.pie.enums.Pie_ZIP_Name;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -124,13 +128,24 @@ public class Pie_Encryption {
         if (options == null)
             return null;
 
+        boolean demo = false;
+        Pie_Option opt = null;
         for (Object o : options) {
-            if (o instanceof Pie_Config)
+            if (o instanceof Pie_Config) {
                 config = (Pie_Config) o;
+                if (config.getOptions().contains(Pie_Option.DEMO_MODE)) {
+                    demo = true;
+                    config.setDemo_mode(demo);
+                }
+            }
             else if (o instanceof File)
                 folder = (File) o;
             else if (o instanceof String)
                 file_name = (String) o;
+            else if (o instanceof  Pie_Option) {
+                opt = (Pie_Option)  o;
+                demo = opt.equals(Pie_Option.DEMO_MODE);
+            }
         }
 
         if (Pie_Utils.isEmpty(file_name))
@@ -166,24 +181,26 @@ public class Pie_Encryption {
         }
 
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"));
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(cert);
-        } catch (IOException e) {
-            config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
+
+        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.ENCODE_MODE_ARGB, Pie_Option.MODULATION,
+                Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
+                new Pie_Encode_Source(new Pie_Text(new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8),
+                    file_name + (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie") )),
+                new Pie_Encoded_Destination(cert)
+        );
+
+        if (demo)
+            encoding_config.setDemo_mode(true);
+
+        Pie_Encode encode = new Pie_Encode(encoding_config);
+        encode.getEncoded_file_list().forEach(System.out::println);
+        if (encode.isEncoding_Error()) {
+            config.logging(Level.INFO, "Certificate file not created");
             return null;
+        }else{
+            config.logging(Level.INFO, "Certificate file created");
+            return cert;
         }
-        PrintWriter pw = new PrintWriter(fw);
-        pw.println(new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8));
-        try {
-            pw.close();
-            fw.close();
-        } catch (IOException e) {
-            config.logging(Level.SEVERE, "Unable to create certificate file : " + e.getMessage());
-            return null;
-        }
-        config.logging(Level.INFO, "Certificate file created");
-        return cert;
     }
 
     /** **************************************************<br>
