@@ -366,7 +366,6 @@ public class Pie_Encode {
      * @return offset (int)
      **/
     private int dataImageOffset(int size, int dim) {
-        getConfig().logging(Level.INFO,"Encoding Offset");
         if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
             switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
                 case TOP_RIGHT:
