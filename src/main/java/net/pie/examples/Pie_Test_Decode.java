@@ -40,10 +40,10 @@ public class Pie_Test_Decode {
             Pie_Option.SHOW_MEMORY_USAGE,
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Level.INFO,
-            new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
+            new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
             //new Pie_Decode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")),
             new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
-            new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + File.separator + temp_Decode_To))
+            new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
         );
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);

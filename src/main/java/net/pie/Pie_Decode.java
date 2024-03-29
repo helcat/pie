@@ -2,8 +2,8 @@ package net.pie;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Option;
+import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_URL;
 import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
@@ -27,6 +27,7 @@ public class Pie_Decode {
     private boolean modulation = false;
     private final byte split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
     private final byte start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
+    private Pie_Source_Type source_type = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -310,13 +311,24 @@ public class Pie_Decode {
      * @param options int[]
      */
     private boolean check_Options(int[] options) {
-        if ((options[0]) != 0)
-            setEncrypted(true);
-        if (isEncrypted() && getConfig().getEncryption() == null) {
-            getConfig().logging(Level.SEVERE, "Decryption Required");
-            return false;
-        }
-        return true;
+        try {
+            if (options[0] != 0)
+                setEncrypted(true);
+            if (isEncrypted() && getConfig().getEncryption() == null) {
+                getConfig().logging(Level.SEVERE, "Decryption Required");
+                return false;
+            }
+            // Source type
+            setSource_type(Pie_Source_Type.get(options[1]));
+            if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE) &&
+                    !getSource_type().equals(Pie_Source_Type.TEXT)) {
+                getConfig().logging(Level.SEVERE,
+                        "Pie_Option.DECODE_TEXT_TO_VARIABLE cannot be used with " + getSource_type().toString());
+                return false;
+            }
+            return true;
+        } catch (Exception ignored) { }
+        return false;
     }
 
     /** *******************************************************************<br>
@@ -463,5 +475,13 @@ public class Pie_Decode {
 
     public byte getStart_tag() {
         return start_tag;
+    }
+
+    public Pie_Source_Type getSource_type() {
+        return source_type;
+    }
+
+    public void setSource_type(Pie_Source_Type source_type) {
+        this.source_type = source_type;
     }
 }

@@ -42,7 +42,7 @@ public class Pie_Test_Encode {
             Pie_ZIP_Name.AS_IS,
             Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
             Level.INFO,
-            new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie")),
+            new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
             //new Pie_Encode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/cork.jpg")),
             new Pie_Encode_Source(new File(Pie_Utils.getDesktopPath() + File.separator + temp_To_Be_Encoded)),
             //new Pie_Encode_Source(new Pie_Text(new File(Pie_Utils.getDesktopPath() + File.separator +"LICENSE.txt"), "myfile.png")),

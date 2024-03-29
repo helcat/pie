@@ -282,8 +282,8 @@ public class Pie_Encode {
 
         // Options
         data_image.setRGB(x++, y, new Color(
-                (has_Been_Encrypted ? 1 : 0) + getModulate()[0],  // Encrypted Yes - No
-                getModulate()[1],                               // Spare
+                (has_Been_Encrypted ? 1 : 0) + getModulate()[0],                     // Encrypted Yes - No
+                getConfig().getEncoder_source().getType().ordinal() + getModulate()[1], // encode content type
                 getModulate()[2],                               // Spare
                 getModulate()[3]                                // Spare
                 ).getRGB());

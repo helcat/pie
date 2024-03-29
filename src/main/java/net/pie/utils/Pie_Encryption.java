@@ -18,9 +18,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Pie_Encryption {
     private String password = null;
@@ -57,9 +58,11 @@ public class Pie_Encryption {
     }
 
     public static boolean verify_Certificate(File file) {
-        return new Pie_Encryption().read_Certificate(file);
+        return verify_Certificate(file, false);
     }
-
+    public static boolean verify_Certificate(File file, boolean demo) {
+        return new Pie_Encryption().read_Certificate(file, demo);
+    }
 
     /** **************************************************<br>
      * read Certificate
@@ -67,15 +70,18 @@ public class Pie_Encryption {
      * @return (boolean)
      */
     public boolean read_Certificate(File file) {
+        return read_Certificate(file, false);
+    }
+    public boolean read_Certificate(File file, boolean demo) {
         if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
-        Pie_Config decoding_config = new Pie_Config(
-                Pie_Option.OVERWRITE_FILE,
-                Pie_Option.DEMO_MODE,
-                Pie_Option.DECODE_TEXT_TO_VARIABLE,
-                new Pie_Decode_Source(file));
-        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_TEXT_TO_VARIABLE, new Pie_Decode_Source(file));
+        if (demo)
+            options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, Pie_Option.DECODE_TEXT_TO_VARIABLE,
+                    new Pie_Decode_Source(file));
+
+        Pie_Decode decoded = new Pie_Decode(new Pie_Config(options));
         if (decoded.getOutput() != null)
             key_text = (String) decoded.getOutput();
         return !Pie_Utils.isEmpty(key_text);
@@ -105,6 +111,7 @@ public class Pie_Encryption {
 
     /** **************************************************<br>
      * create Certificate File
+     * Generates a certificate of bewteen 100 - 600 random byte charactors between 1 - 255
      * @param options (Pie_Config will be created if not entered, folder (File - Save to folder), file_name (String)
      * @return (File) Certificate Created
      */
@@ -150,11 +157,7 @@ public class Pie_Encryption {
             return null;
         }
 
-        if (getPassword() == null || getPassword().length() < 8) {
-            config.logging(Level.SEVERE, "Invalid key must be 8 or more");
-            setError_code(Pie_Constants.ERROR_CODE_17.ordinal());
-            return null;
-        }
+        setPassword(getRandomSpecialChars());
 
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"));
 
@@ -176,6 +179,22 @@ public class Pie_Encryption {
             config.logging(Level.INFO, "Certificate file created");
             return cert;
         }
+    }
+
+    /** **************************************************<br>
+     * get Random Special Chars
+     * @return (String)
+     */
+    private String getRandomSpecialChars() {
+        Random random_number = new Random();
+        int count = random_number.nextInt(600 - 100) + 100;
+        Random random = new SecureRandom();
+        IntStream specialChars = random.ints(count, 1, 255);
+        List<Character> charList = specialChars.mapToObj(data -> (char) data).collect(Collectors.toList());
+        Collections.shuffle(charList);
+        return charList.stream()
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
     }
 
     /** **************************************************<br>
