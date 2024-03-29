@@ -38,7 +38,6 @@ public class Pie_Utils {
             out.write(bytes);
             out.close();
         } catch (IOException e) {
-            getConfig().logging(Level.WARNING, "Decompression Failed " + e.getMessage());
             return bytes;
         }
         try {

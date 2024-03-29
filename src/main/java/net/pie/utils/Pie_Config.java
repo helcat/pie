@@ -27,8 +27,6 @@ import java.util.logging.*;
  **/
 public class Pie_Config {
     private List<Pie_Option> options = new ArrayList<>();
-    private Pie_Encode_Min_Size encoder_Minimum_Image = new Pie_Encode_Min_Size(Pie_Constants.MIN_PROTECTED_SIZE.getParm1(),
-            Pie_Constants.MIN_PROTECTED_SIZE.getParm1());
     private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(),
             Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
@@ -95,7 +93,6 @@ public class Pie_Config {
                         return;
                     }
                     break;
-                case "Pie_Encode_Min_Size": this.encoder_Minimum_Image = (Pie_Encode_Min_Size) o; break;
                 case "Pie_Encode_Source":
                     this.encoder_source = (Pie_Encode_Source) o;
                     if (this.encoder_source.getError_code() != null) {
@@ -128,6 +125,10 @@ public class Pie_Config {
 
         if (this.encoder_destination == null)
             this.encoder_destination = new Pie_Encoded_Destination();
+
+        if (getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
+            this.setDecoded_Source_destination(new Pie_Decode_Destination());
+        }
 
         if (this.log_level != null && this.log_level == Level.OFF)
             exit_Logging();
@@ -257,15 +258,6 @@ public class Pie_Config {
      */
     public Pie_Zip getEncoder_storage() {
         return encoder_storage;
-    }
-
-    /** ***************************************************************<br>
-     * Encoder Minimum Image, Sets a new Pie_Encode_Min_Size object containing the area that should be used.
-     * @return Pie_Encode_Min_Size
-     * @see Pie_Encode_Min_Size
-     */
-    public Pie_Encode_Min_Size getEncoder_Minimum_Image() {
-        return encoder_Minimum_Image;
     }
 
     /** ***************************************************************<br>

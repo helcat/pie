@@ -219,8 +219,11 @@ public class Pie_Encode {
         }
 
         BufferedImage buffImg = null;
-        int width = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getWidth() : 0, image_size.getWidth());
-        int height = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getHeight() : 0, image_size.getHeight());
+        //int width = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getWidth() : 0, image_size.getWidth());
+        //int height = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getHeight() : 0, image_size.getHeight());
+        int width = image_size.getWidth();
+        int height = image_size.getHeight();
+
         if (width > image_size.getWidth() || height > image_size.getHeight()) {
             getConfig().logging(Level.INFO,"Extending Encoded Image");
             buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -279,7 +282,7 @@ public class Pie_Encode {
 
         // Options
         data_image.setRGB(x++, y, new Color(
-                has_Been_Encrypted ? 1 + getModulate()[0] : 0,  // Encrypted Yes - No
+                (has_Been_Encrypted ? 1 : 0) + getModulate()[0],  // Encrypted Yes - No
                 getModulate()[1],                               // Spare
                 getModulate()[2],                               // Spare
                 getModulate()[3]                                // Spare

@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import net.pie.Pie_Decode;
 import net.pie.Pie_Encode;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Encode_Mode;
@@ -68,29 +69,16 @@ public class Pie_Encryption {
     public boolean read_Certificate(File file) {
         if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
-
-        String line = null;
-        StringBuilder key_text = new StringBuilder();
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((line = bufferedReader.readLine()) != null)
-                key_text.append(line);
-            bufferedReader.close();
-            fileReader.close();
-
-            byte[] bytes = Base64.getDecoder().decode(key_text.toString());
-            if (bytes == null) {
-                setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
-                return false;
-            }
-
-            setKey(new SecretKeySpec(bytes, 0, bytes.length, "AES"));
-        } catch (IllegalArgumentException | IOException ex) {
-            setError_code(Pie_Constants.ERROR_CODE_2.ordinal());
-            return false;
-        }
-        return true;
+        String key_text = null;
+        Pie_Config decoding_config = new Pie_Config(
+                Pie_Option.OVERWRITE_FILE,
+                Pie_Option.DEMO_MODE,
+                Pie_Option.DECODE_TEXT_TO_VARIABLE,
+                new Pie_Decode_Source(file));
+        Pie_Decode decoded = new Pie_Decode(decoding_config);
+        if (decoded.getOutput() != null)
+            key_text = (String) decoded.getOutput();
+        return !Pie_Utils.isEmpty(key_text);
     }
 
     /** **************************************************<br>
@@ -168,25 +156,12 @@ public class Pie_Encryption {
             return null;
         }
 
-        createKey(config);
-        if (getKey() == null) {
-            config.logging(Level.SEVERE, "Unable to create certificate file");
-            return null;
-        }
-
-        byte[] keyToBytes = getKey().getEncoded();
-        if (keyToBytes == null) {
-            config.logging(Level.SEVERE, "Unable to create certificate file");
-            return null;
-        }
-
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"));
 
         Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.ENCODE_MODE_ARGB, Pie_Option.MODULATION,
-                Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
-                new Pie_Encode_Source(new Pie_Text(new String(Base64.getEncoder().encode(keyToBytes), StandardCharsets.UTF_8),
-                    file_name + (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie") )),
-                new Pie_Encoded_Destination(cert)
+            Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
+            new Pie_Encode_Source(new Pie_Text(getPassword())), file_name + (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"),
+            new Pie_Encoded_Destination(cert)
         );
 
         if (demo)

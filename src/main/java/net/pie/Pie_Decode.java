@@ -79,24 +79,29 @@ public class Pie_Decode {
         int processing_file = 0;
         byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
-            setUpOutFile(getConfig().getDecoded_Source_destination().getFile_name());
-            if (!getConfig().isError()) {
-                while (processing_file < getTotal_files()) {
-                    try {
-                        getOutputStream().write(message);
-                    } catch (IOException e) {
-                        getConfig().logging(Level.SEVERE, "Writing to stream error : " + e.getMessage());
-                        break;
-                    }
-                    processing_file++;
-                    if (processing_file < getTotal_files()) {
-                        message = start_Decode(utils, collectImage(processing_file));
-                        if (message == null)
+            if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
+                setOutput(new String(message, StandardCharsets.UTF_8));
+                getConfig().logging(Level.INFO, "Decoded To Variable - Available using getOutput()");
+            }else{
+                setUpOutFile(getConfig().getDecoded_Source_destination().getFile_name());
+                if (!getConfig().isError()) {
+                    while (processing_file < getTotal_files()) {
+                        try {
+                            getOutputStream().write(message);
+                        } catch (IOException e) {
+                            getConfig().logging(Level.SEVERE, "Writing to stream error : " + e.getMessage());
                             break;
+                        }
+                        processing_file++;
+                        if (processing_file < getTotal_files()) {
+                            message = start_Decode(utils, collectImage(processing_file));
+                            if (message == null)
+                                break;
+                        }
                     }
                 }
+                closeOutFile();
             }
-            closeOutFile();
             message = null;
         }
 
@@ -268,7 +273,7 @@ public class Pie_Decode {
                 }
 
                 if (x == 1 && y == 0) {
-                    if (check_Options(value, modulate))
+                    if (check_Options(value)) // Is encrypted
                         continue;
                     return null;
                 }
@@ -304,8 +309,8 @@ public class Pie_Decode {
      * Check options
      * @param options int[]
      */
-    private boolean check_Options(int[] options, int[] modulate) {
-        if ((options[0] - modulate[0]) != 0)
+    private boolean check_Options(int[] options) {
+        if ((options[0]) != 0)
             setEncrypted(true);
         if (isEncrypted() && getConfig().getEncryption() == null) {
             getConfig().logging(Level.SEVERE, "Decryption Required");

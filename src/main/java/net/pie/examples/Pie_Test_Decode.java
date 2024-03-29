@@ -33,8 +33,7 @@ public class Pie_Test_Decode {
         //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
 
         // Decoding - Decode the image created
-        Pie_Config decoding_config = null;
-        decoding_config = new Pie_Config(
+        Pie_Config decoding_config = new Pie_Config(
             Pie_Option.OVERWRITE_FILE,
             Pie_Option.SHOW_PROCESSING_TIME,
             Pie_Option.RUN_GC_AFTER_PROCESSING,

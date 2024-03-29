@@ -101,12 +101,12 @@ public class Pie_Encoded_Destination {
             config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.AS_IS)) {
             return name;
         }else{
-            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM)) {
+            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM))
                 return getEncoding_id() + "_" + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
-            }
-            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER)) {
+
+            if (config.getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER))
                 return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
-            }
+
         }
         return name;
     }
