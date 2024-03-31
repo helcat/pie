@@ -37,10 +37,13 @@ public class Pie_Test_Encode {
             Pie_Option.SHOW_MEMORY_USAGE,
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Pie_Shape.SHAPE_RECTANGLE,
+
             Pie_Encode_Mode.ENCODE_MODE_ARGB,
             //Pie_Option.MODULATION,
+
             Pie_ZIP_Name.AS_IS,
             Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
+
             Level.INFO,
             new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
             //new Pie_Encode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/cork.jpg")),
