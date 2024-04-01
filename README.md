@@ -9,7 +9,6 @@
     * [Pie Text](#pie-text)
   * [Pie Encode Mode](#pie-encode-mode)
   * [Pie Encode Max MB](#pie-encode-max-mb)
-  * [Pie Encode Min Size](#pie-encode-min-size)
   * [Pie Encoded Destination](#pie-encoded-destination)
   * [Pie Shape](#pie-shape)
   * [Pie ZIP Name](#pie-zip-name)
@@ -151,23 +150,6 @@ You can set the Maximum MB for the encoding. If the file exceeds this, the file 
 Important. Pie_Encode_Max_MB is just one method of protecting the library. There is a "MAX_PROTECTED_SIZE" which cannot be changed.
 Is this an image height and width the encoded image can not exceed. This is hardcoded to 15000 x 15000. This limitation will be removed in version 2 of the library
 in the future.
-
-### Pie Encode Min Size
-Optional
-* `new Pie_Encode_Min_Size(100, 100, Pie_Position.MIDDLE_CENTER)`
-
-If the encoded image is tiny, and you want the end file to be a certain size, you can add a minimum size parameter to the configuration with an offset positional layout.
-The default position is "Pie_Position.MIDDLE_CENTER" however you can use any of the following.
-
-* `TOP_LEFT`
-* `TOP_CENTER`
-* `TOP_RIGHT`
-* `MIDDLE_LEFT`
-* `MIDDLE_CENTER` Default.
-* `MIDDLE_RIGHT`
-* `BOTTOM_LEFT`
-* `BOTTOM_CENTER`
-* `BOTTOM_RIGHT`
 
 ### Pie Encoded Destination
 Optional

@@ -218,27 +218,12 @@ public class Pie_Encode {
             return;
         }
 
-        BufferedImage buffImg = null;
-        //int width = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getWidth() : 0, image_size.getWidth());
-        //int height = Math.max(getConfig().getEncoder_Minimum_Image() != null ? getConfig().getEncoder_Minimum_Image().getHeight() : 0, image_size.getHeight());
-        int width = image_size.getWidth();
-        int height = image_size.getHeight();
-
-        if (width > image_size.getWidth() || height > image_size.getHeight()) {
-            getConfig().logging(Level.INFO,"Extending Encoded Image");
-            buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D gd = buffImg.createGraphics();
-            gd.drawImage(data_image, null,dataImageOffset(image_size.getWidth(), width), dataImageOffset(image_size.getHeight(), height));
-            gd.dispose();
-        }
-
         // Process the image - send to destination if required
-        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), buffImg != null ? buffImg : data_image,
+        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), data_image,
                 file_number, total_files, getConfig().getEncoder_source().getFile_name()))
             getConfig().logging(Level.SEVERE,"Encoding image was not saved");
 
         data_image = null;
-        buffImg = null;
     }
 
     /** ******************************************************<br>
@@ -359,29 +344,6 @@ public class Pie_Encode {
         int b = rbg.contains("B") ? checker(store, count++, 0) :  0;
         return  rbg.contains("A") ? new Color(r, g, b, checker(store, count++, (modulate ? 1 : 0) )) :
                 transparent ? new Color( r, g, b, 1) : new Color(r, g, b);
-    }
-
-    /** ******************************************************<br>
-     * <b>Create Data Image - Offset</b><br>
-     * Calculates the offset (Position) of the frst image within the second image. Used in createImage<br>
-     * @param size uses a calculation to determin the size of the original image.
-     * @param dim reusable Parameter (Width and Height)
-     * @return offset (int)
-     **/
-    private int dataImageOffset(int size, int dim) {
-        if (getConfig().getEncoder_Maximum_Image() != null && getConfig().getEncoder_Maximum_Image().getPosition() != null) {
-            switch (getConfig().getEncoder_Maximum_Image().getPosition()) {
-                case TOP_RIGHT:
-                case BOTTOM_RIGHT :
-                case MIDDLE_RIGHT :
-                    return dim - size;
-                case TOP_CENTER :
-                case BOTTOM_CENTER :
-                case MIDDLE_CENTER :
-                    return (dim / 2) - (size / 2);
-            }
-        }
-        return 0;
     }
 
     /** ******************************************************<br>
