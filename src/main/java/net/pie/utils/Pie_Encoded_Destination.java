@@ -22,7 +22,7 @@ import java.util.logging.Level;
  * Use getEncoded_image from Pie_Encode
  **/
 public class Pie_Encoded_Destination {
-    private File local_file;
+    private File local_folder;
     private URL web_address;
     private String encoding_id = UUID.randomUUID().toString();
     private List<String> encoded_file_list = null;
@@ -39,7 +39,7 @@ public class Pie_Encoded_Destination {
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/
     public Pie_Encoded_Destination(File file) {
-        setLocal_file(file);
+        setLocal_folder(file);
     }
 
     /** *******************************************************************<br>
@@ -84,7 +84,7 @@ public class Pie_Encoded_Destination {
      * @return String
      */
     public String create_File_Name(Pie_Config config, int file_number, String source_filename) {
-        String name = getLocal_file().isDirectory() ? source_filename : getLocal_file().getName();
+        String name = getLocal_folder().isDirectory() ? source_filename : getLocal_folder().getName();
         if (name.endsWith(".pie"))
             return name;
 
@@ -120,11 +120,11 @@ public class Pie_Encoded_Destination {
         boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
         String name = create_File_Name(config, file_number, source_filename);
         File file = new File(
-            getLocal_file().isDirectory() ?
-            getLocal_file().getAbsolutePath() + File.separator + name
+            getLocal_folder().isDirectory() ?
+            getLocal_folder().getAbsolutePath() + File.separator + name
             :
-            getLocal_file().getAbsolutePath().substring(0,
-                    getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+            getLocal_folder().getAbsolutePath().substring(0,
+                    getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
@@ -137,7 +137,7 @@ public class Pie_Encoded_Destination {
      * @param source_filename (int)
      */
     private String getZip_File_Name(String source_filename) {
-        String name = getLocal_file().isDirectory() ? source_filename  : getLocal_file().getName();
+        String name = getLocal_folder().isDirectory() ? source_filename  : getLocal_folder().getName();
         if (name.equals(source_filename))
             name = "enc_" + name;
         if (!name.toLowerCase().endsWith(".zip"))
@@ -152,11 +152,11 @@ public class Pie_Encoded_Destination {
     private File create_Zip_File(Pie_Config config, String name) {
         boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
         File file = new File(
-                getLocal_file().isDirectory() ?
-                        getLocal_file().getAbsolutePath() + File.separator + name
+                getLocal_folder().isDirectory() ?
+                        getLocal_folder().getAbsolutePath() + File.separator + name
                         :
-                        getLocal_file().getAbsolutePath().substring(0,
-                                getLocal_file().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+                        getLocal_folder().getAbsolutePath().substring(0,
+                                getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
@@ -164,25 +164,20 @@ public class Pie_Encoded_Destination {
         return file;
     }
 
-    public File getLocal_file() {
-        return local_file;
+    public File getLocal_folder() {
+        return local_folder;
     }
 
     /** *******************************************************************<br>
-     * <b>setLocal_file</b><br>
-     * Warning if local file exists it will be deleted first.<br>
-     * Sets up a file to contain the encoded image.<br>
-     * Local file name extension will be added or changed if required.<br>
-     * Extension should be ".png".
+     * <b>setLocal_folder</b><br>
+     * if local folder exists<br>
      **/
-    private void setLocal_file(File local_file) {
-        if (local_file != null) {
-            if (local_file.exists() && local_file.isFile())
-                local_file.delete();
-            this.local_file = local_file;
+    private void setLocal_folder(File local_folder) {
+        if (local_folder != null && local_folder.exists() && local_folder.isDirectory()) {
+            this.local_folder = local_folder;
             return;
         }
-        this.local_file = null;
+        this.local_folder = null;
     }
 
     public URL getWeb_address() {
