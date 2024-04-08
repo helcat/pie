@@ -6,7 +6,7 @@
 
 * [Encoding Options](#encoding-options)
   * [Pie Encode Source](#pie-encode-source)
-    * [Pie Text](#pie-text)
+  * [Pie Text](#pie-text)
   * [Pie Encode Mode](#pie-encode-mode)
   * [Pie Encode Max MB](#pie-encode-max-mb)
   * [Pie Encoded Destination](#pie-encoded-destination)

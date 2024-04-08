@@ -18,7 +18,7 @@ public class Pie_Encode_Max_MB {
         return mb;
     }
 
-    private void setMb(int mb) {
+    public void setMb(int mb) {
         this.mb = mb;
     }
 }
