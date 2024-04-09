@@ -47,8 +47,7 @@ public class Pie_Encoded_Destination {
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
     public boolean save_Encoded_Image(Pie_Config config, BufferedImage image, int file_number, int total_files, String source_filename) {
-        if (getEncoded_file_list() == null)
-            setEncoded_file_list(new ArrayList<>());
+        setEncoded_file_list(new ArrayList<>());
 
         if (config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
             config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
