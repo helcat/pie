@@ -24,7 +24,7 @@ public class Pie_Text {
     public Pie_Text(Object text, String file_name) {
         process_object(text);
         if (!Pie_Utils.isEmpty(file_name))
-            setFile_name(file_name + (file_name.toLowerCase().endsWith(".txt") ? "" : ".txt"));
+            setFile_name(file_name);
     }
 
     private void process_object(Object encode) {

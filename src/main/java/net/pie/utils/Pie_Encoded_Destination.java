@@ -87,8 +87,8 @@ public class Pie_Encoded_Destination {
         if (name.endsWith(".pie"))
             return name;
 
-        if (name.equals(source_filename))
-            name = "enc_" + name;
+        //if (name.equals(source_filename))
+           // name = "enc_" + name;
 
         if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             name = name.substring(0, name.length() - ("." + Pie_Constants.IMAGE_TYPE.getParm2()).length());
@@ -137,8 +137,8 @@ public class Pie_Encoded_Destination {
      */
     private String getZip_File_Name(String source_filename) {
         String name = getLocal_folder().isDirectory() ? source_filename  : getLocal_folder().getName();
-        if (name.equals(source_filename))
-            name = "enc_" + name;
+        //if (name.equals(source_filename))
+           // name = "enc_" + name;
         if (!name.toLowerCase().endsWith(".zip"))
             name = name + ".zip";
         return name;
