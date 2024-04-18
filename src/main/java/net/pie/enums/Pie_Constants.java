@@ -5,6 +5,8 @@ package net.pie.enums;
  * Constants used internally for default settings.
  **/
 public enum Pie_Constants {
+    PIE_VERSION (0, "v1.3"),
+
     MIN_PROTECTED_SIZE (50, "MIN"),
     MAX_PROTECTED_SIZE (15000, "MAX"),
     MAX_PROTCTED_CREATED_FILES (30, "MAX_FILES"),
