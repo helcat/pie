@@ -49,11 +49,7 @@ public class Pie_Encryption {
             if (!((File) parm).isFile() || !read_Certificate(((File) parm)))
                 setError_code(Pie_Constants.ERROR_CODE_1.ordinal());
         } else if (parm instanceof String) {
-            if (((String) parm).length() > 7) {
-                setPassword((String) parm);
-            }else{
-                setError_code(Pie_Constants.ERROR_CODE_3.ordinal());
-            }
+            setPassword((String) parm);
         }
     }
 

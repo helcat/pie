@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.zip.Inflater;
@@ -22,6 +23,50 @@ public class Pie_Utils {
     public Pie_Utils(Pie_Config config) {
         ImageIO.setUseCache(false);
         setConfig(config);
+    }
+
+    /** **********************************************************<br>
+     * find repeated patterns
+     * @param userString (String)
+     * @return boolean
+     */
+    public boolean find_repeated_patterns(String userString) {
+        String buildString;
+        LinkedList<String> patterns = new LinkedList<>();
+        int size = userString.length();
+        int hits, newSize;
+        String[] coreString  = new String[size];
+        Map<String, Integer> hitCountMap = new HashMap<>();
+
+        for (int x = 0; x < size; x++) {
+            coreString[x] = userString.substring(x, x + 1);
+        }
+
+        for (int index = 0; index < size - 1; index++) {
+            buildString = coreString[index];
+            for (int x = index + 1; x < size; x++) {
+                buildString = buildString + coreString[x];
+                patterns.add(buildString);
+            }
+        }
+
+        for (String pattern : patterns) {
+            String check = userString.replaceFirst(pattern, "");
+            if (check.contains(pattern)) {
+                newSize = userString.replaceAll(pattern, "").length();
+                hits    = (size - newSize) / pattern.length();
+                hitCountMap.put(pattern, hits);
+            }
+        }
+
+        for (String pattern : hitCountMap.keySet()) {
+            if (hitCountMap.get(pattern) > 10)
+                System.out.println("Pattern: " + pattern +
+                        " repeated " + hitCountMap.get(pattern) +
+                        " times.");
+        }
+
+        return true;
     }
 
     /** *******************************************************<br>

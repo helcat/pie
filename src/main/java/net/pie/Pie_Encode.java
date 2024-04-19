@@ -77,7 +77,7 @@ public class Pie_Encode {
                     close();
                     return;
                 }
-                encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created);
+                encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created, utils);
                 file_count++;
             }
 
@@ -120,7 +120,7 @@ public class Pie_Encode {
      * @param file_number int
      * @param total_files int
      */
-    private void encode(byte[] originalArray, int file_number, int total_files) {
+    private void encode(byte[] originalArray, int file_number, int total_files, Pie_Utils utils) {
         boolean has_Been_Encrypted = false;
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,"Encoding FAILED");
@@ -177,7 +177,7 @@ public class Pie_Encode {
                 return;
             }
 
-            // Base 64
+            // Base 64 find_repeated_patterns
             if (getConfig().getOptions().contains(Pie_Option.MODULATION)) {
                 originalArray = Base64.getEncoder().encode(baos.toByteArray().length < originalArray.length ? baos.toByteArray() : originalArray);
             }else {

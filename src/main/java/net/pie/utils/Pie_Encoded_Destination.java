@@ -176,7 +176,7 @@ public class Pie_Encoded_Destination {
             this.local_folder = local_folder;
             return;
         }
-        this.local_folder = null;
+        this.local_folder = local_folder != null && local_folder.getName().toLowerCase().endsWith(".pie") ? local_folder : null;
     }
 
     public URL getWeb_address() {
