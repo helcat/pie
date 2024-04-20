@@ -84,11 +84,8 @@ public class Pie_Encoded_Destination {
      */
     public String create_File_Name(Pie_Config config, int file_number, String source_filename) {
         String name = getLocal_folder().isDirectory() ? source_filename : getLocal_folder().getName();
-        if (name.endsWith(".pie"))
+        if (config.getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
             return name;
-
-        //if (name.equals(source_filename))
-           // name = "enc_" + name;
 
         if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             name = name.substring(0, name.length() - ("." + Pie_Constants.IMAGE_TYPE.getParm2()).length());
@@ -137,8 +134,6 @@ public class Pie_Encoded_Destination {
      */
     private String getZip_File_Name(String source_filename) {
         String name = getLocal_folder().isDirectory() ? source_filename  : getLocal_folder().getName();
-        //if (name.equals(source_filename))
-           // name = "enc_" + name;
         if (!name.toLowerCase().endsWith(".zip"))
             name = name + ".zip";
         return name;
@@ -172,11 +167,15 @@ public class Pie_Encoded_Destination {
      * if local folder exists<br>
      **/
     private void setLocal_folder(File local_folder) {
-        if (local_folder != null && local_folder.exists() && local_folder.isDirectory()) {
-            this.local_folder = local_folder;
+        if (local_folder != null) {
+            if (local_folder.exists() && local_folder.isDirectory()) {
+                this.local_folder = local_folder;
+            } else {
+                this.local_folder = local_folder.getParentFile();
+            }
             return;
         }
-        this.local_folder = local_folder != null && local_folder.getName().toLowerCase().endsWith(".pie") ? local_folder : null;
+        this.local_folder = null;
     }
 
     public URL getWeb_address() {
