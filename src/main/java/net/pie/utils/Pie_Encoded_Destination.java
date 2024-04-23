@@ -122,9 +122,16 @@ public class Pie_Encoded_Destination {
             getLocal_folder().getAbsolutePath().substring(0,
                     getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
-        if (file.exists())
-            config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
-
+        if (file.exists()) {
+            if (file.getName().equals(config.getEncoder_source().getFile_name())) {
+                while (file.exists()) {
+                    file = new File(file.getParentFile() + File.separator +
+                            "enc_" + config.getEncoder_source().getFile_name());
+                }
+            }else {
+                config.logging(Level.WARNING, "File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
+            }
+        }
         return file;
     }
 
