@@ -126,21 +126,21 @@ File names are used in the encoded image, Just in case the end client wants to e
 
 ### Pie Encode Mode
 Encoding only. (Optional) Changes the type of encoding to be used. Values allowed are :</span>
-* `Pie_Encode_Mode.ENCODE_MODE_R` Image will be red - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_G` Image will be green - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_B` Image will be blue - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RT` use red channel only Fully transparent - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_GT` use green channel only Fully transparent - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_BT` use blue channel only Fully transparent - X Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_GB` Image will be green and blue - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RB` Image will be red and blue - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RG` Image will be red and green - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_GBT` use green and blue channels only Fully transparent - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RBT` use red and blue channels only Fully transparent - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RGT` use red and green channels only Fully transparent - Large file size
-* `Pie_Encode_Mode.ENCODE_MODE_RGB` Image will be red, green and blue - Medium file size
-* `Pie_Encode_Mode.ENCODE_MODE_RGBT` use red, green and blue channels Fully transparent - Medium file size
-* `Pie_Encode_Mode.ENCODE_MODE_ARGB` full encoding. Small File size. Default.
+* `Pie_Encode_Mode.R` Image will be red - X Large file size
+* `Pie_Encode_Mode.G` Image will be green - X Large file size
+* `Pie_Encode_Mode.B` Image will be blue - X Large file size
+* `Pie_Encode_Mode.RT` use red channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.GT` use green channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.BT` use blue channel only Fully transparent - X Large file size
+* `Pie_Encode_Mode.GB` Image will be green and blue - Large file size
+* `Pie_Encode_Mode.RB` Image will be red and blue - Large file size
+* `Pie_Encode_Mode.RG` Image will be red and green - Large file size
+* `Pie_Encode_Mode.GBT` use green and blue channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.RBT` use red and blue channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.RGT` use red and green channels only Fully transparent - Large file size
+* `Pie_Encode_Mode.RGB` Image will be red, green and blue - Medium file size
+* `Pie_Encode_Mode.RGBT` use red, green and blue channels Fully transparent - Medium file size
+* `Pie_Encode_Mode.ARGB` full encoding. Small File size. Default.
 
 ### Pie Encode Max MB
 Encoding only. (Optional)

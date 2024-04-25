@@ -32,7 +32,7 @@ public class Pie_Config {
     private Pie_Encryption encryption = null;
     private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB(200);
     private Pie_Zip encoder_storage = null;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ENCODE_MODE_ARGB;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Level log_level = Level.SEVERE;
     private boolean error = false;

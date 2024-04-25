@@ -38,7 +38,7 @@ public class Pie_Test_Encode {
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Pie_Shape.SHAPE_RECTANGLE,
 
-            Pie_Encode_Mode.ENCODE_MODE_ARGB,
+            Pie_Encode_Mode.ARGB,
             //Pie_Option.MODULATION,
 
             Pie_ZIP_Name.AS_IS,

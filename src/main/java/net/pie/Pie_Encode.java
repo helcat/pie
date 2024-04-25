@@ -357,19 +357,19 @@ public class Pie_Encode {
             case 1 :
                 image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
                 if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_GB); // try 2
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.GB); // try 2
                 if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB); // try 3
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.RGB); // try 3
                 break;
             case 2 :
                 image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
                 if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_RGB);
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.RGB);
                 break;
             case 3 :
                 image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
                 if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ENCODE_MODE_ARGB); // try 4
+                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ARGB); // try 4
                 break;
 
             case 4 : image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
