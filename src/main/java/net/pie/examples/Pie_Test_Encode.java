@@ -14,7 +14,6 @@ import net.pie.enums.*;
 import net.pie.utils.*;
 
 import java.io.File;
-import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
@@ -28,7 +27,18 @@ public class Pie_Test_Encode {
     public Pie_Test_Encode(String arg) {
 
         //Pie_Encryption encryption = new Pie_Encryption("this a temp1 2st art gfh fgf again");
+        Pie_Encode encode = new Pie_Encode(new Pie_ConfigBuilder()
+            .add_Pie_Option(Pie_Option.OVERWRITE_FILE)
+            .add_Pie_Encode_Mode(Pie_Encode_Mode.ARGB)
+            .add_Pie_Encryption(new Pie_Encryption(new File(
+                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))
+            .add_Pie_Encode_Source(new Pie_Encode_Source(new File(
+                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))
+            .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(new File(
+                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))
+            .build());
 
+/**
         // Build a config file for encoding.
         Pie_Config encoding_config = new Pie_Config(
             Pie_Option.OVERWRITE_FILE,
@@ -40,9 +50,7 @@ public class Pie_Test_Encode {
 
             Pie_Encode_Mode.ARGB,
             //Pie_Option.MODULATION,
-
-            Pie_ZIP_Name.AS_IS,
-            Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED,
+            new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED),
 
             Level.INFO,
             new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
@@ -54,6 +62,7 @@ public class Pie_Test_Encode {
 
         // Do Encoding, Will create the image and put it in the destination
         Pie_Encode encode = new Pie_Encode(encoding_config);
+ **/
         System.out.println(encode.isEncoding_Error());
         encode.getEncoded_file_list().forEach(System.out::println);
     }

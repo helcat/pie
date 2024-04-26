@@ -34,14 +34,17 @@ public class Pie_Config {
     private Pie_Zip encoder_storage = null;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
-    private Level log_level = Level.SEVERE;
-    private boolean error = false;
-    private String error_message = null;
-    private Logger log = null;
+
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
     private Pie_Decode_Source decode_source = null;
     private Pie_Decode_Destination  decoded_Source_destination = null;
+
+    private Level log_level = Level.SEVERE;
+    private boolean error = false;
+    private String error_message = null;
+    private Logger log = null;
+
     private boolean demo_mode = false;
 
     public Pie_Config(Object... options) {
@@ -60,11 +63,6 @@ public class Pie_Config {
         }
 
         setOptions(new ArrayList<>());
-        //        Arrays.stream(options)
-        //        .filter(option -> option instanceof Pie_Option)
-        //        .map(option -> (Pie_Option) option)
-        //        .collect(Collectors.toList()));
-
         this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
         this.log_level = Level.SEVERE;
 
