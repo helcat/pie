@@ -4,6 +4,7 @@ import net.pie.enums.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.*;
 
@@ -46,10 +47,32 @@ public class Pie_Config {
     private Logger log = null;
 
     private boolean demo_mode = false;
+    private String language = Locale.getDefault().getLanguage().toLowerCase();
+
+    /** **********************************************************
+     * From Demo
+     * @param language (String)
+     * @param options (List)
+     */
+    public Pie_Config(String language, Object... options) {
+        setLanguage(language);
+        setup(options);
+    }
+
+    /** **********************************************************
+     * From Demo
+     * @param language (String)
+     * @param options (List)
+     */
+    public Pie_Config(String language, List<Object> options) {
+        setLanguage(language);
+        setup(options.toArray());
+    }
 
     public Pie_Config(Object... options) {
         setup(options);
     }
+
     public Pie_Config(List<Object> options) {
         setup(options.toArray());
     }
@@ -57,7 +80,7 @@ public class Pie_Config {
     private void setup(Object[] options) {
         setUpLogging();
         if (options == null) {
-            logging(Level.SEVERE, "Error no configuration options");
+            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS,getLanguage()));
             setError(true);
             return;
         }
@@ -66,7 +89,6 @@ public class Pie_Config {
         this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
         this.log_level = Level.SEVERE;
 
-        // Arrays.stream(options).forEach(o -> { // For is faster!
         Pie_Option opt = null;
         for (Object o : options) {
             if (o == null)
@@ -85,8 +107,8 @@ public class Pie_Config {
                 case "Pie_ZIP_Name": this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o); break;
                 case "Pie_Encryption":
                     this.encryption = ((Pie_Encryption) o);
-                    if (this.encryption.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Constants.values()[this.encryption.getError_code()].getParm2());
+                    if (this.encryption.getError_message() != null) {
+                        logging(Level.SEVERE, Pie_Word.translate(this.encryption.getError_message(), getLanguage()));
                         setError(true);
                         return;
                     }
@@ -350,6 +372,14 @@ public class Pie_Config {
 
     public void setDemo_mode(boolean demo_mode) {
         this.demo_mode = demo_mode;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     /** ******************************************************************<br>

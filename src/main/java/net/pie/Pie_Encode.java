@@ -27,7 +27,7 @@ public class Pie_Encode {
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
      * Encode a file or text from Pie_Source using options from Pie_Config<br>
-     * Send in Pie_Config.<br>
+     * Send in Pie_getConfig().<br>
      * @param config (Pie_Config)
      * @see Pie_Config
      **/
@@ -38,14 +38,15 @@ public class Pie_Encode {
 
         if (config == null || config.isError())
             return;
+
         setConfig(config);
 
         Pie_Utils utils = new Pie_Utils(getConfig());
         long memory_Start = utils.getMemory();
 
-        if (config.getEncoder_source() == null || config.getEncoder_source().getInput() == null) {
-            config.logging(Level.SEVERE, "Error no source to encode");
-            config.setError(true);
+        if (getConfig().getEncoder_source() == null || getConfig().getEncoder_source().getInput() == null) {
+            getConfig().logging(Level.SEVERE, "Error no source to encode");
+            getConfig().setError(true);
             return;
         }
 
@@ -442,8 +443,8 @@ public class Pie_Encode {
      */
     private byte[] encoding_addon(int total_files) {
         boolean zip =
-                config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
-                config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
+                getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+                getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
 
         String filename = getConfig().getEncoder_source().getFile_name() != null &&
                 !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "";

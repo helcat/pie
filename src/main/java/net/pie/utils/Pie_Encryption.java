@@ -2,10 +2,7 @@ package net.pie.utils;
 
 import net.pie.Pie_Decode;
 import net.pie.Pie_Encode;
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Encode_Mode;
-import net.pie.enums.Pie_Option;
-import net.pie.enums.Pie_ZIP_Name;
+import net.pie.enums.*;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -26,7 +23,7 @@ import java.util.stream.IntStream;
 public class Pie_Encryption {
     private String password = null;
     private SecretKey key = null;
-    private Integer error_code = null;
+    private Pie_Word error_message = null;
     private boolean was_Encrypted = false;
 
     public Pie_Encryption() {
@@ -40,14 +37,14 @@ public class Pie_Encryption {
     public Pie_Encryption(Object parm) {
         setPassword(null);
         setKey(null);
-        setError_code(null);
+        setError_message(null);
 
         if (parm instanceof SecretKey) {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File) {
             if (!((File) parm).isFile() || !read_Certificate(((File) parm)))
-                setError_code(Pie_Constants.ERROR_CODE_1.ordinal());
+                setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
         } else if (parm instanceof String) {
             setPassword((String) parm);
         }
@@ -93,7 +90,7 @@ public class Pie_Encryption {
             return; // reuse key
 
         if (!Pie_Utils.isEmpty(getPassword()) && getPassword().length() < 8) {
-            config.logging(Level.WARNING, "Invalid Encryption Password");
+            config.logging(Level.WARNING, Pie_Word.translate(Pie_Word.PIE_CERTIFICATE, config.getLanguage()));
             setKey(null);
             return;
         }
@@ -139,17 +136,17 @@ public class Pie_Encryption {
             }
         }
 
-        if (Pie_Utils.isEmpty(file_name))
-            file_name = "pie_certificate";
-
         if (config == null)
             config = new Pie_Config();
+
+        if (Pie_Utils.isEmpty(file_name))
+            file_name = Pie_Word.translate(Pie_Word.PIE_CERTIFICATE, config.getLanguage());
 
         if (folder == null)
             folder = Pie_Utils.getDesktop();
 
         if (!folder.isDirectory()) {
-            config.logging(Level.SEVERE, "Invalid folder");
+            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_FOLDER, config.getLanguage()));
             return null;
         }
 
@@ -169,10 +166,10 @@ public class Pie_Encryption {
         Pie_Encode encode = new Pie_Encode(encoding_config);
         encode.getEncoded_file_list().forEach(System.out::println);
         if (encode.isEncoding_Error()) {
-            config.logging(Level.INFO, "Certificate file not created");
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
             return null;
         }else{
-            config.logging(Level.INFO, "Certificate file created");
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
             return cert;
         }
     }
@@ -207,7 +204,7 @@ public class Pie_Encryption {
             if (!Pie_Utils.isEmpty(getPassword())) {
                 createKey(config);
                 if (getKey() == null) {
-                    config.logging(Level.WARNING, "Encryption Error - Cannot create key");
+                    config.logging(Level.WARNING, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR_NO_KEY, config.getLanguage()));
                     return input;
                 }
             } else {
@@ -239,7 +236,7 @@ public class Pie_Encryption {
             return combined;
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | NoSuchPaddingException |
                  IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
+            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR_NO_KEY, config.getLanguage()));
             return input;
         }
     }
@@ -292,20 +289,20 @@ public class Pie_Encryption {
         this.password = password;
     }
 
-    public Integer getError_code() {
-        return error_code;
-    }
-
-    public void setError_code(Integer error_code) {
-        this.error_code = error_code;
-    }
-
     public boolean isWas_Encrypted() {
         return was_Encrypted;
     }
 
     public void setWas_Encrypted(boolean was_Encrypted) {
         this.was_Encrypted = was_Encrypted;
+    }
+
+    public Pie_Word getError_message() {
+        return error_message;
+    }
+
+    public void setError_message(Pie_Word error_message) {
+        this.error_message = error_message;
     }
 }
 
