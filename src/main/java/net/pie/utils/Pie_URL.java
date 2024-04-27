@@ -1,6 +1,7 @@
 package net.pie.utils;
 
 import com.sun.javafx.util.Utils;
+import net.pie.enums.Pie_Word;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,7 @@ public class Pie_URL {
         try {
             setUrl(new URL(url));
         } catch (MalformedURLException e) {
-            error_message = "URL Error : " + e.getMessage();
+            error_message = Pie_Word.translate(Pie_Word.URL_ERROR) + " : " + e.getMessage();
         }
     }
 
@@ -33,10 +34,10 @@ public class Pie_URL {
             try {
                 return getUrl().openStream();
             } catch (IOException e) {
-                error_message = "URL Error : " + e.getMessage();
+                error_message = Pie_Word.translate(Pie_Word.URL_ERROR) + " : " + e.getMessage();
             }
         }else{
-                error_message = "No URL provided";
+                error_message = Pie_Word.translate(Pie_Word.URL_ERROR);
         }
         return null;
     }
@@ -65,7 +66,7 @@ public class Pie_URL {
                                 new String[]{"which", browsers[count]}).waitFor() == 0)
                             browser = browsers[count];
                     if (browser == null) {
-                        error_message = "Could not find web browser";
+                        error_message = Pie_Word.translate(Pie_Word.NO_BROWSER);
                         return;
                     }else {
                         Runtime.getRuntime().exec(new String[]{browser, getUrl().toString()});
@@ -79,7 +80,7 @@ public class Pie_URL {
                             d.getDeclaredMethod("getDesktop").invoke(null),
                             new Object[]{java.net.URI.create(getUrl().toString())});
                 } catch (Exception e2) {
-                    error_message = "Could launch browser" + e2.getMessage();
+                    error_message = Pie_Word.translate(Pie_Word.NO_BROWSER) + " " + e2.getMessage();
                     return;
                 }
             }

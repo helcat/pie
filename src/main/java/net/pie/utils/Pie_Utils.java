@@ -164,21 +164,6 @@ public class Pie_Utils {
                         : "");
     }
 
-    /** *****************************************************<br>
-     * Collects the amount of memory used<br>
-     * @return long
-     */
-    public long getMemory() {
-        return runtime.totalMemory() - runtime.freeMemory();
-    }
-    public void usedMemory(long previous_Menory, String label) {
-        if (!getConfig().getOptions().contains(Pie_Option.SHOW_MEMORY_USAGE))
-            return;
-        getConfig().logging(Level.INFO,label + " Memory Used : " +
-                humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)
-        );
-    }
-
     private String humanReadableBytes(long bytes) {
         if (-1000 < bytes && bytes < 1000) {
             return bytes + " B";
@@ -237,25 +222,10 @@ public class Pie_Utils {
         return map;
     };
 
-
     public static boolean isEmpty(String in) {
         return in == null || in.trim().isEmpty();
     }
-    /** *********************************************************<br>
-     * Log how log it takes to encode
-     * @param startTime (long)
-     */
-    public String logTime(long startTime) {
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        long hours = elapsedTime / 3600000;
-        long minutes = (elapsedTime % 3600000) / 60000;
-        long seconds = ((elapsedTime % 3600000) % 60000) / 1000;
-        long milliseconds = elapsedTime % 1000;
 
-        return "Elapsed time: " + hours + " hours, " +
-                minutes + " minutes, " + seconds + " seconds, " + milliseconds + " milliseconds";
-    }
     /** *******************************************************<br>
      * <b>getters and setters</b><br>
      * General Getters and Setters

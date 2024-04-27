@@ -55,7 +55,7 @@ public class Pie_Config {
      * @param options (List)
      */
     public Pie_Config(String language, Object... options) {
-        setLanguage(language);
+        setLanguage(language == null ? Locale.getDefault().getLanguage().toLowerCase() : language);
         setup(options);
     }
 
@@ -65,7 +65,7 @@ public class Pie_Config {
      * @param options (List)
      */
     public Pie_Config(String language, List<Object> options) {
-        setLanguage(language);
+        setLanguage(language == null ? Locale.getDefault().getLanguage().toLowerCase() : language);
         setup(options.toArray());
     }
 

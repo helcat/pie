@@ -1,12 +1,14 @@
 package net.pie.utils;
 
+import net.pie.enums.Pie_Word;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class Pie_Text {
     private String text = null;
-    private String file_name = "text.txt";
+    private String file_name = Pie_Word.translate(Pie_Word.TEXT, null)+".txt";
 
     /** *****************************************<br>
      * Pie_Text Text or File only
@@ -58,7 +60,7 @@ public class Pie_Text {
     }
 
     public void setFile_name(String file_name) {
-        this.file_name = Pie_Utils.isEmpty(file_name) ? "Text.txt" : file_name;
+        this.file_name = Pie_Utils.isEmpty(file_name) ? Pie_Word.translate(Pie_Word.TEXT, null) + ".txt" : file_name;
     }
 }
 

@@ -71,8 +71,6 @@ public class Pie_Decode {
      */
     private void process_Decoding() {
         Pie_Utils utils = new Pie_Utils(getConfig());
-        long startTime = System.currentTimeMillis();
-        long memory_Start = utils.getMemory();
 
         if (getConfig().isError())
             return;
@@ -113,17 +111,10 @@ public class Pie_Decode {
         }else {
 
             // OK
-            utils.usedMemory(memory_Start, "Decoding : ");
             if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
                 System.gc();
 
             getConfig().logging(Level.INFO, "Decoding Complete");
-
-            if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME)) {
-                String time_diff = utils.logTime(startTime);
-                if (!time_diff.isEmpty())
-                    getConfig().logging(Level.INFO, time_diff);
-            }
         }
 
         getConfig().getDecode_source().close();

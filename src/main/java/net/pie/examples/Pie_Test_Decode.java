@@ -35,9 +35,7 @@ public class Pie_Test_Decode {
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config(
             Pie_Option.OVERWRITE_FILE,
-            Pie_Option.SHOW_PROCESSING_TIME,
             Pie_Option.RUN_GC_AFTER_PROCESSING,
-            Pie_Option.SHOW_MEMORY_USAGE,
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Level.INFO,
             new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),

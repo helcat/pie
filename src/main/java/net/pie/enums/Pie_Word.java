@@ -1,5 +1,7 @@
 package net.pie.enums;
 
+import java.util.Locale;
+
 public enum Pie_Word {
 	NO_OPTIONS (
 			"Error no configuration options", "Erreur aucune option de configuration",
@@ -82,6 +84,12 @@ public enum Pie_Word {
 
 	OVERWRITING_File("Overwriting File", "Fichier d'écrasement", "Sovrascrittura del file", "Sobrescribir archivo"),
 
+	TEXT ("text", "texte", "testo", "texto"),
+
+	URL_ERROR ("URL Error", "Erreur d'URL", "Errore nell'URL", "Error de URL"),
+
+	NO_BROWSER ("Could not find web browser", "Impossible de trouver le navigateur Web", "Impossibile trovare il browser web",
+			"No se pudo encontrar el navegador web"),
 	;
 
 	private String en;
@@ -96,9 +104,13 @@ public enum Pie_Word {
 		setEs(es);
 	}
 
+	public static String translate(Pie_Word word) {
+		return translate(word, Locale.getDefault().getLanguage().toLowerCase());
+	}
+
 	public static String translate(Pie_Word word, String langauge) {
 		if (langauge == null)
-			langauge = "en";
+			langauge = Locale.getDefault().getLanguage().toLowerCase();
 
 		switch (langauge.toLowerCase()) {
 			case "en":

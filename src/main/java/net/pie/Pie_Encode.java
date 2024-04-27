@@ -42,7 +42,6 @@ public class Pie_Encode {
         setConfig(config);
 
         Pie_Utils utils = new Pie_Utils(getConfig());
-        long memory_Start = utils.getMemory();
 
         if (getConfig().getEncoder_source() == null || getConfig().getEncoder_source().getInput() == null) {
             getConfig().logging(Level.SEVERE, "Error no source to encode");
@@ -100,10 +99,6 @@ public class Pie_Encode {
         }
 
         getConfig().logging(Level.INFO,"Encoding : Complete");
-        utils.usedMemory(memory_Start, "Encoding : ");
-
-        if (getConfig().getOptions().contains(Pie_Option.SHOW_PROCESSING_TIME))
-            getConfig().logging(Level.INFO, utils.logTime(startTime));
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
