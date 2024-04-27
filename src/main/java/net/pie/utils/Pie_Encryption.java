@@ -69,7 +69,8 @@ public class Pie_Encryption {
         if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
-        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_TEXT_TO_VARIABLE, new Pie_Decode_Source(file));
+        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_TEXT_TO_VARIABLE,
+                new Pie_Decode_Source(file));
         if (demo)
             options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, Pie_Option.DECODE_TEXT_TO_VARIABLE,
                     new Pie_Decode_Source(file));
@@ -98,7 +99,7 @@ public class Pie_Encryption {
             setKey(new SecretKeySpec(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(
                     new PBEKeySpec(getPassword().toCharArray(), new byte[16], 65536, 256)).getEncoded(), "AES"));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            config.logging(Level.SEVERE, "Encryption Error " + e.getMessage());
+            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, config.getLanguage()) + " " + e.getMessage());
         }
     }
 
@@ -152,9 +153,11 @@ public class Pie_Encryption {
 
         setPassword(getRandomSpecialChars());
 
-        File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ? "" :  ".pie"));
+        File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ?
+                "" :  ".pie"));
 
-        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.ARGB, Pie_Option.MODULATION, Pie_Option.CREATE_CERTIFICATE,
+        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.ARGB, Pie_Option.MODULATION,
+                Pie_Option.CREATE_CERTIFICATE,
             Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
             new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
             new Pie_Encoded_Destination(cert.getParentFile())

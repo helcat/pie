@@ -1,9 +1,6 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Option;
-import net.pie.enums.Pie_ZIP_Name;
-import net.pie.enums.Pie_ZIP_Option;
+import net.pie.enums.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,7 +50,7 @@ public class Pie_Encoded_Destination {
             config.getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (config.getEncoder_storage().getFos() == null)
                 if (!config.getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(config, getZip_File_Name(source_filename)))) {
-                    config.logging(Level.SEVERE, "Unable to create zip flie for additional files ");
+                    config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_CREATE_ZIP_ADDITIONAL, config.getLanguage()));
                     return false;
                 }
 
@@ -62,15 +59,17 @@ public class Pie_Encoded_Destination {
             // Single Files Only Or Beginning of Zip
             File toFile = addFileNumber(config, file_number, source_filename);
             if (toFile.exists() && !config.getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
-                config.logging(Level.SEVERE, "Encoded file already exists : New encoded file - " + toFile.getName() +
-                        " Was not created, Set config to overwrite file is required");
+                config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_FILE_EXISTS, config.getLanguage()) +
+                        " - " + toFile.getName() +
+                        " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, config.getLanguage()));
                 return false;
             }
             getEncoded_file_list().add(toFile.getPath());
             try {
                 return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
             } catch (IOException e) {
-                config.logging(Level.SEVERE, "Unable to write encoded image " + e.getMessage());
+                config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_WRITE_ENCODED_IMAGE, config.getLanguage())+
+                        " " + e.getMessage());
                 return false;
             }
         }
@@ -129,7 +128,9 @@ public class Pie_Encoded_Destination {
                             "enc_" + config.getEncoder_source().getFile_name());
                 }
             }else {
-                config.logging(Level.WARNING, "File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
+                config.logging(Level.WARNING, Pie_Word.translate(Pie_Word.FILE_EXISTS, config.getLanguage())
+                        + " : " + file.getName() +
+                        (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, config.getLanguage())+")" : ""));
             }
         }
         return file;
@@ -160,7 +161,9 @@ public class Pie_Encoded_Destination {
                                 getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
-            config.logging(Level.WARNING,"File Exists : " + file.getName() + (overwrite ? " (Overwriting File)" : ""));
+            config.logging(Level.WARNING,Pie_Word.translate(Pie_Word.FILE_EXISTS, config.getLanguage()) +
+                    " : " + file.getName() +
+                    (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, config.getLanguage())+")" : ""));
 
         return file;
     }

@@ -116,7 +116,7 @@ public class Pie_Config {
                 case "Pie_Encode_Source":
                     this.encoder_source = (Pie_Encode_Source) o;
                     if (this.encoder_source.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Constants.values()[this.encoder_source.getError_code()].getParm2());
+                        logging(Level.SEVERE, Pie_Word.translate(this.encoder_source.getError_code(), getLanguage()));
                         setError(true);
                         return;
                     }
@@ -127,7 +127,7 @@ public class Pie_Config {
                 case "Pie_Decode_Source":
                     this.decode_source = (Pie_Decode_Source) o;
                     if (this.decode_source.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Constants.values()[this.decode_source.getError_code()].getParm2());
+                        logging(Level.SEVERE, Pie_Word.translate(this.decode_source.getError_code(), getLanguage()));
                         setError(true);
                         return;
                     }
@@ -135,7 +135,7 @@ public class Pie_Config {
                 case "Pie_Decode_Destination":
                     this.decoded_Source_destination = (Pie_Decode_Destination) o;
                     if (this.decoded_Source_destination.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Constants.values()[this.decoded_Source_destination.getError_code()].getParm2());
+                        logging(Level.SEVERE, Pie_Word.translate(this.decode_source.getError_code(), getLanguage()));
                         setError(true);
                         return;
                     }

@@ -1,6 +1,6 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Word;
 
 import java.io.*;
 import java.net.URL;
@@ -19,7 +19,7 @@ public class Pie_Decode_Source {
     private String[] addon_Files = null;
     private boolean isZipped = false;
     private Pie_Zip zip_Object = null;
-    private Integer error_code = null;
+    private Pie_Word error_code = null;
 
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
@@ -31,7 +31,7 @@ public class Pie_Decode_Source {
         setDecode_object(decode);
         setInput(null);
         if (getDecode_object() == null) {
-            setError_code(Pie_Constants.ERROR_CODE_10.ordinal());
+            setError_code(Pie_Word.NO_DECODE_OBJECT);
             return;
         }
 
@@ -45,7 +45,7 @@ public class Pie_Decode_Source {
                 break;
             default:
                 setDecode_object(null);
-                setError_code(Pie_Constants.ERROR_CODE_11.ordinal());
+                setError_code(Pie_Word.UNABLE_TO_DECODE);
         }
     }
 
@@ -62,7 +62,7 @@ public class Pie_Decode_Source {
         }
 
         if (getDecode_object() == null) {
-           config.logging(Level.SEVERE, "No object detected to decode");
+           config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_DECODE_OBJECT, config.getLanguage()));
            return;
         }
 
@@ -70,7 +70,8 @@ public class Pie_Decode_Source {
             case "File":
                 File f = (File) getDecode_object();
                 setZipped(new ZipInputStream(Files.newInputStream(((File) getDecode_object()).toPath())).getNextEntry() != null);
-                config.logging(Level.INFO,"Loading File " + (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
+                config.logging(Level.INFO,Pie_Word.translate(Pie_Word.LOADING_FILE, config.getLanguage()) + " " +
+                        (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
                 try {
                     if (isZipped()) {
                         if (getZip_Object() == null) {
@@ -87,20 +88,23 @@ public class Pie_Decode_Source {
                         if (nf.exists()) {
                             setInput(new FileInputStream(nf));
                         }else{
-                            config.logging(Level.SEVERE,"File " + nf.getName() + " is missing. Unable to continue.");
+                            config.logging(Level.SEVERE,Pie_Word.translate(Pie_Word.FILE, config.getLanguage())  + " " +
+                                    nf.getName() + " " + Pie_Word.translate(Pie_Word.MISSING_FILE_ADDON, config.getLanguage()));
                         }
                     }
                 } catch (FileNotFoundException e) {
-                    config.logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+                    config.logging(Level.SEVERE,Pie_Word.translate(Pie_Word.UNABLE_TO_READ_FILE, config.getLanguage())  +
+                            " " + e.getMessage());
                 }
                 break;
             case "URL":
                 URL u = (URL) getDecode_object();
-                config.logging(Level.INFO,"Downloading File ");
+                config.logging(Level.INFO,Pie_Word.translate(Pie_Word.DOWNLOADING_FILE, config.getLanguage()));
                 try {
                     setInput(u.openStream());
                 } catch (IOException e) {
-                    config.logging(Level.SEVERE,"Unable to open stream " + e.getMessage());
+                    config.logging(Level.SEVERE,Pie_Word.translate(Pie_Word.UNABLE_TO_OPEN_STREAM, config.getLanguage()) +
+                            " " + e.getMessage());
                 }
                 break;
             case "Pie_URL":
@@ -109,7 +113,7 @@ public class Pie_Decode_Source {
                     config.logging(Level.SEVERE,pu.getError_message());
                     break;
                 }
-                config.logging(Level.INFO,"Downloading File ");
+                config.logging(Level.INFO,Pie_Word.translate(Pie_Word.DOWNLOADING_FILE, config.getLanguage()));
                 setInput(pu.getInputStream());
                 if (!Pie_Utils.isEmpty(pu.getError_message()))
                     config.logging(Level.SEVERE,pu.getError_message());
@@ -118,7 +122,7 @@ public class Pie_Decode_Source {
             case "FileInputStream":
             case "ByteArrayInputStream":
                 InputStream is = (InputStream) getDecode_object();
-                config.logging(Level.INFO,"Using Input-stream ");
+                config.logging(Level.INFO,Pie_Word.translate(Pie_Word.USING_INPUTSTREAM, config.getLanguage()));
                 setInput(is);
                 break;
         }
@@ -176,11 +180,11 @@ public class Pie_Decode_Source {
         this.zip_Object = zip_Object;
     }
 
-    public Integer getError_code() {
+    public Pie_Word getError_code() {
         return error_code;
     }
 
-    public void setError_code(Integer error_code) {
+    public void setError_code(Pie_Word error_code) {
         this.error_code = error_code;
     }
 }

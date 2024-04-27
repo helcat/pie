@@ -178,20 +178,6 @@ public class Pie_Utils {
                 humanReadableBytes((runtime.totalMemory() - runtime.freeMemory()) - previous_Menory)
         );
     }
-/*
-	Runtime runtime = Runtime.getRuntime();
-		JSONObject j = new JSONObject();
-		j.put("total", runtime.totalMemory());
-		j.put("free", runtime.freeMemory());
-		j.put("max", runtime.maxMemory());
-		j.put("used", runtime.totalMemory() - runtime.freeMemory());
-
-		j.put("free-text", FileUtils.byteCountToDisplaySize(runtime.freeMemory()));
-		j.put("total-text", FileUtils.byteCountToDisplaySize(runtime.totalMemory()));
-		j.put("max-text", FileUtils.byteCountToDisplaySize(runtime.maxMemory()));
-		j.put("used-text", FileUtils.byteCountToDisplaySize(runtime.totalMemory() - runtime.freeMemory()));
-		return j;
- */
 
     private String humanReadableBytes(long bytes) {
         if (-1000 < bytes && bytes < 1000) {

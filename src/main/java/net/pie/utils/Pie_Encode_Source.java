@@ -2,6 +2,7 @@ package net.pie.utils;
 
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
+import net.pie.enums.Pie_Word;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -20,7 +21,7 @@ public class Pie_Encode_Source {
     private String file_name = null;
     private InputStream input = null;
     private long source_size;
-    private Integer error_code = null;
+    private Pie_Word error_code = null;
 
     /** *******************************************************<br>
      * <b>Pie_Encode_Source</b><br>
@@ -53,7 +54,7 @@ public class Pie_Encode_Source {
         setSource_size(0);
 
         if (encode == null) {
-            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            setError_code(Pie_Word.NO_SOURCE);
             return;
         }
         switch (encode.getClass().getSimpleName()) {
@@ -69,7 +70,7 @@ public class Pie_Encode_Source {
             case "Pie_Text" :
                 Pie_Text text = (Pie_Text) encode;
                 if (Pie_Utils.isEmpty(text.getText())) {
-                    setError_code(Pie_Constants.ERROR_CODE_8.ordinal());
+                    setError_code(Pie_Word.ENCODING_STRING_REQUIRED);
                     return;
                 }
                 setSource_size(text.getText().getBytes().length);
@@ -86,18 +87,18 @@ public class Pie_Encode_Source {
                         setSource_size((int) f.length());
                         setType(Pie_Source_Type.FILE);
                     } catch (FileNotFoundException e) {
-                        setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
+                        setError_code(Pie_Word.INVALID_FILE);
                         return;
                     }
                 }else{
-                    setError_code(Pie_Constants.ERROR_CODE_9.ordinal());
+                    setError_code(Pie_Word.INVALID_FILE);
                     return;
                 }
                 break;
         }
 
         if (getInput() == null)
-            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            setError_code(Pie_Word.NO_SOURCE);
     }
 
     /** *********************************************************<br>
@@ -108,7 +109,7 @@ public class Pie_Encode_Source {
 
     private void receive(Object o) {
         if (o == null) {
-            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            setError_code(Pie_Word.NO_SOURCE);
             return;
         }
         boolean setup = false;
@@ -128,7 +129,7 @@ public class Pie_Encode_Source {
                     if (o.getClass().getSimpleName().equalsIgnoreCase("Pie_URL") ) {
                         Pie_URL pu = (Pie_URL) o;
                         if (!Pie_Utils.isEmpty(pu.getError_message())) {
-                            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+                            setError_code(Pie_Word.NO_SOURCE);
                             return;
                         }
                         url = pu.getUrl();
@@ -141,7 +142,7 @@ public class Pie_Encode_Source {
             }
         } catch (IOException ignored) {  }
         if (http == null) {
-            setError_code(Pie_Constants.ERROR_CODE_4.ordinal());
+            setError_code(Pie_Word.NO_SOURCE);
             return;
         }
  
@@ -156,7 +157,7 @@ public class Pie_Encode_Source {
             }
 
             if (http.getResponseCode() > 299) {
-                setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+                setError_code(Pie_Word.DOWNLOAD_FAILED);
                 http.disconnect();
                 return;
             }
@@ -173,14 +174,14 @@ public class Pie_Encode_Source {
                 is.close();
                 setInput(new ByteArrayInputStream(data));
             }else{
-                setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+                setError_code(Pie_Word.DOWNLOAD_FAILED);
                 http.disconnect();
                 return;
             }
 
             String filename = getFileName(http);
             if (Pie_Utils.isEmpty(filename)) {
-                setError_code(Pie_Constants.ERROR_CODE_15.ordinal());
+                setError_code(Pie_Word.MISSING_FILE_NAME);
                 http.disconnect();
                 return;
             }else {
@@ -189,10 +190,10 @@ public class Pie_Encode_Source {
 
             setSource_size(http.getContentLengthLong());
             if (getSource_size() < 1)
-                setError_code(Pie_Constants.ERROR_CODE_16.ordinal());
+                setError_code(Pie_Word.NO_SOURCE_SIZE);
 
         } catch (IOException e) {
-            setError_code(Pie_Constants.ERROR_CODE_14.ordinal());
+            setError_code(Pie_Word.DOWNLOAD_FAILED);
         }
 
     }
@@ -286,11 +287,11 @@ public class Pie_Encode_Source {
         this.source_size = source_size;
     }
 
-    public Integer getError_code() {
+    public Pie_Word getError_code() {
         return error_code;
     }
 
-    private void setError_code(Integer error_code) {
+    private void setError_code(Pie_Word error_code) {
         this.error_code = error_code;
     }
 }

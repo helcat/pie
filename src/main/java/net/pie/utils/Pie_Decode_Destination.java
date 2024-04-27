@@ -1,6 +1,6 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
+import net.pie.enums.Pie_Word;
 
 import java.io.File;
 import java.net.URL;
@@ -16,7 +16,7 @@ public class Pie_Decode_Destination {
     private URL web_address;
     private String file_name = null;
     private byte[] bytes = null;
-    private Integer error_code = null;
+    private Pie_Word error_code = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Encode_Destination</b><br>
@@ -44,7 +44,7 @@ public class Pie_Decode_Destination {
                 }
         }
 
-        setError_code(Pie_Constants.ERROR_CODE_12.ordinal());
+        setError_code(Pie_Word.INVALID_DECODING_DESTINATION);
         setLocal_folder(null);
 
     }
@@ -85,11 +85,11 @@ public class Pie_Decode_Destination {
         this.bytes = bytes;
     }
 
-    public Integer getError_code() {
+    public Pie_Word getError_code() {
         return error_code;
     }
 
-    public void setError_code(Integer error_code) {
+    public void setError_code(Pie_Word error_code) {
         this.error_code = error_code;
     }
 }
