@@ -90,6 +90,45 @@ public enum Pie_Word {
 
 	NO_BROWSER ("Could not find web browser", "Impossible de trouver le navigateur Web", "Impossibile trovare il browser web",
 			"No se pudo encontrar el navegador web"),
+
+	DECODING_FAILED_SOURCE ("Decoding Failed : Source required", "Échec du décodage : source requise",
+			"Decodifica non riuscita: sorgente richiesta", "Error de decodificación: fuente requerida"),
+
+	DECODING_FAILED_DEST_SOURCE ("Decoding Failed : Source destination required", "Échec du décodage : source destination requise",
+			"Decodifica non riuscita: destinazione di origine richiesta", "Error de decodificación: se requiere destino de origen"),
+
+	DEST_FILE_DELETED ("Destination File Deleted", "Fichier de destination supprimé",
+			"Archivo de destino eliminado", "Decodificado a variable - Disponible usando"),
+
+	DECODED_TO_VALUE_USING ("Decoded To Variable - Available using", "Décodé en variable - Disponible en utilisant",
+	"Decodificato in variabile: disponibile utilizzando","Decodificado a variable - Disponible usando" ),
+
+	WRITING_TO_STREAM_ERROR ("Writing to stream error", "Erreur d'écriture dans le flux", "Errore di scrittura nello streaming",
+			"Error al escribir en la secuencia"),
+
+	DECODING_COMPLETE ("Decoding Complete", "Décodage terminé", "Decodifica completata", "Decodificación completa"),
+
+	DECRYPTION_REQUIRED ("Decryption Required", "Décryptage requis", "Decrittazione richiesta", "Se requiere descifrado"),
+
+	BASE_ENCODING_ERROR ("Base Encoding Error", "Erreur d'encodage de base", "Errore di codifica di base", "Error de codificación base"),
+
+	INVALID_ENCODED_IMAGE ("Invalid Encoded Image", "Image codée invalide", "Immagine codificata non valida", "Imagen codificada no válida"),
+
+	INVALID_ENCODED_FILE ("Invalid Encoded File", "Fichier codé invalide", "File codificato non valido", "Archivo codificado no válido"),
+
+	DECODING_ERROR ("Decoding Error", "Erreur de décodage","Errore di decodifica", "Error de decodificación"),
+
+	DECODING_COLLECTING_FILE ("Decoding : Collecting file", "Décodage : Collecte de fichier", "Decodifica: raccolta di file",
+			"Decodificación: recopilación de archivos"),
+
+	CANNOT_BE_USED_WITH ("cannot be used with", "ne peut pas être utilisé avec", "non può essere utilizzato con", "no se puede utilizar con"),
+
+	ERROR ("Error","Erreur", "Errore", "Error"),
+
+	ALREADY_EXISTS ("Already Exists", "Existe déjà", "Esiste già", "Ya existe"),
+
+	CREATING_STREAM_ERROR ("Creating stream Error", "Erreur de création de flux", "Errore nella creazione del flusso",
+			"Error al crear secuencia"),
 	;
 
 	private String en;

@@ -3,6 +3,7 @@ package net.pie;
 import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Source_Type;
+import net.pie.enums.Pie_Word;
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Utils;
 
@@ -44,14 +45,14 @@ public class Pie_Decode {
         setEncrypted(false);
 
         if (getConfig().getDecode_source() == null || getConfig().getDecode_source().getDecode_object() == null) {
-            getConfig().logging(Level.SEVERE, "Decoding FAILED : Source required");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE,config.getLanguage()));
             return;
         }
 
         setOutputStream(null);
 
         if (getConfig().getDecoded_Source_destination() == null) {
-            getConfig().logging(Level.SEVERE, "Decoding FAILED : Source destination required");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_DEST_SOURCE, config.getLanguage()));
             return;
         }
         process_Decoding();
@@ -60,7 +61,8 @@ public class Pie_Decode {
             if (getDecoded_file_path() != null && !getDecoded_file_path().isEmpty()) {
                 File f = new File(getDecoded_file_path());
                 if (f.isFile() && f.delete())
-                    getConfig().logging(Level.SEVERE, "Destination File Deleted " + f.getName());
+                    getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DEST_FILE_DELETED, config.getLanguage()) +
+                            " " + f.getName());
             }
             setDecoded_file_path(null);
         }
@@ -80,7 +82,8 @@ public class Pie_Decode {
         if (message != null) {
             if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
                 setOutput(new String(message, StandardCharsets.UTF_8));
-                getConfig().logging(Level.INFO, "Decoded To Variable - Available using getOutput()");
+                getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODED_TO_VALUE_USING, getConfig().getLanguage()) +
+                        " getOutput()");
             }else{
                 setUpOutFile(getConfig().getDecoded_Source_destination().getFile_name());
                 if (!getConfig().isError()) {
@@ -88,7 +91,8 @@ public class Pie_Decode {
                         try {
                             getOutputStream().write(message);
                         } catch (IOException e) {
-                            getConfig().logging(Level.SEVERE, "Writing to stream error : " + e.getMessage());
+                            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.WRITING_TO_STREAM_ERROR, getConfig().getLanguage()) +
+                                    " : " + e.getMessage());
                             break;
                         }
                         processing_file++;
@@ -114,7 +118,7 @@ public class Pie_Decode {
             if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
                 System.gc();
 
-            getConfig().logging(Level.INFO, "Decoding Complete");
+            getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
         }
 
         getConfig().getDecode_source().close();
@@ -136,7 +140,7 @@ public class Pie_Decode {
             return null;
 
         if (isEncrypted() && getConfig().getEncryption() == null) {
-            getConfig().logging(Level.SEVERE, "Decryption Required");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_REQUIRED, getConfig().getLanguage()));
             return null;
         }
 
@@ -144,7 +148,8 @@ public class Pie_Decode {
             if (isModulation())
                 message = Base64.getDecoder().decode(message);
         } catch (Exception e) {
-            getConfig().logging(Level.SEVERE, "Base Encoding Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.BASE_ENCODING_ERROR, getConfig().getLanguage()) +
+                    " " + e.getMessage());
             return null;
         }
 
@@ -170,7 +175,7 @@ public class Pie_Decode {
                 count++;
             }
             if (!found) {
-                getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) );
                 return null;
             }
 
@@ -184,12 +189,12 @@ public class Pie_Decode {
             message = Arrays.copyOfRange(message, 1, message.length);
 
         } else {
-            getConfig().logging(Level.SEVERE, "Invalid Encoded File");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_FILE, getConfig().getLanguage()) );
             return null;
         }
 
         if (message.length == 0) {
-            getConfig().logging(Level.SEVERE, "Decoding Error");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_ERROR, getConfig().getLanguage()) );
             return null;
         }
 
@@ -203,19 +208,20 @@ public class Pie_Decode {
     private BufferedImage collectImage(int processing_file) {
         BufferedImage buffimage = null;
         try {
-            getConfig().logging(Level.INFO, "Decode : Collecting file " +
+            getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COLLECTING_FILE, getConfig().getLanguage()) + " " +
                     (getTotal_files() > 0 ? (processing_file + 1)  + " / " + getTotal_files() : "" ));
             getConfig().getDecode_source().next(getConfig(), processing_file);
             if (!getConfig().isError() && getConfig().getDecode_source().getInput() != null )
                 buffimage = ImageIO.read(getConfig().getDecode_source().getInput());
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE, "Invalid Encoded Image " + e.getMessage());
+            getConfig().logging(Level.SEVERE,  Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) +
+                    " " + e.getMessage());
             return null;
         }
         getConfig().getDecode_source().close();
 
         if (buffimage == null) {
-            getConfig().logging(Level.SEVERE, "Invalid Encoded Image");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()));
             return null;
         }
         return buffimage;
@@ -306,7 +312,7 @@ public class Pie_Decode {
             if (options[0] != 0)
                 setEncrypted(true);
             if (isEncrypted() && getConfig().getEncryption() == null) {
-                getConfig().logging(Level.SEVERE, "Decryption Required");
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_REQUIRED, getConfig().getLanguage()));
                 return false;
             }
             // Source type
@@ -314,7 +320,9 @@ public class Pie_Decode {
             if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE) &&
                     !getSource_type().equals(Pie_Source_Type.TEXT)) {
                 getConfig().logging(Level.SEVERE,
-                        "Pie_Option.DECODE_TEXT_TO_VARIABLE cannot be used with " + getSource_type().toString());
+                        "Pie_Option.DECODE_TEXT_TO_VARIABLE " +
+                                Pie_Word.translate(Pie_Word.CANNOT_BE_USED_WITH, getConfig().getLanguage()) + " " +
+                                        getSource_type().toString());
                 return false;
             }
             return true;
@@ -331,7 +339,8 @@ public class Pie_Decode {
             File f = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
             try {
                 if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && f.exists()) {
-                    getConfig().logging(Level.SEVERE, "Error : " + file_name + " Already Exists");
+                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ERROR, getConfig().getLanguage()) +
+                            " : " + file_name + " " + Pie_Word.translate(Pie_Word.ALREADY_EXISTS, getConfig().getLanguage()));
                     return;
                 }
 
@@ -339,7 +348,8 @@ public class Pie_Decode {
                 setDecoded_file_path(f.getPath());
             } catch (FileNotFoundException e) {
                 setOutputStream(null);
-                getConfig().logging(Level.SEVERE, "Creating stream Error : " + e.getMessage());
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.CREATING_STREAM_ERROR, getConfig().getLanguage()) +
+                        " : " + e.getMessage());
             }
         }
     }
@@ -380,7 +390,7 @@ public class Pie_Decode {
             }
 
         } catch (Exception ignored) {
-            getConfig().logging(Level.SEVERE, "Security Error");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_ERROR, getConfig().getLanguage()));
         }
     }
 
