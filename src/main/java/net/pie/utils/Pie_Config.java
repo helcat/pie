@@ -47,27 +47,7 @@ public class Pie_Config {
     private Logger log = null;
 
     private boolean demo_mode = false;
-    private String language = Locale.getDefault().getLanguage().toLowerCase();
-
-    /** **********************************************************
-     * From Demo
-     * @param language (String)
-     * @param options (List)
-     */
-    public Pie_Config(String language, Object... options) {
-        setLanguage(language == null ? Locale.getDefault().getLanguage().toLowerCase() : language);
-        setup(options);
-    }
-
-    /** **********************************************************
-     * From Demo
-     * @param language (String)
-     * @param options (List)
-     */
-    public Pie_Config(String language, List<Object> options) {
-        setLanguage(language == null ? Locale.getDefault().getLanguage().toLowerCase() : language);
-        setup(options.toArray());
-    }
+    private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
     public Pie_Config(Object... options) {
         setup(options);
@@ -80,7 +60,7 @@ public class Pie_Config {
     private void setup(Object[] options) {
         setUpLogging();
         if (options == null) {
-            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS,getLanguage()));
+            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS, getLanguage()));
             setError(true);
             return;
         }
@@ -95,6 +75,9 @@ public class Pie_Config {
                 continue;
 
             switch (o.getClass().getSimpleName()) {
+                case "Pie_Language" :
+                    setLanguage( (Pie_Language) o);
+                    break;
                 case "Pie_Option":
                     opt = (Pie_Option) o;
                     if (opt.equals(Pie_Option.DEMO_MODE))
@@ -187,7 +170,7 @@ public class Pie_Config {
      **/
     public void logging(Level level, String message) {
         if (isDemo_mode()) {
-            System.out.println(level.toString() + " : " + message);
+            Pie_Utils.console_out(level.toString() + " : " + message);
             return;
         }
 
@@ -375,10 +358,13 @@ public class Pie_Config {
     }
 
     public String getLanguage() {
-        return language;
+        if (language != null)
+            return language.getCode();
+        language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
+        return language.getCode();
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(Pie_Language language) {
         this.language = language;
     }
 

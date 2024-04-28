@@ -74,8 +74,10 @@ public enum Pie_Word {
 	ENCODED_FILE_EXISTS ("Encoded file already exists : New encoded file", "Le fichier encodé existe déjà : Nouveau fichier encodé",
 			"Il file codificato esiste già: nuovo file codificato", "El archivo codificado ya existe: nuevo archivo codificado"),
 
-	OVERRIDE_FILE_REQUIRED ("Was not created, Set config to overwrite file is required", "N'a pas été créé, définir la configuration pour écraser le fichier est requis",
-		"Non è stato creato, è necessario impostare la configurazione per sovrascrivere il file", "No se creó, se requiere configurar la configuración para sobrescribir el archivo"),
+	OVERRIDE_FILE_REQUIRED ("Was not created, Set config to overwrite file is required",
+			"N'a pas été créé, définir la configuration pour écraser le fichier est requis",
+		"Non è stato creato, è necessario impostare la configurazione per sovrascrivere il file",
+			"No se creó, se requiere configurar la configuración para sobrescribir el archivo"),
 
 	UNABLE_TO_WRITE_ENCODED_IMAGE ("Unable to write encoded image", "Impossible d'écrire l'image codée", "Impossibile scrivere l'immagine codificata",
 			"No se puede escribir la imagen codificada"),

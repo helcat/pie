@@ -4,6 +4,7 @@ import net.pie.enums.Pie_Option;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
@@ -65,7 +66,7 @@ public class Pie_Utils {
      * @param content (String)
      */
     public static void console_out(String content) {
-        System.out.println(stringDate() + " : " + content);
+        System.out.println(stringDate() + " : " + new String(content.getBytes(StandardCharsets.UTF_8)));
     }
 
     /** *******************************************************<br>
@@ -87,9 +88,10 @@ public class Pie_Utils {
             if (log_file.exists() && !log_file.delete())
                 return;
 
-            PrintStream out = new PrintStream(new FileOutputStream(log_file, true), true);
+            PrintStream out = new PrintStream(new FileOutputStream(log_file, true), true, StandardCharsets.UTF_8.name());
             System.setOut(out);
-        } catch (FileNotFoundException ignored) { }
+
+        } catch (FileNotFoundException | UnsupportedEncodingException ignored) { }
 
     }
 
