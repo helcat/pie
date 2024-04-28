@@ -129,6 +129,41 @@ public enum Pie_Word {
 
 	CREATING_STREAM_ERROR ("Creating stream Error", "Erreur de création de flux", "Errore nella creazione del flusso",
 			"Error al crear secuencia"),
+
+	MAX_FILES_EXCEEDED ("System protection. Max files exceeded", "Proteccion del sistema. Se superó el número máximo de archivos",
+		"Protezione del sistema. È stato superato il numero massimo di file", "Proteccion del sistema. Se superó el número máximo de archivos"),
+
+	ENCODING_FAILED ("Encoding Failed", "Échec de l'encodage", "Codifica non riuscita", "Error de codificación"),
+
+	ENCODING_COMPLETE ("Encoding Complete", "Encodage terminé", "Codifica completata", "Codificación completa"),
+
+	COMPRESSION_FAILED ("Compression Failed", "Échec de la compression", "Compressione non riuscita", "Fallo de compresión"),
+
+	UNABLE_To_READ_FILE ("Unable to read file", "Impossible de lire le fichier", "Impossibile leggere il file",
+			"Imposible leer el archivo"),
+
+	ENCODED_IMAGE_WAS_NOT_SAVED ("Encoded image was not saved", "L'image codée n'a pas été enregistrée",
+			"L'immagine codificata non è stata salvata", "La imagen codificada no se guardó"),
+
+	UNEXPRECTED_FILE_COUNT ("Unexpected file count.", "Nombre de fichiers inattendu", "Conteggio file imprevisto",
+			"Recuento de archivos inesperado"),
+
+	GENERATING_IMAGE_SIZE ("Generating Image Size", "Génération de la taille de l'image", "Generazione della dimensione dell'immagine",
+			"Generando tamaño de imagen"),
+
+	IMAGE_SIZE_WOULD_BE ("Image Size Would be", "La taille de l'image serait", "La dimensione dell'immagine sarebbe",
+			"El tamaño de la imagen sería"),
+
+	MAX_SIZE_IS ("Maximum Size Is", "La taille maximale est", "La dimensione massima è","El tamaño máximo es"),
+
+	INCREASE_MEMORY ("Increase Memory and / or Maximum Image Size. Encode mode", "Augmentez la mémoire et/ou la taille maximale de l'image. Mode d'encodage",
+			"Aumenta la memoria e/o la dimensione massima dell'immagine. Modalità di codifica",
+			"Aumentar la Memoria y/o el Tamaño Máximo de Imagen. Modo de codificación"),
+
+	FAILED ("Failed", "Échoué", "Fallito", "Fallido"),
+
+	MAX_IMAGE_SIZE_NOT_SET ("Maximum Image Size Is Not Set", "La taille maximale de l'image n'est pas définie",
+		"La dimensione massima dell'immagine non è impostata", "El tamaño máximo de imagen no está establecido")
 	;
 
 	private String en;

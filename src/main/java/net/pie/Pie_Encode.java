@@ -44,13 +44,13 @@ public class Pie_Encode {
         Pie_Utils utils = new Pie_Utils(getConfig());
 
         if (getConfig().getEncoder_source() == null || getConfig().getEncoder_source().getInput() == null) {
-            getConfig().logging(Level.SEVERE, "Error no source to encode");
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_SOURCE, getConfig().getLanguage()));
             getConfig().setError(true);
             return;
         }
 
         if (getConfig().getEncoder_source().getSource_size() == 0) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED : Unable to collect source size");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.NO_SOURCE_SIZE, getConfig().getLanguage()));
             close();
             return;
         }
@@ -63,7 +63,7 @@ public class Pie_Encode {
         files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
 
         if (files_to_be_created > Pie_Constants.MAX_PROTCTED_CREATED_FILES.getParm1()) {
-            getConfig().logging(Level.SEVERE,"System protection. Max files exceeded");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.MAX_FILES_EXCEEDED, getConfig().getLanguage()));
             return;
         }
 
@@ -86,7 +86,8 @@ public class Pie_Encode {
             bytesRead = 0;
 
         } catch (IOException e) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED : " + e.getMessage());
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()) +
+                    " : " + e.getMessage());
             close();
             return;
         }
@@ -94,11 +95,11 @@ public class Pie_Encode {
         close();
 
         if (getConfig().isError()) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
             return;
         }
 
-        getConfig().logging(Level.INFO,"Encoding : Complete");
+        getConfig().logging(Level.INFO,Pie_Word.translate(Pie_Word.ENCODING_COMPLETE, getConfig().getLanguage()));
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
@@ -119,11 +120,11 @@ public class Pie_Encode {
     private void encode(byte[] originalArray, int file_number, int total_files, Pie_Utils utils) {
         boolean has_Been_Encrypted = false;
         if (getConfig().isError() || originalArray == null) {
-            getConfig().logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
             return;
         }
         if (file_number > total_files) {
-            getConfig().logging(Level.SEVERE,"System protection. Unexpected file count.");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.UNEXPRECTED_FILE_COUNT, getConfig().getLanguage()));
             return;
         }
 
@@ -157,7 +158,7 @@ public class Pie_Encode {
                     getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
             has_Been_Encrypted = getConfig().getEncryption() != null && getConfig().getEncryption().isWas_Encrypted();
             if (originalArray == null) {
-                getConfig().logging(Level.SEVERE,"Encryption Error");
+                getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, getConfig().getLanguage()));
                 return;
             }
 
@@ -169,8 +170,8 @@ public class Pie_Encode {
                 out.write(originalArray);
                 out.close();
             } catch (IOException e) {
-                getConfig().logging(Level.WARNING, "Deflater Compression Filed " + e.getMessage());
-                return;
+                getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.COMPRESSION_FAILED, getConfig().getLanguage()) +
+                        " " + e.getMessage());
             }
 
             // Base 64 find_repeated_patterns
@@ -187,14 +188,16 @@ public class Pie_Encode {
             } catch (IOException ignored) {  }
 
         }catch (Exception e) {
-            getConfig().logging(Level.SEVERE,"Error " + e.getMessage());
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ERROR, getConfig().getLanguage()) +
+                    " " + e.getMessage());
             return;
         }
 
         try {
             image_size = calculate_image_Mode(originalArray.length);
         } catch (Exception e) {
-            getConfig().logging(Level.SEVERE,"Unable to read file " + e.getMessage());
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.UNABLE_To_READ_FILE, getConfig().getLanguage())+
+                    " " + e.getMessage());
             return;
         }
 
@@ -210,14 +213,14 @@ public class Pie_Encode {
         originalArray = null;
         if (getConfig().isError()) {
             data_image = null;
-            getConfig().logging(Level.SEVERE,"Encoding FAILED");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
             return;
         }
 
         // Process the image - send to destination if required
         if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), data_image,
                 file_number, total_files, getConfig().getEncoder_source().getFile_name()))
-            getConfig().logging(Level.SEVERE,"Encoding image was not saved");
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
 
         data_image = null;
     }
@@ -229,7 +232,8 @@ public class Pie_Encode {
      * @return BufferedImage
      */
     private BufferedImage buildImage_Mode1(Pie_Size image_size, byte[] originalArray, boolean has_Been_Encrypted ) {
-        getConfig().logging(Level.INFO,"Generating Image Size " + image_size.getWidth()  + " x " + image_size.getHeight());
+        getConfig().logging(Level.INFO,Pie_Word.translate(Pie_Word.GENERATING_IMAGE_SIZE, getConfig().getLanguage()) +
+                " " + image_size.getWidth()  + " x " + image_size.getHeight());
         int image_type = BufferedImage.TYPE_INT_RGB;
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
@@ -383,18 +387,19 @@ public class Pie_Encode {
      */
     private Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
         Pie_Size image_size = getPieSize((double) length, mode);
-
         if (getConfig().hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) >
                     getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
-                getConfig().logging(Level.WARNING, "Image Size Would be " + image_size.getWidth() + " x " + image_size.getHeight() +
-                        ", Maximum Size Is " + getConfig().getEncoder_Maximum_Image().getWidth() +
+                getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.IMAGE_SIZE_WOULD_BE, getConfig().getLanguage())
+                        + " " +  image_size.getWidth() + " x " + image_size.getHeight() +
+                        ", "+Pie_Word.translate(Pie_Word.MAX_SIZE_IS, getConfig().getLanguage())+ " " + getConfig().getEncoder_Maximum_Image().getWidth() +
                         " x " + getConfig().getEncoder_Maximum_Image().getHeight() + " " +
-                        "Increase Memory and / or Maximum Image Size. Encode mode " + mode.toString() + " Failed");
+                        Pie_Word.translate(Pie_Word.INCREASE_MEMORY, getConfig().getLanguage()) +
+                        " " + mode.toString() + " " + Pie_Word.translate(Pie_Word.FAILED, getConfig().getLanguage()));
                 return null;
             }
         }else{
-            getConfig().logging(Level.WARNING,"Maximum Image Size Is Not Set");
+            getConfig().logging(Level.WARNING,Pie_Word.translate(Pie_Word.MAX_IMAGE_SIZE_NOT_SET, getConfig().getLanguage()));
         }
 
         return image_size;
