@@ -122,6 +122,10 @@ public class Pie_Encoded_Destination {
                     getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists()) {
+            if (config.getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && file.delete()) {
+                return file;
+            }
+
             if (file.getName().equals(config.getEncoder_source().getFile_name())) {
                 while (file.exists()) {
                     file = new File(file.getParentFile() + File.separator +

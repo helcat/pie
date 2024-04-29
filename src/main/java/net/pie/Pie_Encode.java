@@ -34,7 +34,6 @@ public class Pie_Encode {
     public Pie_Encode (Pie_Config config) {
         setByte_map(Pie_Utils.create_Encoding_Byte_Map());
         ImageIO.setUseCache(false);
-        long startTime = System.currentTimeMillis();
 
         if (config == null || config.isError())
             return;
