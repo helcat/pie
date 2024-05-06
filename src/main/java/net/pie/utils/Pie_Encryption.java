@@ -45,6 +45,7 @@ public class Pie_Encryption {
         } else if (parm instanceof File) {
             if (!((File) parm).isFile() || !read_Certificate(((File) parm)))
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
+
         } else if (parm instanceof String) {
             setPassword((String) parm);
         }
