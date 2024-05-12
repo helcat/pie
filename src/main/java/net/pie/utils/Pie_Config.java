@@ -169,14 +169,14 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (isDemo_mode()) {
-            Pie_Utils.console_out(level.toString() + " : " + message);
-            return;
-        }
-
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message);
+        }
+
+        if (isDemo_mode()) {
+            Pie_Utils.console_out(level.toString() + " : " + message);
+            return;
         }
 
         if (getLog() == null || getLog_level().equals(Level.OFF))

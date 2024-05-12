@@ -36,17 +36,19 @@ public class Pie_Decode_Destination {
             return;
         }
 
-        switch (o.getClass().getSimpleName()) {
-            case "File":
-                if (((File) o).exists() && ((File) o).isDirectory()) {
-                    setLocal_folder((File) o);
-                    return;
-                }
+       if (o instanceof File && ((File) o).exists() && ((File) o).isDirectory()) {
+            setLocal_folder((File) o);
+            return;
         }
 
-        setError_code(Pie_Word.INVALID_DECODING_DESTINATION);
-        setLocal_folder(null);
+        if (o instanceof String) {
+            File f = new File((String) o);
+            if (f.exists() && f.isDirectory())
+                setLocal_folder(f);
+            return;
+        }
 
+        setLocal_folder(Pie_Utils.getDesktop());
     }
 
     /** *******************************************************************<br>
