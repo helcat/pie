@@ -273,7 +273,7 @@ public class Pie_Encryption {
             return cipher.doFinal(encryptedData);
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            return input;
+            return null;
         }
     }
 

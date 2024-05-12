@@ -112,6 +112,8 @@ public enum Pie_Word {
 
 	DECRYPTION_REQUIRED ("Decryption Required", "Décryptage requis", "Decrittazione richiesta", "Se requiere descifrado"),
 
+	DECRYPTION_FAILED ("Decryption Failed", "Échec du décryptage", "Decrittografia non riuscita","Error de descifrado"),
+
 	BASE_ENCODING_ERROR ("Base Encoding Error", "Erreur d'encodage de base", "Errore di codifica di base", "Error de codificación base"),
 
 	INVALID_ENCODED_IMAGE ("Invalid Encoded Image", "Image codée invalide", "Immagine codificata non valida", "Imagen codificada no válida"),

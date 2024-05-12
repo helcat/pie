@@ -44,6 +44,9 @@ public class Pie_Decode {
         setTotal_files(0);
         setEncrypted(false);
 
+        if (getConfig().isError())
+            return;
+
         if (getConfig().getDecode_source() == null || getConfig().getDecode_source().getDecode_object() == null) {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE,config.getLanguage()));
             return;
@@ -55,6 +58,7 @@ public class Pie_Decode {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_DEST_SOURCE, config.getLanguage()));
             return;
         }
+
         process_Decoding();
 
         if (getConfig().isError() && !getConfig().getOptions().contains(Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR)) {
@@ -93,7 +97,7 @@ public class Pie_Decode {
                         } catch (IOException e) {
                             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.WRITING_TO_STREAM_ERROR, getConfig().getLanguage()) +
                                     " : " + e.getMessage());
-                            break;
+                            return;
                         }
                         processing_file++;
                         if (processing_file < getTotal_files()) {
@@ -108,24 +112,20 @@ public class Pie_Decode {
             message = null;
         }
 
-        // Error
-        if (getConfig().isError()) {
-            if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-                System.gc();
-        }else {
-
-            // OK
-            if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-                System.gc();
-
-            getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
-        }
+        if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
+            System.gc();
 
         getConfig().getDecode_source().close();
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
 
+        // Error
+        if (getConfig().isError()) {
+            getConfig().getDecode_source().close();
+        }else {
+            getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
+        }
     }
 
     /** *********************************************************<br>
@@ -161,8 +161,15 @@ public class Pie_Decode {
             return null;
 
         message = getConfig().getEncryption() != null ? getConfig().getEncryption().decrypt(getConfig(), message) : message;
-        if (message == null)
-            return null;
+        if (message == null) {
+            if (getConfig().getEncryption() != null) {
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_FAILED, getConfig().getLanguage()));
+                return null;
+            }else{
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) );
+                return null;
+            }
+        }
 
         if (message[0] == getSplit_tag()) {
             int count = 1;
