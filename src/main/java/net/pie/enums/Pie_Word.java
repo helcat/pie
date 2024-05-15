@@ -20,6 +20,9 @@ public enum Pie_Word {
 	ENCRYPTION_PASS_ERROR ("Encrypted password is invalid", "Le mot de passe crypté n'est pas valide",
 			"La password crittografata non è valida", "La contraseña cifrada no es válida"),
 
+	ENCRYPTION_PASS_SIZE_ERROR ("Encrypted password size less than 6 long", "Taille du mot de passe crypté inférieure à 6",
+			"La dimensione della password crittografata è inferiore a 6", "Tamaño de contraseña cifrada inferior a 6"),
+
 	ENCRYPTION_FILE_INVALID ("Encryption Certificate is not a file", "Le certificat de cryptage n'est pas un fichier",
 			"Il certificato di crittografia non è un file","El certificado de cifrado no es un archivo"),
 

@@ -484,7 +484,9 @@ public class Pie_Encode {
     public boolean isEncoding_Error() {
         return  getConfig() == null || getConfig().isError();
     }
-
+    public String getEncoding_Error_Message() {
+        return  getConfig() != null && getConfig().isError() ? getConfig().getError_message() : null;
+    }
     /** *******************************************************<br>
      * Close the source input stream
      */

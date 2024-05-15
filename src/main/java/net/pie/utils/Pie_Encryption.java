@@ -91,8 +91,8 @@ public class Pie_Encryption {
         if (getKey() != null)
             return; // reuse key
 
-        if (!Pie_Utils.isEmpty(getPassword()) && getPassword().length() < 8) {
-            config.logging(Level.WARNING, Pie_Word.translate(Pie_Word.PIE_CERTIFICATE, config.getLanguage()));
+        if (!Pie_Utils.isEmpty(getPassword()) && getPassword().length() < 6) {
+            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_PASS_SIZE_ERROR, config.getLanguage()));
             setKey(null);
             return;
         }
