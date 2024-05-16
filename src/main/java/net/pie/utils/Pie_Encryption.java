@@ -207,6 +207,9 @@ public class Pie_Encryption {
         if (getKey() == null) {
             if (!Pie_Utils.isEmpty(getPassword())) {
                 createKey(config);
+                if (config.isError())
+                    return null;
+
                 if (getKey() == null) {
                     config.logging(Level.WARNING, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR_NO_KEY, config.getLanguage()));
                     return input;

@@ -78,6 +78,9 @@ public class Pie_Encode {
                 }
                 encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created, utils);
                 file_count++;
+
+                if (getConfig().isError())
+                    break;
             }
 
             fis.close();
@@ -94,7 +97,8 @@ public class Pie_Encode {
         close();
 
         if (getConfig().isError()) {
-            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
+            if (getConfig().getError_message().isEmpty())
+                getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
             return;
         }
 
@@ -157,7 +161,8 @@ public class Pie_Encode {
                     getConfig().getEncryption().encrypt(getConfig(), buffer.array()) : buffer.array();
             has_Been_Encrypted = getConfig().getEncryption() != null && getConfig().getEncryption().isWas_Encrypted();
             if (originalArray == null) {
-                getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, getConfig().getLanguage()));
+                if (getConfig().getError_message().isEmpty())
+                    getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, getConfig().getLanguage()));
                 return;
             }
 
