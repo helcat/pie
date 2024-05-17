@@ -79,6 +79,8 @@ public class Pie_Encryption {
         Pie_Decode decoded = new Pie_Decode(new Pie_Config(options));
         if (decoded.getOutput() != null)
             key_text = (String) decoded.getOutput();
+
+        setPassword(Pie_Utils.isEmpty(key_text) ? null : key_text);
         return !Pie_Utils.isEmpty(key_text);
     }
 
