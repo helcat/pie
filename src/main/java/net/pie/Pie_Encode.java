@@ -39,9 +39,6 @@ public class Pie_Encode {
             return;
 
         setConfig(config);
-
-        Pie_Utils utils = new Pie_Utils(getConfig());
-
         if (getConfig().getEncoder_source() == null || getConfig().getEncoder_source().getInput() == null) {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_SOURCE, getConfig().getLanguage()));
             getConfig().setError(true);
@@ -76,7 +73,7 @@ public class Pie_Encode {
                     close();
                     return;
                 }
-                encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created, utils);
+                encode(Arrays.copyOfRange(buffer, 0, bytesRead), file_count, files_to_be_created);
                 file_count++;
 
                 if (getConfig().isError())
@@ -120,7 +117,7 @@ public class Pie_Encode {
      * @param file_number int
      * @param total_files int
      */
-    private void encode(byte[] originalArray, int file_number, int total_files, Pie_Utils utils) {
+    private void encode(byte[] originalArray, int file_number, int total_files) {
         boolean has_Been_Encrypted = false;
         if (getConfig().isError() || originalArray == null) {
             getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
@@ -260,7 +257,7 @@ public class Pie_Encode {
 
         boolean modulate = false;
         if (getConfig().getOptions().contains(Pie_Option.MODULATION)) {
-            setModulate(getRandom_Value(rbg, 99));
+            setModulate(getRandom_Value(rbg));
             modulate = true;
         }else {
             setModulate(new int[]{0, 0, 0, 0});
@@ -321,16 +318,18 @@ public class Pie_Encode {
         return data_image;
     }
 
-    /** ******************************************************<br>
+    /**
+     * *****************************************************<br>
      * Return a random Value
+     *
      * @param rbg
      * @return int[]
      */
-    private int[] getRandom_Value(String rbg, int max_number) {
+    private int[] getRandom_Value(String rbg) {
         return new int[]{
-            (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
-            (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
-            (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (max_number - 1 + 1)) + 1) : 0),
+            (rbg.contains ("R") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+            (rbg.contains ("G") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
+            (rbg.contains ("B") ? ((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1) : 0),
             0};
     }
 

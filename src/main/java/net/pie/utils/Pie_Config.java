@@ -126,8 +126,11 @@ public class Pie_Config {
             }
         }
 
-        if (this.encoder_destination == null)
-            this.encoder_destination = new Pie_Encoded_Destination();
+        if (this.encoder_destination == null) {
+            if (encoder_source != null &&
+                    encoder_source.getParent_folder() != null && !encoder_source.getParent_folder().isEmpty())
+            this.encoder_destination = new Pie_Encoded_Destination(encoder_source.getParent_folder());
+        }
 
         if (getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
             this.setDecoded_Source_destination(new Pie_Decode_Destination());

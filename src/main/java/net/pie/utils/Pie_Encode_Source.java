@@ -1,6 +1,5 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Constants;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.enums.Pie_Word;
 
@@ -22,6 +21,7 @@ public class Pie_Encode_Source {
     private InputStream input = null;
     private long source_size;
     private Pie_Word error_code = null;
+    private String parent_folder = null;
 
     /** *******************************************************<br>
      * <b>Pie_Encode_Source</b><br>
@@ -52,6 +52,7 @@ public class Pie_Encode_Source {
         setType(Pie_Source_Type.NONE);
         setFile_name(null);
         setSource_size(0);
+        setParent_folder(null);
 
         if (encode == null) {
             setError_code(Pie_Word.NO_SOURCE);
@@ -86,6 +87,7 @@ public class Pie_Encode_Source {
                         setFile_name(f.getName());
                         setSource_size((int) f.length());
                         setType(Pie_Source_Type.FILE);
+                        setParent_folder(f.getAbsolutePath());
                     } catch (FileNotFoundException e) {
                         setError_code(Pie_Word.INVALID_FILE);
                         return;
@@ -293,6 +295,14 @@ public class Pie_Encode_Source {
 
     private void setError_code(Pie_Word error_code) {
         this.error_code = error_code;
+    }
+
+    public String getParent_folder() {
+        return parent_folder;
+    }
+
+    public void setParent_folder(String parent_folder) {
+        this.parent_folder = parent_folder;
     }
 }
 

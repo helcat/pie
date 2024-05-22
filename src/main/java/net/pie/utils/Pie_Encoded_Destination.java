@@ -29,6 +29,17 @@ public class Pie_Encoded_Destination {
      * With no parameters, Pie_Encoded_Destination allows for custom parameters.
      **/
     public Pie_Encoded_Destination() {
+        setLocal_folder(Pie_Utils.getTempFolder());
+    }
+
+    /** *******************************************************************<br>
+     * <b>Pie_Encoded_Destination</b><br>
+     * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
+     **/
+    public Pie_Encoded_Destination(String file) {
+        File dir = new File(file);
+        if (dir.exists() && dir.isDirectory())
+            setLocal_folder(dir);
     }
 
     /** *******************************************************************<br>
@@ -82,6 +93,9 @@ public class Pie_Encoded_Destination {
      * @return String
      */
     public String create_File_Name(Pie_Config config, int file_number, String source_filename) {
+        if (getLocal_folder() == null)
+            setLocal_folder(Pie_Utils.getTempFolder());
+
         String name = getLocal_folder().isDirectory() ? source_filename : getLocal_folder().getName();
         if (config.getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
             return name;

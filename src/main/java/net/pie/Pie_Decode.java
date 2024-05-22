@@ -164,11 +164,10 @@ public class Pie_Decode {
         if (message == null) {
             if (getConfig().getEncryption() != null) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_FAILED, getConfig().getLanguage()));
-                return null;
             }else{
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) );
-                return null;
             }
+            return null;
         }
 
         if (message[0] == getSplit_tag()) {
@@ -283,7 +282,7 @@ public class Pie_Decode {
                     return null;
                 }
 
-                if (isZero(value) || isModulation() && (Arrays.stream(value).sum() == 0))
+                if (Arrays.stream(value).sum() == 0 || isModulation() && (Arrays.stream(value).sum() == 0))
                     break;
 
                 for (int v : value)
@@ -302,12 +301,6 @@ public class Pie_Decode {
         } catch (IOException ignored) { }
 
         return bytes.toByteArray();
-    }
-
-    private boolean isZero(int[] value) {
-        if (value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] == 0)
-            return true;
-        return false;
     }
 
     /** *******************************************************************<br>

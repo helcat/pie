@@ -1,6 +1,5 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Option;
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -10,9 +9,7 @@ import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
@@ -99,20 +96,28 @@ public class Pie_Utils {
      * get a static folder. Some where files will never be deleted.
      * @return (File)
      */
-    public static File create_Static_Folder(String folder_name) {
-        String staticDirPath = System.getProperty("user.home");
-        if (staticDirPath.startsWith(File.separator))
-            staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
-        else
-            staticDirPath = System.getenv("APPDATA");
+    public static File getStatic_Folder() {
+        return getStatic_Folder(null);
+    }
+    public static File getStatic_Folder(String folder_name) {
+        if (folder_name == null || folder_name.isEmpty())
+            folder_name = "PIE_TEMP";
 
-        if (new File(staticDirPath).exists()) {
-            File folder = new File(file_concat(staticDirPath, folder_name));
-            if (folder.exists())
-                return folder;
-            if (folder.mkdir())
-                return folder;
-        }
+        try {
+            String staticDirPath = System.getProperty("user.home");
+            if (staticDirPath.startsWith(File.separator))
+                staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
+            else
+                staticDirPath = System.getenv("APPDATA");
+
+            if (new File(staticDirPath).exists()) {
+                File folder = new File(file_concat(staticDirPath, folder_name));
+                if (folder.exists())
+                    return folder;
+                if (folder.mkdir())
+                    return folder;
+            }
+        } catch (Exception ignored) { }
 
         return getTempFolder(folder_name);
      }
@@ -121,7 +126,12 @@ public class Pie_Utils {
      * Get a temp folder
      * @return (File)
      */
-     public static File getTempFolder(String folder_name)  {
+    public static File getTempFolder()  {
+        return getTempFolder(null);
+    }
+    public static File getTempFolder(String folder_name)  {
+         if (folder_name == null || folder_name.isEmpty())
+             folder_name = "PIE_Temp";
          // Use Temp Directory
          String tempDirPath = System.getProperty("java.io.tmpdir");
          if (tempDirPath.startsWith(File.separator))

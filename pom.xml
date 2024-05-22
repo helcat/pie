@@ -79,6 +79,6 @@
              </plugin>
          </plugins>
 
-        <finalName>Pie</finalName>
+        <finalName>pie-1.3</finalName>
      </build>
  </project>
