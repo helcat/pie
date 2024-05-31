@@ -4,7 +4,6 @@ import net.pie.enums.*;
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Encode_Source;
 import net.pie.utils.Pie_Size;
-import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,8 +20,8 @@ import java.util.zip.DeflaterOutputStream;
 public class Pie_Encode {
     private Pie_Config config;
     private int[] modulate = new int[]{0,0,0,0};
+    private List<BufferedImage> output_Images = null;
 
-    private Map<Integer, Integer> byte_map = new HashMap<>();
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
@@ -32,7 +31,7 @@ public class Pie_Encode {
      * @see Pie_Config
      **/
     public Pie_Encode (Pie_Config config) {
-        setByte_map(Pie_Utils.create_Encoding_Byte_Map());
+        setOutput_Images(new ArrayList<>());
         ImageIO.setUseCache(false);
 
         if (config == null || config.isError())
@@ -219,11 +218,14 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), data_image,
-                file_number, total_files, getConfig().getEncoder_source().getFile_name()))
-            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
-
-        data_image = null;
+        if (getConfig().getEncoder_destination() != null) {
+            if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), data_image,
+                    file_number, total_files, getConfig().getEncoder_source().getFile_name()))
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
+            data_image = null;
+        }else {
+            getOutput_Images().add(data_image);
+        }
     }
 
     /** ******************************************************<br>
@@ -278,7 +280,7 @@ public class Pie_Encode {
         for (int i : originalArray) {
             if (store == null)
                 store = new int[rbg.length()];
-            store[store_count ++] = (!modulate ? getByte_map().getOrDefault(i, i) : i);
+            store[store_count ++] = (!modulate ? getConfig().getByte_map().getOrDefault(i, i) : i);
             if (store_count < rbg.length())
                 continue;
 
@@ -321,9 +323,7 @@ public class Pie_Encode {
     /**
      * *****************************************************<br>
      * Return a random Value
-     *
      * @param rbg
-     * @return int[]
      */
     private int[] getRandom_Value(String rbg) {
         return new int[]{
@@ -474,7 +474,7 @@ public class Pie_Encode {
      * @return ist<String>
      */
     public List<String> getEncoded_file_list() {
-        if (getConfig() == null)
+        if (getConfig() == null || getConfig().getEncoder_destination() == null)
             return new ArrayList<>();
         return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() :
                 getConfig().getEncoder_destination().getEncoded_file_list();
@@ -517,11 +517,12 @@ public class Pie_Encode {
         this.modulate = modulate;
     }
 
-    public Map<Integer, Integer> getByte_map() {
-        return byte_map;
+
+    public List<BufferedImage> getOutput_Images() {
+        return output_Images;
     }
 
-    public void setByte_map(Map<Integer, Integer> byte_map) {
-        this.byte_map = byte_map;
+    public void setOutput_Images(List<BufferedImage> output_Images) {
+        this.output_Images = output_Images;
     }
 }

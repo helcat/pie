@@ -13,6 +13,8 @@ import net.pie.Pie_Encode;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Pie_Test_Encode {
@@ -29,9 +31,9 @@ public class Pie_Test_Encode {
         //Pie_Encryption encryption = new Pie_Encryption("this a temp1 2st art gfh fgf again");
         Pie_Encode encode = new Pie_Encode(new Pie_ConfigBuilder()
             .add_Pie_Option(Pie_Option.OVERWRITE_FILE)
-            .add_Pie_Encode_Mode(Pie_Encode_Mode.ARGB)
-            .add_Pie_Encryption(new Pie_Encryption(new File(
-                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))
+            //.add_Pie_Encode_Mode(Pie_Encode_Mode.ARGB)
+            //.add_Pie_Encryption(new Pie_Encryption(new File(
+            //         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))
             .add_Pie_Encode_Source(new Pie_Encode_Source(new File(
                     Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))
             .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(new File(

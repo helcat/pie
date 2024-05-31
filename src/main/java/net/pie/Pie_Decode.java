@@ -38,7 +38,7 @@ public class Pie_Decode {
     public Pie_Decode(Pie_Config config) {
         if (config == null || config.isError())
             return;
-        setByte_map(Pie_Utils.create_Decoding_Byte_Map());
+
         setConfig(config);
         ImageIO.setUseCache(false);
         setTotal_files(0);
@@ -269,10 +269,10 @@ public class Pie_Decode {
                     b = (pixelColor & 0xFF);
                     a = ((pixelColor >> 24) & 0xFF);
                     value = new int[]{
-                            isModulation() ? r - modulate[0] : getByte_map().getOrDefault(r, r),
-                            isModulation() ? g - modulate[1] : getByte_map().getOrDefault(g, g),
-                            isModulation() ? b - modulate[2] : getByte_map().getOrDefault(b, b),
-                            isModulation() ? a - modulate[3] : getByte_map().getOrDefault(a, a),
+                            isModulation() ? r - modulate[0] : getConfig().getByte_map().getOrDefault(r, r),
+                            isModulation() ? g - modulate[1] : getConfig().getByte_map().getOrDefault(g, g),
+                            isModulation() ? b - modulate[2] : getConfig().getByte_map().getOrDefault(b, b),
+                            isModulation() ? a - modulate[3] : getConfig().getByte_map().getOrDefault(a, a),
                     };
                 }
 
@@ -452,14 +452,6 @@ public class Pie_Decode {
 
     private void setOutput(Object output) {
         this.output = output;
-    }
-
-    public Map<Integer, Integer> getByte_map() {
-        return byte_map;
-    }
-
-    public void setByte_map(Map<Integer, Integer> byte_map) {
-        this.byte_map = byte_map;
     }
 
     public boolean isModulation() {

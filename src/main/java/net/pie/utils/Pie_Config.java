@@ -2,11 +2,9 @@ package net.pie.utils;
 
 import net.pie.enums.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.*;
+import java.util.logging.Formatter;
 
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>
@@ -49,6 +47,8 @@ public class Pie_Config {
     private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
+    private Map<Integer, Integer> byte_map = new HashMap<>();
+
     public Pie_Config(Object... options) {
         setup(options);
     }
@@ -58,6 +58,7 @@ public class Pie_Config {
     }
 
     private void setup(Object[] options) {
+        setByte_map(Pie_Utils.create_Encoding_Byte_Map());
         setUpLogging();
         if (options == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS, getLanguage()));
@@ -124,16 +125,6 @@ public class Pie_Config {
                     }
                     break;
             }
-        }
-
-        if (this.encoder_destination == null) {
-            if (encoder_source != null &&
-                    encoder_source.getParent_folder() != null && !encoder_source.getParent_folder().isEmpty())
-            this.encoder_destination = new Pie_Encoded_Destination(encoder_source.getParent_folder());
-        }
-
-        if (getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
-            this.setDecoded_Source_destination(new Pie_Decode_Destination());
         }
 
         if (this.log_level != null && this.log_level == Level.OFF)
@@ -380,6 +371,14 @@ public class Pie_Config {
         public String format(LogRecord record) {
             return record.getLevel() + ": " + record.getMessage() + "\n";
         }
+    }
+
+    public Map<Integer, Integer> getByte_map() {
+        return byte_map;
+    }
+
+    public void setByte_map(Map<Integer, Integer> byte_map) {
+        this.byte_map = byte_map;
     }
 
     /** ******************************************************************<br>

@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "enc_background.jpg.png";
+    private String temp_Encoded_Imaage = "background.jpg.png";
     private String temp_Decode_To = "shared";
 
     public static void main(String[] args) {
@@ -31,6 +31,8 @@ public class Pie_Test_Decode {
 
         //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
         //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
+        //new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
+        //new Pie_Decode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")),
 
         // Decoding - Decode the image created
         Pie_Config decoding_config = new Pie_Config(
@@ -38,8 +40,6 @@ public class Pie_Test_Decode {
             Pie_Option.RUN_GC_AFTER_PROCESSING,
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Level.INFO,
-            new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
-            //new Pie_Decode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")),
             new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
             new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
         );
