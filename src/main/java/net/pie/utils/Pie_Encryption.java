@@ -70,15 +70,17 @@ public class Pie_Encryption {
         if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
-        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_TEXT_TO_VARIABLE,
-                new Pie_Decode_Source(file));
+        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, new Pie_Decode_Source(file));
         if (demo)
-            options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, Pie_Option.DECODE_TEXT_TO_VARIABLE,
-                    new Pie_Decode_Source(file));
+            options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, new Pie_Decode_Source(file));
 
         Pie_Decode decoded = new Pie_Decode(new Pie_Config(options));
-        if (decoded.getOutput() != null)
-            key_text = (String) decoded.getOutput();
+        if (decoded.getOutputStream() != null) {
+            if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
+                ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
+                key_text = stream.toString();
+            }
+        }
 
         setPassword(Pie_Utils.isEmpty(key_text) ? null : key_text);
         return !Pie_Utils.isEmpty(key_text);

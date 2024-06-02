@@ -33,29 +33,18 @@ public class Pie_Encode {
     public Pie_Encode (Pie_Config config) {
         setOutput_Images(new ArrayList<>());
         ImageIO.setUseCache(false);
-
-        if (config == null || config.isError())
-            return;
-
         setConfig(config);
-        if (getConfig().getEncoder_source() == null || getConfig().getEncoder_source().getInput() == null) {
-            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_SOURCE, getConfig().getLanguage()));
-            getConfig().setError(true);
-            return;
-        }
+        getConfig().validate_Encoding_Parameters();
 
-        if (getConfig().getEncoder_source().getSource_size() == 0) {
-            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.NO_SOURCE_SIZE, getConfig().getLanguage()));
+        if (getConfig() == null || getConfig().isError()) {
             close();
             return;
         }
 
-        int bufferSize = getConfig().getMax_mb().getMb() * 1024 * 1024; // MAx MB buffer size
-        if (bufferSize > getConfig().getEncoder_source().getSource_size())
-            bufferSize = (int) getConfig().getEncoder_source().getSource_size();
+        int bufferSize = getConfig().getEncoding_bufferSize();
 
-        int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize);
-        files_to_be_created = files_to_be_created + (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
+        int files_to_be_created = Math.toIntExact(getConfig().getEncoder_source().getSource_size() / bufferSize) +
+                (getConfig().getEncoder_source().getSource_size() % bufferSize > 0  ? 1 :0);
 
         if (files_to_be_created > Pie_Constants.MAX_PROTCTED_CREATED_FILES.getParm1()) {
             getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.MAX_FILES_EXCEEDED, getConfig().getLanguage()));

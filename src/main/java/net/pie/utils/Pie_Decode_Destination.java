@@ -23,7 +23,7 @@ public class Pie_Decode_Destination {
      * With no parameters, Pie_Encoded_Destination allows for custom parameters.
      **/
     public Pie_Decode_Destination() {
-        setLocal_folder(Pie_Utils.getDesktop());
+        setLocal_folder(Pie_Utils.getTempFolder());
     }
 
     /** *******************************************************************<br>

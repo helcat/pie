@@ -18,7 +18,7 @@
 
     <groupId>net.pie</groupId>
     <artifactId>pie</artifactId>
-    <version>${pie.version}</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
     <name>${pie.title}</name>
     <description>${pie.title}</description>

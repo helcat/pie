@@ -132,6 +132,45 @@ public class Pie_Config {
     }
 
     /** *********************************************************<br>
+     * validate Decoding Parameters
+     */
+    public void validate_Decoding_Parameters() {
+        if (getDecode_source() == null || getDecode_source().getDecode_object() == null) {
+            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE, getLanguage()));
+            setError(true);
+            return;
+        }
+    }
+
+    /** *********************************************************<br>
+     * validate Encoding Parameters
+     */
+    public void validate_Encoding_Parameters() {
+        if (getEncoder_source() == null || getEncoder_source().getInput() == null) {
+            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_SOURCE, getLanguage()));
+            setError(true);
+            return;
+        }
+
+        if (getEncoder_source().getSource_size() == 0) {
+            logging(Level.SEVERE,Pie_Word.translate(Pie_Word.NO_SOURCE_SIZE, getLanguage()));
+            setError(true);
+            return;
+        }
+    }
+
+    /** *********************************************************<br>
+     *  Encoding bufferSize
+     * @return int
+     */
+    public int getEncoding_bufferSize() {
+        int bufferSize = getMax_mb().getMb() * 1024 * 1024; // MAx MB buffer size
+        if (bufferSize > getEncoder_source().getSource_size())
+            bufferSize = (int) getEncoder_source().getSource_size();
+        return bufferSize;
+    }
+
+    /** *********************************************************<br>
      * Sets up the logging for this class with a random logger name.
      **/
     private void setUpLogging() {
@@ -163,6 +202,9 @@ public class Pie_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
+        if (isError())
+            return;
+
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message);

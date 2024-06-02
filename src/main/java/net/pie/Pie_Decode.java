@@ -21,10 +21,7 @@ public class Pie_Decode {
     private Pie_Config config;
     private int total_files = 0;
     private OutputStream outputStream = null;
-    private String decoded_file_path = null;
     private boolean encrypted = false;
-    private Object output = null;
-    private Map<Integer, Integer> byte_map = new HashMap<>();
     private boolean modulation = false;
     private final byte split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
     private final byte start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
@@ -36,47 +33,13 @@ public class Pie_Decode {
      * @param config configuration file
      **/
     public Pie_Decode(Pie_Config config) {
-        if (config == null || config.isError())
-            return;
-
         setConfig(config);
+        Pie_Utils utils = new Pie_Utils(getConfig());
         ImageIO.setUseCache(false);
         setTotal_files(0);
         setEncrypted(false);
-
-        if (getConfig().isError())
-            return;
-
-        if (getConfig().getDecode_source() == null || getConfig().getDecode_source().getDecode_object() == null) {
-            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE,config.getLanguage()));
-            return;
-        }
-
         setOutputStream(null);
-
-        if (getConfig().getDecoded_Source_destination() == null) {
-            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_DEST_SOURCE, config.getLanguage()));
-            return;
-        }
-
-        process_Decoding();
-
-        if (getConfig().isError() && !getConfig().getOptions().contains(Pie_Option.DO_NOT_DELETE_DESTINATION_FILE_ON_ERROR)) {
-            if (getDecoded_file_path() != null && !getDecoded_file_path().isEmpty()) {
-                File f = new File(getDecoded_file_path());
-                if (f.isFile() && f.delete())
-                    getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DEST_FILE_DELETED, config.getLanguage()) +
-                            " " + f.getName());
-            }
-            setDecoded_file_path(null);
-        }
-    }
-
-    /** *********************************************************<br>
-     * Process : Decode the image/s
-     */
-    private void process_Decoding() {
-        Pie_Utils utils = new Pie_Utils(getConfig());
+        getConfig().validate_Decoding_Parameters();
 
         if (getConfig().isError())
             return;
@@ -84,12 +47,23 @@ public class Pie_Decode {
         int processing_file = 0;
         byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
-            if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE)) {
-                setOutput(new String(message, StandardCharsets.UTF_8));
-                getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODED_TO_VALUE_USING, getConfig().getLanguage()) +
-                        " getOutput()");
-            }else{
-                setUpOutFile(getConfig().getDecoded_Source_destination().getFile_name());
+            if (getSource_type().equals(Pie_Source_Type.TEXT)) {
+                setOutputStream(new ByteArrayOutputStream());
+                try {
+                    getOutputStream().write(message);
+                } catch (IOException e) {
+                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.WRITING_TO_STREAM_ERROR, getConfig().getLanguage()) +
+                            " : " + e.getMessage());
+                    return;
+                }
+
+            }else if (getSource_type().equals(Pie_Source_Type.FILE)) {
+
+                if (getConfig().getDecoded_Source_destination() == null)
+                    setOutputStream(new ByteArrayOutputStream());
+                else
+                    setup_FileOutputstream();
+
                 if (!getConfig().isError()) {
                     while (processing_file < getTotal_files()) {
                         try {
@@ -107,7 +81,12 @@ public class Pie_Decode {
                         }
                     }
                 }
-                closeOutFile();
+                try {
+                    if (getOutputStream() != null) {
+                        getOutputStream().close();
+                        setOutputStream(null);
+                    }
+                } catch (IOException ignored) {  }
             }
             message = null;
         }
@@ -120,13 +99,34 @@ public class Pie_Decode {
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
             getConfig().exit_Logging();
 
-        // Error
-        if (getConfig().isError()) {
-            getConfig().getDecode_source().close();
-        }else {
+        if (!getConfig().isError())
             getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
+    }
+
+    /** *********************************************************<br>
+     * setup FileOutputstream
+     */
+    private void setup_FileOutputstream() {
+        String file_name = getConfig().getDecoded_Source_destination().getFile_name();
+        if (getConfig().getDecoded_Source_destination().getLocal_folder() != null &&
+                getConfig().getDecoded_Source_destination().getLocal_folder().isDirectory()) {
+            File decoded_file = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
+            try {
+                if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && decoded_file.exists()) {
+                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ERROR, getConfig().getLanguage()) +
+                            " : " + file_name + " " + Pie_Word.translate(Pie_Word.ALREADY_EXISTS, getConfig().getLanguage()));
+                    return;
+                }
+
+                setOutputStream(new FileOutputStream(decoded_file));
+            } catch (FileNotFoundException e) {
+                setOutputStream(null);
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.CREATING_STREAM_ERROR, getConfig().getLanguage()) +
+                        " : " + e.getMessage());
+            }
         }
     }
+
 
     /** *********************************************************<br>
      * Start Main Decodin
@@ -317,53 +317,10 @@ public class Pie_Decode {
             }
             // Source type
             setSource_type(Pie_Source_Type.get(options[1]));
-            if (getConfig().getOptions().contains(Pie_Option.DECODE_TEXT_TO_VARIABLE) &&
-                    !getSource_type().equals(Pie_Source_Type.TEXT)) {
-                getConfig().logging(Level.SEVERE,
-                        "Pie_Option.DECODE_TEXT_TO_VARIABLE " +
-                                Pie_Word.translate(Pie_Word.CANNOT_BE_USED_WITH, getConfig().getLanguage()) + " " +
-                                        getSource_type().toString());
-                return false;
-            }
+
             return true;
         } catch (Exception ignored) { }
         return false;
-    }
-
-    /** *******************************************************************<br>
-     * Set up the output stream
-     * @param file_name (String)
-     */
-    private void setUpOutFile(String file_name) {
-        if (getConfig().getDecoded_Source_destination().getLocal_folder() != null && getConfig().getDecoded_Source_destination().getLocal_folder().isDirectory()) {
-            File f = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
-            try {
-                if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && f.exists()) {
-                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ERROR, getConfig().getLanguage()) +
-                            " : " + file_name + " " + Pie_Word.translate(Pie_Word.ALREADY_EXISTS, getConfig().getLanguage()));
-                    return;
-                }
-
-                setOutputStream(new FileOutputStream(f));
-                setDecoded_file_path(f.getPath());
-            } catch (FileNotFoundException e) {
-                setOutputStream(null);
-                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.CREATING_STREAM_ERROR, getConfig().getLanguage()) +
-                        " : " + e.getMessage());
-            }
-        }
-    }
-
-    /** *******************************************************************<br>
-     * Close Outputstream
-     */
-    private void closeOutFile() {
-        try {
-            if (getOutputStream() != null) {
-                getOutputStream().close();
-                setOutputStream(null);
-            }
-        } catch (IOException ignored) {  }
     }
 
     /** *******************************************************************<br>
@@ -418,24 +375,11 @@ public class Pie_Decode {
     private void setTotal_files(int total_files) {
         this.total_files = total_files;
     }
-    private OutputStream getOutputStream() {
+    public OutputStream getOutputStream() {
         return outputStream;
     }
-    private void setOutputStream(OutputStream outputStream) {
+    public void setOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
-    }
-
-    /** *******************************************************************<br>
-     * getDecoded_file_path<br>
-     * returns the location of the decoded file path to use in your own application if required.<br>
-     * @return String
-     */
-    public String getDecoded_file_path() {
-        return decoded_file_path == null ? "" : decoded_file_path;
-    }
-
-    private void setDecoded_file_path(String decoded_file_path) {
-        this.decoded_file_path = decoded_file_path;
     }
 
     public boolean isEncrypted() {
@@ -444,14 +388,6 @@ public class Pie_Decode {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
-    }
-
-    public Object getOutput() {
-        return output;
-    }
-
-    private void setOutput(Object output) {
-        this.output = output;
     }
 
     public boolean isModulation() {

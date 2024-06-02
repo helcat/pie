@@ -89,11 +89,11 @@ public class Pie_Encode_Source {
                         setType(Pie_Source_Type.FILE);
                         setParent_folder(f.getAbsolutePath());
                     } catch (FileNotFoundException e) {
-                        setError_code(Pie_Word.INVALID_FILE);
+                        setError_code(Pie_Word.NO_SOURCE);
                         return;
                     }
                 }else{
-                    setError_code(Pie_Word.INVALID_FILE);
+                    setError_code(Pie_Word.NO_SOURCE);
                     return;
                 }
                 break;

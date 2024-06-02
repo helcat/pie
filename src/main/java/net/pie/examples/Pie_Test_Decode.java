@@ -41,11 +41,11 @@ public class Pie_Test_Decode {
             Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
             Level.INFO,
             new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
-            new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
+            new Pie_Decode_Destination()
+            //new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
         );
 
         Pie_Decode decoded = new Pie_Decode(decoding_config);
-        System.out.println("Decoded to " + decoded.getDecoded_file_path());
         System.out.println("Has Error " + decoded.isDecoding_Error());
         System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
     }
