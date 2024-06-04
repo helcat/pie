@@ -48,5 +48,9 @@ public class Pie_Test_Decode {
         Pie_Decode decoded = new Pie_Decode(decoding_config);
         System.out.println("Has Error " + decoded.isDecoding_Error());
         System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
+        System.out.println("File - " + decoded.getOutput_location());
+
+        if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
+            System.out.println("File - Created");
     }
 }

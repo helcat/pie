@@ -91,6 +91,8 @@ public enum Pie_Word {
 
 	TEXT ("text", "texte", "testo", "texto"),
 
+	UNKNOWN ("Unknown", "Inconnue", "Sconosciuto", "Desconocido"),
+
 	URL_ERROR ("URL Error", "Erreur d'URL", "Errore nell'URL", "Error de URL"),
 
 	NO_BROWSER ("Could not find web browser", "Impossible de trouver le navigateur Web", "Impossibile trovare il browser web",

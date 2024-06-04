@@ -26,6 +26,7 @@ public class Pie_Decode {
     private final byte split_tag = Pie_Constants.PARM_SPLIT_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
     private final byte start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
     private Pie_Source_Type source_type = null;
+    private String output_location = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -40,6 +41,7 @@ public class Pie_Decode {
         setEncrypted(false);
         setOutputStream(null);
         getConfig().validate_Decoding_Parameters();
+        setOutput_location(null);
 
         if (getConfig().isError())
             return;
@@ -47,7 +49,7 @@ public class Pie_Decode {
         int processing_file = 0;
         byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
-            if (getSource_type().equals(Pie_Source_Type.TEXT)) {
+            if (getSource_type().equals(Pie_Source_Type.TEXT)) { // Text
                 setOutputStream(new ByteArrayOutputStream());
                 try {
                     getOutputStream().write(message);
@@ -57,7 +59,7 @@ public class Pie_Decode {
                     return;
                 }
 
-            }else if (getSource_type().equals(Pie_Source_Type.FILE)) {
+            }else if (getSource_type().equals(Pie_Source_Type.FILE)) { // File
 
                 if (getConfig().getDecoded_Source_destination() == null)
                     setOutputStream(new ByteArrayOutputStream());
@@ -108,8 +110,7 @@ public class Pie_Decode {
      */
     private void setup_FileOutputstream() {
         String file_name = getConfig().getDecoded_Source_destination().getFile_name();
-        if (getConfig().getDecoded_Source_destination().getLocal_folder() != null &&
-                getConfig().getDecoded_Source_destination().getLocal_folder().isDirectory()) {
+        if (Pie_Utils.isDirectory(getConfig().getDecoded_Source_destination().getLocal_folder())) {
             File decoded_file = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
             try {
                 if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && decoded_file.exists()) {
@@ -119,6 +120,7 @@ public class Pie_Decode {
                 }
 
                 setOutputStream(new FileOutputStream(decoded_file));
+                setOutput_location(decoded_file.getAbsolutePath());
             } catch (FileNotFoundException e) {
                 setOutputStream(null);
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.CREATING_STREAM_ERROR, getConfig().getLanguage()) +
@@ -126,7 +128,6 @@ public class Pie_Decode {
             }
         }
     }
-
 
     /** *********************************************************<br>
      * Start Main Decodin
@@ -412,5 +413,13 @@ public class Pie_Decode {
 
     public void setSource_type(Pie_Source_Type source_type) {
         this.source_type = source_type;
+    }
+
+    public String getOutput_location() {
+        return output_location;
+    }
+
+    public void setOutput_location(String output_location) {
+        this.output_location = output_location;
     }
 }

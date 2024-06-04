@@ -46,6 +46,15 @@ public class Pie_Utils {
     }
 
     /** *******************************************************<br>
+     * is Directory
+     * @param file File
+     * @return boolean
+     */
+    public static boolean isDirectory(File file) {
+        return (file != null && file.exists() && file.isDirectory());
+    }
+
+    /** *******************************************************<br>
      * <b>get path to desktop</b><br>
      * STATIC METHOD. use Pie_Utils.getDesktopPath() note this is optional.<br>
      * Not required just handy if you need it.<br>
@@ -100,7 +109,7 @@ public class Pie_Utils {
         return getStatic_Folder(null);
     }
     public static File getStatic_Folder(String folder_name) {
-        if (folder_name == null || folder_name.isEmpty())
+        if (isEmpty(folder_name))
             folder_name = "PIE_TEMP";
 
         try {
@@ -130,7 +139,7 @@ public class Pie_Utils {
         return getTempFolder(null);
     }
     public static File getTempFolder(String folder_name)  {
-         if (folder_name == null || folder_name.isEmpty())
+         if (isEmpty(folder_name ))
              folder_name = "PIE_Temp";
          // Use Temp Directory
          String tempDirPath = System.getProperty("java.io.tmpdir");

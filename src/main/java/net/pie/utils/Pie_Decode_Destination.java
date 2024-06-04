@@ -36,14 +36,14 @@ public class Pie_Decode_Destination {
             return;
         }
 
-       if (o instanceof File && ((File) o).exists() && ((File) o).isDirectory()) {
+       if (o instanceof File && ((File) o).exists() && Pie_Utils.isDirectory((File) o)) {
             setLocal_folder((File) o);
             return;
         }
 
         if (o instanceof String) {
             File f = new File((String) o);
-            if (f.exists() && f.isDirectory())
+            if (Pie_Utils.isDirectory(f))
                 setLocal_folder(f);
             return;
         }

@@ -4,6 +4,7 @@ import net.pie.enums.*;
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Encode_Source;
 import net.pie.utils.Pie_Size;
+import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -438,8 +439,15 @@ public class Pie_Encode {
                 getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
                 getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1;
 
-        String filename = getConfig().getEncoder_source().getFile_name() != null &&
-                !getConfig().getEncoder_source().getFile_name().isEmpty() ? getConfig().getEncoder_source().getFile_name() : "";
+        String filename = !Pie_Utils.isEmpty(getConfig().getEncoder_source().getFile_name()) ?
+                getConfig().getEncoder_source().getFile_name() : "";
+
+        if (Pie_Utils.isEmpty(filename)) {
+            if (getConfig().getEncoder_source().getType().equals(Pie_Source_Type.TEXT))
+                filename = Pie_Word.translate(Pie_Word.TEXT, getConfig().getLanguage()) + ".txt";
+            else
+                filename = Pie_Word.translate(Pie_Word.UNKNOWN, getConfig().getLanguage());
+        }
 
         StringBuilder addon_files = new StringBuilder();
         if (zip)

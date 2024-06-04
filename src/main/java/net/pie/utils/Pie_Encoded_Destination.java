@@ -38,7 +38,7 @@ public class Pie_Encoded_Destination {
      **/
     public Pie_Encoded_Destination(String file) {
         File dir = new File(file);
-        if (dir.exists() && dir.isDirectory())
+        if (Pie_Utils.isDirectory(dir))
             setLocal_folder(dir);
     }
 
@@ -47,7 +47,16 @@ public class Pie_Encoded_Destination {
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/
     public Pie_Encoded_Destination(File file) {
-        setLocal_folder(file);
+        if (Pie_Utils.isDirectory(file)) {
+            setLocal_folder(file);
+        }else{
+            if (file == null) {
+                setLocal_folder(Pie_Utils.getTempFolder());
+            }else{
+                if (file.isFile())
+                    setLocal_folder(file.getParentFile());
+            }
+        }
     }
 
     /** *******************************************************************<br>
@@ -96,7 +105,7 @@ public class Pie_Encoded_Destination {
         if (getLocal_folder() == null)
             setLocal_folder(Pie_Utils.getTempFolder());
 
-        String name = getLocal_folder().isDirectory() ? source_filename : getLocal_folder().getName();
+        String name = Pie_Utils.isDirectory(getLocal_folder()) ? source_filename : getLocal_folder().getName();
         if (config.getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
             return name;
 
@@ -128,8 +137,7 @@ public class Pie_Encoded_Destination {
     private File addFileNumber(Pie_Config config, int file_number, String source_filename) {
         boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
         String name = create_File_Name(config, file_number, source_filename);
-        File file = new File(
-            getLocal_folder().isDirectory() ?
+        File file = new File(Pie_Utils.isDirectory(getLocal_folder()) ?
             getLocal_folder().getAbsolutePath() + File.separator + name
             :
             getLocal_folder().getAbsolutePath().substring(0,
@@ -159,7 +167,7 @@ public class Pie_Encoded_Destination {
      * @param source_filename (int)
      */
     private String getZip_File_Name(String source_filename) {
-        String name = getLocal_folder().isDirectory() ? source_filename  : getLocal_folder().getName();
+        String name = Pie_Utils.isDirectory(getLocal_folder()) ? source_filename  : getLocal_folder().getName();
         if (!name.toLowerCase().endsWith(".zip"))
             name = name + ".zip";
         return name;
@@ -171,8 +179,7 @@ public class Pie_Encoded_Destination {
      */
     private File create_Zip_File(Pie_Config config, String name) {
         boolean overwrite = config.getOptions().contains(Pie_Option.OVERWRITE_FILE);
-        File file = new File(
-                getLocal_folder().isDirectory() ?
+        File file = new File(Pie_Utils.isDirectory(getLocal_folder()) ?
                         getLocal_folder().getAbsolutePath() + File.separator + name
                         :
                         getLocal_folder().getAbsolutePath().substring(0,
@@ -196,7 +203,7 @@ public class Pie_Encoded_Destination {
      **/
     private void setLocal_folder(File local_folder) {
         if (local_folder != null) {
-            if (local_folder.exists() && local_folder.isDirectory()) {
+            if (Pie_Utils.isDirectory(local_folder)) {
                 this.local_folder = local_folder;
             } else {
                 this.local_folder = local_folder.getParentFile();
