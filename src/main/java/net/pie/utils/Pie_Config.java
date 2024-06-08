@@ -37,7 +37,7 @@ public class Pie_Config {
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
     private Pie_Decode_Source decode_source = null;
-    private Pie_Decode_Destination  decoded_Source_destination = null;
+    private Pie_Decode_Destination  decoded_destination = null;
 
     private Level log_level = Level.SEVERE;
     private boolean error = false;
@@ -117,8 +117,8 @@ public class Pie_Config {
                     }
                     break;
                 case "Pie_Decode_Destination":
-                    this.decoded_Source_destination = (Pie_Decode_Destination) o;
-                    if (this.decoded_Source_destination.getError_code() != null) {
+                    this.decoded_destination = (Pie_Decode_Destination) o;
+                    if (this.decoded_destination.getError_code() != null) {
                         logging(Level.SEVERE, Pie_Word.translate(this.decode_source.getError_code(), getLanguage()));
                         setError(true);
                         return;
@@ -360,12 +360,12 @@ public class Pie_Config {
         this.options = options;
     }
 
-    public Pie_Decode_Destination getDecoded_Source_destination() {
-        return decoded_Source_destination;
+    public Pie_Decode_Destination getDecoded_destination() {
+        return decoded_destination;
     }
 
-    private void setDecoded_Source_destination(Pie_Decode_Destination decoded_Source_destination) {
-        this.decoded_Source_destination = decoded_Source_destination;
+    public void setDecoded_destination(Pie_Decode_Destination decoded_destination) {
+        this.decoded_destination = decoded_destination;
     }
 
     public Pie_Encode_Max_MB getMax_mb() {

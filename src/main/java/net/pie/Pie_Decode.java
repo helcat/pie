@@ -5,6 +5,7 @@ import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.enums.Pie_Word;
 import net.pie.utils.Pie_Config;
+import net.pie.utils.Pie_Decode_Destination;
 import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
@@ -61,7 +62,7 @@ public class Pie_Decode {
 
             }else if (getSource_type().equals(Pie_Source_Type.FILE)) { // File
 
-                if (getConfig().getDecoded_Source_destination() == null)
+                if (getConfig().getDecoded_destination() == null)
                     setOutputStream(new ByteArrayOutputStream());
                 else
                     setup_FileOutputstream();
@@ -109,9 +110,9 @@ public class Pie_Decode {
      * setup FileOutputstream
      */
     private void setup_FileOutputstream() {
-        String file_name = getConfig().getDecoded_Source_destination().getFile_name();
-        if (Pie_Utils.isDirectory(getConfig().getDecoded_Source_destination().getLocal_folder())) {
-            File decoded_file = new File(getConfig().getDecoded_Source_destination().getLocal_folder() + File.separator + file_name);
+        String file_name = getConfig().getDecoded_destination().getFile_name();
+        if (Pie_Utils.isDirectory(getConfig().getDecoded_destination().getLocal_folder())) {
+            File decoded_file = new File(getConfig().getDecoded_destination().getLocal_folder() + File.separator + file_name);
             try {
                 if (!getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE) && decoded_file.exists()) {
                     getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ERROR, getConfig().getLanguage()) +
@@ -123,6 +124,7 @@ public class Pie_Decode {
                 setOutput_location(decoded_file.getAbsolutePath());
             } catch (FileNotFoundException e) {
                 setOutputStream(null);
+                setOutput_location(null);
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.CREATING_STREAM_ERROR, getConfig().getLanguage()) +
                         " : " + e.getMessage());
             }
@@ -148,14 +150,12 @@ public class Pie_Decode {
         try {
             if (isModulation())
                 message = Base64.getDecoder().decode(message);
-        } catch (Exception e) {
-            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.BASE_ENCODING_ERROR, getConfig().getLanguage()) +
-                    " " + e.getMessage());
+        } catch (Exception ignored) {  }
+
+        if (message == null) {
+            getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.BASE_ENCODING_ERROR, getConfig().getLanguage()));
             return null;
         }
-
-        if (message == null)
-            return null;
 
         message = utils.decompress_return_bytes(message);
         if (message == null)
@@ -163,11 +163,10 @@ public class Pie_Decode {
 
         message = getConfig().getEncryption() != null ? getConfig().getEncryption().decrypt(getConfig(), message) : message;
         if (message == null) {
-            if (getConfig().getEncryption() != null) {
+            if (getConfig().getEncryption() != null)
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_FAILED, getConfig().getLanguage()));
-            }else{
+            else
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) );
-            }
             return null;
         }
 
@@ -194,7 +193,6 @@ public class Pie_Decode {
 
         } else if (message[0] == getStart_tag()) {
             message = Arrays.copyOfRange(message, 1, message.length);
-
         } else {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_FILE, getConfig().getLanguage()) );
             return null;
@@ -254,10 +252,10 @@ public class Pie_Decode {
 
                 if (x == 0 && y == 0) {
                     value = new int[]{
-                            ((pixelColor >> 16) & 0xFF) - modulate[0],
-                            ((pixelColor >> 8) & 0xFF) - modulate[1],
-                            (pixelColor & 0xFF) - modulate[2],
-                            ((pixelColor >> 24) & 0xFF) - modulate[3]
+                        ((pixelColor >> 16) & 0xFF) - modulate[0],
+                        ((pixelColor >> 8) & 0xFF) - modulate[1],
+                        (pixelColor & 0xFF) - modulate[2],
+                        ((pixelColor >> 24) & 0xFF) - modulate[3]
                     };
 
                     modulate = value;
@@ -270,10 +268,10 @@ public class Pie_Decode {
                     b = (pixelColor & 0xFF);
                     a = ((pixelColor >> 24) & 0xFF);
                     value = new int[]{
-                            isModulation() ? r - modulate[0] : getConfig().getByte_map().getOrDefault(r, r),
-                            isModulation() ? g - modulate[1] : getConfig().getByte_map().getOrDefault(g, g),
-                            isModulation() ? b - modulate[2] : getConfig().getByte_map().getOrDefault(b, b),
-                            isModulation() ? a - modulate[3] : getConfig().getByte_map().getOrDefault(a, a),
+                        isModulation() ? r - modulate[0] : getConfig().getByte_map().getOrDefault(r, r),
+                        isModulation() ? g - modulate[1] : getConfig().getByte_map().getOrDefault(g, g),
+                        isModulation() ? b - modulate[2] : getConfig().getByte_map().getOrDefault(b, b),
+                        isModulation() ? a - modulate[3] : getConfig().getByte_map().getOrDefault(a, a),
                     };
                 }
 
@@ -330,13 +328,15 @@ public class Pie_Decode {
      */
     private void collect_encoded_parms(byte[] add_on_bytes) {
         getConfig().getDecode_source().setAddon_Files(null);
+        if (getConfig().getDecoded_destination() == null)
+            getConfig().setDecoded_destination(new Pie_Decode_Destination());
         try {
             String parms = new String(add_on_bytes, StandardCharsets.UTF_8);
             int parm = 0;
             if (parms.contains("?")) {
                 Stream<String> stream = Pattern.compile("\\?").splitAsStream(parms);
                 List<String> partsList = stream.collect(Collectors.toList());
-                getConfig().getDecoded_Source_destination().setFile_name(partsList.get(parm ++));                   // 0
+                getConfig().getDecoded_destination().setFile_name(partsList.get(parm ++));                   // 0
                 setTotal_files(Integer.parseInt(partsList.get(parm ++).replaceAll("\\D", "")));    // 1
                 String files = partsList.get(parm ++);                                                              // 2
                 if (!files.isEmpty()) {
