@@ -26,16 +26,15 @@ import java.util.logging.Formatter;
  **/
 public class Pie_Config {
     private List<Pie_Option> options = new ArrayList<>();
-    private Pie_Size encoder_Maximum_Image = new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(),
-            Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     private Pie_Encryption encryption = null;
-    private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB(200);
+    private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB();
     private Pie_Zip encoder_storage = null;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
 
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
+
     private Pie_Decode_Source decode_source = null;
     private Pie_Decode_Destination  decoded_destination = null;
 
@@ -47,8 +46,6 @@ public class Pie_Config {
     private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
-    private Map<Integer, Integer> byte_map = new HashMap<>();
-
     public Pie_Config(Object... options) {
         setup(options);
     }
@@ -58,7 +55,6 @@ public class Pie_Config {
     }
 
     private void setup(Object[] options) {
-        setByte_map(Pie_Utils.create_Encoding_Byte_Map());
         setUpLogging();
         if (options == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS, getLanguage()));
@@ -306,29 +302,7 @@ public class Pie_Config {
      * @see Pie_Size
      */
     public Pie_Size getEncoder_Maximum_Image() {
-        return encoder_Maximum_Image;
-    }
-
-    /** *******************************************************************<br>
-     * <b>setEncoder_Maximum_Image</b><br>
-     * Sets the maximum size the encoded image can be. If any of the parameters is zero the size is ignored.<br>
-     * default is 15000, this should stop the application from going out of memory.<br>
-     * However, if the application does go out of memory decrease this parameter or increase the memory size.<br>
-     * @param encoder_Maximum_Image (new Pie_Size)
-     * @see Pie_Size
-     **/
-    public void setEncoder_Maximum_Image(Pie_Size encoder_Maximum_Image) {
-        this.encoder_Maximum_Image = encoder_Maximum_Image;
-    }
-
-    /** ******************************************************************<br>
-     * Quick way to determine if a Max image is required.
-     * @return boolean
-     */
-    public boolean hasEncoder_Maximum_Image() {
-        return getEncoder_Maximum_Image() != null &&
-                getEncoder_Maximum_Image().getHeight() != 0 &&
-                getEncoder_Maximum_Image().getWidth() != 0;
+        return new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
     }
 
     /** ******************************************************************<br>
@@ -413,14 +387,6 @@ public class Pie_Config {
         public String format(LogRecord record) {
             return record.getLevel() + ": " + record.getMessage() + "\n";
         }
-    }
-
-    public Map<Integer, Integer> getByte_map() {
-        return byte_map;
-    }
-
-    public void setByte_map(Map<Integer, Integer> byte_map) {
-        this.byte_map = byte_map;
     }
 
     /** ******************************************************************<br>

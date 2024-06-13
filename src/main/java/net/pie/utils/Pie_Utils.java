@@ -55,6 +55,15 @@ public class Pie_Utils {
     }
 
     /** *******************************************************<br>
+     *
+     * @param file File
+     * @return boolean
+     */
+    public static boolean isFile(File file) {
+        return (file != null && file.exists() && file.isFile());
+    }
+
+    /** *******************************************************<br>
      * <b>get path to desktop</b><br>
      * STATIC METHOD. use Pie_Utils.getDesktopPath() note this is optional.<br>
      * Not required just handy if you need it.<br>
@@ -161,6 +170,20 @@ public class Pie_Utils {
 
     /** **************************************************************<br>
      * There are no dependancies with this jar so can not use FilenameUtils.concat
+     * @param original (File)
+     * @param addon (String)
+     * @return (File)
+     */
+    public static File file_concat(File original, String addon) {
+        return new File(original.getAbsolutePath() +
+                (!isEmpty(addon) ?
+                        (original.getAbsolutePath().endsWith(File.separator) ? "" : File.separator) +
+                        (addon.startsWith(File.separator) ? (addon.substring(1)) : addon )
+                        : "")
+                );
+    }
+    /** **************************************************************<br>
+     * There are no dependancies with this jar so can not use FilenameUtils.concat
      * @param original (String)
      * @param addon (String)
      * @return (String)
@@ -216,32 +239,6 @@ public class Pie_Utils {
             throw new RuntimeException(e);
         }
     }
-
-    /** *********************************************************<br>
-     * create Byte Map - Encoding
-     * @return Map<Integer, Integer>
-     */
-    public static Map<Integer, Integer> create_Encoding_Byte_Map() {
-        Map<Integer, Integer> map = new HashMap<>();
-        int new_Value = Byte.MAX_VALUE + 1;
-        for (int i = Byte.MIN_VALUE; i < 0; i++) {
-            map.put(i, new_Value ++);
-        }
-        return map;
-    };
-
-    /** *********************************************************<br>
-     * create Byte Map - Decoding
-     * @return Map<Integer, Integer>
-     */
-    public static Map<Integer, Integer> create_Decoding_Byte_Map() {
-        Map<Integer, Integer> map = new HashMap<>();
-        int new_Value = Byte.MAX_VALUE + 1;
-        for (int i = Byte.MIN_VALUE; i < 0; i++) {
-            map.put(new_Value ++, i);
-        }
-        return map;
-    };
 
     public static boolean isEmpty(String in) {
         return in == null || in.trim().isEmpty();

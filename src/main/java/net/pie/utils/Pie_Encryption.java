@@ -43,7 +43,7 @@ public class Pie_Encryption {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File) {
-            if (!((File) parm).isFile() || !read_Certificate(((File) parm)))
+            if (!Pie_Utils.isFile(((File) parm)) || !read_Certificate(((File) parm)))
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
 
         } else if (parm instanceof String) {
@@ -67,7 +67,7 @@ public class Pie_Encryption {
         return read_Certificate(file, false);
     }
     public boolean read_Certificate(File file, boolean demo) {
-        if (file == null || !file.getName().toLowerCase().endsWith(".pie"))
+        if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
         List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, new Pie_Decode_Source(file));

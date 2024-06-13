@@ -160,17 +160,12 @@ public class Pie_Encode {
                 out.write(originalArray);
                 out.close();
             } catch (IOException e) {
-                getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.COMPRESSION_FAILED, getConfig().getLanguage()) +
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.COMPRESSION_FAILED, getConfig().getLanguage()) +
                         " " + e.getMessage());
+                return;
             }
 
-            // Base 64 find_repeated_patterns
-            if (getConfig().getOptions().contains(Pie_Option.MODULATION)) {
-                originalArray = Base64.getEncoder().encode(baos.toByteArray().length < originalArray.length ? baos.toByteArray() : originalArray);
-            }else {
-                if (baos.toByteArray().length < originalArray.length)
-                    originalArray = baos.toByteArray();
-            }
+            originalArray = Base64.getEncoder().encode(baos.toByteArray());
 
             try {
                 baos.close();
@@ -184,7 +179,7 @@ public class Pie_Encode {
         }
 
         try {
-            image_size = calculate_image_Mode(originalArray.length);
+            image_size = calculate_image_Size(originalArray.length, getConfig().getEncoder_mode());
         } catch (Exception e) {
             getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.UNABLE_To_READ_FILE, getConfig().getLanguage())+
                     " " + e.getMessage());
@@ -231,18 +226,18 @@ public class Pie_Encode {
         if (getConfig().getEncoder_mode().getParm1().contains("A") || getConfig().getEncoder_mode().getParm1().contains("T"))
             image_type = BufferedImage.TYPE_INT_ARGB;
         return buildImage(new BufferedImage(image_size.getWidth(), image_size.getHeight(), image_type),
-                image_size, originalArray, getConfig().getEncoder_mode().getParm1(), has_Been_Encrypted );
+                image_size, originalArray, has_Been_Encrypted );
     }
 
     /** *********************************************************<br>
      * Red, Green, or Blue Only
      * @param data_image (BufferedImage)
      * @param originalArray (byte[])
-     * @param rbg (String)
      * @return BufferedImage
      */
-    private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray, String rbg,
+    private BufferedImage buildImage(BufferedImage data_image, Pie_Size size, byte[] originalArray,
             boolean has_Been_Encrypted) {
+        String rbg = getConfig().getEncoder_mode().getParm1();
         int x =0, y = 0, store_count = 0;
         boolean transparent = rbg.contains("T");
         rbg = rbg.replace("T", "");
@@ -262,15 +257,15 @@ public class Pie_Encode {
         data_image.setRGB(x++, y, new Color(
                 (has_Been_Encrypted ? 1 : 0) + getModulate()[0],                     // Encrypted Yes - No
                 getConfig().getEncoder_source().getType().ordinal() + getModulate()[1], // encode content type
-                getModulate()[2],                               // Spare
-                getModulate()[3]                                // Spare
+                getConfig().getEncoder_mode().ordinal() + getModulate()[2],             // encode mode
+                getModulate()[3]                                                        // Spare
                 ).getRGB());
 
         int[] store = null;
         for (int i : originalArray) {
             if (store == null)
                 store = new int[rbg.length()];
-            store[store_count ++] = (!modulate ? getConfig().getByte_map().getOrDefault(i, i) : i);
+            store[store_count ++] = i;
             if (store_count < rbg.length())
                 continue;
 
@@ -313,7 +308,7 @@ public class Pie_Encode {
     /**
      * *****************************************************<br>
      * Return a random Value
-     * @param rbg
+     * @param rbg String
      */
     private int[] getRandom_Value(String rbg) {
         return new int[]{
@@ -340,47 +335,14 @@ public class Pie_Encode {
     }
 
     /** ******************************************************<br>
-     * <b>Calculate image Mode</b>
-     * @param length (int)
-     * @return Pie_Size
-     */
-    private Pie_Size calculate_image_Mode(int length) {
-        Pie_Size image_size = null;
-        switch (getConfig().getEncoder_mode().getParm1().length()) {
-            case 1 :
-                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 1
-                if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.GB); // try 2
-                if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.RGB); // try 3
-                break;
-            case 2 :
-                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());   // try 2
-                if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.RGB);
-                break;
-            case 3 :
-                image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
-                if (image_size == null)
-                    image_size = calculate_image_Size(length, Pie_Encode_Mode.ARGB); // try 4
-                break;
-
-            case 4 : image_size = calculate_image_Size(length, getConfig().getEncoder_mode());
-                break;
-        }
-
-        return image_size;
-    }
-
-    /** ******************************************************<br>
      * <b>Calculate image Size</b><br>
      * @param length (int)
      * @param mode (Pie_Encode_Mode)
      * @return Pie_Size
      */
     private Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
-        Pie_Size image_size = getPieSize((double) length, mode);
-        if (getConfig().hasEncoder_Maximum_Image()) {
+        Pie_Size image_size = getPieSize(((double) length + 5), mode); // add 5 pixels
+        if (hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) >
                     getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
                 getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.IMAGE_SIZE_WOULD_BE, getConfig().getLanguage())
@@ -398,6 +360,15 @@ public class Pie_Encode {
         return image_size;
     }
 
+    /** ******************************************************************<br>
+     * Quick way to determine if a Max image is required.
+     * @return boolean
+     */
+    private boolean hasEncoder_Maximum_Image() {
+        return getConfig().getEncoder_Maximum_Image() != null &&
+                getConfig().getEncoder_Maximum_Image().getHeight() != 0 &&
+                getConfig().getEncoder_Maximum_Image().getWidth() != 0;
+    }
     /** ******************************************************<br>
      * getPieSize
      * @param length (double)

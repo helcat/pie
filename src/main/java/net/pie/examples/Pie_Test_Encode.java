@@ -16,11 +16,15 @@ import net.pie.utils.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "background.jpg";
-    private String temp_Encoded_Image = "background.jpg";
+    private String temp_To_Be_Encoded = "Test_File.jpg";
+    private String temp_Encoded_Image = "Test_File.jpg";
+
+    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "Test_File.jpg"));
+    public static File folder = Pie_Utils.getDesktop();
 
     public static void main(String[] args) {
         new Pie_Test_Encode(args != null && args.length != 0 ?  args[0] : null);
@@ -28,17 +32,34 @@ public class Pie_Test_Encode {
 
     public Pie_Test_Encode(String arg) {
 
+        Pie_Config config = new Pie_ConfigBuilder()
+                .add_Pie_Encode_Source(new Pie_Encode_Source(new Pie_Text("Hello")))					// File to be encoded
+                .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(folder))   	// Folder to place encoded file
+                .add_Log_Level(Level.INFO)												// Optional logging level
+                .add_Pie_Encode_Max_MB(new Pie_Encode_Max_MB(200))						// Optional largest file allowed before slicing Default is 500 MB
+                .add_Pie_Encode_Mode(Pie_Encode_Mode.RGBT)								// Optional Default is Pie_Encode_Mode.ARGB See Pie_Encode_Mode Examples
+                .add_Pie_Encryption(new Pie_Encryption("my password"))			// Optional Encryption. See Encryption Examples
+                .add_Pie_Shape(Pie_Shape.SHAPE_SQUARE)									// Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
+                .add_Pie_Zip(new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ALWAYS))	// Optional Default is new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED)
+                .add_Pie_Option(Pie_Option.MODULATION, Pie_Option.OVERWRITE_FILE,		// Optional set Pie_Option's as required. See Pie_Option examples
+                        Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
+                        Pie_Option.RUN_GC_AFTER_PROCESSING)
+                .build();																// Build the Pie_Config
+
+        new Pie_Encode(config);
+
+
         //Pie_Encryption encryption = new Pie_Encryption("this a temp1 2st art gfh fgf again");
-        Pie_Encode encode = new Pie_Encode(new Pie_ConfigBuilder()
-            .add_Pie_Option(Pie_Option.OVERWRITE_FILE)
+       // Pie_Encode encode = new Pie_Encode(new Pie_ConfigBuilder()
+        //    .add_Pie_Option(Pie_Option.OVERWRITE_FILE)
             //.add_Pie_Encode_Mode(Pie_Encode_Mode.ARGB)
             //.add_Pie_Encryption(new Pie_Encryption(new File(
             //         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))
-            .add_Pie_Encode_Source(new Pie_Encode_Source(new File(
-                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))
-            .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(new File(
-                    Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))
-            .build());
+         //   .add_Pie_Encode_Source(new Pie_Encode_Source(new File(
+         //           Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))
+         //   .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(new File(
+          //          Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))
+         //   .build());
 
 /**
         // Build a config file for encoding.
@@ -65,6 +86,6 @@ public class Pie_Test_Encode {
         // Do Encoding, Will create the image and put it in the destination
         Pie_Encode encode = new Pie_Encode(encoding_config);
  **/
-        encode.getEncoded_file_list().forEach(System.out::println);
+       // encode.getEncoded_file_list().forEach(System.out::println);
     }
 }

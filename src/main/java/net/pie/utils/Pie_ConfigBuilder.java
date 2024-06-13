@@ -28,10 +28,6 @@ public class Pie_ConfigBuilder {
     private Pie_Zip encoder_storage = null;
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
-    private Pie_Size encoder_Maximum_Image = new Pie_Size(
-            Pie_Constants.MAX_PROTECTED_SIZE.getParm1(),
-            Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
     private Pie_Decode_Source decode_source = null;
@@ -170,26 +166,14 @@ public class Pie_ConfigBuilder {
     }
 
     /** *********************************************************<br>
-     * add Max Encoded Created Image Size
-     * @param width (int)
-     * @param height (int)
-     * @return (Pie_ConfigBuilder)
-     */
-    public Pie_ConfigBuilder add_Max_Image_Size(int width, int height) {
-        this.encoder_Maximum_Image = new Pie_Size(
-                Math.min(width, Pie_Constants.MAX_PROTECTED_SIZE.getParm1()),
-                Math.min(height, Pie_Constants.MAX_PROTECTED_SIZE.getParm1()) );
-        return this;
-    }
-
-    /** *********************************************************<br>
      * Build Pie_Config
      */
     public Pie_Config build() {
         List<Object> options = new ArrayList<>(pie_options);
 
-        if (encoder_Maximum_Image != null)
-            options.add(encoder_Maximum_Image);
+        options.add(new Pie_Size(
+                Pie_Constants.MAX_PROTECTED_SIZE.getParm1(),
+                Pie_Constants.MAX_PROTECTED_SIZE.getParm1()));
 
         if (encryption != null)
             options.add(encryption);

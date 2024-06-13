@@ -1,9 +1,6 @@
 package net.pie;
 
-import net.pie.enums.Pie_Constants;
-import net.pie.enums.Pie_Option;
-import net.pie.enums.Pie_Source_Type;
-import net.pie.enums.Pie_Word;
+import net.pie.enums.*;
 import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Decode_Destination;
 import net.pie.utils.Pie_Utils;
@@ -28,6 +25,7 @@ public class Pie_Decode {
     private final byte start_tag = Pie_Constants.PARM_START_TAG.getParm2().getBytes(StandardCharsets.UTF_8)[0];
     private Pie_Source_Type source_type = null;
     private String output_location = null;
+    private Pie_Encode_Mode encode_mode = null;
 
     /** *********************************************************<br>
      * <b>Pie_Decode</b><br>
@@ -51,7 +49,10 @@ public class Pie_Decode {
         byte[] message = start_Decode(utils, collectImage(processing_file)); // First file decode.
         if (message != null) {
             if (getSource_type().equals(Pie_Source_Type.TEXT)) { // Text
-                setOutputStream(new ByteArrayOutputStream());
+                if (getConfig().getDecoded_destination() == null)
+                    setOutputStream(new ByteArrayOutputStream());
+                else
+                    setup_FileOutputstream();
                 try {
                     getOutputStream().write(message);
                 } catch (IOException e) {
@@ -84,15 +85,16 @@ public class Pie_Decode {
                         }
                     }
                 }
-                try {
-                    if (getOutputStream() != null) {
-                        getOutputStream().close();
-                        setOutputStream(null);
-                    }
-                } catch (IOException ignored) {  }
             }
             message = null;
         }
+
+        try {
+            if (getOutputStream() != null) {
+                getOutputStream().close();
+                setOutputStream(null);
+            }
+        } catch (IOException ignored) {  }
 
         if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
             System.gc();
@@ -148,8 +150,7 @@ public class Pie_Decode {
         }
 
         try {
-            if (isModulation())
-                message = Base64.getDecoder().decode(message);
+            message = Base64.getDecoder().decode(message);
         } catch (Exception ignored) {  }
 
         if (message == null) {
@@ -244,7 +245,7 @@ public class Pie_Decode {
         setModulation(false);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
-        int r,g,b,a = 0;
+        int counter,r,g,b,a = 0;
         for (int y = 0; y < buffimage.getHeight(); y++) {
             for (int x = 0; x < buffimage.getWidth(); x++) {
 
@@ -268,10 +269,10 @@ public class Pie_Decode {
                     b = (pixelColor & 0xFF);
                     a = ((pixelColor >> 24) & 0xFF);
                     value = new int[]{
-                        isModulation() ? r - modulate[0] : getConfig().getByte_map().getOrDefault(r, r),
-                        isModulation() ? g - modulate[1] : getConfig().getByte_map().getOrDefault(g, g),
-                        isModulation() ? b - modulate[2] : getConfig().getByte_map().getOrDefault(b, b),
-                        isModulation() ? a - modulate[3] : getConfig().getByte_map().getOrDefault(a, a),
+                        r - modulate[0],
+                        g - modulate[1],
+                        b - modulate[2],
+                        getEncode_mode() != null && getEncode_mode().getParm1().endsWith("T") ? 0 : a - modulate[3],
                     };
                 }
 
@@ -284,9 +285,10 @@ public class Pie_Decode {
                 if (Arrays.stream(value).sum() == 0 || isModulation() && (Arrays.stream(value).sum() == 0))
                     break;
 
-                for (int v : value)
-                    if (!isModulation() || isModulation() && v > 0 && v < 255)
+                for (int v : value) {
+                    if (v > 0 && v < 255)
                         bytes.write((byte) v);
+                }
             }
         }
 
@@ -316,7 +318,7 @@ public class Pie_Decode {
             }
             // Source type
             setSource_type(Pie_Source_Type.get(options[1]));
-
+            setEncode_mode(Pie_Encode_Mode.get(options[2]));
             return true;
         } catch (Exception ignored) { }
         return false;
@@ -421,5 +423,13 @@ public class Pie_Decode {
 
     public void setOutput_location(String output_location) {
         this.output_location = output_location;
+    }
+
+    public Pie_Encode_Mode getEncode_mode() {
+        return encode_mode;
+    }
+
+    public void setEncode_mode(Pie_Encode_Mode encode_mode) {
+        this.encode_mode = encode_mode;
     }
 }

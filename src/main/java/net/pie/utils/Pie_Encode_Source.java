@@ -81,7 +81,7 @@ public class Pie_Encode_Source {
                 break;
             case "File" :
                 File f = (File) encode;
-                if (f.isFile()) {
+                if (Pie_Utils.isFile(f)) {
                     try {
                         setInput(new FileInputStream((File) encode));
                         setFile_name(f.getName());

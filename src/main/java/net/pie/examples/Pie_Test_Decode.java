@@ -19,7 +19,8 @@ import java.util.logging.Level;
 public class Pie_Test_Decode {
     private String temp_Encoded_Imaage = "background.jpg.png";
     private String temp_Decode_To = "shared";
-
+    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "text.txt.png"));
+    public static File folder = Pie_Utils.getDesktop();
     public static void main(String[] args) {
         new Pie_Test_Decode();
     }
@@ -29,28 +30,41 @@ public class Pie_Test_Decode {
      **/
     public Pie_Test_Decode() {
 
+        Pie_Config config = new Pie_ConfigBuilder()
+                .add_Pie_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
+                .add_Pie_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
+                .add_Log_Level(Level.INFO)												// Optional logging level
+                .add_Pie_Encryption(new Pie_Encryption("my password"))					// Optional Encryption. See Encryption Examples
+                .add_Pie_Option(Pie_Option.OVERWRITE_FILE,								// Optional set Pie_Option's as required. See Pie_Option examples
+                        Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
+                        Pie_Option.RUN_GC_AFTER_PROCESSING)
+                .build();																// Build the Pie_Config
+
+        new Pie_Decode(config);
+
+
         //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
         //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
         //new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
         //new Pie_Decode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")),
 
         // Decoding - Decode the image created
-        Pie_Config decoding_config = new Pie_Config(
-            Pie_Option.OVERWRITE_FILE,
-            Pie_Option.RUN_GC_AFTER_PROCESSING,
-            Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
-            Level.INFO,
-            new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
-            new Pie_Decode_Destination()
+//        Pie_Config decoding_config = new Pie_Config(
+//            Pie_Option.OVERWRITE_FILE,
+//            Pie_Option.RUN_GC_AFTER_PROCESSING,
+//            Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
+//            Level.INFO,
+//            new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
+//            new Pie_Decode_Destination()
             //new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
-        );
+       // );
 
-        Pie_Decode decoded = new Pie_Decode(decoding_config);
-        System.out.println("Has Error " + decoded.isDecoding_Error());
-        System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
-        System.out.println("File - " + decoded.getOutput_location());
-
-        if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
-            System.out.println("File - Created");
+//        Pie_Decode decoded = new Pie_Decode(decoding_config);
+//        System.out.println("Has Error " + decoded.isDecoding_Error());
+//        System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
+//        System.out.println("File - " + decoded.getOutput_location());
+//
+//        if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
+//            System.out.println("File - Created");
     }
 }
