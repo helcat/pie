@@ -91,10 +91,14 @@ public class Pie_Encode {
         getConfig().logging(Level.INFO,Pie_Word.translate(Pie_Word.ENCODING_COMPLETE, getConfig().getLanguage()));
 
         if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
-            getConfig().exit_Logging();
+            try {
+                getConfig().exit_Logging();
+            } catch (Exception ignored) {  }
 
         if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-            System.gc();
+            try {
+                System.gc();
+            } catch (Exception ignored) { }
     }
 
     /** ******************************************************<br>

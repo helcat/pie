@@ -11,9 +11,12 @@ git push origin main
 
 import net.pie.Pie_Decode;
 import net.pie.enums.Pie_Option;
+import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
@@ -31,16 +34,16 @@ public class Pie_Test_Decode {
     public Pie_Test_Decode() {
 
         Pie_Config config = new Pie_ConfigBuilder()
-                .add_Pie_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
-                .add_Pie_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
-                .add_Log_Level(Level.INFO)												// Optional logging level
-                .add_Pie_Encryption(new Pie_Encryption("my password"))					// Optional Encryption. See Encryption Examples
-                .add_Pie_Option(Pie_Option.OVERWRITE_FILE,								// Optional set Pie_Option's as required. See Pie_Option examples
-                        Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
-                        Pie_Option.RUN_GC_AFTER_PROCESSING)
-                .build();																// Build the Pie_Config
+            .add_Pie_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
+            //.add_Pie_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
+            .add_Log_Level(Level.INFO)												// Optional logging level
+            .add_Pie_Encryption(new Pie_Encryption("my password"))					// Optional Encryption. See Encryption Examples
+            .add_Pie_Option(Pie_Option.OVERWRITE_FILE,								// Optional set Pie_Option's as required. See Pie_Option examples
+                    Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
+                    Pie_Option.RUN_GC_AFTER_PROCESSING)
+            .build();																// Build the Pie_Config
 
-        new Pie_Decode(config);
+        Pie_Decode decoded = new Pie_Decode(config);
 
 
         //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
@@ -64,7 +67,12 @@ public class Pie_Test_Decode {
 //        System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
 //        System.out.println("File - " + decoded.getOutput_location());
 //
-//        if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
-//            System.out.println("File - Created");
+       if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
+            System.out.println("File - Created");
+
+       if (decoded.getOutputStream() != null && decoded.getSource_type().equals(Pie_Source_Type.TEXT))
+           try {
+               System.out.println(((ByteArrayOutputStream) decoded.getOutputStream()).toString("UTF-8"));
+           } catch (UnsupportedEncodingException ignored) { }
     }
 }

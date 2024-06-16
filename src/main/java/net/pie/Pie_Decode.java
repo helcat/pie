@@ -2,7 +2,6 @@ package net.pie;
 
 import net.pie.enums.*;
 import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_Decode_Destination;
 import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
@@ -90,22 +89,30 @@ public class Pie_Decode {
         }
 
         try {
-            if (getOutputStream() != null) {
+            if (getConfig().getDecoded_destination() != null && getOutputStream() != null) {
                 getOutputStream().close();
                 setOutputStream(null);
             }
         } catch (IOException ignored) {  }
 
         if (getConfig().getOptions().contains(Pie_Option.RUN_GC_AFTER_PROCESSING))
-            System.gc();
+            try {
+                System.gc();
+            } catch (Exception ignored) { }
 
-        getConfig().getDecode_source().close();
-
-        if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
-            getConfig().exit_Logging();
+        try {
+            getConfig().getDecode_source().close();
+        } catch (Exception ignored) {  }
 
         if (!getConfig().isError())
-            getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
+            try {
+                getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
+            } catch (Exception ignored) { }
+
+        if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
+            try {
+                getConfig().exit_Logging();
+            } catch (Exception ignored) { }
     }
 
     /** *********************************************************<br>
@@ -330,15 +337,19 @@ public class Pie_Decode {
      */
     private void collect_encoded_parms(byte[] add_on_bytes) {
         getConfig().getDecode_source().setAddon_Files(null);
-        if (getConfig().getDecoded_destination() == null)
-            getConfig().setDecoded_destination(new Pie_Decode_Destination());
         try {
             String parms = new String(add_on_bytes, StandardCharsets.UTF_8);
             int parm = 0;
             if (parms.contains("?")) {
                 Stream<String> stream = Pattern.compile("\\?").splitAsStream(parms);
                 List<String> partsList = stream.collect(Collectors.toList());
-                getConfig().getDecoded_destination().setFile_name(partsList.get(parm ++));                   // 0
+
+                if (getConfig().getDecoded_destination() != null &&
+                    Pie_Utils.isEmpty(getConfig().getDecoded_destination().getFile_name()))
+                    getConfig().getDecoded_destination().setFile_name(partsList.get(parm ++));
+                else
+                    parm ++;
+
                 setTotal_files(Integer.parseInt(partsList.get(parm ++).replaceAll("\\D", "")));    // 1
                 String files = partsList.get(parm ++);                                                              // 2
                 if (!files.isEmpty()) {
@@ -432,4 +443,5 @@ public class Pie_Decode {
     public void setEncode_mode(Pie_Encode_Mode encode_mode) {
         this.encode_mode = encode_mode;
     }
+
 }
