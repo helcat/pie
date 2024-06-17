@@ -29,7 +29,7 @@ public class Pie_Config {
     private Pie_Encryption encryption = null;
     private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB();
     private Pie_Zip encoder_storage = null;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
 
     private Pie_Encode_Source encoder_source = null;
@@ -41,7 +41,6 @@ public class Pie_Config {
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private String error_message = null;
-    private Logger log = null;
 
     private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
@@ -55,7 +54,6 @@ public class Pie_Config {
     }
 
     private void setup(Object[] options) {
-        setUpLogging();
         if (options == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_OPTIONS, getLanguage()));
             setError(true);
@@ -103,7 +101,7 @@ public class Pie_Config {
                     break;
                 case "Pie_Encoded_Destination": this.encoder_destination = (Pie_Encoded_Destination) o; break;
                 case "Pie_Encode_Max_MB": this.max_mb = (Pie_Encode_Max_MB) o; break;
-                case "Level": this.log_level = (Level) o; getLog().setLevel(this.log_level); break;
+                case "Level": this.log_level = (Level) o; break;
                 case "Pie_Decode_Source":
                     this.decode_source = (Pie_Decode_Source) o;
                     if (this.decode_source.getError_code() != null) {
@@ -123,8 +121,6 @@ public class Pie_Config {
             }
         }
 
-        if (this.log_level != null && this.log_level == Level.OFF)
-            exit_Logging();
     }
 
     /** *********************************************************<br>
@@ -167,30 +163,6 @@ public class Pie_Config {
     }
 
     /** *********************************************************<br>
-     * Sets up the logging for this class with a random logger name.
-     **/
-    private void setUpLogging() {
-        if (getLog() == null) {
-            setLog(Logger.getLogger(UUID.randomUUID().toString()));
-            getLog().setUseParentHandlers(false);
-            ConsoleHandler customHandler = new ConsoleHandler();
-            customHandler.setFormatter(new Pie_Logging_Format());
-            getLog().addHandler(customHandler);
-            getLog().setLevel(getLog_level());
-        }
-    }
-
-    /** *********************************************************<br>
-     * Remove the custom handler and logging.<br>
-     * If logging is not required at all, then run this method after building the configuration
-     **/
-    public void exit_Logging() {
-        if (getLog() != null && getLog().getHandlers().length > 0)
-            getLog().removeHandler(getLog().getHandlers()[0]);
-        setLog(null);
-    }
-
-    /** *********************************************************<br>
      * <b>Logging</b><br>
      * Used internally for logging. Outputs the level and message via a custom handler<br>
      * @see Level (Logging level to be used)
@@ -211,9 +183,10 @@ public class Pie_Config {
             return;
         }
 
-        if (getLog() == null || getLog_level().equals(Level.OFF))
+        if (getLog_level().equals(Level.OFF))
             return;
-        getLog().log(level,  message);
+
+        System.out.println(message);
 
     }
 
@@ -251,21 +224,6 @@ public class Pie_Config {
     }
     public void setEncryption(Pie_Encryption encryption) {
         this.encryption = encryption;
-    }
-    /** ***************************************************************<br>
-     * Logging Used internally
-     * @return (Logger)
-     */
-    public Logger getLog() {
-        return log;
-    }
-
-    /** ***************************************************************<br>
-     * Logger used internally
-     * @param log (Logger)
-     */
-    private void setLog(Logger log) {
-        this.log = log;
     }
 
     /** ***************************************************************<br>

@@ -109,10 +109,6 @@ public class Pie_Decode {
                 getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));
             } catch (Exception ignored) { }
 
-        if (getConfig().getOptions().contains(Pie_Option.TERMINATE_LOG_AFTER_PROCESSING))
-            try {
-                getConfig().exit_Logging();
-            } catch (Exception ignored) { }
     }
 
     /** *********************************************************<br>

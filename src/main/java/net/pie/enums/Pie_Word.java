@@ -1,5 +1,7 @@
 package net.pie.enums;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public enum Pie_Word {
@@ -207,6 +209,10 @@ public enum Pie_Word {
 			default:
 				return word.getEn();
 		}
+	}
+
+	public static List<String> available_languages() {
+		return Arrays.asList("en", "fr", "it", "es");
 	}
 
 	public String getEn() {

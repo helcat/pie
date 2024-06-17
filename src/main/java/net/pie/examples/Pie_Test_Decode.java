@@ -34,17 +34,15 @@ public class Pie_Test_Decode {
     public Pie_Test_Decode() {
 
         Pie_Config config = new Pie_ConfigBuilder()
-            .add_Pie_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
-            //.add_Pie_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
-            .add_Log_Level(Level.INFO)												// Optional logging level
-            .add_Pie_Encryption(new Pie_Encryption("my password"))					// Optional Encryption. See Encryption Examples
-            .add_Pie_Option(Pie_Option.OVERWRITE_FILE,								// Optional set Pie_Option's as required. See Pie_Option examples
-                    Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
+            .add_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
+            //.add_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
+            .add_Log_Level(Level.OFF)												// Optional logging level
+            .add_Encryption(new Pie_Encryption("my password"))					// Optional Encryption. See Encryption Examples
+            .add_Option(Pie_Option.OVERWRITE_FILE,								// Optional set Pie_Option's as required. See Pie_Option examples
                     Pie_Option.RUN_GC_AFTER_PROCESSING)
             .build();																// Build the Pie_Config
 
         Pie_Decode decoded = new Pie_Decode(config);
-
 
         //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
         //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")

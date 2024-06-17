@@ -161,7 +161,7 @@ public class Pie_Encryption {
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ?
                 "" :  ".pie"));
 
-        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.ARGB, Pie_Option.MODULATION,
+        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.THREE, Pie_Option.MODULATION,
                 Pie_Option.CREATE_CERTIFICATE,
             Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
             new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),

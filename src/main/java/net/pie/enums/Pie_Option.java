@@ -12,7 +12,6 @@ package net.pie.enums;
 public enum Pie_Option {
     OVERWRITE_FILE,
     RUN_GC_AFTER_PROCESSING,
-    TERMINATE_LOG_AFTER_PROCESSING,
     MODULATION,
     DEMO_MODE,
     CREATE_CERTIFICATE

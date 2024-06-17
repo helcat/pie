@@ -9,13 +9,13 @@ import java.util.logging.Level;
 /** **************************************************************
  * Usage
  Pie_Encode encode = new Pie_Encode(new Pie_ConfigBuilder()
- .add_Pie_Option(Pie_Option.OVERWRITE_FILE)
- .add_Pie_Encode_Mode(Pie_Encode_Mode.ARGB)
- .add_Pie_Encryption(new Pie_Encryption(new File(
+ .add_Option(Pie_Option.OVERWRITE_FILE)
+ .add_Encode_Mode(Pie_Encode_Mode.ARGB)
+ .add_Encryption(new Pie_Encryption(new File(
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))
- .add_Pie_Encode_Source(new Pie_Encode_Source(new File(
+ .add_Encode_Source(new Pie_Encode_Source(new File(
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))
- .add_Pie_Encoded_Destination(new Pie_Encoded_Destination(new File(
+ .add_Encoded_Destination(new Pie_Encoded_Destination(new File(
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))
  .build());
  */
@@ -23,13 +23,16 @@ import java.util.logging.Level;
 
 public class Pie_ConfigBuilder {
     private List<Pie_Option> pie_options = new ArrayList<>();
-    private Pie_Encryption encryption = null;
+
     private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB(200);
     private Pie_Zip encoder_storage = null;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.ARGB;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Source encoder_source = null;
     private Pie_Encoded_Destination encoder_destination = null;
+
+    private Pie_Encryption encryption = null;
+
     private Pie_Decode_Source decode_source = null;
     private Pie_Decode_Destination decoded_Source_destination = null;
 
@@ -40,7 +43,7 @@ public class Pie_ConfigBuilder {
      * @param options
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Option(Pie_Option... options) {
+    public Pie_ConfigBuilder add_Option(Pie_Option... options) {
         if (options != null)
             for (Pie_Option option : options) {
                 if (option != null && !this.pie_options.contains(option))
@@ -54,7 +57,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Shape)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Shape(Pie_Shape option) {
+    public Pie_ConfigBuilder add_Shape(Pie_Shape option) {
         if (option != null)
             this.encoder_shape = option;
         else
@@ -78,7 +81,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Decode_Destination)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Decode_Destination(Pie_Decode_Destination option) {
+    public Pie_ConfigBuilder add_Decode_Destination(Pie_Decode_Destination option) {
         if (option != null)
             this.decoded_Source_destination = option;
         return this;
@@ -89,7 +92,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Decode_Source)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Decode_Source(Pie_Decode_Source option) {
+    public Pie_ConfigBuilder add_Decode_Source(Pie_Decode_Source option) {
         if (option != null)
             this.decode_source = option;
         return this;
@@ -100,7 +103,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Encoded_Destination)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Encoded_Destination(Pie_Encoded_Destination option) {
+    public Pie_ConfigBuilder add_Encoded_Destination(Pie_Encoded_Destination option) {
         if (option != null)
             this.encoder_destination = option;
         return this;
@@ -111,7 +114,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Encode_Source)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Encode_Source(Pie_Encode_Source option) {
+    public Pie_ConfigBuilder add_Encode_Source(Pie_Encode_Source option) {
         if (option != null)
             this.encoder_source = option;
         return this;
@@ -122,11 +125,11 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Encode_Mode)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Encode_Mode(Pie_Encode_Mode option) {
+    public Pie_ConfigBuilder add_Encode_Mode(Pie_Encode_Mode option) {
         if (option != null)
             this.encoder_mode = option;
         else
-            this.encoder_mode = Pie_Encode_Mode.ARGB;
+            this.encoder_mode = Pie_Encode_Mode.THREE;
         return this;
     }
 
@@ -135,7 +138,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Zip)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Zip(Pie_Zip option) {
+    public Pie_ConfigBuilder add_Zip_Option(Pie_Zip option) {
         if (option != null)
             this.encoder_storage = option;
         else
@@ -148,7 +151,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Encode_Max_MB)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Encode_Max_MB(Pie_Encode_Max_MB option) {
+    public Pie_ConfigBuilder add_Max_MB(Pie_Encode_Max_MB option) {
         if (option != null && option.getMb() > 50)
             this.max_mb = option;
         return this;
@@ -159,7 +162,7 @@ public class Pie_ConfigBuilder {
      * @param option (Pie_Option)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_ConfigBuilder add_Pie_Encryption(Pie_Encryption option) {
+    public Pie_ConfigBuilder add_Encryption(Pie_Encryption option) {
         if (option != null)
             this.encryption = option;
         return this;
@@ -193,7 +196,7 @@ public class Pie_ConfigBuilder {
         if (encoder_source != null)
             options.add(encoder_source);
 
-        if  (encoder_destination != null)
+        if (encoder_destination != null)
             options.add(encoder_destination);
 
         if (decode_source != null)
