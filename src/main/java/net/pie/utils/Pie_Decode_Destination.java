@@ -3,7 +3,6 @@ package net.pie.utils;
 import net.pie.enums.Pie_Word;
 
 import java.io.File;
-import java.net.URL;
 
 /** *******************************************************************<br>
  * <b>Pie_Encode_Destination</b><br>
@@ -13,7 +12,6 @@ import java.net.URL;
  **/
 public class Pie_Decode_Destination {
     private File local_folder;
-    private URL web_address;
     private String file_name = null;
     private byte[] bytes = null;
     private Pie_Word error_code = null;
@@ -51,17 +49,6 @@ public class Pie_Decode_Destination {
         setLocal_folder(Pie_Utils.getDesktop());
     }
 
-    /** *******************************************************************<br>
-     * <b>getters and setters</b><br>
-     * General Getters and Setters
-     **/
-    public URL getWeb_address() {
-        return web_address;
-    }
-
-    public void setWeb_address(URL web_address) {
-        this.web_address = web_address;
-    }
 
     public File getLocal_folder() {
         return local_folder;

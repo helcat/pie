@@ -1,5 +1,6 @@
 package net.pie.utils;
 
+import net.pie.decoding.Pie_Decode_Config;
 import net.pie.enums.Pie_Word;
 
 import java.io.*;
@@ -53,7 +54,7 @@ public class Pie_Decode_Source {
      * get next object
      * @param processing_file (int)
      */
-    public void next(Pie_Config config, int processing_file) throws IOException {
+    public void next(Pie_Decode_Config config, int processing_file) throws IOException {
         close();
 
         if (isZipped()) {

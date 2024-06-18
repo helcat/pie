@@ -4,11 +4,6 @@ package net.pie.examples;
 java -classpath pie-1.2.jar Pie_Test
  */
 
-import net.pie.utils.Pie_Config;
-import net.pie.utils.Pie_Encryption;
-import net.pie.utils.Pie_URL;
-import net.pie.utils.Pie_Utils;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -17,13 +12,11 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 

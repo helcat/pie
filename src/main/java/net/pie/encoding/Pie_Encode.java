@@ -1,7 +1,6 @@
-package net.pie;
+package net.pie.encoding;
 
 import net.pie.enums.*;
-import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Encode_Source;
 import net.pie.utils.Pie_Size;
 import net.pie.utils.Pie_Utils;
@@ -19,19 +18,18 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 public class Pie_Encode {
-    private Pie_Config config;
+    private Pie_Encode_Config config;
     private int[] modulate = new int[]{0,0,0,0};
     private List<BufferedImage> output_Images = null;
 
-
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
-     * Encode a file or text from Pie_Source using options from Pie_Config<br>
+     * Encode a file or text from Pie_Source using options from Pie_Encode_Config<br>
      * Send in Pie_getConfig().<br>
-     * @param config (Pie_Config)
-     * @see Pie_Config
+     * @param config (Pie_Encode_Config)
+     * @see Pie_Encode_Config
      **/
-    public Pie_Encode (Pie_Config config) {
+    public Pie_Encode (Pie_Encode_Config config) {
         setOutput_Images(new ArrayList<>());
         ImageIO.setUseCache(false);
         setConfig(config);
@@ -203,8 +201,7 @@ public class Pie_Encode {
 
         // Process the image - send to destination if required
         if (getConfig().getEncoder_destination() != null) {
-            if (!getConfig().getEncoder_destination().save_Encoded_Image(getConfig(), data_image,
-                    file_number, total_files, getConfig().getEncoder_source().getFile_name()))
+            if (!save_Encoded_Image(data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name()))
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
             data_image = null;
         }else {
@@ -427,8 +424,7 @@ public class Pie_Encode {
             for (int i = 2; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");
-                addon_files.append(getConfig().getEncoder_destination().create_File_Name(getConfig(), i,
-                        getConfig().getEncoder_source().getFile_name()));
+                addon_files.append(create_File_Name(i, getConfig().getEncoder_source().getFile_name()));
             }
         }
 
@@ -469,10 +465,143 @@ public class Pie_Encode {
         } catch (IOException ignored) {}
     }
 
-    private void setConfig(Pie_Config config) {
+    /** *******************************************************************<br>
+     * <b>save_Encoded_Image</b><br>
+     * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
+     **/
+    public boolean save_Encoded_Image(BufferedImage image, int file_number, int total_files, String source_filename) {
+        getConfig().getEncoder_destination().setEncoded_file_list(new ArrayList<>());
+
+        if (getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
+                getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
+            if (getConfig().getEncoder_storage().getFos() == null)
+                if (!getConfig().getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
+                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_CREATE_ZIP_ADDITIONAL, getConfig().getLanguage()));
+                    return false;
+                }
+
+            return getConfig().getEncoder_storage().addZipEntry(create_File_Name(file_number, source_filename), image);
+        }else {
+            // Single Files Only Or Beginning of Zip
+            File toFile = addFileNumber(file_number, source_filename);
+            if (toFile.exists() && !getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_FILE_EXISTS, getConfig().getLanguage()) +
+                        " - " + toFile.getName() +
+                        " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, getConfig().getLanguage()));
+                return false;
+            }
+            getEncoded_file_list().add(toFile.getPath());
+            try {
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
+            } catch (IOException e) {
+                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_WRITE_ENCODED_IMAGE, getConfig().getLanguage())+
+                        " " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
+    /** *******************************************************************<br>
+     * Add File number if second file is required
+     * @param file_number (int)
+     * @param source_filename (String)
+     */
+    private File addFileNumber(int file_number, String source_filename) {
+        boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
+        String name = create_File_Name(file_number, source_filename);
+        File file = new File(Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
+                Pie_Utils.file_concat(getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath(),  name)
+                : Pie_Utils.file_concat(getConfig().getEncoder_destination().getLocal_folder().getParent(), name ));
+        if (file.exists()) {
+            if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && file.delete())
+                return file;
+
+            if (file.getName().equals(getConfig().getEncoder_source().getFile_name())) {
+                while (file.exists()) {
+                    file = new File(file.getParentFile() + File.separator +
+                            "enc_" + getConfig().getEncoder_source().getFile_name());
+                }
+            }else {
+                getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage())
+                        + " : " + file.getName() +
+                        (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, getConfig().getLanguage())+")" : ""));
+            }
+        }
+        return file;
+    }
+
+    /** *******************************************************************<br>
+     * Zip file name
+     * @param source_filename (int)
+     */
+    private String getZip_File_Name(String source_filename) {
+        String name = Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
+                source_filename  : getConfig().getEncoder_destination().getLocal_folder().getName();
+        if (!name.toLowerCase().endsWith(".zip"))
+            name = name + ".zip";
+        return name;
+    }
+
+    /** *******************************************************************<br>
+     * Create a file name
+     * @param file_number (int)
+     * @param source_filename (String)
+     * @return String
+     */
+    public String create_File_Name(int file_number, String source_filename) {
+        if (getConfig().getEncoder_destination().getLocal_folder() == null)
+            getConfig().getEncoder_destination().setLocal_folder(Pie_Utils.getTempFolder());
+
+        String name = Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
+                source_filename : getConfig().getEncoder_destination().getLocal_folder().getName();
+        if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
+            return name;
+
+        if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
+            name = name.substring(0, name.length() - ("." + Pie_Constants.IMAGE_TYPE.getParm2()).length());
+        if (file_number > 1)
+            name = name + "_" + file_number;
+        name = name + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+
+        if (getConfig().getEncoder_storage() == null || getConfig().getEncoder_storage() != null && getConfig().getEncoder_storage().getFos() != null &&
+                getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.AS_IS)) {
+            return name;
+        }else{
+            if (getConfig().getEncoder_storage().getFos() != null && getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.RANDOM))
+                return UUID.randomUUID() + "_" + file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+
+            if (getConfig().getEncoder_storage().getFos() != null && getConfig().getEncoder_storage().getInternal_name_format().equals(Pie_ZIP_Name.NUMBER))
+                return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
+
+        }
+        return name;
+    }
+
+    /** *******************************************************************<br>
+     * Create Zip file
+     * @param name (int)
+     */
+    private File create_Zip_File(String name) {
+        boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
+        File file = new File(Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
+                getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath() + File.separator + name
+                :
+                getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath().substring(0,
+                        getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+        );
+        if (file.exists())
+            getConfig().logging(Level.WARNING,Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage()) +
+                    " : " + file.getName() +
+                    (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, getConfig().getLanguage())+")" : ""));
+
+        return file;
+    }
+
+
+    private void setConfig(Pie_Encode_Config config) {
         this.config = config;
     }
-    private Pie_Config getConfig() {
+    private Pie_Encode_Config getConfig() {
         return config;
     }
 
@@ -492,4 +621,5 @@ public class Pie_Encode {
     public void setOutput_Images(List<BufferedImage> output_Images) {
         this.output_Images = output_Images;
     }
+
 }

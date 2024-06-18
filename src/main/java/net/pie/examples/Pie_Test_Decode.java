@@ -9,7 +9,9 @@ git commit -m "Work Commit"
 git push origin main
  */
 
-import net.pie.Pie_Decode;
+import net.pie.decoding.Pie_Decode;
+import net.pie.decoding.Pie_Decode_Config;
+import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Source_Type;
 import net.pie.utils.*;
@@ -33,7 +35,7 @@ public class Pie_Test_Decode {
      **/
     public Pie_Test_Decode() {
 
-        Pie_Config config = new Pie_ConfigBuilder()
+        Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
             .add_Decode_Source(new Pie_Decode_Source(source))					// File to be decoded
             //.add_Decode_Destination(new Pie_Decode_Destination(Pie_Utils.file_concat(folder, "shared")))   		// Folder to place decoded file
             .add_Log_Level(Level.OFF)												// Optional logging level

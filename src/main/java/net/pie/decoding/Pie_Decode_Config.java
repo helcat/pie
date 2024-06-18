@@ -1,43 +1,33 @@
-package net.pie.utils;
+package net.pie.decoding;
 
 import net.pie.enums.*;
+import net.pie.utils.*;
 
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
-/** *******************************************************************<br>
+/** ************************************************************************************************<br>
+ * This Class Previous to Version 1.3 was just "Pie_Config" but users were not happy with this.
  * Starts a default configuration and sets up logging and options<br>
- * Both encoding and decoding options. Pie_Option, Level, Pie_Encryption
- * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encode_Source, Pie_Encoded_Destination<br>
+ * Decoding options. Pie_Option, Level, Pie_Encryption
  * Add parmeters in any order, or use an object list<br>
  * The Default is Log level is Level.SEVERE<br>
- * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
  * @see Pie_Option
- * @see Pie_Shape
- * @see Pie_Encode_Mode
  * @see Level
- * @see Pie_ZIP_Option
- * @see Pie_ZIP_Name
  * @see Pie_Encryption
- * @see Pie_Encode_Source
- * @see Pie_Encoded_Destination
+ * @see Pie_Decode_Source
+ * @see Pie_Decode_Destination
  *
  **/
-public class Pie_Config {
+public class Pie_Decode_Config {
     private List<Pie_Option> options = new ArrayList<>();
     private Pie_Encryption encryption = null;
-    private Pie_Encode_Max_MB max_mb = new Pie_Encode_Max_MB();
-    private Pie_Zip encoder_storage = null;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
-    private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
-
-    private Pie_Encode_Source encoder_source = null;
-    private Pie_Encoded_Destination encoder_destination = null;
-
     private Pie_Decode_Source decode_source = null;
     private Pie_Decode_Destination  decoded_destination = null;
-
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private String error_message = null;
@@ -45,11 +35,11 @@ public class Pie_Config {
     private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
-    public Pie_Config(Object... options) {
+    public Pie_Decode_Config(Object... options) {
         setup(options);
     }
 
-    public Pie_Config(List<Object> options) {
+    public Pie_Decode_Config(List<Object> options) {
         setup(options.toArray());
     }
 
@@ -61,9 +51,6 @@ public class Pie_Config {
         }
 
         setOptions(new ArrayList<>());
-        this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
-        this.log_level = Level.SEVERE;
-
         Pie_Option opt = null;
         for (Object o : options) {
             if (o == null)
@@ -79,10 +66,6 @@ public class Pie_Config {
                         setDemo_mode(true);
                     getOptions().add(opt);
                     break;
-                case "Pie_Shape": this.encoder_shape = (Pie_Shape) o; break;
-                case "Pie_Encode_Mode": this.encoder_mode = (Pie_Encode_Mode) o; break;
-                case "Pie_ZIP_Option": this.encoder_storage.setOption((Pie_ZIP_Option) o); break;
-                case "Pie_ZIP_Name": this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o); break;
                 case "Pie_Encryption":
                     this.encryption = ((Pie_Encryption) o);
                     if (this.encryption.getError_message() != null) {
@@ -91,16 +74,6 @@ public class Pie_Config {
                         return;
                     }
                     break;
-                case "Pie_Encode_Source":
-                    this.encoder_source = (Pie_Encode_Source) o;
-                    if (this.encoder_source.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Word.translate(this.encoder_source.getError_code(), getLanguage()));
-                        setError(true);
-                        return;
-                    }
-                    break;
-                case "Pie_Encoded_Destination": this.encoder_destination = (Pie_Encoded_Destination) o; break;
-                case "Pie_Encode_Max_MB": this.max_mb = (Pie_Encode_Max_MB) o; break;
                 case "Level": this.log_level = (Level) o; break;
                 case "Pie_Decode_Source":
                     this.decode_source = (Pie_Decode_Source) o;
@@ -130,63 +103,33 @@ public class Pie_Config {
         if (getDecode_source() == null || getDecode_source().getDecode_object() == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE, getLanguage()));
             setError(true);
-            return;
         }
-    }
-
-    /** *********************************************************<br>
-     * validate Encoding Parameters
-     */
-    public void validate_Encoding_Parameters() {
-        if (getEncoder_source() == null || getEncoder_source().getInput() == null) {
-            logging(Level.SEVERE, Pie_Word.translate(Pie_Word.NO_SOURCE, getLanguage()));
-            setError(true);
-            return;
-        }
-
-        if (getEncoder_source().getSource_size() == 0) {
-            logging(Level.SEVERE,Pie_Word.translate(Pie_Word.NO_SOURCE_SIZE, getLanguage()));
-            setError(true);
-            return;
-        }
-    }
-
-    /** *********************************************************<br>
-     *  Encoding bufferSize
-     * @return int
-     */
-    public int getEncoding_bufferSize() {
-        int bufferSize = getMax_mb().getMb() * 1024 * 1024; // MAx MB buffer size
-        if (bufferSize > getEncoder_source().getSource_size())
-            bufferSize = (int) getEncoder_source().getSource_size();
-        return bufferSize;
     }
 
     /** *********************************************************<br>
      * <b>Logging</b><br>
      * Used internally for logging. Outputs the level and message via a custom handler<br>
+     * Note uses the Java logging Tags but not java logging. This slowed down the entire process<br>
+     * When speed is the ultimate goal.
      * @see Level (Logging level to be used)
      * @param level (Logging level)
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (isError())
+        if (isError() || getLog_level().equals(Level.OFF))
             return;
 
         if (level.equals(Level.SEVERE)) {
             setError(true);
-            setError_message(message);
+            setError_message(message); // Allows the user to collect a message for their system
         }
 
-        if (isDemo_mode()) {
+        if (isDemo_mode()) { // Used in demo to fill up a text area
             Pie_Utils.console_out(level.toString() + " : " + message);
             return;
         }
 
-        if (getLog_level().equals(Level.OFF))
-            return;
-
-        System.out.println(message);
+        System.out.println(message); // Displays messages in the console
 
     }
 
@@ -227,33 +170,6 @@ public class Pie_Config {
     }
 
     /** ***************************************************************<br>
-     * Collects the Pie_Encode_Mode for the process.
-     * @return Pie_Encode_Mode
-     * @see Pie_Encode_Mode
-     */
-    public Pie_Encode_Mode getEncoder_mode() {
-        return encoder_mode;
-    }
-
-    /** ***************************************************************<br>
-     * Gets the shape of the final encoded image.
-     * @return Pie_Shape
-     * @see Pie_Shape
-     */
-    public Pie_Shape getEncoder_shape() {
-        return encoder_shape;
-    }
-
-    /** ***************************************************************<br>
-     * Encoder_storage - gets the final storage of the file.
-     * @return Pie_Zip
-     * @see Pie_Zip
-     */
-    public Pie_Zip getEncoder_storage() {
-        return encoder_storage;
-    }
-
-    /** ***************************************************************<br>
      * Encoder Maximum Image<br>
      * Sets the maximum area that should be used.
      * @return Pie_Size
@@ -261,23 +177,6 @@ public class Pie_Config {
      */
     public Pie_Size getEncoder_Maximum_Image() {
         return new Pie_Size(Pie_Constants.MAX_PROTECTED_SIZE.getParm1(), Pie_Constants.MAX_PROTECTED_SIZE.getParm1());
-    }
-
-    /** ******************************************************************<br>
-     * Source for file or text to be encoded.
-     * @return Pie_Encode_Source
-     * @see Pie_Encode_Source
-     */
-    public Pie_Encode_Source getEncoder_source() {
-        return encoder_source;
-    }
-
-    /** ******************************************************************<br>
-     * get the file or destination, where to send the final file.
-     * @see Pie_Encoded_Destination
-     */
-    public Pie_Encoded_Destination getEncoder_destination() {
-        return encoder_destination;
     }
 
     /** ******************************************************************<br>
@@ -298,14 +197,6 @@ public class Pie_Config {
 
     public void setDecoded_destination(Pie_Decode_Destination decoded_destination) {
         this.decoded_destination = decoded_destination;
-    }
-
-    public Pie_Encode_Max_MB getMax_mb() {
-        return max_mb;
-    }
-
-    private void setMax_mb(Pie_Encode_Max_MB max_mb) {
-        this.max_mb = max_mb;
     }
 
     public String getError_message() {

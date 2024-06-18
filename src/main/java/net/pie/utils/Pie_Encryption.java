@@ -1,7 +1,9 @@
 package net.pie.utils;
 
-import net.pie.Pie_Decode;
-import net.pie.Pie_Encode;
+import net.pie.decoding.Pie_Decode;
+import net.pie.decoding.Pie_Decode_Config;
+import net.pie.encoding.Pie_Encode;
+import net.pie.encoding.Pie_Encode_Config;
 import net.pie.enums.*;
 
 import javax.crypto.*;
@@ -9,7 +11,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -74,7 +75,7 @@ public class Pie_Encryption {
         if (demo)
             options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, new Pie_Decode_Source(file));
 
-        Pie_Decode decoded = new Pie_Decode(new Pie_Config(options));
+        Pie_Decode decoded = new Pie_Decode(new Pie_Decode_Config(options));
         if (decoded.getOutputStream() != null) {
             if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
                 ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
@@ -88,34 +89,32 @@ public class Pie_Encryption {
 
     /** **************************************************<br>
      * Create a key
-     * @param config (Pie_Config)
-     * @see Pie_Config
      */
-    private void createKey(Pie_Config config) {
+    private Pie_Word createKey() {
         if (getKey() != null)
-            return; // reuse key
+            return null; // reuse key
 
         if (!Pie_Utils.isEmpty(getPassword()) && getPassword().length() < 6) {
-            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_PASS_SIZE_ERROR, config.getLanguage()));
             setKey(null);
-            return;
+            return Pie_Word.ENCRYPTION_PASS_SIZE_ERROR;
         }
         try {
             setKey(new SecretKeySpec(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(
                     new PBEKeySpec(getPassword().toCharArray(), new byte[16], 65536, 256)).getEncoded(), "AES"));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, config.getLanguage()) + " " + e.getMessage());
+            return Pie_Word.ENCRYPTION_ERROR;
         }
+        return null;
     }
 
     /** **************************************************<br>
      * create Certificate File
      * Generates a certificate of bewteen 100 - 600 random byte charactors between 1 - 255
-     * @param options (Pie_Config will be created if not entered, folder (File - Save to folder), file_name (String)
+     * @param options (Pie_Encode_Config will be created if not entered, folder (File - Save to folder), file_name (String)
      * @return (File) Certificate Created
      */
     public File create_Certificate_File(Object... options) {
-        Pie_Config config = null;
+        Pie_Encode_Config config = null;
         File folder = null;
         String file_name = null;
 
@@ -125,8 +124,8 @@ public class Pie_Encryption {
         boolean demo = false;
         Pie_Option opt = null;
         for (Object o : options) {
-            if (o instanceof Pie_Config) {
-                config = (Pie_Config) o;
+            if (o instanceof Pie_Encode_Config) {
+                config = (Pie_Encode_Config) o;
                 if (config.getOptions().contains(Pie_Option.DEMO_MODE)) {
                     demo = true;
                     config.setDemo_mode(demo);
@@ -143,7 +142,7 @@ public class Pie_Encryption {
         }
 
         if (config == null)
-            config = new Pie_Config();
+            config = new Pie_Encode_Config();
 
         if (Pie_Utils.isEmpty(file_name))
             file_name = Pie_Word.translate(Pie_Word.PIE_CERTIFICATE, config.getLanguage());
@@ -161,7 +160,7 @@ public class Pie_Encryption {
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ?
                 "" :  ".pie"));
 
-        Pie_Config encoding_config = new Pie_Config(Pie_Encode_Mode.THREE, Pie_Option.MODULATION,
+        Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.THREE, Pie_Option.MODULATION,
                 Pie_Option.CREATE_CERTIFICATE,
             Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
             new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
@@ -203,14 +202,16 @@ public class Pie_Encryption {
      * @param input (byte[])
      * @return (byte[])
      */
-    public byte[] encrypt(Pie_Config config, byte[] input) {
+    public byte[] encrypt(Pie_Encode_Config config, byte[] input) {
         setWas_Encrypted(false);
         if (config == null)
-            config = new Pie_Config();
+            return null;
 
         if (getKey() == null) {
             if (!Pie_Utils.isEmpty(getPassword())) {
-                createKey(config);
+                Pie_Word word = createKey();
+                if (word != null)
+                    config.logging(Level.SEVERE, Pie_Word.translate(word, config.getLanguage()));
                 if (config.isError())
                     return null;
 
@@ -257,15 +258,21 @@ public class Pie_Encryption {
      * @param input (byte[])
      * @return (byte[])
      */
-    public byte[] decrypt(Pie_Config config, byte[] input) {
+    public byte[] decrypt(Pie_Decode_Config config, byte[] input) {
         if (config == null)
-            config = new Pie_Config();
+            config = new Pie_Decode_Config();
 
         if (getKey() == null) {
-            if (!Pie_Utils.isEmpty(getPassword()))
-                createKey(config);
-            else
+            if (!Pie_Utils.isEmpty(getPassword())) {
+                Pie_Word word = createKey();
+                if (word != null) {
+                    config.logging(Level.SEVERE, Pie_Word.translate(word, config.getLanguage()));
+                    config.setError(true);
+                    return null;
+                }
+            }else {
                 return input;
+            }
         }
 
         if (getKey() == null)

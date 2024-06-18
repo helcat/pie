@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+/** ***************************************************<br>
+ * Poor Mans translator : There are better ways of doing this but it works.
+ */
+
 public enum Pie_Word {
 	NO_OPTIONS (
 			"Error no configuration options", "Erreur aucune option de configuration",

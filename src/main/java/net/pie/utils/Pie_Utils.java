@@ -1,6 +1,7 @@
 package net.pie.utils;
 
-import javax.imageio.ImageIO;
+import com.sun.javafx.util.Utils;
+
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,19 +9,12 @@ import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterOutputStream;
 
 public class Pie_Utils {
-    private boolean error = false;
-    private Runtime runtime = Runtime.getRuntime();
-    private Pie_Config config = null;
 
-    public Pie_Utils(Pie_Config config) {
-        ImageIO.setUseCache(false);
-        setConfig(config);
+    public Pie_Utils() {
     }
 
     /** *******************************************************<br>
@@ -46,7 +40,7 @@ public class Pie_Utils {
     }
 
     /** *******************************************************<br>
-     * is Directory
+     * is Directory ("isDirectory" does not check for a null)
      * @param file File
      * @return boolean
      */
@@ -55,7 +49,7 @@ public class Pie_Utils {
     }
 
     /** *******************************************************<br>
-     *
+     * IsFile does not check for a null. This is just to make it easier.
      * @param file File
      * @return boolean
      */
@@ -78,6 +72,7 @@ public class Pie_Utils {
 
     /** *******************************************************<br>
      * console out
+     * Used in Demo Not in PIE
      * @param content (String)
      */
     public static void console_out(String content) {
@@ -91,6 +86,12 @@ public class Pie_Utils {
     public static String stringDate() {
         return stringDate(true);
     }
+
+    /** **************************************************************<br>
+     * Used in Demo Not in PIE
+     * @param as_output boolean
+     * @return String
+     */
     public static String stringDate(boolean as_output) {
         try {
             return new SimpleDateFormat(as_output ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy_HH-mm-ss").format(new Date());
@@ -98,6 +99,10 @@ public class Pie_Utils {
         return "";
     }
 
+    /** **************************************************************<br>
+     * Used in Demo not in PIE
+     * @param log_file
+     */
     public static void setConsole_Out_File(File log_file) {
         try {
             if (log_file.exists() && !log_file.delete())
@@ -112,6 +117,7 @@ public class Pie_Utils {
 
     /** **************************************************************<br>
      * get a static folder. Some where files will never be deleted.
+     * Used for Pie_Demo not PIE. Assumes Windows or OSX
      * @return (File)
      */
     public static File getStatic_Folder() {
@@ -123,8 +129,10 @@ public class Pie_Utils {
 
         try {
             String staticDirPath = System.getProperty("user.home");
-            if (staticDirPath.startsWith(File.separator))
+            if (Utils.isMac() && staticDirPath.startsWith(File.separator))
                 staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
+            else if (Utils.isUnix() && staticDirPath.startsWith(File.separator))
+                staticDirPath = System.getProperty("java.io.tmpdir");
             else
                 staticDirPath = System.getenv("APPDATA");
 
@@ -152,13 +160,12 @@ public class Pie_Utils {
              folder_name = "PIE_Temp";
          // Use Temp Directory
          String tempDirPath = System.getProperty("java.io.tmpdir");
-         if (tempDirPath.startsWith(File.separator))
+         if (Utils.isMac() && tempDirPath.startsWith(File.separator)) // Assume OSX / Ubuntu
              tempDirPath = file_concat(tempDirPath, file_concat("tmp", folder_name));
          else
-             tempDirPath = file_concat(tempDirPath ,folder_name);
+             tempDirPath = file_concat(tempDirPath ,folder_name); // Windows
 
          File folder = new File(tempDirPath);
-
          if (folder.exists())
              return folder;
 
@@ -244,32 +251,6 @@ public class Pie_Utils {
         return in == null || in.trim().isEmpty();
     }
 
-    /** *******************************************************<br>
-     * <b>getters and setters</b><br>
-     * General Getters and Setters
-     **/
-    public Pie_Config getConfig() {
-        return config;
-    }
-    public void setConfig(Pie_Config config) {
-        this.config = config;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public Runtime getRuntime() {
-        return runtime;
-    }
-
-    public void setRuntime(Runtime runtime) {
-        this.runtime = runtime;
-    }
 }
 
 

@@ -80,7 +80,7 @@ public class Pie_Zip {
      * @param entryName (String)
      * @param bi (BufferedImage)
      */
-    boolean addZipEntry(String entryName, BufferedImage bi) {
+    public boolean addZipEntry(String entryName, BufferedImage bi) {
         ZipEntry entry = new ZipEntry(entryName);
         try {
             getZos().putNextEntry(entry);
@@ -161,7 +161,7 @@ public class Pie_Zip {
         this.zos = zos;
     }
 
-    FileOutputStream getFos() {
+    public FileOutputStream getFos() {
         return fos;
     }
 

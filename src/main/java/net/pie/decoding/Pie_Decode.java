@@ -1,7 +1,6 @@
-package net.pie;
+package net.pie.decoding;
 
 import net.pie.enums.*;
-import net.pie.utils.Pie_Config;
 import net.pie.utils.Pie_Utils;
 
 import javax.imageio.ImageIO;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Pie_Decode {
-    private Pie_Config config;
+    private Pie_Decode_Config config;
     private int total_files = 0;
     private OutputStream outputStream = null;
     private boolean encrypted = false;
@@ -31,9 +30,9 @@ public class Pie_Decode {
      * Processing for decoding the image back to source.<br>
      * @param config configuration file
      **/
-    public Pie_Decode(Pie_Config config) {
+    public Pie_Decode(Pie_Decode_Config config) {
         setConfig(config);
-        Pie_Utils utils = new Pie_Utils(getConfig());
+        Pie_Utils utils = new Pie_Utils();
         ImageIO.setUseCache(false);
         setTotal_files(0);
         setEncrypted(false);
@@ -373,10 +372,10 @@ public class Pie_Decode {
         return  getConfig() != null && getConfig().isError() ? getConfig().getError_message() : null;
     }
 
-    private void setConfig(Pie_Config config) {
+    private void setConfig(Pie_Decode_Config config) {
         this.config = config;
     }
-    private Pie_Config getConfig() {
+    private Pie_Decode_Config getConfig() {
         return config;
     }
     private int getTotal_files() {
