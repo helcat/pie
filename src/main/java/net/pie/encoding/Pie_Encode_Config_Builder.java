@@ -12,13 +12,11 @@ import java.util.logging.Level;
  Pie_Encode encode = new Pie_Encode(new Pie_Encode_Config_Builder()<br>
  .add_Option(Pie_Option.OVERWRITE_FILE)<br>
  .add_Mode(Pie_Encode_Mode.THREE)<br>
- .add_Language(new Pie_Language("fr")<br>
+ .add_Language("fr")<br>
  .add_Encryption(new Pie_Encryption(new File(<br>
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))<br>
- .add_Encode_Source(new Pie_Encode_Source(new File(<br>
-        Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))<br>
- .add_Encoded_Destination(new Pie_Encoded_Destination(new File(<br>
-        Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))<br>
+ .add_Encode_Source(new Pie_Encode_Source(new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), temp_To_Be_Encoded))<br>
+ .add_Directory(new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), temp_Encoded_Image))<br>
  .build());<br>
  */
 
@@ -30,7 +28,7 @@ public class Pie_Encode_Config_Builder {
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Source encoder_source = null;
-    private Pie_Encoded_Destination encoder_destination = null;
+    private Pie_Directory directory = null;
     private Pie_Language language = null;
 
     private Pie_Encryption encryption = null;
@@ -76,24 +74,32 @@ public class Pie_Encode_Config_Builder {
     }
 
     /** *********************************************************<br>
-     * Add Pie Langauge (For Error Translations)
+     * Add Pie Langauge (For Error Translations) Pie_Language or String ie "en"
      * @param option (Pie_Language)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Language(Pie_Language option) {
-        if (option != null)
-            this.language = option;
+    public Pie_Encode_Config_Builder add_Language(Object option) {
+        if (option != null) {
+            if (option instanceof  Pie_Language)
+                this.language = (Pie_Language) option;
+            else if (option instanceof  String)
+                this.language = new Pie_Language((String) option);
+        }
         return this;
     }
 
     /** *********************************************************<br>
-     * Add Pie Encoded Destination
-     * @param option (Pie_Encoded_Destination)
+     * Add Directory : File / String (Path)
+     * @param option (Object)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Encoded_Destination(Pie_Encoded_Destination option) {
-        if (option != null)
-            this.encoder_destination = option;
+    public Pie_Encode_Config_Builder add_Directory(Object option) {
+        if (option != null) {
+            if (option instanceof  Pie_Directory)
+                this.directory = (Pie_Directory) option;
+            else
+                this.directory = new Pie_Directory(option);
+        }
         return this;
     }
 
@@ -126,22 +132,43 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Zip)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Zip_Option(Pie_Zip option) {
-        if (option != null)
-            this.encoder_storage = option;
-        else
-            this.encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
+    public Pie_Encode_Config_Builder add_Zip_Option(Object... option) {
+        if (option == null || option.length == 0 || option.length > 2)
+            return  this;
+
+        if (option.length == 1) {
+            if (option[0] instanceof Pie_Zip) {
+                this.encoder_storage = (Pie_Zip) option[0];
+                return this;
+            }
+        }
+
+        Pie_ZIP_Name name = Pie_ZIP_Name.AS_IS;
+        Pie_ZIP_Option opt = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
+        for (Object o : option) {
+            if (o instanceof Pie_ZIP_Name)
+                name = (Pie_ZIP_Name) o;
+            if (o instanceof Pie_ZIP_Option)
+                opt = (Pie_ZIP_Option) o;
+        }
+
+        this.encoder_storage = new Pie_Zip(name, opt);
         return this;
     }
 
     /** *********************************************************<br>
-     * Add Pie Encode Max MB Must be greater than 50
+     * Add Pie Encode Max MB Must be greater than 50 Pie_Max_MB or Integer
      * @param option (Pie_Max_MB)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Max_MB(Pie_Max_MB option) {
-        if (option != null && option.getMb() > 50)
-            this.max_mb = option;
+    public Pie_Encode_Config_Builder add_Max_MB(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Max_MB)
+                this.max_mb = (Pie_Max_MB) option;
+            else if (option instanceof  Integer)
+                this.max_mb = new Pie_Max_MB((Integer) option);
+        }
+
         return this;
     }
 
@@ -187,8 +214,8 @@ public class Pie_Encode_Config_Builder {
         if (encoder_source != null)
             options.add(encoder_source);
 
-        if (encoder_destination != null)
-            options.add(encoder_destination);
+        if (directory != null)
+            options.add(directory);
 
         if (log_level != null)
             options.add(log_level);

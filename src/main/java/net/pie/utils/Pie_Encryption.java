@@ -164,7 +164,7 @@ public class Pie_Encryption {
                 Pie_Option.CREATE_CERTIFICATE,
             Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
             new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
-            new Pie_Encoded_Destination(cert.getParentFile())
+            new Pie_Directory(cert.getParentFile())
         );
 
         if (demo)

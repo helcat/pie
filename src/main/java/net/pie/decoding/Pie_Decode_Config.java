@@ -85,11 +85,6 @@ public class Pie_Decode_Config {
                     break;
                 case "Pie_Decode_Destination":
                     this.decoded_destination = (Pie_Decode_Destination) o;
-                    if (this.decoded_destination.getError_code() != null) {
-                        logging(Level.SEVERE, Pie_Word.translate(this.decode_source.getError_code(), getLanguage()));
-                        setError(true);
-                        return;
-                    }
                     break;
             }
         }

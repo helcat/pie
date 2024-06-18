@@ -1,27 +1,21 @@
 package net.pie.utils;
 
-import net.pie.enums.Pie_Word;
-
 import java.io.File;
-import java.util.List;
 
 /** *******************************************************************<br>
- * <b>Pie_Encode_Destination</b><br>
- * Used to save the encoded image after its built.<br>
- * This is optional. The encoded bufferedImage is available directly after the encoded process.<br>
- * Use getEncoded_image from Pie_Encode
+ * <b>Pie_Directory</b><br>
+ * Used to save the encoded image after its built or decoded file after decoding .<br>
+ * This is optional.<br>
  **/
-public class Pie_Decode_Destination {
+
+public class Pie_Directory {
     private File local_folder;
-    private String file_name = null;
-    private byte[] bytes = null;
-    private List<String> file_list = null;
 
     /** *******************************************************************<br>
-     * <b>Pie_Encode_Destination</b><br>
-     * With no parameters, Pie_Encoded_Destination allows for custom parameters.
+     * <b>Pie_Directory</b><br>
+     * With no parameters
      **/
-    public Pie_Decode_Destination() {
+    public Pie_Directory() {
         setLocal_folder(Pie_Utils.getTempFolder());
     }
 
@@ -29,7 +23,7 @@ public class Pie_Decode_Destination {
      * <b>Pie_Encode_Destination</b><br>
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/
-    public Pie_Decode_Destination(Object o) {
+    public Pie_Directory(Object o) {
         if (o == null) {
             setLocal_folder(Pie_Utils.getDesktop());
             return;
@@ -40,16 +34,22 @@ public class Pie_Decode_Destination {
             return;
         }
 
+        if (o instanceof File && ((File) o).exists() && Pie_Utils.isFile((File) o)) {
+            setLocal_folder(((File) o).getParentFile());
+            return;
+        }
+
         if (o instanceof String) {
             File f = new File((String) o);
             if (Pie_Utils.isDirectory(f))
                 setLocal_folder(f);
+            else if (Pie_Utils.isFile(f))
+                setLocal_folder(f.getParentFile());
             return;
         }
 
         setLocal_folder(Pie_Utils.getDesktop());
     }
-
 
     public File getLocal_folder() {
         return local_folder;
@@ -59,29 +59,6 @@ public class Pie_Decode_Destination {
         this.local_folder = local_folder;
     }
 
-    public String getFile_name() {
-        return file_name;
-    }
-
-    public void setFile_name(String file_name) {
-        this.file_name = file_name;
-    }
-
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-    public List<String> getFile_list() {
-        return file_list;
-    }
-
-    public void setFile_list(List<String> file_list) {
-        this.file_list = file_list;
-    }
 }
 
 

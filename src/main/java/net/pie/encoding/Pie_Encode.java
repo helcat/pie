@@ -21,6 +21,7 @@ public class Pie_Encode {
     private Pie_Encode_Config config;
     private int[] modulate = new int[]{0,0,0,0};
     private List<BufferedImage> output_Images = null;
+    private List<String> file_list = new ArrayList<>();
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
@@ -200,7 +201,7 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (getConfig().getEncoder_destination() != null) {
+        if (getConfig().getDirectory() != null) {
             if (!save_Encoded_Image(data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name()))
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
             data_image = null;
@@ -437,10 +438,9 @@ public class Pie_Encode {
      * @return ist<String>
      */
     public List<String> getEncoded_file_list() {
-        if (getConfig() == null || getConfig().getEncoder_destination() == null)
+        if (getConfig() == null || getConfig().getDirectory() == null)
             return new ArrayList<>();
-        return getConfig().getEncoder_destination().getEncoded_file_list() == null ? new ArrayList<>() :
-                getConfig().getEncoder_destination().getEncoded_file_list();
+        return getFile_list() == null ? new ArrayList<>() : getFile_list();
     }
 
     /** *******************************************************************<br>
@@ -469,9 +469,7 @@ public class Pie_Encode {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    public boolean save_Encoded_Image(BufferedImage image, int file_number, int total_files, String source_filename) {
-        getConfig().getEncoder_destination().setEncoded_file_list(new ArrayList<>());
-
+    private boolean save_Encoded_Image(BufferedImage image, int file_number, int total_files, String source_filename) {
         if (getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ALWAYS) ||
                 getConfig().getEncoder_storage().getOption().equals(Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED) && total_files > 1) {
             if (getConfig().getEncoder_storage().getFos() == null)
@@ -509,9 +507,9 @@ public class Pie_Encode {
     private File addFileNumber(int file_number, String source_filename) {
         boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
         String name = create_File_Name(file_number, source_filename);
-        File file = new File(Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
-                Pie_Utils.file_concat(getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath(),  name)
-                : Pie_Utils.file_concat(getConfig().getEncoder_destination().getLocal_folder().getParent(), name ));
+        File file = new File(Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
+                Pie_Utils.file_concat(getConfig().getDirectory().getLocal_folder().getAbsolutePath(),  name)
+                : Pie_Utils.file_concat(getConfig().getDirectory().getLocal_folder().getParent(), name ));
         if (file.exists()) {
             if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && file.delete())
                 return file;
@@ -535,8 +533,8 @@ public class Pie_Encode {
      * @param source_filename (int)
      */
     private String getZip_File_Name(String source_filename) {
-        String name = Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
-                source_filename  : getConfig().getEncoder_destination().getLocal_folder().getName();
+        String name = Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
+                source_filename  : getConfig().getDirectory().getLocal_folder().getName();
         if (!name.toLowerCase().endsWith(".zip"))
             name = name + ".zip";
         return name;
@@ -548,12 +546,12 @@ public class Pie_Encode {
      * @param source_filename (String)
      * @return String
      */
-    public String create_File_Name(int file_number, String source_filename) {
-        if (getConfig().getEncoder_destination().getLocal_folder() == null)
-            getConfig().getEncoder_destination().setLocal_folder(Pie_Utils.getTempFolder());
+    private String create_File_Name(int file_number, String source_filename) {
+        if (getConfig().getDirectory().getLocal_folder() == null)
+            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
 
-        String name = Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
-                source_filename : getConfig().getEncoder_destination().getLocal_folder().getName();
+        String name = Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
+                source_filename : getConfig().getDirectory().getLocal_folder().getName();
         if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
             return name;
 
@@ -583,11 +581,11 @@ public class Pie_Encode {
      */
     private File create_Zip_File(String name) {
         boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
-        File file = new File(Pie_Utils.isDirectory(getConfig().getEncoder_destination().getLocal_folder()) ?
-                getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath() + File.separator + name
+        File file = new File(Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
+                getConfig().getDirectory().getLocal_folder().getAbsolutePath() + File.separator + name
                 :
-                getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath().substring(0,
-                        getConfig().getEncoder_destination().getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
+                getConfig().getDirectory().getLocal_folder().getAbsolutePath().substring(0,
+                        getConfig().getDirectory().getLocal_folder().getAbsolutePath().lastIndexOf(File.separator)) + File.separator +  name
         );
         if (file.exists())
             getConfig().logging(Level.WARNING,Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage()) +
@@ -618,8 +616,15 @@ public class Pie_Encode {
         return output_Images;
     }
 
-    public void setOutput_Images(List<BufferedImage> output_Images) {
+    private void setOutput_Images(List<BufferedImage> output_Images) {
         this.output_Images = output_Images;
     }
 
+    public List<String> getFile_list() {
+        return file_list;
+    }
+
+    public void setFile_list(List<String> file_list) {
+        this.file_list = file_list;
+    }
 }

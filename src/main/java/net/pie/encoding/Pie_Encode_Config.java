@@ -11,7 +11,7 @@ import java.util.logging.Level;
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>
  * Encoding options. Pie_Option, Level, Pie_Encryption
- * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encode_Source, Pie_Encoded_Destination<br>
+ * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encode_Source, Pie_Directory<br>
  * Add parmeters in any order, or use an object list<br>
  * The Default is Log level is Level.SEVERE<br>
  * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
@@ -23,7 +23,7 @@ import java.util.logging.Level;
  * @see Pie_ZIP_Name
  * @see Pie_Encryption
  * @see Pie_Encode_Source
- * @see Pie_Encoded_Destination
+ * @see Pie_Directory
  *
  **/
 public class Pie_Encode_Config {
@@ -35,7 +35,7 @@ public class Pie_Encode_Config {
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
 
     private Pie_Encode_Source encoder_source = null;
-    private Pie_Encoded_Destination encoder_destination = null;
+    private Pie_Directory directory = null;
 
     private Level log_level = Level.SEVERE;
     private boolean error = false;
@@ -95,7 +95,7 @@ public class Pie_Encode_Config {
                         return;
                     }
                     break;
-                case "Pie_Encoded_Destination": this.encoder_destination = (Pie_Encoded_Destination) o; break;
+                case "Pie_Directory": this.directory = (Pie_Directory) o; break;
                 case "Pie_Max_MB": this.max_mb = (Pie_Max_MB) o; break;
                 case "Level": this.log_level = (Level) o; break;
             }
@@ -240,14 +240,6 @@ public class Pie_Encode_Config {
     }
 
     /** ******************************************************************<br>
-     * get the file or destination, where to send the final file.
-     * @see Pie_Encoded_Destination
-     */
-    public Pie_Encoded_Destination getEncoder_destination() {
-        return encoder_destination;
-    }
-
-    /** ******************************************************************<br>
      * List of Pie_Option's
      * @return (List)
      */
@@ -293,6 +285,10 @@ public class Pie_Encode_Config {
 
     public void setLanguage(Pie_Language language) {
         this.language = language;
+    }
+
+    public Pie_Directory getDirectory() {
+        return directory;
     }
 
 }
