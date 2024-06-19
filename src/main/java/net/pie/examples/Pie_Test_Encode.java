@@ -85,6 +85,6 @@ public class Pie_Test_Encode {
         // Do Encoding, Will create the image and put it in the destination
         Pie_Encode encode = new Pie_Encode(encoding_config);
  **/
-       encode.getEncoded_file_list().forEach(System.out::println);
+       encode.getFile_list().forEach(System.out::println);
     }
 }

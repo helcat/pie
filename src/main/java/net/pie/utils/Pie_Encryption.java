@@ -171,7 +171,7 @@ public class Pie_Encryption {
             encoding_config.setDemo_mode(true);
 
         Pie_Encode encode = new Pie_Encode(encoding_config);
-        encode.getEncoded_file_list().forEach(System.out::println);
+        encode.getFile_list().forEach(System.out::println);
         if (encode.isEncoding_Error()) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
             return null;

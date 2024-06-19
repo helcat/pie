@@ -3,6 +3,8 @@ package net.pie.encoding;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
+import javax.crypto.SecretKey;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -54,11 +56,23 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Shape)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Shape(Pie_Shape option) {
-        if (option != null)
-            this.encoder_shape = option;
-        else
-            this.encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
+    public Pie_Encode_Config_Builder add_Shape(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Shape) {
+                this.encoder_shape = (Pie_Shape) option;
+                return this;
+            } else if (option instanceof String) {
+                if (Pie_Word.is_in_Translation(Pie_Word.RECTANGLE, (String) option)) {
+                    this.encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
+                    return this;
+                }
+                if (Pie_Word.is_in_Translation(Pie_Word.SQUARE, (String) option)) {
+                    this.encoder_shape = Pie_Shape.SHAPE_SQUARE;
+                    return this;
+                }
+            }
+        }
+        this.encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
         return this;
     }
 
@@ -108,9 +122,13 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Encode_Source)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Encode_Source(Pie_Encode_Source option) {
-        if (option != null)
-            this.encoder_source = option;
+    public Pie_Encode_Config_Builder add_Encode_Source(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Encode_Source)
+                this.encoder_source = (Pie_Encode_Source) option;
+            else
+                this.encoder_source = new Pie_Encode_Source(option);
+        }
         return this;
     }
 
@@ -119,11 +137,27 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Encode_Mode)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Mode(Pie_Encode_Mode option) {
-        if (option != null)
-            this.encoder_mode = option;
-        else
-            this.encoder_mode = Pie_Encode_Mode.THREE;
+    public Pie_Encode_Config_Builder add_Mode(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Encode_Mode) {
+                this.encoder_mode = (Pie_Encode_Mode) option;
+                return this;
+            } else if (option instanceof String) {
+                if (Pie_Word.is_in_Translation(Pie_Word.ONE, (String) option)) {
+                    this.encoder_mode = Pie_Encode_Mode.ONE;
+                    return this;
+                }
+                if (Pie_Word.is_in_Translation(Pie_Word.TWO, (String) option)) {
+                    this.encoder_mode = Pie_Encode_Mode.TWO;
+                    return this;
+                }
+                if (Pie_Word.is_in_Translation(Pie_Word.THREE, (String) option)) {
+                    this.encoder_mode = Pie_Encode_Mode.THREE;
+                    return this;
+                }
+            }
+        }
+        this.encoder_mode = Pie_Encode_Mode.THREE;
         return this;
     }
 
@@ -177,9 +211,21 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Option)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Encryption(Pie_Encryption option) {
-        if (option != null)
-            this.encryption = option;
+    public Pie_Encode_Config_Builder add_Encryption(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Encryption) {
+                this.encryption = (Pie_Encryption) option;
+
+            } else if (option instanceof File) {
+                this.encryption = new Pie_Encryption((File) option);
+
+            } else if (option instanceof String) {
+                this.encryption = new Pie_Encryption((String) option);
+
+            } else if (option instanceof SecretKey) {
+                this.encryption = new Pie_Encryption((SecretKey) option);
+            }
+        }
         return this;
     }
 

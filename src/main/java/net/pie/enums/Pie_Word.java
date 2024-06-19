@@ -178,7 +178,17 @@ public enum Pie_Word {
 	FAILED ("Failed", "Échoué", "Fallito", "Fallido"),
 
 	MAX_IMAGE_SIZE_NOT_SET ("Maximum Image Size Is Not Set", "La taille maximale de l'image n'est pas définie",
-		"La dimensione massima dell'immagine non è impostata", "El tamaño máximo de imagen no está establecido")
+		"La dimensione massima dell'immagine non è impostata", "El tamaño máximo de imagen no está establecido"),
+
+	RECTANGLE ("Rectangle", "Rectangle", "Rettangolo", "Rectángulo"),
+
+	SQUARE ("Square", "Carré", "Piazza", "Cuadrado"),
+
+	ONE ("One", "Un", "Uno", "Uno"),
+
+	TWO ("Two", "Deux", "Due", "Dos"),
+
+	THREE ("Three", "Trois", "Tre", "Tres"),
 	;
 
 	private String en;
@@ -191,6 +201,19 @@ public enum Pie_Word {
 		setFr(fr);
 		setIt(it);
 		setEs(es);
+	}
+
+	/** *****************************************************************<br>
+	 * Find out if the user has entered one of the given translations of a given Pie_Word
+	 * @param word Pie_Word
+	 * @param wording String
+	 * @return boolean
+	 */
+	public static boolean is_in_Translation(Pie_Word word, String wording) {
+		return (word.getEn().equalsIgnoreCase(wording.toLowerCase()) ||
+				word.getFr().equalsIgnoreCase(wording.toLowerCase()) ||
+				word.getIt().equalsIgnoreCase(wording.toLowerCase()) ||
+				word.getEs().equalsIgnoreCase(wording.toLowerCase()));
 	}
 
 	public static String translate(Pie_Word word) {

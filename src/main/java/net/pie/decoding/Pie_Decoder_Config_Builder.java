@@ -4,6 +4,8 @@ import net.pie.encoding.Pie_Encode_Config_Builder;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
+import javax.crypto.SecretKey;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,9 +52,13 @@ public class Pie_Decoder_Config_Builder {
      * @param option (Pie_Language)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Decoder_Config_Builder add_Language(Pie_Language option) {
-        if (option != null)
-            this.language = option;
+    public Pie_Decoder_Config_Builder add_Language(Object option) {
+        if (option != null) {
+            if (option instanceof  Pie_Language)
+                this.language = (Pie_Language) option;
+            else if (option instanceof  String)
+                this.language = new Pie_Language((String) option);
+        }
         return this;
     }
 
@@ -94,9 +100,21 @@ public class Pie_Decoder_Config_Builder {
      * @param option (Pie_Option)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Decoder_Config_Builder add_Encryption(Pie_Encryption option) {
-        if (option != null)
-            this.encryption = option;
+    public Pie_Decoder_Config_Builder add_Encryption(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Encryption) {
+                this.encryption = (Pie_Encryption) option;
+
+            } else if (option instanceof File) {
+                this.encryption = new Pie_Encryption((File) option);
+
+            } else if (option instanceof String) {
+                this.encryption = new Pie_Encryption((String) option);
+
+            } else if (option instanceof SecretKey) {
+                this.encryption = new Pie_Encryption((SecretKey) option);
+            }
+        }
         return this;
     }
 

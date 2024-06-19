@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -32,6 +34,31 @@ public class Pie_Test {
      * @param arg (Text Supplied when starting the jar)
      **/
     public Pie_Test(String arg) {
+
+        String base64String =
+                "VGVycnkgV2FzIEhlcmUgaW4gQ2hlbHRlbmhhbSBUZXJyeSBXYXMgSGVyZSBpbiBDaGVsdGVuaGFt";
+        Map<String, Integer> letterCounts = new HashMap<>();
+
+        for (int i = 0; i < base64String.length() - 1; i++) {
+            String seq = base64String.substring(i, i + 2);
+            if (!letterCounts.containsKey(seq)) {
+                letterCounts.put(seq, 1);
+            } else {
+                int count = letterCounts.get(seq) + 1;
+                letterCounts.put(seq, count);
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : letterCounts.entrySet()) {
+            if (entry.getValue() > 1) {
+                System.out.println("Pattern: " + entry.getKey());
+                System.out.println("Count: " + entry.getValue());
+            }
+        }
+
+
+
+
         //for (int i = 0; i < 50; i++)
         //    System.out.println(((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1));
 

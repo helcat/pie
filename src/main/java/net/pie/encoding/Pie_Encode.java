@@ -20,7 +20,7 @@ import java.util.zip.DeflaterOutputStream;
 public class Pie_Encode {
     private Pie_Encode_Config config;
     private int[] modulate = new int[]{0,0,0,0};
-    private List<BufferedImage> output_Images = null;
+    private List<BufferedImage> output_Images = new ArrayList<>();
     private List<String> file_list = new ArrayList<>();
 
     /** ******************************************************<br>
@@ -31,7 +31,6 @@ public class Pie_Encode {
      * @see Pie_Encode_Config
      **/
     public Pie_Encode (Pie_Encode_Config config) {
-        setOutput_Images(new ArrayList<>());
         ImageIO.setUseCache(false);
         setConfig(config);
         getConfig().validate_Encoding_Parameters();
@@ -433,17 +432,6 @@ public class Pie_Encode {
     }
 
     /** *******************************************************************<br>
-     * getEncoded_file_list<br>
-     * returns a list of the files created, does not include files stored in a zip file.<br>
-     * @return ist<String>
-     */
-    public List<String> getEncoded_file_list() {
-        if (getConfig() == null || getConfig().getDirectory() == null)
-            return new ArrayList<>();
-        return getFile_list() == null ? new ArrayList<>() : getFile_list();
-    }
-
-    /** *******************************************************************<br>
      * isEncoding_Error<br>
      * Not used in Pie. Can be used by user to see if an error occurred without checking the logs.
      * @return boolean
@@ -488,7 +476,7 @@ public class Pie_Encode {
                         " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, getConfig().getLanguage()));
                 return false;
             }
-            getEncoded_file_list().add(toFile.getPath());
+            getFile_list().add(toFile.getPath());
             try {
                 return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
             } catch (IOException e) {
@@ -611,20 +599,12 @@ public class Pie_Encode {
         this.modulate = modulate;
     }
 
-
     public List<BufferedImage> getOutput_Images() {
         return output_Images;
-    }
-
-    private void setOutput_Images(List<BufferedImage> output_Images) {
-        this.output_Images = output_Images;
     }
 
     public List<String> getFile_list() {
         return file_list;
     }
 
-    public void setFile_list(List<String> file_list) {
-        this.file_list = file_list;
-    }
 }
