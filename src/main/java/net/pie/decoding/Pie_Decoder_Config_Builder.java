@@ -5,7 +5,11 @@ import net.pie.enums.*;
 import net.pie.utils.*;
 
 import javax.crypto.SecretKey;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,14 +33,14 @@ public class Pie_Decoder_Config_Builder {
     private Pie_Encryption encryption = null;
 
     private Pie_Decode_Source decode_source = null;
-    private Pie_Decode_Destination decoded_Source_destination = null;
+    private Pie_Directory directory = null;
     private Pie_Language language = null;
     private Level log_level = Level.SEVERE;
 
     /** *********************************************************<br>
      * Add Pie Options, Be be single or multiple
      * @param options
-     * @return (Pie_ConfigBuilder)
+     * @return (Pie_Decoder_Config_Builder)
      */
     public Pie_Decoder_Config_Builder add_Option(Pie_Option... options) {
         if (options != null)
@@ -50,7 +54,7 @@ public class Pie_Decoder_Config_Builder {
     /** *********************************************************<br>
      * Add Pie Langauge (For Error Translations)
      * @param option (Pie_Language)
-     * @return (Pie_ConfigBuilder)
+     * @return (Pie_Decoder_Config_Builder)
      */
     public Pie_Decoder_Config_Builder add_Language(Object option) {
         if (option != null) {
@@ -65,7 +69,7 @@ public class Pie_Decoder_Config_Builder {
     /** *********************************************************<br>
      * Add log level
      * @param option (log_level)
-     * @return (Pie_ConfigBuilder)
+     * @return (Pie_Decoder_Config_Builder)
      */
     public Pie_Decoder_Config_Builder add_Log_Level(Level option) {
         if (option != null)
@@ -74,31 +78,57 @@ public class Pie_Decoder_Config_Builder {
     }
 
     /** *********************************************************<br>
-     * Add Pie Decode Destination
-     * @param option (Pie_Decode_Destination)
-     * @return (Pie_ConfigBuilder)
+     * Add Directory : File / String (Path)
+     * @param option (Object)
+     * @return (Pie_Decoder_Config_Builder)
      */
-    public Pie_Decoder_Config_Builder add_Decode_Destination(Pie_Decode_Destination option) {
-        if (option != null)
-            this.decoded_Source_destination = option;
+    public Pie_Decoder_Config_Builder add_Directory(Object option) {
+        if (option != null) {
+            if (option instanceof  Pie_Directory)
+                this.directory = (Pie_Directory) option;
+            else
+                this.directory = new Pie_Directory(option);
+        }
         return this;
     }
-
     /** *********************************************************<br>
      * Add Pie Decode Source
      * @param option (Pie_Decode_Source)
-     * @return (Pie_ConfigBuilder)
+     * @return (Pie_Decoder_Config_Builder)
      */
-    public Pie_Decoder_Config_Builder add_Decode_Source(Pie_Decode_Source option) {
-        if (option != null)
-            this.decode_source = option;
+    public Pie_Decoder_Config_Builder add_Decode_Source(Object option) {
+        if (option != null) {
+            if (option instanceof Pie_Decode_Source) {
+                this.decode_source = (Pie_Decode_Source) option;
+
+            }else if (option instanceof File) {
+                this.decode_source = new Pie_Decode_Source((File) option);
+
+            }else if (option instanceof URL) {
+                this.decode_source = new Pie_Decode_Source((URL) option);
+
+            }else if (option instanceof Pie_URL) {
+                this.decode_source = new Pie_Decode_Source((Pie_URL) option);
+
+            }else if (option instanceof FileInputStream) {
+                this.decode_source = new Pie_Decode_Source((FileInputStream) option);
+
+            }else if (option instanceof ByteArrayInputStream) {
+                this.decode_source = new Pie_Decode_Source((ByteArrayInputStream) option);
+
+            }else if (option instanceof InputStream) {
+                this.decode_source = new Pie_Decode_Source((InputStream) option);
+            }
+
+        }
+
         return this;
     }
 
     /** *********************************************************<br>
      * Add Pie Options
      * @param option (Pie_Option)
-     * @return (Pie_ConfigBuilder)
+     * @return (Pie_Decoder_Config_Builder)
      */
     public Pie_Decoder_Config_Builder add_Encryption(Object option) {
         if (option != null) {
@@ -137,8 +167,8 @@ public class Pie_Decoder_Config_Builder {
         if (decode_source != null)
             options.add(decode_source);
 
-        if (decoded_Source_destination != null)
-            options.add(decoded_Source_destination);
+        if (directory != null)
+            options.add(directory);
 
         if (log_level != null)
             options.add(log_level);
@@ -152,6 +182,14 @@ public class Pie_Decoder_Config_Builder {
 
     public void setLanguage(Pie_Language language) {
         this.language = language;
+    }
+
+    public Pie_Directory getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(Pie_Directory directory) {
+        this.directory = directory;
     }
 }
 

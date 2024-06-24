@@ -9,8 +9,9 @@ import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
-import java.util.zip.Inflater;
-import java.util.zip.InflaterOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.*;
 
 public class Pie_Utils {
 
@@ -24,6 +25,54 @@ public class Pie_Utils {
      * @return ByteArrayOutputStream
      **/
     public byte[] decompress_return_bytes(byte[] bytes) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (GZIPInputStream gzipper = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = gzipper.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            return bytes;
+        }
+
+        byte[] return_bytes = outputStream.toByteArray();
+
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return return_bytes;
+    }
+
+    public static byte[] compress_return_bytes(byte[] bytes) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            //Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+            GZIPOutputStream out = new GZIPOutputStream(baos); //, compressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException ignored) {
+            return bytes;
+        }
+
+        byte[] return_bytes = baos.toByteArray();
+        try {
+            baos.close();
+            baos = null;
+        } catch (IOException ignored) {  }
+
+        return return_bytes;
+    }
+
+    /** *******************************************************<br>
+     * <b>decompress_return_Baos</b><br>
+     * Main functon for decompressing.<br>
+     * @param bytes (byte[])
+     * @return ByteArrayOutputStream
+     **/
+    public static byte[] inflater_return_bytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             Inflater decompressor = new Inflater(true);
@@ -37,6 +86,26 @@ public class Pie_Utils {
             baos.close();
         } catch (IOException ignored) { }
         return baos.toByteArray();
+    }
+
+    public static byte[] deflater_return_bytes(byte[] bytes) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
+            OutputStream out = new DeflaterOutputStream(baos, compressor);
+            out.write(bytes);
+            out.close();
+        } catch (IOException ignored) {
+            return bytes;
+        }
+
+        byte[] return_bytes = baos.toByteArray();
+        try {
+            baos.close();
+            baos = null;
+        } catch (IOException ignored) {  }
+
+        return return_bytes;
     }
 
     /** *******************************************************<br>
@@ -250,6 +319,39 @@ public class Pie_Utils {
     public static boolean isEmpty(String in) {
         return in == null || in.trim().isEmpty();
     }
+
+    public static byte[] find_duplicates(String base64String) {
+        Map<String, Integer> letterCounts = new HashMap<>();
+        int count = 0;
+        String seq = null;
+        int chunk = 2;
+        int high = 0;
+        for (int i = 0; i < base64String.length() - 1;) {
+            seq = base64String.substring(i, i + chunk);
+            if (!letterCounts.containsKey(seq)) {
+                letterCounts.put(seq, 1);
+            } else {
+                count = letterCounts.get(seq) + 1;
+                high = (Math.max(count, high));
+                letterCounts.put(seq, count);
+            }
+            i = i + chunk;
+        }
+
+        System.out.println("highest : " + high);
+        count = 0;
+        for (Map.Entry<String, Integer> entry : letterCounts.entrySet()) {
+            if (entry.getValue() > 400) {
+                System.out.println("Pattern: " + entry.getKey() + " Count: " + entry.getValue());
+                count ++;
+            }
+        }
+        System.out.println("Over 400 " + count + ", " +
+                "Total Count: " + letterCounts.size() + " Length " + base64String.length());
+
+        return base64String.getBytes(StandardCharsets.UTF_8);
+    }
+
 
 }
 

@@ -1,5 +1,7 @@
 package net.pie.enums;
 
+import java.nio.charset.StandardCharsets;
+
 /** *******************************************************<br>
  * <b>Pie_Constants</b><br>
  * Constants used internally for default settings.
@@ -10,8 +12,9 @@ public enum Pie_Constants {
     MIN_PROTECTED_SIZE (50, "MIN"),
     MAX_PROTECTED_SIZE (15000, "MAX"),
     MAX_PROTCTED_CREATED_FILES (30, "MAX_FILES"),
-    PARM_SPLIT_TAG (0, "|"),
-    PARM_START_TAG (0, ">"),
+    PARM_SPLIT_TAG ("|".getBytes(StandardCharsets.UTF_8)[0], "|"),
+    PARM_START_TAG (">".getBytes(StandardCharsets.UTF_8)[0], ">"),
+    PARM_END_TAG ("~".getBytes(StandardCharsets.UTF_8)[0], "~"),
     IMAGE_TYPE (0, "png"),
     ;
 

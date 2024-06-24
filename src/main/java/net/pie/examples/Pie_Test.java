@@ -10,9 +10,11 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.GZIPInputStream;
 
 public class Pie_Test {
 
@@ -35,6 +38,71 @@ public class Pie_Test {
      **/
     public Pie_Test(String arg) {
 
+    }
+
+    private void ai() {
+        String text = "{" +
+                "  \"model\": \"llama3:latest\"," +
+                "  \"prompt\": \"Hello How Are you today. Respond using String\"" +
+                "," +
+                "\"format\": \"json\"" +
+                "," +
+                "\"stream\": false" +
+                "}";
+
+        receive("http://localhost:11434",  null);
+        receive("http://localhost:11434/api/tags", null);
+        receive("http://localhost:11434/api/generate", text);
+    }
+    
+    private void receive(String ollama_url, String post_text)  {
+        URL url = null;
+        try {
+            url = new URL(ollama_url);
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(post_text != null ? "POST" : "GET");
+            if (post_text != null) {
+                http.setRequestProperty("content-Length", ""+post_text.getBytes(StandardCharsets.UTF_8).length);
+                http.setRequestProperty("Content-type", "application/json");
+            }
+            http.setReadTimeout(30000);
+            http.setConnectTimeout(30000);
+            http.setDoInput(true);
+            http.setDoOutput(true);
+            http.setUseCaches(true);
+
+            if (post_text != null)
+                http.getOutputStream().write(post_text.getBytes(StandardCharsets.UTF_8));
+
+            if (http.getResponseCode() > 299) {
+                http.disconnect();
+                return;
+            }
+
+            InputStream is = http.getInputStream();
+            if ( is != null) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096]; // Buffer size can be adjusted as needed
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1)
+                    baos.write(buffer, 0, bytesRead);
+                byte[] data = baos.toByteArray();
+                baos.close();
+                is.close();
+                System.out.println(new String(data, StandardCharsets.UTF_8));
+            }else {
+                return;
+            }
+            http.disconnect();
+
+        } catch (MalformedURLException e) {} catch (ProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void test_find_duplicates() {
         String base64String =
                 "VGVycnkgV2FzIEhlcmUgaW4gQ2hlbHRlbmhhbSBUZXJyeSBXYXMgSGVyZSBpbiBDaGVsdGVuaGFt";
         Map<String, Integer> letterCounts = new HashMap<>();
@@ -55,62 +123,6 @@ public class Pie_Test {
                 System.out.println("Count: " + entry.getValue());
             }
         }
-
-
-
-
-        //for (int i = 0; i < 50; i++)
-        //    System.out.println(((int) Math.floor(Math.random() * (99 - 1 + 1)) + 1));
-
-        /**
-        StringBuilder text = new StringBuilder();
-        for (int i = 0; i < 10000; i++)
-            text.append("W");
-
-        FileWriter f = null;
-        try {
-            f = new FileWriter(new File(Pie_Utils.getDesktop() + File.separator + "test.txt"));
-            f.write(Arrays.toString(compress(text.toString().getBytes())));
-            //f.write(Arrays.toString(text.toString().getBytes()));
-            //f.write(String.valueOf(text));
-            f.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-         **/
-
-        //Pie_Encryption encryption = new Pie_Encryption("123456789 £ 0123456h ghfghfghfghfghf");
-        //encryption.create_Certificate_File(new Pie_Config(Level.INFO), Pie_Utils.getDesktop(), "pie_certificate");
-
-        /**
-        Pie_Config config = new Pie_Config();
-        Pie_Encryption encryption =
-                new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_certificate.pie"));
-        byte[] bytes = "this is a dsg £ g hhhhh gfd gtest".getBytes(StandardCharsets.UTF_8);
-        bytes = encryption.encrypt(config, bytes);
-        bytes = encryption.decrypt(config, bytes);
-        System.out.println(new String(bytes, StandardCharsets.UTF_8));
-        **/
-
-        /**
-        byte[] bytes = new byte[0];
-        try {
-            bytes = encrypt("this is a dsg g  gfd gtest".getBytes(StandardCharsets.UTF_8), "passkeyqaqaqaqaqdfsdfdsd");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println(new String(bytes));
-
-        try {
-            System.out.println(new String(decrypt(bytes, "passkeyqaqaqaqaqdfsdfdsd")));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-         **/
-
-        //combineNumbers();
-        //test_bytes();
     }
 
     public static byte[] encrypt(byte[] input, String password) throws Exception {

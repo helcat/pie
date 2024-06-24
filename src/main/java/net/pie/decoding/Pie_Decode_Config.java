@@ -20,14 +20,14 @@ import java.util.logging.LogRecord;
  * @see Level
  * @see Pie_Encryption
  * @see Pie_Decode_Source
- * @see Pie_Decode_Destination
+ * @see Pie_Directory
  *
  **/
 public class Pie_Decode_Config {
     private List<Pie_Option> options = new ArrayList<>();
     private Pie_Encryption encryption = null;
     private Pie_Decode_Source decode_source = null;
-    private Pie_Decode_Destination  decoded_destination = null;
+    private Pie_Directory directory = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private String error_message = null;
@@ -83,9 +83,7 @@ public class Pie_Decode_Config {
                         return;
                     }
                     break;
-                case "Pie_Decode_Destination":
-                    this.decoded_destination = (Pie_Decode_Destination) o;
-                    break;
+                case "Pie_Directory": this.directory = (Pie_Directory) o; break;
             }
         }
 
@@ -94,11 +92,13 @@ public class Pie_Decode_Config {
     /** *********************************************************<br>
      * validate Decoding Parameters
      */
-    public void validate_Decoding_Parameters() {
+    public boolean validate_Decoding_Parameters() {
         if (getDecode_source() == null || getDecode_source().getDecode_object() == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE, getLanguage()));
             setError(true);
         }
+
+        return !isError(); // Reason could be there is an error not evaluated from here
     }
 
     /** *********************************************************<br>
@@ -186,14 +186,6 @@ public class Pie_Decode_Config {
         this.options = options;
     }
 
-    public Pie_Decode_Destination getDecoded_destination() {
-        return decoded_destination;
-    }
-
-    public void setDecoded_destination(Pie_Decode_Destination decoded_destination) {
-        this.decoded_destination = decoded_destination;
-    }
-
     public String getError_message() {
         return error_message;
     }
@@ -220,6 +212,14 @@ public class Pie_Decode_Config {
 
     public void setLanguage(Pie_Language language) {
         this.language = language;
+    }
+
+    public Pie_Directory getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(Pie_Directory directory) {
+        this.directory = directory;
     }
 
     /** ******************************************************************<br>

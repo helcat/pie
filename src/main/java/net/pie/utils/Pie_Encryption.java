@@ -64,10 +64,10 @@ public class Pie_Encryption {
      * @param file (File)
      * @return (boolean)
      */
-    public boolean read_Certificate(File file) {
+    private boolean read_Certificate(File file) {
         return read_Certificate(file, false);
     }
-    public boolean read_Certificate(File file, boolean demo) {
+    private boolean read_Certificate(File file, boolean demo) {
         if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
@@ -113,7 +113,7 @@ public class Pie_Encryption {
      * @param options (Pie_Encode_Config will be created if not entered, folder (File - Save to folder), file_name (String)
      * @return (File) Certificate Created
      */
-    public File create_Certificate_File(Object... options) {
+    public File create_Certificate(Object... options) {
         Pie_Encode_Config config = null;
         File folder = null;
         String file_name = null;
@@ -160,7 +160,7 @@ public class Pie_Encryption {
         File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ?
                 "" :  ".pie"));
 
-        Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.THREE, Pie_Option.MODULATION,
+        Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.THREE,
                 Pie_Option.CREATE_CERTIFICATE,
             Pie_ZIP_Name.AS_IS, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
             new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
@@ -295,7 +295,7 @@ public class Pie_Encryption {
         return key;
     }
 
-    public void setKey(SecretKey key) {
+    private void setKey(SecretKey key) {
         this.key = key;
     }
 
@@ -303,7 +303,7 @@ public class Pie_Encryption {
         return password;
     }
 
-    public void setPassword(String password) {
+    private void setPassword(String password) {
         this.password = password;
     }
 
@@ -311,7 +311,7 @@ public class Pie_Encryption {
         return was_Encrypted;
     }
 
-    public void setWas_Encrypted(boolean was_Encrypted) {
+    private void setWas_Encrypted(boolean was_Encrypted) {
         this.was_Encrypted = was_Encrypted;
     }
 
@@ -319,7 +319,7 @@ public class Pie_Encryption {
         return error_message;
     }
 
-    public void setError_message(Pie_Word error_message) {
+    private void setError_message(Pie_Word error_message) {
         this.error_message = error_message;
     }
 }

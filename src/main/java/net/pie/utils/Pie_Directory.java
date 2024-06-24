@@ -10,6 +10,7 @@ import java.io.File;
 
 public class Pie_Directory {
     private File local_folder;
+    private String filename = null;
 
     /** *******************************************************************<br>
      * <b>Pie_Directory</b><br>
@@ -43,8 +44,10 @@ public class Pie_Directory {
             File f = new File((String) o);
             if (Pie_Utils.isDirectory(f))
                 setLocal_folder(f);
+
             else if (Pie_Utils.isFile(f))
                 setLocal_folder(f.getParentFile());
+
             return;
         }
 
@@ -59,6 +62,13 @@ public class Pie_Directory {
         this.local_folder = local_folder;
     }
 
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 }
 
 

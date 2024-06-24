@@ -20,7 +20,7 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "Test_File.jpg";
+    private String temp_To_Be_Encoded = "The Fall Guy S00E01.mkv";
     private String temp_Encoded_Image = "Test_File.jpg";
 
     public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "Test_File.jpg"));
@@ -33,7 +33,9 @@ public class Pie_Test_Encode {
     public Pie_Test_Encode(String arg) {
 
         Pie_Encode_Config config = new Pie_Encode_Config_Builder()
-            .add_Encode_Source(new Pie_Encode_Source(new Pie_Text("Hello")))	// File to be encoded
+            //.add_Encode_Source(new Pie_Encode_Source(new Pie_Text("terry")))	// File to be encoded
+            .add_Encode_Source(new File(
+                Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded))
             .add_Directory(folder)   	                                            // Folder to place encoded file
             .add_Log_Level(Level.OFF)										        // Optional logging level Default OFF
             .add_Max_MB(200)						                            // Optional largest file allowed before slicing Default is 500 MB
@@ -41,8 +43,7 @@ public class Pie_Test_Encode {
             .add_Encryption(new Pie_Encryption("my password"))			    // Optional Encryption. See Encryption Examples
             .add_Shape(Pie_Shape.SHAPE_SQUARE)									    // Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
             .add_Zip_Option(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ALWAYS)	            // Optional Default is new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED)
-            .add_Option(Pie_Option.MODULATION, Pie_Option.OVERWRITE_FILE,		    // Optional set Pie_Option's as required. See Pie_Option examples
-                    Pie_Option.RUN_GC_AFTER_PROCESSING)
+            .add_Option(Pie_Option.OVERWRITE_FILE)		                            // Optional set Pie_Option's as required. See Pie_Option examples
             .build();																// Build the Pie_Config
 
         Pie_Encode encode = new Pie_Encode(config);
