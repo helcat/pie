@@ -250,8 +250,12 @@ public class Pie_Decode {
                 if (x == 1 && y == 0)       // 2nd pixel Spare options
                   continue;
 
+                counter = 0;
                 for (int v : value) {
+                    if (getEncode_mode().getParm1().contains("T") && counter == 3)
+                        break;
                     bytes.write((byte) (v > 127 ? -(v - 127) : v) );
+                    counter ++;
                 }
             }
         }
@@ -273,16 +277,6 @@ public class Pie_Decode {
         }
         return Arrays.copyOfRange(image_bytes, 0, i);
 
-//
-//        int t = 0;
-//        int byte_value = 0;
-//        for (t = image_bytes.length; t > 0; t --) {
-//            byte_value = image_bytes[t-1];
-//            if (byte_value > 0)
-//                break;
-//        }
-//
-//        return Arrays.copyOfRange(image_bytes, 0, t);
     }
 
     /** *******************************************************************<br>

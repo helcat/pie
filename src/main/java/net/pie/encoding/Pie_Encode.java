@@ -189,20 +189,14 @@ public class Pie_Encode {
         rbg = rbg.replace("T", "");
 
         // Options
-        data_image.setRGB(x++, y, new Color(
+        addPixel(data_image, x++, y, new int[] {
                 (has_Been_Encrypted ? 1 : 0),                           // Encrypted Yes - No
                 getConfig().getEncoder_source().getType().ordinal(),    // encode content type
                 getConfig().getEncoder_mode().ordinal(),                // encode mode
-                0                                                       // Spare
-                ).getRGB());
+                0});                                                    // Always Alpha
 
         // Future Options
-        data_image.setRGB(x++, y, new Color(
-                (has_Been_Encrypted ? 1 : 0),                           // Spare
-                getConfig().getEncoder_source().getType().ordinal(),    // Spare
-                getConfig().getEncoder_mode().ordinal(),                // Spare
-                0                                                       // Spare
-        ).getRGB());
+        addPixel(data_image, x++, y, new int[] { 0, 0, 0, 0 });
 
         int end = 255;
         int[] store = null;
@@ -211,7 +205,7 @@ public class Pie_Encode {
             i = (i < 0 ? Math.abs(i) + 127 : i);
 
             if (store == null)
-                store = new int[rbg.length()];
+                store = new int[]{ 0, 0, 0, 1};
             store[store_count ++] = i;
             if (store_count < rbg.length())
                 continue;
@@ -221,41 +215,39 @@ public class Pie_Encode {
                 y++;
             }
 
-            if (store_count < 3) {
-                store[store_count] = end;
-                end = 0;
-            }
             store_count = 0;
-            data_image.setRGB(x++, y, buildColor(rbg, store).getRGB());
+            addPixel(data_image, x++, y, new int[] { store[0], store[1], store[2], store[3]});
             store = null;
         }
 
         // Finish any existing pixels
-        if (store != null && Arrays.stream(store).sum() > 0) {
+        if (store != null) {
             if (x >= size.getWidth()) {
                 x = 0;
                 y++;
             }
-
-            if (store_count < 4) {
-                store[store_count] = end;
+            while ( store_count < 4) {
+                store[store_count++] = end;
                 end = 0;
             }
-
-            data_image.setRGB(x++, y, buildColor(rbg, store).getRGB());
+            addPixel(data_image, x++, y, new int[] { store[0], store[1], store[2], store[3] });
         }
 
         // Stopper (end of image all zeros after will be trimmed)
-        if (x < size.getWidth())
-            data_image.setRGB(x++, y, new Color(end, 0, 0, 0).getRGB());
-        else
+        if (x < size.getWidth()) {
+            addPixel(data_image, x++, y, new int[] { end, 0, 0, 0 });
+            end = 0;
+        }else {
             return data_image;
+        }
 
         // Filler
         if (y > 0) {
             int w = x;
-            for (; w < size.getWidth(); w++)
-                data_image.setRGB(w, y, new Color(0, 0, 0, 0).getRGB());
+            for (; w < size.getWidth(); w++) {
+                addPixel(data_image, w, y, new int[] { end, 0, 0, 0 });
+                end = 0;
+            }
         }
 
         size = null; store = null; x =0; y = 0; store_count = 0; // Save every byte of memory possible.
@@ -263,18 +255,16 @@ public class Pie_Encode {
     }
 
     /** ******************************************************<br>
-     * build Color
-     * @param rbg (String)
-     * @param store (int[])
-     * @return (Color)
+     * Add Pixel
+     * @param data_image BufferedImage
+     * @param x int
+     * @param y int
+     * @param store int[]
+     * @return BufferedImage
      */
-    private Color buildColor(String rbg, int[] store) {
-        int count = 0;
-        int r = rbg.contains("R") ? checker(store, count++, 0) :  0;
-        int g = rbg.contains("G") ? checker(store, count++, 0) :  0;
-        int b = rbg.contains("B") ? checker(store, count++, 0) :  0;
-        int a = rbg.contains("A") ? checker(store, count++, 0) :  0;
-        return  new Color(r, g, b, a);
+    private BufferedImage addPixel(BufferedImage data_image, int x, int y, int[] store) {
+        data_image.setRGB(x, y, new Color(store[0], store[1], store[2], store[3]).getRGB());
+        return data_image;
     }
 
     /** ******************************************************<br>
@@ -284,7 +274,7 @@ public class Pie_Encode {
      * @return Pie_Size
      */
     private Pie_Size calculate_image_Size(int length, Pie_Encode_Mode mode) {
-        Pie_Size image_size = getPieSize(((double) length + 5), mode); // add 5 pixels
+        Pie_Size image_size = getPieSize(((double) length + 10), mode); // add 10 pixels
         if (hasEncoder_Maximum_Image()) {
             if ((image_size.getWidth() * image_size.getHeight()) >
                     getConfig().getEncoder_Maximum_Image().getWidth() * getConfig().getEncoder_Maximum_Image().getHeight()) {
@@ -330,18 +320,6 @@ public class Pie_Encode {
             return new Pie_Size(size,size);
 
         return new Pie_Size((int) Math.ceil(size * 1.25), (int) Math.ceil(size / 1.25));
-    }
-
-    /** ******************************************************<br>
-     * <b>Checks the number to make sure its above zero.</b><br>
-     * @param store (stored bytes)
-     * @param position (position of stored byte)
-     * @return int
-     **/
-    private int checker(int[] store, int position, int min) {
-        if (store.length > position)
-            return Math.max(store[position], min);
-        return 0;
     }
 
     /** *******************************************************<br>

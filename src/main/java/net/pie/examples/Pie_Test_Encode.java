@@ -20,7 +20,7 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "The Fall Guy S00E01.mkv";
+    private String temp_To_Be_Encoded = "Test_File.jpg";
     private String temp_Encoded_Image = "Test_File.jpg";
 
     public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "Test_File.jpg"));
@@ -39,7 +39,7 @@ public class Pie_Test_Encode {
             .add_Directory(folder)   	                                            // Folder to place encoded file
             .add_Log_Level(Level.OFF)										        // Optional logging level Default OFF
             .add_Max_MB(200)						                            // Optional largest file allowed before slicing Default is 500 MB
-            .add_Mode(Pie_Encode_Mode.THREE)								        // Optional Default is Pie_Encode_Mode.THREE See Pie_Encode_Mode Examples
+            .add_Mode(Pie_Encode_Mode.TWO)								        // Optional Default is Pie_Encode_Mode.THREE See Pie_Encode_Mode Examples
             .add_Encryption(new Pie_Encryption("my password"))			    // Optional Encryption. See Encryption Examples
             .add_Shape(Pie_Shape.SHAPE_SQUARE)									    // Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
             .add_Zip_Option(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ALWAYS)	            // Optional Default is new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED)
