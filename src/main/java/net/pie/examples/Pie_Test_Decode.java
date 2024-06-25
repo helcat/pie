@@ -24,7 +24,7 @@ import java.util.logging.Level;
 public class Pie_Test_Decode {
     private String temp_Encoded_Imaage = "text.txt.png";
     private String temp_Decode_To = "shared";
-    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "Test_File.jpg.png"));
+    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "The Fall Guy S01E02.mkv.zip"));
     public static File folder = Pie_Utils.getDesktop();
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -46,27 +46,6 @@ public class Pie_Test_Decode {
 
         Pie_Decode decoded = new Pie_Decode(config);
 
-        //new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
-        //new URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")
-        //new Pie_Encryption(new File(Pie_Utils.getDesktopPath() + File.separator + "pie_Certificate.pie")),
-        //new Pie_Decode_Source(new Pie_URL("https://corecreate.s3.eu-west-2.amazonaws.com/enc_fire2.jpg.png")),
-
-        // Decoding - Decode the image created
-//        Pie_Config decoding_config = new Pie_Config(
-//            Pie_Option.OVERWRITE_FILE,
-//            Pie_Option.RUN_GC_AFTER_PROCESSING,
-//            Pie_Option.TERMINATE_LOG_AFTER_PROCESSING,
-//            Level.INFO,
-//            new Pie_Decode_Source(new File(Pie_Utils.getDesktopPath() + File.separator +  temp_Encoded_Imaage)),
-//            new Pie_Decode_Destination()
-            //new Pie_Decode_Destination(new File( Pie_Utils.getDesktopPath() + File.separator + temp_Decode_To))
-       // );
-
-//        Pie_Decode decoded = new Pie_Decode(decoding_config);
-//        System.out.println("Has Error " + decoded.isDecoding_Error());
-//        System.out.println("Error Message - " + decoded.getDecoding_Error_Message());
-//        System.out.println("File - " + decoded.getOutput_location());
-//
        if (decoded.getOutput_location() != null && new File(decoded.getOutput_location()).exists())
             System.out.println("File - Created");
 

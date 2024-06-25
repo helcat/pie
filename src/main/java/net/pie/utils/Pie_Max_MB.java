@@ -5,7 +5,7 @@ public class Pie_Max_MB {
 
     /** *******************************************************<br>
      * <b>Pie_Max_MB</b><br>
-     * Sets the minimum size of he encoded image before splitting. Default is 200mb<br>
+     * Sets the minimum size of he encoded image before splitting. Default is 500mb<br>
      * set the default you want in MB. Warning Library can crash without of memory if the wrong size is put in.
      **/
     public Pie_Max_MB() {

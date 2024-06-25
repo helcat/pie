@@ -2,15 +2,13 @@ package net.pie.enums;/** ******************************************************
  * <b>Pie Encode Modes</b><br>
  * Image sizes will increase or decrease depending on the mode selected.
  * The colour of the encoded image will also change. Allowed encodings are :<br>
- * ONE. Medium file size Pixels are solid<br>
- * TWO. Medium file size. Transparent Encoded Image
- * THREE. LOW file size. Semi Transparent Encoded Image (Default Setting)
+ * M_1. Medium file size. Transparent Encoded Image
+ * M_2. LOW file size. Semi Transparent Encoded Image (Default Setting)
  **/
 
 public enum Pie_Encode_Mode {
-    ONE ("RGB"),
-    TWO ("RGBT"),
-    THREE ("ARGB"),
+    M_1 ("RGBT"),
+    M_2("ARGB"),
     ;
 
     public final String parm1;

@@ -25,16 +25,14 @@ import java.util.logging.Level;
 
 public class Pie_Encode_Config_Builder {
     private List<Pie_Option> pie_options = new ArrayList<>();
-    private Pie_Max_MB max_mb = new Pie_Max_MB(200);
-    private Pie_Zip encoder_storage = null;
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
+    private Pie_Max_MB max_mb = new Pie_Max_MB(500);
+    private Pie_Zip encoder_storage = new Pie_Zip();
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.M_2;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Source encoder_source = null;
     private Pie_Directory directory = null;
-    private Pie_Language language = null;
-
+    private Pie_Language language = new Pie_Language("en");
     private Pie_Encryption encryption = null;
-
     private Level log_level = Level.SEVERE;
 
     /** *********************************************************<br>
@@ -142,51 +140,19 @@ public class Pie_Encode_Config_Builder {
             if (option instanceof Pie_Encode_Mode) {
                 this.encoder_mode = (Pie_Encode_Mode) option;
                 return this;
+
             } else if (option instanceof String) {
                 if (Pie_Word.is_in_Translation(Pie_Word.ONE, (String) option)) {
-                    this.encoder_mode = Pie_Encode_Mode.ONE;
+                    this.encoder_mode = Pie_Encode_Mode.M_1;
                     return this;
                 }
                 if (Pie_Word.is_in_Translation(Pie_Word.TWO, (String) option)) {
-                    this.encoder_mode = Pie_Encode_Mode.TWO;
-                    return this;
-                }
-                if (Pie_Word.is_in_Translation(Pie_Word.THREE, (String) option)) {
-                    this.encoder_mode = Pie_Encode_Mode.THREE;
+                    this.encoder_mode = Pie_Encode_Mode.M_2;
                     return this;
                 }
             }
         }
-        this.encoder_mode = Pie_Encode_Mode.THREE;
-        return this;
-    }
-
-    /** *********************************************************<br>
-     * Add Pie Zip Options (Pie_ZIP_Name, Pie_ZIP_Option)
-     * @param option (Pie_Zip)
-     * @return (Pie_ConfigBuilder)
-     */
-    public Pie_Encode_Config_Builder add_Zip_Option(Object... option) {
-        if (option == null || option.length == 0 || option.length > 2)
-            return  this;
-
-        if (option.length == 1) {
-            if (option[0] instanceof Pie_Zip) {
-                this.encoder_storage = (Pie_Zip) option[0];
-                return this;
-            }
-        }
-
-        Pie_ZIP_Name name = Pie_ZIP_Name.AS_IS;
-        Pie_ZIP_Option opt = Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED;
-        for (Object o : option) {
-            if (o instanceof Pie_ZIP_Name)
-                name = (Pie_ZIP_Name) o;
-            if (o instanceof Pie_ZIP_Option)
-                opt = (Pie_ZIP_Option) o;
-        }
-
-        this.encoder_storage = new Pie_Zip(name, opt);
+        this.encoder_mode = Pie_Encode_Mode.M_2;
         return this;
     }
 
@@ -275,6 +241,22 @@ public class Pie_Encode_Config_Builder {
 
     public void setLanguage(Pie_Language language) {
         this.language = language;
+    }
+
+    private Pie_Zip getEncoder_storage() {
+        return encoder_storage;
+    }
+
+    private void setEncoder_storage(Pie_Zip encoder_storage) {
+        this.encoder_storage = encoder_storage;
+    }
+
+    private List<Pie_Option> getPie_options() {
+        return pie_options;
+    }
+
+    private void setPie_options(List<Pie_Option> pie_options) {
+        this.pie_options = pie_options;
     }
 }
 

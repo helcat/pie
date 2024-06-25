@@ -42,7 +42,7 @@ public class Pie_Decode {
             return;
 
         int processing_file = 0;
-        byte[] message = start_Decode(collectImage(processing_file)); // First file decode.
+        byte[] message = start_Decode(collectImage(processing_file), processing_file); // First file decode.
         if (message == null || message.length == 0) {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_DECODE, getConfig().getLanguage()));
             return;
@@ -79,7 +79,7 @@ public class Pie_Decode {
                     }
                     processing_file++;
                     if (processing_file < getTotal_files()) {
-                        message = start_Decode(collectImage(processing_file));
+                        message = start_Decode(collectImage(processing_file), processing_file);
                         if (message == null)
                             break;
                     }
@@ -134,7 +134,7 @@ public class Pie_Decode {
     /** *********************************************************<br>
      * Start Main Decodin
      */
-    private byte[] start_Decode(BufferedImage buffimage) {
+    private byte[] start_Decode(BufferedImage buffimage, int file_number) {
         if (buffimage == null)
             return null;
 
@@ -173,6 +173,9 @@ public class Pie_Decode {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_ENCODED_IMAGE, getConfig().getLanguage()) );
                 return null;
             }
+
+            if (file_number > 0)
+                return message;
 
             collect_encoded_parms(Arrays.copyOfRange(message, 1, count));
             if (getConfig().isError())
@@ -271,6 +274,7 @@ public class Pie_Decode {
 
         byte[] image_bytes = bytes.toByteArray();
 
+        // read backwards until 255 is found or a number greater than zero.
         int i = image_bytes.length - 1;
         while (i >= 0 && image_bytes[i] == 0) {
             i--;

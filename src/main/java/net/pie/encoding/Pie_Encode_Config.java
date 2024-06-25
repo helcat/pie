@@ -11,7 +11,7 @@ import java.util.logging.Level;
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>
  * Encoding options. Pie_Option, Level, Pie_Encryption
- * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_ZIP_Option, Pie_ZIP_Name, Pie_Encode_Source, Pie_Directory<br>
+ * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_Encode_Source, Pie_Directory<br>
  * Add parmeters in any order, or use an object list<br>
  * The Default is Log level is Level.SEVERE<br>
  * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
@@ -19,8 +19,6 @@ import java.util.logging.Level;
  * @see Pie_Shape
  * @see Pie_Encode_Mode
  * @see Level
- * @see Pie_ZIP_Option
- * @see Pie_ZIP_Name
  * @see Pie_Encryption
  * @see Pie_Encode_Source
  * @see Pie_Directory
@@ -30,8 +28,8 @@ public class Pie_Encode_Config {
     private List<Pie_Option> options = new ArrayList<>();
     private Pie_Encryption encryption = null;
     private Pie_Max_MB max_mb = new Pie_Max_MB();
-    private Pie_Zip encoder_storage = new Pie_Zip(Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED);
-    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.THREE;
+    private Pie_Zip encoder_storage = null;
+    private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.M_2;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
 
     private Pie_Encode_Source encoder_source = null;
@@ -58,7 +56,7 @@ public class Pie_Encode_Config {
             setError(true);
             return;
         }
-
+        setEncoder_storage(new Pie_Zip());
         setOptions(new ArrayList<>());
         Pie_Option opt = null;
         for (Object o : options) {
@@ -77,8 +75,6 @@ public class Pie_Encode_Config {
                     break;
                 case "Pie_Shape": this.encoder_shape = (Pie_Shape) o; break;
                 case "Pie_Encode_Mode": this.encoder_mode = (Pie_Encode_Mode) o; break;
-                case "Pie_ZIP_Option": this.encoder_storage.setOption((Pie_ZIP_Option) o); break;
-                case "Pie_ZIP_Name": this.encoder_storage.setInternal_name_format((Pie_ZIP_Name) o); break;
                 case "Pie_Encryption":
                     this.encryption = ((Pie_Encryption) o);
                     if (this.encryption.getError_message() != null) {
@@ -290,6 +286,11 @@ public class Pie_Encode_Config {
     public Pie_Directory getDirectory() {
         return directory;
     }
+
+    private void setEncoder_storage(Pie_Zip encoder_storage) {
+        this.encoder_storage = encoder_storage;
+    }
+
 
 }
 
