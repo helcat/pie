@@ -3,6 +3,8 @@ package net.pie.utils;
 import net.pie.decoding.Pie_Decode_Config;
 import net.pie.enums.Pie_Word;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -21,6 +23,7 @@ public class Pie_Decode_Source {
     private boolean isZipped = false;
     private Pie_Zip zip_Object = null;
     private Pie_Word error_code = null;
+    private BufferedImage encoded_bufferedimage = null;
 
     /** *******************************************************<br>
      * <b>Pie_Decode_Source</b><br>
@@ -51,6 +54,34 @@ public class Pie_Decode_Source {
     }
 
     /** *******************************************************<br>
+     * convert BufferedImage
+     * @return byte[]
+     */
+    public byte[] convert_BufferedImage() {
+        if (getEncoded_bufferedimage() == null)
+            return null;
+
+        final ByteArrayOutputStream output = new ByteArrayOutputStream() {
+            @Override
+            public synchronized byte[] toByteArray() {
+                return this.buf;
+            }
+        };
+        try {
+            ImageIO.write(getEncoded_bufferedimage(), "png", output);
+        } catch (IOException e) {
+            return null;
+        }
+        byte[] bytes = output.toByteArray();
+        try {
+            output.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return bytes;
+    }
+
+    /** *******************************************************<br>
      * get next object
      * @param processing_file (int)
      */
@@ -68,6 +99,10 @@ public class Pie_Decode_Source {
         }
 
         switch (getDecode_object().getClass().getSimpleName()) {
+            case "BufferedImage":
+                encoded_bufferedimage = (BufferedImage) getDecode_object();
+                break;
+
             case "File":
                 File f = (File) getDecode_object();
                 setZipped(new ZipInputStream(Files.newInputStream(((File) getDecode_object()).toPath())).getNextEntry() != null);
@@ -187,6 +222,10 @@ public class Pie_Decode_Source {
 
     public void setError_code(Pie_Word error_code) {
         this.error_code = error_code;
+    }
+
+    public BufferedImage getEncoded_bufferedimage() {
+        return encoded_bufferedimage;
     }
 }
 

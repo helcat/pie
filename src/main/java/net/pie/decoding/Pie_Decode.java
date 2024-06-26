@@ -42,7 +42,13 @@ public class Pie_Decode {
             return;
 
         int processing_file = 0;
-        byte[] message = start_Decode(collectImage(processing_file), processing_file); // First file decode.
+        byte[] message = null;
+
+        if (getConfig().getDecode_source().getEncoded_bufferedimage() != null) {
+            message = getConfig().getDecode_source().convert_BufferedImage();
+        }else {
+            message = start_Decode(collectImage(processing_file), processing_file); // First file decode.
+        }
         if (message == null || message.length == 0) {
             getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_DECODE, getConfig().getLanguage()));
             return;
