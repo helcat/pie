@@ -1,6 +1,13 @@
 package net.pie.decoding;
 
-import net.pie.encoding.Pie_Encode_Config_Builder;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
+
 import net.pie.enums.*;
 import net.pie.utils.*;
 

@@ -1,4 +1,11 @@
 package net.pie.utils;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
 import net.pie.enums.Pie_Word;
 import java.util.Locale;

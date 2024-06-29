@@ -1,8 +1,13 @@
 package net.pie.utils;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
-import com.sun.javafx.util.Utils;
 import net.pie.enums.Pie_Word;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -49,12 +54,12 @@ public class Pie_URL {
     public void launch() {
         if (getUrl() != null && (Pie_Utils.isEmpty(getError_message()))) {
             try {
-                if (Utils.isMac()) {
+                if (Pie_Utils.isMac()) {
                     Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
                     Method openURL = fileMgr.getDeclaredMethod("openURL",
                             new Class[]{String.class});
                     openURL.invoke(null, new Object[]{getUrl().toString()});
-                } else if (Utils.isWindows())
+                } else if (Pie_Utils.isWin())
                     Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + getUrl().toString());
                 else { //assume Unix or Linux
                     String[] browsers = {

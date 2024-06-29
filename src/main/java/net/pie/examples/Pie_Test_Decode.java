@@ -22,9 +22,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 
 public class Pie_Test_Decode {
-    private String temp_Encoded_Imaage = "text.txt.png";
+    private String temp_Encoded_Imaage = "enc_tomato.png";
     private String temp_Decode_To = "shared";
-    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "The Fall Guy S01E02.mkv.zip"));
+    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "enc_tomato.png"));
     public static File folder = Pie_Utils.getDesktop();
     public static void main(String[] args) {
         new Pie_Test_Decode();

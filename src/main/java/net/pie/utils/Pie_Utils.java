@@ -1,6 +1,13 @@
 package net.pie.utils;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
-import com.sun.javafx.util.Utils;
+import sun.awt.OSInfo;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
@@ -198,9 +205,9 @@ public class Pie_Utils {
 
         try {
             String staticDirPath = System.getProperty("user.home");
-            if (Utils.isMac() && staticDirPath.startsWith(File.separator))
+            if (isMac() && staticDirPath.startsWith(File.separator))
                 staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
-            else if (Utils.isUnix() && staticDirPath.startsWith(File.separator))
+            else if (isUnix() && staticDirPath.startsWith(File.separator))
                 staticDirPath = System.getProperty("java.io.tmpdir");
             else
                 staticDirPath = System.getenv("APPDATA");
@@ -229,7 +236,7 @@ public class Pie_Utils {
              folder_name = "PIE_Temp";
          // Use Temp Directory
          String tempDirPath = System.getProperty("java.io.tmpdir");
-         if (Utils.isMac() && tempDirPath.startsWith(File.separator)) // Assume OSX / Ubuntu
+         if (isMac() && tempDirPath.startsWith(File.separator)) // Assume OSX / Ubuntu
              tempDirPath = file_concat(tempDirPath, file_concat("tmp", folder_name));
          else
              tempDirPath = file_concat(tempDirPath ,folder_name); // Windows
@@ -350,6 +357,31 @@ public class Pie_Utils {
                 "Total Count: " + letterCounts.size() + " Length " + base64String.length());
 
         return base64String.getBytes(StandardCharsets.UTF_8);
+    }
+
+
+    /** ***********************************************<br>
+     * is Mac
+     * @return
+     */
+    public static boolean isMac() {
+        return OSInfo.getOSType().equals(OSInfo.OSType.MACOSX);
+    }
+
+    /** ***********************************************<br>
+     * is Windows
+     * @return
+     */
+    public static boolean isWin() {
+        return OSInfo.getOSType().equals(OSInfo.OSType.WINDOWS);
+    }
+
+    /** ***********************************************<br>
+     * is Unix
+     * @return
+     */
+    public static boolean isUnix() {
+        return OSInfo.getOSType().equals(OSInfo.OSType.LINUX);
     }
 
 

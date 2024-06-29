@@ -1,4 +1,11 @@
 package net.pie.encoding;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
 import net.pie.enums.*;
 import net.pie.utils.Pie_Encode_Source;
@@ -12,13 +19,12 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.List;
 import java.util.logging.Level;
 
 public class Pie_Encode {
     private Pie_Encode_Config config;
-    private List<BufferedImage> output_Images = new ArrayList<>();
-    private List<String> file_list = new ArrayList<>();
+    private BufferedImage output_Image = null;
+    private String output_file_name = null;
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
@@ -30,8 +36,8 @@ public class Pie_Encode {
     public Pie_Encode (Pie_Encode_Config config) {
         ImageIO.setUseCache(false);
         setConfig(config);
-        setOutput_Images(new ArrayList<>());
-        setFile_list(new ArrayList<>());
+        setOutput_Image(null);
+        setOutput_file_name(null);
         getConfig().validate_Encoding_Parameters();
 
         if (getConfig() == null || getConfig().isError()) {
@@ -169,7 +175,7 @@ public class Pie_Encode {
             }
             data_image = null;
         }else {
-            getOutput_Images().add(data_image);
+            setOutput_Image(data_image);
         }
         return true;
     }
@@ -263,7 +269,9 @@ public class Pie_Encode {
      * @return BufferedImage
      */
     private BufferedImage addPixel(BufferedImage data_image, int x, int y, int[] store) {
-        data_image.setRGB(x, y, new Color(store[0], store[1], store[2], store[3]).getRGB());
+        int c = new Color(store[0], store[1], store[2], store[3]).getRGB();
+
+        data_image.setRGB(x, y, c);
         return data_image;
     }
 
@@ -386,16 +394,16 @@ public class Pie_Encode {
             return getConfig().getEncoder_storage().addZipEntry(create_File_Name(file_number, source_filename), image);
         }else {
             // Single Files Only Or Beginning of Zip
-            File toFile = addFileNumber(file_number, source_filename);
-            if (toFile.exists() && !getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
+            File file = addFileNumber(file_number, source_filename);
+            if (file.exists() && !getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE)) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_FILE_EXISTS, getConfig().getLanguage()) +
-                        " - " + toFile.getName() +
+                        " - " + file.getName() +
                         " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, getConfig().getLanguage()));
                 return false;
             }
-            getFile_list().add(toFile.getPath());
+            setOutput_file_name(file.getPath());
             try {
-                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), toFile);
+                return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), file);
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.UNABLE_TO_WRITE_ENCODED_IMAGE, getConfig().getLanguage())+
                         " " + e.getMessage());
@@ -502,19 +510,19 @@ public class Pie_Encode {
         return config;
     }
 
-    public List<BufferedImage> getOutput_Images() {
-        return output_Images;
+    public BufferedImage getOutput_Image() {
+        return output_Image;
     }
 
-    public List<String> getFile_list() {
-        return file_list;
+    public void setOutput_Image(BufferedImage output_Image) {
+        this.output_Image = output_Image;
     }
 
-    public void setOutput_Images(List<BufferedImage> output_Images) {
-        this.output_Images = output_Images;
+    public String getOutput_file_name() {
+        return output_file_name;
     }
 
-    public void setFile_list(List<String> file_list) {
-        this.file_list = file_list;
+    public void setOutput_file_name(String output_file_name) {
+        this.output_file_name = output_file_name;
     }
 }

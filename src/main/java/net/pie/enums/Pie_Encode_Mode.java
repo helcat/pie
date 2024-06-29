@@ -1,4 +1,14 @@
-package net.pie.enums;/** *******************************************************<br>
+package net.pie.enums;
+
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3<br>
+ * Copyright Terry Clarke 2024<br>
+ **/
+
+/** **********************************************<br>
  * <b>Pie Encode Modes</b><br>
  * Image sizes will increase or decrease depending on the mode selected.
  * The colour of the encoded image will also change. Allowed encodings are :<br>

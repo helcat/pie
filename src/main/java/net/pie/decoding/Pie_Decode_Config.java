@@ -1,4 +1,11 @@
 package net.pie.decoding;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
 import net.pie.enums.*;
 import net.pie.utils.*;
@@ -93,13 +100,19 @@ public class Pie_Decode_Config {
      * validate Decoding Parameters
      */
     public boolean validate_Decoding_Parameters() {
-        if (getDecode_source() == null || getDecode_source().getDecode_object() == null ||
-            getDecode_source().getInput() == null || getDecode_source().getEncoded_bufferedimage() == null) {
+        if (getDecode_source() == null) {
             logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE, getLanguage()));
             setError(true);
+            return false;
         }
+        if (getDecode_source().getDecode_object() != null ||
+            getDecode_source().getInput() != null || getDecode_source().getEncoded_bufferedimage() != null)
+            return true;
 
-        return !isError(); // Reason could be there is an error not evaluated from here
+        logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECODING_FAILED_SOURCE, getLanguage()));
+        setError(true);
+
+        return false;
     }
 
     /** *********************************************************<br>

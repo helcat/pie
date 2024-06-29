@@ -1,5 +1,11 @@
 package net.pie.enums;
-
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 /** *******************************************************<br>
  * <b>Pie Shape</b><br>
  * Settings, used to shape the encoded image.<br>

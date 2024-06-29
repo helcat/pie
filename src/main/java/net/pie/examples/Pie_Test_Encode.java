@@ -20,10 +20,10 @@ import java.util.logging.Level;
 
 public class Pie_Test_Encode {
 
-    private String temp_To_Be_Encoded = "The Fall Guy S01E02.mkv";
+    private String temp_To_Be_Encoded = "tomato.png";
     private String temp_Encoded_Image = "Test_File.jpg";
 
-    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "The Fall Guy S01E02.mkv"));
+    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "tomato.png"));
     public static File folder = Pie_Utils.getDesktop();
 
     public static void main(String[] args) {
@@ -31,11 +31,11 @@ public class Pie_Test_Encode {
     }
 
     public Pie_Test_Encode(String arg) {
-
         Pie_Encode_Config config = new Pie_Encode_Config_Builder()
             //.add_Encode_Source(new Pie_Encode_Source(new Pie_Text("terry")))	// File to be encoded
             .add_Encode_Source(new File(
-                Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded))
+                Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) +
+                        temp_To_Be_Encoded))
             .add_Directory(folder)   	                                    // Folder to place encoded file
             .add_Log_Level(Level.OFF)										// Optional logging level Default OFF
             .add_Max_MB(200)						                    // Optional largest file allowed before slicing Default is 200 MB
@@ -47,6 +47,6 @@ public class Pie_Test_Encode {
 
         Pie_Encode encode = new Pie_Encode(config);
 
-       encode.getFile_list().forEach(System.out::println);
+        System.out.println(encode.getOutput_file_name());
     }
 }

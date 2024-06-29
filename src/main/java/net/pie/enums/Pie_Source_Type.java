@@ -1,5 +1,11 @@
 package net.pie.enums;
-
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 /** *******************************************************<br>
  * <b>Pie Source Type</b><br>
  * Sets the source type, which is encoded within the final file for decoding.<br>

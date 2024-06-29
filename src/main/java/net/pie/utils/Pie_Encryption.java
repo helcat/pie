@@ -1,4 +1,11 @@
 package net.pie.utils;
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 
 import net.pie.decoding.Pie_Decode;
 import net.pie.decoding.Pie_Decode_Config;
@@ -170,7 +177,7 @@ public class Pie_Encryption {
             encoding_config.setDemo_mode(true);
 
         Pie_Encode encode = new Pie_Encode(encoding_config);
-        encode.getFile_list().forEach(System.out::println);
+        System.out.println(encode.getOutput_file_name());
         if (encode.isEncoding_Error()) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
             return null;
