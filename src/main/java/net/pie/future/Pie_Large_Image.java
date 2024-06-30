@@ -1,5 +1,11 @@
 package net.pie.future;
-
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -8,11 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /** **********************************************<br>
- * @author terry
- * @since 1.1
- * @version 1.3
- * Note not used in PIE
- * These are experiments for future releases
+ * Note not used in PIE These are experiments for future releases
  */
 
 public class Pie_Large_Image {

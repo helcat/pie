@@ -187,15 +187,20 @@ public enum Pie_Word {
 	MAX_IMAGE_SIZE_NOT_SET ("Maximum Image Size Is Not Set", "La taille maximale de l'image n'est pas définie",
 		"La dimensione massima dell'immagine non è impostata", "El tamaño máximo de imagen no está establecido"),
 
+	SHAPE("Shape", "Forme", "Forma", "Forma"),
 	RECTANGLE ("Rectangle", "Rectangle", "Rettangolo", "Rectángulo"),
-
 	SQUARE ("Square", "Carré", "Piazza", "Cuadrado"),
 
 	ONE ("One", "Un", "Uno", "Uno"),
-
 	TWO ("Two", "Deux", "Due", "Dos"),
 
-	THREE ("Three", "Trois", "Tre", "Tres"),
+	ENCODE ("Encode", "Encoder", "Codificare", "Codificar"),
+	DECODE ("Decode", "Décoder", "Decodificare", "Descodificar"),
+
+	DIRECTORY ("Directory", "Annuaire", "Direttorio", "Directorio"),
+
+	MODE ("Mode", "Mode", "Modalità", "Modo" ),
+	Max_MB ("MaxMB", "MaxMB", "MaxMB", "MáxMB")
 	;
 
 	private String en;

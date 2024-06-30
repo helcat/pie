@@ -1,16 +1,18 @@
 package net.pie.future;
-
+/** **********************************************<br>
+ * PIE Pixel Image Encode
+ * @author terry clarke
+ * @since 1.0
+ * @version 1.3
+ * Copyright Terry Clarke 2024
+ */
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /** **********************************************<br>
- * @author terry
- * @since 1.1
- * @version 1.3
- * Note not used in PIE
- * These are experiments for future releases ** Not working yet.
+ * Note not used in PIE These are experiments for future releases ** Not working yet.
  */
 
 public class Pie_Process_Png_Chunks {

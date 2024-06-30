@@ -19,9 +19,9 @@ public class Pie_Max_MB {
         setMb(500);
     }
 
-    public Pie_Max_MB(int mb) {
-        if (mb < 50)
-            mb = 200;
+    public Pie_Max_MB(Integer mb) {
+        if (mb == null || mb < 50)
+            mb = 500;
         setMb(mb);
     }
 

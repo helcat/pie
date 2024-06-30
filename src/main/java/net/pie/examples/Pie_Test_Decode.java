@@ -31,7 +31,7 @@ public class Pie_Test_Decode {
     }
 
     /** ***********************************************<br>
-     * <b>Pie_Test Decode</b><br>
+     * <b>Pie Decode</b><br>
      **/
     public Pie_Test_Decode() {
 

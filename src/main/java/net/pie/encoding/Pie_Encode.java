@@ -428,9 +428,12 @@ public class Pie_Encode {
                 return file;
 
             if (file.getName().equals(getConfig().getEncoder_source().getFile_name())) {
+                file = new File(file.getParentFile() + File.separator +
+                        "enc_" + getConfig().getEncoder_source().getFile_name());
+                int counter = 1;
                 while (file.exists()) {
                     file = new File(file.getParentFile() + File.separator +
-                            "enc_" + getConfig().getEncoder_source().getFile_name());
+                            "enc_" + (counter++) + "_" + getConfig().getEncoder_source().getFile_name());
                 }
             }else {
                 getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage())
