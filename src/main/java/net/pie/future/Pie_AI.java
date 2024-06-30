@@ -6,6 +6,7 @@ package net.pie.future;
  * @since 1.0
  * @version 1.3
  * Copyright Terry Clarke 2024
+ * pixel.image.encode@gmail.com
  */
 
 /** **********************************************<br>

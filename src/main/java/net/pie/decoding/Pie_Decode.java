@@ -5,6 +5,7 @@ package net.pie.decoding;
  * @since 1.0
  * @version 1.3
  * Copyright Terry Clarke 2024
+ * pixel.image.encode@gmail.com
  */
 import net.pie.enums.*;
 import net.pie.utils.Pie_Utils;

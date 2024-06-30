@@ -1,4 +1,15 @@
 PIE (Pixel to Image Encoding) Software Library License Agreement
+pixel.image.encode@gmail.com
+
+#######  011  10000##
+#######  011  10000#
+### 011  010  01#
+### 011  010  01####
+####011  010  01####
+#01      100  101
+#01      100  101###
+#01      100  101####
+
 
 This PIE (Pixel to Image Encoding) software library ("the Software") is provided by Terence Clarke ("the Licensor") under the following terms and conditions:
 
@@ -31,5 +42,5 @@ By using the PIE Software Library, the Licensee agrees to be bound by the terms 
 
 For permissions beyond the scope of this license, contact the Licensor at terry.clarke@gmail.com.
 
-Terence Clarke
+Terry Clarke
 1th April 2023

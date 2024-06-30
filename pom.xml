@@ -43,7 +43,7 @@
         <developer>
             <id>TC</id>
             <name>${written.by}</name>
-            <email>commodoredot64@gmail.com</email>
+            <email>pixel.image.encode@gmail.com</email>
             <url>${pie.url}</url>
             <roles>
                 <role>Developer</role>

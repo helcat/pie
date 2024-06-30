@@ -5,6 +5,7 @@ package net.pie.enums;
  * @since 1.0
  * @version 1.3
  * Copyright Terry Clarke 2024
+ * pixel.image.encode@gmail.com
  */
 
 import java.util.Arrays;
@@ -38,6 +39,10 @@ public enum Pie_Word {
 
 	ENCRYPTION_FILE_INVALID ("Encryption Certificate is not a file", "Le certificat de cryptage n'est pas un fichier",
 			"Il certificato di crittografia non è un file","El certificado de cifrado no es un archivo"),
+
+	ENCRYPTION ("Encryption", "Chiffrement", "Crittografia", "Cifrado"),
+
+	CERTIFICATE ("Certificate", "Certificat", "Certificato", "Certificado"),
 
 	PIE_CERTIFICATE ("pie_certificate", "pie_certificat", "pie_certificato", "pie_certificado"),
 
@@ -200,7 +205,14 @@ public enum Pie_Word {
 	DIRECTORY ("Directory", "Annuaire", "Direttorio", "Directorio"),
 
 	MODE ("Mode", "Mode", "Modalità", "Modo" ),
-	Max_MB ("MaxMB", "MaxMB", "MaxMB", "MáxMB")
+	Max_MB ("MaxMB", "MaxMB", "MaxMB", "MáxMB"),
+
+	LOG ("Log", "Enregistrer", "Tronco_d'albero", "Registro"),
+	INFORMATION ("Information", "Information", "Informazione", "Información"),
+	OFF ("Off", "Désactivé", "Spento", "Apagado"),
+	SEVERE ("Severe", "Grave", "Acuto", "Severo"),
+
+	OVERWRITE ("Overwrite", "Écraser", "Sovrascrivi", "Sobrescribir")
 	;
 
 	private String en;
