@@ -47,7 +47,7 @@ public class Pie {
 
     /** **************************************************<br>
      * Process Parameters : <br>
-     * java -jar pie-1.3.jar<br>
+     * java -cp .\pie-1.3.jar net.pie.examples.Pie<br>
      * -encode<br>
      * -overwrite (Optional default false overwrites the current encoded file)<br>
      * -file "C:\Users\terry\Desktop\tomato.png"<br>
@@ -59,7 +59,7 @@ public class Pie {
      * -certificate "my password" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
-     * java -jar pie-1.3.jar<br>
+     * java -cp .\pie-1.3.jar net.pie.examples.Pie<br>
      * -decode<br>
      * -overwrite (Optional default false overwrites the current decoded file)<br>
      * -file "C:\Users\terry\Desktop\tomato.png"<br>
@@ -67,6 +67,14 @@ public class Pie {
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "my password" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
+     */
+
+    /** ***************************************************************************<br>
+     * Full encoding runnable Example
+     * java -cp .\pie-1.3.jar net.pie.examples.Pie
+     * -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop"
+     * -shape square -maxmb 200 -encryption "my password"
+
      */
 
     public Pie(String[] args) {
