@@ -1,5 +1,3 @@
-package net.pie.examples;
-
 import net.pie.decoding.Pie_Decode;
 import net.pie.decoding.Pie_Decode_Config;
 import net.pie.decoding.Pie_Decoder_Config_Builder;
@@ -7,6 +5,7 @@ import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
 import net.pie.encoding.Pie_Encode_Config_Builder;
 import net.pie.enums.Pie_Encode_Mode;
+import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Shape;
 import net.pie.enums.Pie_Word;
 import net.pie.utils.Pie_Encryption;
@@ -47,7 +46,7 @@ public class Pie {
 
     /** **************************************************<br>
      * Process Parameters : <br>
-     * java -cp .\pie-1.3.jar net.pie.examples.Pie<br>
+     * java -cp .\pie-1.3.jar Pie<br>
      * -encode<br>
      * -overwrite (Optional default false overwrites the current encoded file)<br>
      * -file "C:\Users\terry\Desktop\tomato.png"<br>
@@ -59,7 +58,7 @@ public class Pie {
      * -certificate "my password" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
-     * java -cp .\pie-1.3.jar net.pie.examples.Pie<br>
+     * java -cp .\pie-1.3.jar Pie<br>
      * -decode<br>
      * -overwrite (Optional default false overwrites the current decoded file)<br>
      * -file "C:\Users\terry\Desktop\tomato.png"<br>
@@ -67,14 +66,15 @@ public class Pie {
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "my password" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
+     *
+     * java -cp .\pie-1.3.jar Pie<br>
+     * -create_certificate<br>
+     * -directory "C:\Users\terry\Desktop"<br><br>
      */
 
     /** ***************************************************************************<br>
      * Full encoding runnable Example
-     * java -cp .\pie-1.3.jar net.pie.examples.Pie
-     * -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop"
-     * -shape square -maxmb 200 -encryption "my password"
-
+     * java -cp .\pie-1.3.jar net.pie.examples.Pie -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
      */
 
     public Pie(String[] args) {
@@ -141,9 +141,14 @@ public class Pie {
         else if (getCertificate() != null)
             builder.add_Encryption(new Pie_Encryption(getCertificate()));	    // Optional Encryption. See Encryption Examples
 
+        if (isOverwrite())
+            builder.add_Option(Pie_Option.OVERWRITE_FILE);
+
         Pie_Encode_Config config = builder.build();
         Pie_Encode encode = new Pie_Encode(config);
-        System.out.println(encode.getOutput_file_name());
+
+        if (getLog_level().equals(Level.INFO))
+            System.out.println(encode.getOutput_file_name());
     }
 
         /** **************************************************<br>
@@ -298,7 +303,6 @@ public class Pie {
         if (Pie_Word.is_in_Translation(Pie_Word.OVERWRITE, mode))
             setOverwrite(true);
     }
-
 
     /** **************************************************<br>
      * quit

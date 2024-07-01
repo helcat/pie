@@ -343,7 +343,7 @@ public class Pie_Encode {
             if (getConfig().getEncoder_source().getType().equals(Pie_Source_Type.TEXT))
                 filename = Pie_Word.translate(Pie_Word.TEXT, getConfig().getLanguage()) + ".txt";
             else
-                filename = Pie_Word.translate(Pie_Word.UNKNOWN, getConfig().getLanguage());
+                filename = UUID.randomUUID().toString();
         }
 
         StringBuilder addon_files = new StringBuilder();
@@ -351,7 +351,7 @@ public class Pie_Encode {
             for (int i = 1; i <= total_files; i++) {
                 if (addon_files.length() > 0)
                     addon_files.append("*");
-                addon_files.append(i+".png");
+                addon_files.append(i).append(".png");
             }
         }
 
@@ -421,6 +421,7 @@ public class Pie_Encode {
     private File addFileNumber(int file_number, String source_filename) {
         boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
         String name = create_File_Name(file_number, source_filename);
+        int counter = 1;
         File file = new File(Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
                 Pie_Utils.file_concat(getConfig().getDirectory().getLocal_folder().getAbsolutePath(),  name)
                 : Pie_Utils.file_concat(getConfig().getDirectory().getLocal_folder().getParent(), name ));
@@ -429,17 +430,15 @@ public class Pie_Encode {
                 return file;
 
             if (file.getName().equals(getConfig().getEncoder_source().getFile_name())) {
-                file = new File(file.getParentFile() + File.separator +
-                        "enc_" + getConfig().getEncoder_source().getFile_name());
-                int counter = 1;
+                String file_name_text = file.getParentFile() + File.separator + "xxxx" + getConfig().getEncoder_source().getFile_name();
+                file = new File(file_name_text.replace("xxxx", "enc_" + (counter++) + "_"));
+
+                if (file.exists() && overwrite)
+                    return file;
+
                 while (file.exists()) {
-                    file = new File(file.getParentFile() + File.separator +
-                            "enc_" + (counter++) + "_" + getConfig().getEncoder_source().getFile_name());
+                    file = new File(file_name_text.replace("xxxx", "enc_" + (counter++) + "_"));
                 }
-            }else {
-                getConfig().logging(Level.WARNING, Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage())
-                        + " : " + file.getName() +
-                        (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, getConfig().getLanguage())+")" : ""));
             }
         }
         return file;
@@ -475,6 +474,8 @@ public class Pie_Encode {
 
         if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE) && name.endsWith(".pie"))
             return name;
+        else if (getConfig().getOptions().contains(Pie_Option.CREATE_CERTIFICATE))
+            return name+".pie";
 
         if (name.toLowerCase().endsWith(Pie_Constants.IMAGE_TYPE.getParm2()))
             name = name.substring(0, name.length() - ("." + Pie_Constants.IMAGE_TYPE.getParm2()).length());

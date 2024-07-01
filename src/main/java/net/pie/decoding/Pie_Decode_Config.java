@@ -129,18 +129,18 @@ public class Pie_Decode_Config {
         if (isError() || getLog_level().equals(Level.OFF))
             return;
 
-        if (level.equals(Level.SEVERE)) {
-            setError(true);
-            setError_message(message); // Allows the user to collect a message for their system
-        }
-
         if (isDemo_mode()) { // Used in demo to fill up a text area
             Pie_Utils.console_out(level.toString() + " : " + message);
             return;
         }
 
-        System.out.println(message); // Displays messages in the console
+        if (level.equals(Level.SEVERE)) {
+            setError(true);
+            setError_message(message); // Allows the user to collect a message for their system
+            return;
+        }
 
+        System.out.println(message); // Displays messages in the console
     }
 
     /** ***************************************************************<br>

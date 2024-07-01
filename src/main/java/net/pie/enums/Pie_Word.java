@@ -105,6 +105,9 @@ public enum Pie_Word {
 
 	FILE_EXISTS ("File Exists", "Le fichier existe", "Il file esiste", "El archivo existe"),
 
+	CAN_NOT_OVERWRITE_ORIGINAL_FILE ("Cannot overwrite the original file", "Impossible d'écraser le fichier d'origine",
+			"Impossibile sovrascrivere il file originale", "No se puede sobrescribir el archivo original"),
+
 	OVERWRITING_File("Overwriting File", "Fichier d'écrasement", "Sovrascrittura del file", "Sobrescribir archivo"),
 
 	TEXT ("text", "texte", "testo", "texto"),
