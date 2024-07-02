@@ -373,11 +373,13 @@ public class Pie_Encode {
      * Close the source input stream
      */
     private void close() {
-        getConfig().getEncoder_storage().closeZip();    // If required
+        if (getConfig().getEncoder_storage() != null)
+            getConfig().getEncoder_storage().closeZip();    // If required
         try {
-            if (getConfig().getEncoder_source().getInput() != null)
+            if (getConfig().getEncoder_source() != null && getConfig().getEncoder_source().getInput() != null)
                 getConfig().getEncoder_source().getInput().close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     /** *******************************************************************<br>

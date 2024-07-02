@@ -8,9 +8,8 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
-import net.pie.decoding.Pie_Decode;
+import net.pie.certificate.Pie_Certificate;
 import net.pie.decoding.Pie_Decode_Config;
-import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
 import net.pie.enums.*;
 
@@ -26,8 +25,6 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Pie_Encryption {
     private String password = null;
@@ -51,48 +48,17 @@ public class Pie_Encryption {
         if (parm instanceof SecretKey) {
             setKey((SecretKey) parm);
 
-        } else if (parm instanceof File) {
-            if (!Pie_Utils.isFile(((File) parm)) || !read_Certificate(((File) parm)))
+        } else if (parm instanceof File && Pie_Utils.isFile(((File) parm))) {
+            Pie_Certificate certificate = new Pie_Certificate();
+            if (!certificate.read_Certificate((File) parm))
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
 
         } else if (parm instanceof String) {
             setPassword((String) parm);
+
+        }else{
+            setError_message(Pie_Word.ENCRYPTION_ERROR);
         }
-    }
-
-    public static boolean verify_Certificate(File file) {
-        return verify_Certificate(file, false);
-    }
-    public static boolean verify_Certificate(File file, boolean demo) {
-        return new Pie_Encryption().read_Certificate(file, demo);
-    }
-
-    /** **************************************************<br>
-     * read Certificate
-     * @param file (File)
-     * @return (boolean)
-     */
-    private boolean read_Certificate(File file) {
-        return read_Certificate(file, false);
-    }
-    private boolean read_Certificate(File file, boolean demo) {
-        if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
-            return false;
-        String key_text = null;
-        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, new Pie_Decode_Source(file));
-        if (demo)
-            options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, new Pie_Decode_Source(file));
-
-        Pie_Decode decoded = new Pie_Decode(new Pie_Decode_Config(options));
-        if (decoded.getOutputStream() != null) {
-            if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
-                ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
-                key_text = stream.toString();
-            }
-        }
-
-        setPassword(Pie_Utils.isEmpty(key_text) ? null : key_text);
-        return !Pie_Utils.isEmpty(key_text);
     }
 
     /** **************************************************<br>
@@ -113,95 +79,6 @@ public class Pie_Encryption {
             return Pie_Word.ENCRYPTION_ERROR;
         }
         return null;
-    }
-
-    /** **************************************************<br>
-     * create Certificate File
-     * Generates a certificate of bewteen 100 - 600 random byte charactors between 1 - 255
-     * @param options (Pie_Encode_Config will be created if not entered, folder (File - Save to folder), file_name (String)
-     * @return (File) Certificate Created
-     */
-    public File create_Certificate(Object... options) {
-        Pie_Encode_Config config = null;
-        File folder = null;
-        String file_name = null;
-
-        if (options == null)
-            return null;
-
-        boolean demo = false;
-        Pie_Option opt = null;
-        for (Object o : options) {
-            if (o instanceof Pie_Encode_Config) {
-                config = (Pie_Encode_Config) o;
-                if (config.getOptions().contains(Pie_Option.DEMO_MODE)) {
-                    demo = true;
-                    config.setDemo_mode(demo);
-                }
-            }
-            else if (o instanceof File)
-                folder = (File) o;
-            else if (o instanceof String)
-                file_name = (String) o;
-            else if (o instanceof  Pie_Option) {
-                opt = (Pie_Option)  o;
-                demo = opt.equals(Pie_Option.DEMO_MODE);
-            }
-        }
-
-        if (config == null)
-            config = new Pie_Encode_Config();
-
-        if (Pie_Utils.isEmpty(file_name))
-            file_name = Pie_Word.translate(Pie_Word.PIE_CERTIFICATE, config.getLanguage());
-
-        if (folder == null)
-            folder = Pie_Utils.getDesktop();
-
-        if (!folder.isDirectory()) {
-            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.INVALID_FOLDER, config.getLanguage()));
-            return null;
-        }
-
-        setPassword(getRandomSpecialChars());
-
-        File cert = new File(folder + File.separator + file_name +  (file_name.toLowerCase().endsWith(".pie") ?
-                "" :  ".pie"));
-
-        Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.M_1,
-                Pie_Option.CREATE_CERTIFICATE, Level.INFO, (demo ? Pie_Option.DEMO_MODE : Level.INFO), Pie_Option.OVERWRITE_FILE,
-            new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
-            new Pie_Directory(cert.getParentFile())
-        );
-
-        if (demo)
-            encoding_config.setDemo_mode(true);
-
-        Pie_Encode encode = new Pie_Encode(encoding_config);
-        System.out.println(encode.getOutput_file_name());
-        if (encode.isEncoding_Error()) {
-            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
-            return null;
-        }else{
-            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
-            return cert;
-        }
-    }
-
-    /** **************************************************<br>
-     * get Random Special Chars
-     * @return (String)
-     */
-    private String getRandomSpecialChars() {
-        Random random_number = new Random();
-        int count = random_number.nextInt(600 - 100) + 100;
-        Random random = new SecureRandom();
-        IntStream specialChars = random.ints(count, 1, 255);
-        List<Character> charList = specialChars.mapToObj(data -> (char) data).collect(Collectors.toList());
-        Collections.shuffle(charList);
-        return charList.stream()
-                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-                .toString();
     }
 
     /** **************************************************<br>

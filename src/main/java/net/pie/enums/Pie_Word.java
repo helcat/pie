@@ -44,6 +44,14 @@ public enum Pie_Word {
 
 	CERTIFICATE ("Certificate", "Certificat", "Certificato", "Certificado"),
 
+	MAKE_CERTIFICATE ("Make_Certificate", "Faire_un_certificat", "Crea_certificato", "Hacer_certificado"),
+
+	VERIFY_CERTIFICATE ("Verify_Certificate", "Vérifier_le_certificat", "Verifica_certificato",
+		"Verificar_certificado"),
+
+	CERTIFICATE_VERIFIED ("Certificate Verified","Certificat vérifié", "Certificato verificato",
+			"Certificado verificado"),
+
 	PIE_CERTIFICATE ("pie_certificate", "pie_certificat", "pie_certificato", "pie_certificado"),
 
 	ENCRYPTION_ERROR ("Encryption Error", "Erreur de cryptage", "Errore di crittografia", "Error de cifrado"),

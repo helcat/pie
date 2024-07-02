@@ -1,3 +1,4 @@
+import net.pie.certificate.Pie_Certificate;
 import net.pie.decoding.Pie_Decode;
 import net.pie.decoding.Pie_Decode_Config;
 import net.pie.decoding.Pie_Decoder_Config_Builder;
@@ -29,6 +30,9 @@ public class Pie {
     private boolean encode = false;
     private boolean decode = false;
     private boolean overwrite = false;
+    private boolean makeCertificate = false;
+    private boolean verifyCertificate = false;
+
     private File source = null;
     private File directory = null;
     private File certificate = null;
@@ -67,14 +71,14 @@ public class Pie {
      * -certificate "my password" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
-     * java -cp .\pie-1.3.jar Pie<br>
-     * -create_certificate<br>
-     * -directory "C:\Users\terry\Desktop"<br><br>
+     * java -cp .\pie-1.3.jar Pie -make_certificate -directory "C:\Users\terry\Desktop"<br><br>
+     *
+     * java -cp .\pie-1.3.jar Pie -verify_certificate -file "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
      */
 
     /** ***************************************************************************<br>
      * Full encoding runnable Example
-     * java -cp .\pie-1.3.jar net.pie.examples.Pie -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
+     * java -cp .\pie-1.3.jar Pie -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
      */
 
     public Pie(String[] args) {
@@ -84,6 +88,8 @@ public class Pie {
             if (arg.startsWith("-")) {
                 check_mode(arg.substring(1));
                 check_Overwrite(arg.substring(1));
+                check_Certificate(arg.substring(1));
+                check_Verify(arg.substring(1));
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
                     source_file(arg.substring(1), value);
@@ -103,6 +109,31 @@ public class Pie {
 
         if (isEncode())
             encode();
+
+        else if (isDecode())
+            decode();
+
+        else if (isMakeCertificate())
+            createCertificate();
+
+        else if (isVerifyCertificate())
+            verifyCertificate();
+    }
+
+    /** **************************************************<br>
+     * Verify Certificate
+     */
+    private void verifyCertificate() {
+        Pie_Certificate cert = new Pie_Certificate();
+        cert.verify_Certificate(getSource());
+    }
+
+    /** **************************************************<br>
+     * Certificate
+     */
+    private void createCertificate() {
+        Pie_Certificate cert = new Pie_Certificate();
+        cert.create_Certificate(getDirectory());
     }
 
     /** **************************************************<br>
@@ -118,6 +149,9 @@ public class Pie {
             builder.add_Encryption(new Pie_Encryption(getEncryption_phrase()));	// Optional Encryption. See Encryption Examples
         else if (getCertificate() != null)
             builder.add_Encryption(new Pie_Encryption(getCertificate()));	    // Optional Encryption. See Encryption Examples
+
+        if (isOverwrite())
+            builder.add_Option(Pie_Option.OVERWRITE_FILE);
 
         Pie_Decode_Config config = builder.build();
         Pie_Decode decode = new Pie_Decode(config);
@@ -155,10 +189,10 @@ public class Pie {
          * validate
          */
     private void validate() {
-        if (!isDecode() && !isEncode())
+        if (!isDecode() && !isEncode() && !isMakeCertificate() && !isVerifyCertificate())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
 
-        if (getSource() == null)
+        if (!isMakeCertificate() && getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
         if (getDirectory() == null)
@@ -299,9 +333,25 @@ public class Pie {
     /** **************************************************<br>
      * check Overwrite
      */
+    private void check_Certificate(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.MAKE_CERTIFICATE, mode))
+            setMakeCertificate(true);
+    }
+
+    /** **************************************************<br>
+     * check Overwrite
+     */
     private void check_Overwrite(String mode) {
         if (Pie_Word.is_in_Translation(Pie_Word.OVERWRITE, mode))
             setOverwrite(true);
+    }
+
+    /** **************************************************<br>
+     * check Verify Certificate
+     */
+    private void check_Verify(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.VERIFY_CERTIFICATE, mode))
+            setVerifyCertificate(true);
     }
 
     /** **************************************************<br>
@@ -398,5 +448,21 @@ public class Pie {
 
     public void setOverwrite(boolean overwrite) {
         this.overwrite = overwrite;
+    }
+
+    public boolean isMakeCertificate() {
+        return makeCertificate;
+    }
+
+    public void setMakeCertificate(boolean makeCertificate) {
+        this.makeCertificate = makeCertificate;
+    }
+
+    public boolean isVerifyCertificate() {
+        return verifyCertificate;
+    }
+
+    public void setVerifyCertificate(boolean verifyCertificate) {
+        this.verifyCertificate = verifyCertificate;
     }
 }
