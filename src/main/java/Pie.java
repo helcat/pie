@@ -518,7 +518,7 @@ public class Pie {
                     ", 2 = "+ Pie_Word.translate(Pie_Word.INFORMATION)+
                     ", 3 = "+Pie_Word.translate(Pie_Word.SEVERE)+") "+
                     Pie_Word.translate(Pie_Word.DEFAULT)+" \"2. "+Pie_Word.translate(Pie_Word.INFORMATION)+"\"");
-            String in = scanner.nextLine().replace("\"", "");
+            String in = "2" + scanner.nextLine().replace("\"", "");
             if (in.equalsIgnoreCase("1"))
                 setLog_level(Level.OFF);
             else if (in.equalsIgnoreCase("2"))
@@ -536,7 +536,7 @@ public class Pie {
         setOverwrite(true);
         try {
             System.out.println(Pie_Word.translate(Pie_Word.OVERWRITE)+" (Y/n) "+Pie_Word.translate(Pie_Word.DEFAULT)+" \"Y\"");
-            String in = scanner.nextLine().replace("\"", "");
+            String in = "Y" + scanner.nextLine().replace("\"", "");
             if (in.equalsIgnoreCase("n"))
                 setOverwrite(false);
         } catch (Exception ignored) {  }
