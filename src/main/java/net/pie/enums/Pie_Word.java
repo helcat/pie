@@ -23,6 +23,10 @@ public enum Pie_Word {
 
 	INVALID_FOLDER ("Invalid directory" ,"Répertoire invalide" , "Cartella non valida", "Directorio invalido"),
 
+	ENTER_CERTIFICATE ("Enter Certificate", "Entrez le certificat", "Inserisci il certificato", "Ingresar certificado"),
+	ENTER_DIRECTORY("Enter Directory", "Entrer dans le répertoire", "Entra nella Rubrica", "Ingresar al directorio"),
+	ENTER_SOURCE_FILE ("Enter Source File", "Entrez le fichier source", "Inserisci il file di origine", "Ingrese el archivo fuente"),
+
 	CERTIFICATE_NOT_CREATED ("Was unable to create a certificate file", "Impossible de créer un fichier de certificat",
 					"Impossibile creare un file di certificato", "No se pudo crear un archivo de certificado"),
 
@@ -57,6 +61,8 @@ public enum Pie_Word {
 	ENCRYPTION_ERROR ("Encryption Error", "Erreur de cryptage", "Errore di crittografia", "Error de cifrado"),
 
 	NO_SOURCE ("No Source","Aucune source", "Nessuna fonte", "Sin fuentes"),
+
+	NO_DIRECTORY_ENTERED ("No Directory Entered", "Aucun répertoire entré","Nessuna directory inserita", "No se ingresó ningún directorio"),
 
 	ENCODING_STRING_REQUIRED ("Encoding String is required", "La chaîne d'encodage est requise",
 			 "La stringa di codifica è obbligatoria", "Se requiere cadena de codificación"),
@@ -223,7 +229,11 @@ public enum Pie_Word {
 	OFF ("Off", "Désactivé", "Spento", "Apagado"),
 	SEVERE ("Severe", "Grave", "Acuto", "Severo"),
 
-	OVERWRITE ("Overwrite", "Écraser", "Sovrascrivi", "Sobrescribir")
+	OVERWRITE ("Overwrite", "Écraser", "Sovrascrivi", "Sobrescribir"),
+
+	PROMPT ("Prompt", "Rapide", "Richiesta", "Inmediato"),
+
+	DEFAULT ("Default", "Défaut", "Predefinito", "Por defecto")
 	;
 
 	private String en;

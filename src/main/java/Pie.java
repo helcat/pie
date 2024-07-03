@@ -14,6 +14,7 @@ import net.pie.utils.Pie_Max_MB;
 import net.pie.utils.Pie_Utils;
 
 import java.io.File;
+import java.util.Scanner;
 import java.util.logging.Level;
 
 /** **********************************************<br>
@@ -32,6 +33,7 @@ public class Pie {
     private boolean overwrite = false;
     private boolean makeCertificate = false;
     private boolean verifyCertificate = false;
+    private boolean prompt = false;
 
     private File source = null;
     private File directory = null;
@@ -90,6 +92,8 @@ public class Pie {
                 check_Overwrite(arg.substring(1));
                 check_Certificate(arg.substring(1));
                 check_Verify(arg.substring(1));
+                check_Prompt(arg.substring(1));
+
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
                     source_file(arg.substring(1), value);
@@ -105,19 +109,79 @@ public class Pie {
             count ++;
         }
 
-        validate();
+        Scanner scanner = null;
 
-        if (isEncode())
+        // Validation
+        if (!isPrompt()) {
+            validate();
+        }else{
+            scanner = new Scanner(System.in);
+        }
+
+        // Encoding
+        if (isEncode()) {
+            if (isPrompt()) {
+                prompt_encode(scanner);
+                validate();
+            }
             encode();
+        }
 
-        else if (isDecode())
+        // Decoding
+        else if (isDecode()) {
+            if (isPrompt()) {
+                prompt_decode(scanner);
+                validate();
+            }
             decode();
+        }
 
-        else if (isMakeCertificate())
+        // Make Certificate
+        else if (isMakeCertificate()) {
+            if (isPrompt()) {
+                prompt_createCertificate(scanner);
+                validate();
+            }
             createCertificate();
+        }
 
-        else if (isVerifyCertificate())
+        // Verify Certificate
+        else if (isVerifyCertificate()) {
+            if (isPrompt()) {
+                prompt_verifyCertificate(scanner);
+                validate();
+            }
             verifyCertificate();
+        }
+
+        if (scanner != null)
+            scanner.close();
+    }
+
+    /** **************************************************<br>
+     * Prompt - Verify Certificate
+     *  java -cp .\pie-1.3.jar Pie -verify_certificate -prompt
+     */
+    private void prompt_verifyCertificate(Scanner scanner) {
+        if (getSource() == null) {
+            File certificate = null;
+            String in = null;
+            while (certificate == null) {
+                try {
+                    System.out.println(Pie_Word.translate(Pie_Word.ENTER_CERTIFICATE));
+                    in = scanner.nextLine().replace("\"", "");
+                    if (in.isEmpty())
+                        quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
+                    certificate = new File(in);
+                    if (!certificate.exists() || !certificate.isFile())
+                        certificate = null;
+                    else
+                        setSource(certificate);
+                } catch (Exception e) {
+                    certificate = null;
+                }
+            }
+        }
     }
 
     /** **************************************************<br>
@@ -127,6 +191,21 @@ public class Pie {
         Pie_Certificate cert = new Pie_Certificate();
         cert.verify_Certificate(getSource());
     }
+
+    /** **************************************************<br>
+     * Prompt - create Certificate
+     *  java -cp .\pie-1.3.jar Pie -make_certificate -prompt
+     */
+    private void prompt_createCertificate(Scanner scanner) {
+        if (getDirectory() == null) {
+            File folder = null;
+            String in = null;
+            while (folder == null) {
+                folder = check_Prompt_Directory(scanner, true);
+            }
+        }
+    }
+
 
     /** **************************************************<br>
      * Certificate
@@ -159,6 +238,33 @@ public class Pie {
     }
 
     /** **************************************************<br>
+     * Prompt - decode
+     * java -cp .\pie-1.3.jar Pie -decode -prompt<br>
+     * -encryption "my password"  (Optional encryption or certificate)<br>
+     * -certificate "my password" (Optional encryption or certificate)<br>
+     */
+    private void prompt_decode(Scanner scanner) {
+        if (getSource() == null) {
+            File file = null;
+            String in = null;
+            while (file == null) {
+                file = check_Prompt_Source(scanner);
+            }
+        }
+
+        if (getDirectory() == null) {
+            File folder = null;
+            String in = null;
+            while (folder == null) {
+                folder = check_Prompt_Directory(scanner, false);
+            }
+        }
+
+        check_Prompt_Overwrite(scanner);
+        check_Prompt_Log(scanner);
+    }
+
+    /** **************************************************<br>
      * encode
      */
     private void encode() {
@@ -185,9 +291,40 @@ public class Pie {
             System.out.println(encode.getOutput_file_name());
     }
 
-        /** **************************************************<br>
-         * validate
-         */
+    /** ******************************************************<br>
+     * java -cp .\pie-1.3.jar Pie<br>
+     * -encode<br>
+     * -shape square (Optional default Rectangle encode only)<br>
+     * -mode one (Optional encoding mode default is two, encode only)<br>
+     * -maxMB 200 (Optional Maximum MB Encoded File. Default 500 before zipped and sliced)<br>
+     * -encryption "my password"  (Optional encryption or certificate)<br>
+     * -certificate "my password" (Optional encryption or certificate)<br>
+     * @param scanner
+     */
+    private void prompt_encode(Scanner scanner) {
+        if (getSource() == null) {
+            File file = null;
+            String in = null;
+            while (file == null) {
+                file = check_Prompt_Source(scanner);
+            }
+        }
+
+        if (getDirectory() == null) {
+            File folder = null;
+            String in = null;
+            while (folder == null) {
+                folder = check_Prompt_Directory(scanner, false);
+            }
+        }
+
+        check_Prompt_Overwrite(scanner);
+        check_Prompt_Log(scanner);
+    }
+
+    /** **************************************************<br>
+     * validate
+     */
     private void validate() {
         if (!isDecode() && !isEncode() && !isMakeCertificate() && !isVerifyCertificate())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
@@ -355,11 +492,112 @@ public class Pie {
     }
 
     /** **************************************************<br>
+     * check Prompt
+     */
+    private void check_Prompt(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.PROMPT, mode))
+            setPrompt(true);
+    }
+
+    /** **************************************************<br>
      * quit
      */
     private static void quit(String message) {
         System.out.println(message);
         System.exit(0);
+    }
+
+    /** **************************************************<br>
+     * check Prompt Log
+     * @param scanner Scanner
+     */
+    private void check_Prompt_Log(Scanner scanner) {
+        setLog_level(Level.INFO);
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.LOG)+" (1 = "+Pie_Word.translate(Pie_Word.OFF)+
+                    ", 2 = "+ Pie_Word.translate(Pie_Word.INFORMATION)+
+                    ", 3 = "+Pie_Word.translate(Pie_Word.SEVERE)+") "+
+                    Pie_Word.translate(Pie_Word.DEFAULT)+" \"2. "+Pie_Word.translate(Pie_Word.INFORMATION)+"\"");
+            String in = scanner.nextLine().replace("\"", "");
+            if (in.equalsIgnoreCase("1"))
+                setLog_level(Level.OFF);
+            else if (in.equalsIgnoreCase("2"))
+                setLog_level(Level.INFO);
+            else if (in.equalsIgnoreCase("3"))
+                setLog_level(Level.SEVERE);
+        } catch (Exception ignored) {  }
+    }
+
+    /** **************************************************<br>
+     * check Prompt Overwrite
+     * @param scanner Scanner
+     */
+    private void check_Prompt_Overwrite(Scanner scanner) {
+        setOverwrite(true);
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.OVERWRITE)+" (Y/n) "+Pie_Word.translate(Pie_Word.DEFAULT)+" \"Y\"");
+            String in = scanner.nextLine().replace("\"", "");
+            if (in.equalsIgnoreCase("n"))
+                setOverwrite(false);
+        } catch (Exception ignored) {  }
+    }
+
+    /** **************************************************<br>
+     * check Prompt Directory
+     * @param scanner Scanner
+     * @param quit_on_empty boolean
+     * @return File
+     */
+    private File check_Prompt_Directory(Scanner scanner, boolean quit_on_empty) {
+        File folder = null;
+        try {
+            if (quit_on_empty) {
+                System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY));
+            }else{
+                System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY) +
+                        " (" + Pie_Word.translate(Pie_Word.DEFAULT) + " : " + Pie_Utils.getDesktop().getName() + ")");
+            }
+            String in = scanner.nextLine().replace("\"", "");
+            if (quit_on_empty) {
+                if (in.isEmpty()) {
+                    quit(Pie_Word.translate(Pie_Word.NO_DIRECTORY_ENTERED));
+                }else{
+                    in = Pie_Utils.getDesktopPath();
+                    System.out.println(Pie_Word.translate(Pie_Word.DIRECTORY) + " : " + in);
+                }
+            }
+            folder = new File(in);
+            if (!folder.exists() || !folder.isDirectory())
+                folder = null;
+            else
+                setDirectory(folder);
+        } catch (Exception e) {
+            folder = null;
+        }
+        return folder;
+    }
+
+    /** **************************************************<br>
+     * check Prompt Source File
+     * @param scanner Scanner
+     * @return File
+     */
+    private File check_Prompt_Source(Scanner scanner) {
+        File file = null;
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.ENTER_SOURCE_FILE));
+            String in = scanner.nextLine().replace("\"", "");
+            if (in.isEmpty())
+                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
+            file = new File(in);
+            if (!file.exists() || !file.isFile())
+                file = null;
+            else
+                setSource(file);
+        } catch (Exception e) {
+            file = null;
+        }
+        return file;
     }
 
     public boolean isEncode() {
@@ -464,5 +702,13 @@ public class Pie {
 
     public void setVerifyCertificate(boolean verifyCertificate) {
         this.verifyCertificate = verifyCertificate;
+    }
+
+    public boolean isPrompt() {
+        return prompt;
+    }
+
+    public void setPrompt(boolean prompt) {
+        this.prompt = prompt;
     }
 }
