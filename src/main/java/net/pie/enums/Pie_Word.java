@@ -46,6 +46,10 @@ public enum Pie_Word {
 
 	ENCRYPTION ("Encryption", "Chiffrement", "Crittografia", "Cifrado"),
 
+	ENCRYPTION_PHRASE ("Encryption Phrase", "Phrase de cryptage", "Frase di crittografia", "Frase de cifrado"),
+
+	ENCRYPTION_ERROR ("Encryption Error", "Erreur de cryptage", "Errore di crittografia", "Error de cifrado"),
+
 	CERTIFICATE ("Certificate", "Certificat", "Certificato", "Certificado"),
 
 	MAKE_CERTIFICATE ("Make_Certificate", "Faire_un_certificat", "Crea_certificato", "Hacer_certificado"),
@@ -57,8 +61,6 @@ public enum Pie_Word {
 			"Certificado verificado"),
 
 	PIE_CERTIFICATE ("pie_certificate", "pie_certificat", "pie_certificato", "pie_certificado"),
-
-	ENCRYPTION_ERROR ("Encryption Error", "Erreur de cryptage", "Errore di crittografia", "Error de cifrado"),
 
 	NO_SOURCE ("No Source","Aucune source", "Nessuna fonte", "Sin fuentes"),
 
@@ -233,7 +235,10 @@ public enum Pie_Word {
 
 	PROMPT ("Prompt", "Rapide", "Richiesta", "Inmediato"),
 
-	DEFAULT ("Default", "Défaut", "Predefinito", "Por defecto")
+	DEFAULT ("Default", "Défaut", "Predefinito", "Por defecto"),
+
+	LEAVE_BLANK("Leave blank if not required","Laisser vide si ce n'est pas nécessaire",
+			"Lasciare vuoto se non richiesto", "Dejar en blanco si no es necesario")
 	;
 
 	private String en;
