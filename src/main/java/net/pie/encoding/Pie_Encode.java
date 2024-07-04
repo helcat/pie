@@ -517,6 +517,10 @@ public class Pie_Encode {
         return config;
     }
 
+    /** ********************************************<br>
+     * Used by Users in their programs
+     * @return BufferedImage
+     */
     public BufferedImage getOutput_Image() {
         return output_Image;
     }

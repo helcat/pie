@@ -85,7 +85,7 @@ public class Pie {
 
     public Pie(String[] args) {
         int count = 0;
-        String value = null;
+        String value;
         for (String arg : args) {
             if (arg.startsWith("-")) {
                 check_mode(arg.substring(1));
@@ -165,7 +165,7 @@ public class Pie {
     private void prompt_verifyCertificate(Scanner scanner) {
         if (getSource() == null) {
             File certificate = null;
-            String in = null;
+            String in;
             while (certificate == null) {
                 try {
                     System.out.println(Pie_Word.translate(Pie_Word.ENTER_CERTIFICATE));
@@ -627,7 +627,7 @@ public class Pie {
      * @return File
      */
     private File check_Prompt_Directory(Scanner scanner, boolean quit_on_empty) {
-        File folder = null;
+        File folder;
         try {
             if (quit_on_empty) {
                 System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY));
@@ -661,7 +661,7 @@ public class Pie {
      * @return File
      */
     private File check_Prompt_Source(Scanner scanner) {
-        File file = null;
+        File file;
         try {
             System.out.println(Pie_Word.translate(Pie_Word.ENTER_SOURCE_FILE));
             String in = scanner.nextLine().replace("\"", "");
@@ -683,7 +683,7 @@ public class Pie {
      * @param scanner Scanner
      */
     private void check_Prompt_Certificate(Scanner scanner) {
-        File file = null;
+        File file;
         try {
             System.out.println(Pie_Word.translate(Pie_Word.ENTER_CERTIFICATE)+" : "+
                     Pie_Word.translate(Pie_Word.LEAVE_BLANK));
@@ -691,14 +691,9 @@ public class Pie {
             if (Pie_Utils.isEmpty(in))
                 return;
             file = new File(in);
-            if (!file.exists() || !file.isFile())
-                file = null;
-            else
+            if (file.exists() && file.isFile())
                 setCertificate(file);
-        } catch (Exception e) {
-            file = null;
-        }
-        return;
+        } catch (Exception ignored) { }
     }
 
     public boolean isEncode() {
