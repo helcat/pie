@@ -34,7 +34,6 @@ public class Pie_Test_Decode {
      * <b>Pie Decode</b><br>
      **/
     public Pie_Test_Decode() {
-
         Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
             .add_Decode_Source(source)					                            // File to be decoded
             .add_Directory(Pie_Utils.file_concat(folder, "shared"))   		// Folder to place decoded file

@@ -57,7 +57,6 @@ public class Pie_Utils {
     public static byte[] compress_return_bytes(byte[] bytes) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            //Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION, true);
             GZIPOutputStream out = new GZIPOutputStream(baos); //, compressor);
             out.write(bytes);
             out.close();
@@ -178,7 +177,7 @@ public class Pie_Utils {
 
     /** **************************************************************<br>
      * Used in Demo not in PIE
-     * @param log_file
+     * @param log_file File
      */
     public static void setConsole_Out_File(File log_file) {
         try {
@@ -363,7 +362,7 @@ public class Pie_Utils {
 
     /** ***********************************************<br>
      * is Mac
-     * @return
+     * @return boolean
      */
     public static boolean isMac() {
         return OSInfo.getOSType().equals(OSInfo.OSType.MACOSX);
@@ -371,7 +370,7 @@ public class Pie_Utils {
 
     /** ***********************************************<br>
      * is Windows
-     * @return
+     * @return boolean
      */
     public static boolean isWin() {
         return OSInfo.getOSType().equals(OSInfo.OSType.WINDOWS);
@@ -379,7 +378,7 @@ public class Pie_Utils {
 
     /** ***********************************************<br>
      * is Unix
-     * @return
+     * @return boolean
      */
     public static boolean isUnix() {
         return OSInfo.getOSType().equals(OSInfo.OSType.LINUX);
