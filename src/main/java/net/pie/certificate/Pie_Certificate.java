@@ -51,9 +51,11 @@ public class Pie_Certificate {
 
         Pie_Decode_Config config = config_builder.build();
         if (read_Certificate(file)) {
+            setPassword(null);
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
         };
+        setPassword(null);
         config.logging(Level.INFO, Pie_Word.translate(Pie_Word.ERROR, config.getLanguage()));
         return false;
     }
@@ -108,13 +110,19 @@ public class Pie_Certificate {
             builder.add_Option(Pie_Option.DEMO_MODE);
 
         Pie_Encode encode = new Pie_Encode(builder.build());
-        System.out.println(encode.getOutput_file_name());
+
         if (encode.isEncoding_Error()) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
             return null;
         }else{
-            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
-            return cert;
+            if (verify_Certificate(cert)) {
+                System.out.println(encode.getOutput_file_name());
+                config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
+                return cert;
+            }else{
+                config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+                return null;
+            }
         }
     }
 
