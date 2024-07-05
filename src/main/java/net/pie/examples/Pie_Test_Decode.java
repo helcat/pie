@@ -25,6 +25,8 @@ public class Pie_Test_Decode {
     private String temp_Encoded_Imaage = "enc_tomato.png";
     private String temp_Decode_To = "shared";
     public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "enc_1_tomato.png"));
+    public static File certificate = new
+            File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"));
     public static File folder = Pie_Utils.getDesktop();
     public static void main(String[] args) {
         new Pie_Test_Decode();
@@ -38,7 +40,7 @@ public class Pie_Test_Decode {
             .add_Decode_Source(source)					                            // File to be decoded
             .add_Directory(Pie_Utils.file_concat(folder, "shared"))   		// Folder to place decoded file
             .add_Log_Level(Level.INFO)												// Optional logging level
-            .add_Encryption("1234567890abcdefghijklmnopqrstuvwxyz!£$%")					                // Optional Encryption. See Encryption Examples
+            .add_Encryption(certificate)					                // Optional Encryption. See Encryption Examples
             .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional set Pie_Option's as required. See Pie_Option examples
             .build();																// Build the Pie_Config
 

@@ -18,7 +18,8 @@ package net.pie.enums;
 public enum Pie_Option {
     OVERWRITE_FILE,
     DEMO_MODE,
-    CREATE_CERTIFICATE
+    CREATE_CERTIFICATE,
+    DECODE_CERTIFICATE,
     ;
 
 }

@@ -10,8 +10,10 @@ package net.pie.certificate;
 
 import net.pie.decoding.Pie_Decode;
 import net.pie.decoding.Pie_Decode_Config;
+import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
+import net.pie.encoding.Pie_Encode_Config_Builder;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Word;
@@ -27,6 +29,11 @@ import java.util.stream.IntStream;
 public class Pie_Certificate {
 
     private String password = null;
+    private boolean demo_mode = false;
+
+    public Pie_Certificate(boolean demo_mode) {
+        setDemo_mode(demo_mode);
+    }
 
     public Pie_Certificate() {
 
@@ -38,7 +45,11 @@ public class Pie_Certificate {
      * @return boolean
      */
     public boolean verify_Certificate(File file) {
-        Pie_Decode_Config config = new Pie_Decode_Config(Pie_Option.DEMO_MODE);
+        Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
+        if (isDemo_mode())
+            config_builder.add_Option(Pie_Option.DEMO_MODE);
+
+        Pie_Decode_Config config = config_builder.build();
         if (read_Certificate(file)) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
@@ -56,9 +67,12 @@ public class Pie_Certificate {
         if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
-        List<Object> options = Arrays.asList( Pie_Option.OVERWRITE_FILE, Pie_Option.DEMO_MODE, new Pie_Decode_Source(file));
-
-        Pie_Decode decoded = new Pie_Decode(new Pie_Decode_Config(options));
+        Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
+        if (isDemo_mode())
+            config_builder.add_Option(Pie_Option.DEMO_MODE);
+        config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
+        config_builder.add_Decode_Source(file);
+        Pie_Decode decoded = new Pie_Decode(config_builder.build());
         if (decoded.getOutputStream() != null) {
             if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
                 ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
@@ -80,22 +94,20 @@ public class Pie_Certificate {
             folder = Pie_Utils.getDesktop();
 
         Pie_Encode_Config config = new Pie_Encode_Config();
-        config.setDemo_mode(true);
-
         String password = getRandomSpecialChars();
 
         File cert = Pie_Utils.file_concat(folder,UUID.randomUUID().toString()+".pie");
 
-        Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.M_1,
-                Pie_Option.CREATE_CERTIFICATE, Level.INFO, Pie_Option.DEMO_MODE, Level.INFO,
-                Pie_Option.OVERWRITE_FILE,
-            new Pie_Encode_Source(new Pie_Text(password, cert.getName())),
-            new Pie_Directory(cert.getParentFile())
-        );
+        Pie_Encode_Config_Builder builder = new Pie_Encode_Config_Builder()
+                .add_Log_Level(Level.INFO)
+                .add_Mode(Pie_Encode_Mode.M_1)
+                .add_Option(Pie_Option.CREATE_CERTIFICATE, Pie_Option.OVERWRITE_FILE)
+                .add_Encode_Source(new Pie_Text(password, cert.getName()))
+                .add_Directory(cert.getParentFile());
+        if (isDemo_mode())
+            builder.add_Option(Pie_Option.DEMO_MODE);
 
-        encoding_config.setDemo_mode(true);
-
-        Pie_Encode encode = new Pie_Encode(encoding_config);
+        Pie_Encode encode = new Pie_Encode(builder.build());
         System.out.println(encode.getOutput_file_name());
         if (encode.isEncoding_Error()) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
@@ -130,6 +142,13 @@ public class Pie_Certificate {
         this.password = password;
     }
 
+    public boolean isDemo_mode() {
+        return demo_mode;
+    }
+
+    public void setDemo_mode(boolean demo_mode) {
+        this.demo_mode = demo_mode;
+    }
 }
 
 

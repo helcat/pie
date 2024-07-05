@@ -114,7 +114,8 @@ public class Pie_Decode_Source {
             case "File":
                 File f = (File) getDecode_object();
                 setZipped(new ZipInputStream(Files.newInputStream(((File) getDecode_object()).toPath())).getNextEntry() != null);
-                config.logging(Level.INFO,Pie_Word.translate(Pie_Word.LOADING_FILE, config.getLanguage()) + " " +
+                if (!f.getName().toLowerCase().endsWith("pie")) // Don't log loading pie files.
+                    config.logging(Level.INFO,Pie_Word.translate(Pie_Word.LOADING_FILE, config.getLanguage()) + " " +
                         (getAddon_Files() == null || processing_file == 0 ? f.getName() : getAddon_Files()[processing_file - 1]));
                 try {
                     if (isZipped()) {

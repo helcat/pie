@@ -23,7 +23,10 @@ public class Pie_Test_Encode {
     private String temp_To_Be_Encoded = "tomato.png";
     private String temp_Encoded_Image = "Test_File.jpg";
 
-    public static File source = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "tomato.png"));
+    public static File source = new
+            File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "tomato.png"));
+    public static File certificate = new
+            File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"));
     public static File folder = Pie_Utils.getDesktop();
 
     public static void main(String[] args) {
@@ -40,7 +43,7 @@ public class Pie_Test_Encode {
             .add_Log_Level(Level.OFF)										// Optional logging level Default OFF
             .add_Max_MB(200)						                    // Optional largest file allowed before slicing Default is 200 MB
             .add_Mode(Pie_Encode_Mode.M_2)								    // Optional Default is Pie_Encode_Mode.M_2 See Pie_Encode_Mode Examples
-            .add_Encryption(new Pie_Encryption("1234567890abcdefghijklmnopqrstuvwxyz!£$%"))		// Optional Encryption. See Encryption Examples
+            .add_Encryption(new Pie_Encryption(certificate))		        // Optional Encryption. See Encryption Examples
             .add_Shape(Pie_Shape.SHAPE_SQUARE)								// Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
             .add_Option(Pie_Option.OVERWRITE_FILE)		                    // Optional set Pie_Option's as required. See Pie_Option examples
             .build();														// Build the Pie_Config

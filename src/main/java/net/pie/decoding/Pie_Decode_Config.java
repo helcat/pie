@@ -126,7 +126,7 @@ public class Pie_Decode_Config {
      * @param message (Logging Message)
      **/
     public void logging(Level level, String message) {
-        if (isError() || getLog_level().equals(Level.OFF))
+        if (isError() || getLog_level().equals(Level.OFF) || getOptions().contains(Pie_Option.DECODE_CERTIFICATE))
             return;
 
         if (isDemo_mode()) { // Used in demo to fill up a text area
