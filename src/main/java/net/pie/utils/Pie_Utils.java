@@ -17,8 +17,6 @@ import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.*;
 
 public class Pie_Utils {
@@ -327,45 +325,13 @@ public class Pie_Utils {
         return in == null || in.trim().isEmpty();
     }
 
-    public static byte[] find_duplicates(String base64String) {
-        Map<String, Integer> letterCounts = new HashMap<>();
-        int count = 0;
-        String seq = null;
-        int chunk = 2;
-        int high = 0;
-        for (int i = 0; i < base64String.length() - 1;) {
-            seq = base64String.substring(i, i + chunk);
-            if (!letterCounts.containsKey(seq)) {
-                letterCounts.put(seq, 1);
-            } else {
-                count = letterCounts.get(seq) + 1;
-                high = (Math.max(count, high));
-                letterCounts.put(seq, count);
-            }
-            i = i + chunk;
-        }
-
-        System.out.println("highest : " + high);
-        count = 0;
-        for (Map.Entry<String, Integer> entry : letterCounts.entrySet()) {
-            if (entry.getValue() > 400) {
-                System.out.println("Pattern: " + entry.getKey() + " Count: " + entry.getValue());
-                count ++;
-            }
-        }
-        System.out.println("Over 400 " + count + ", " +
-                "Total Count: " + letterCounts.size() + " Length " + base64String.length());
-
-        return base64String.getBytes(StandardCharsets.UTF_8);
-    }
-
-
     /** ***********************************************<br>
      * is Mac
      * @return boolean
      */
     public static boolean isMac() {
-        return OSInfo.getOSType().equals(OSInfo.OSType.MACOSX);
+        Pie_OSValidator os = new Pie_OSValidator();
+        return os.isMac();
     }
 
     /** ***********************************************<br>
@@ -373,7 +339,8 @@ public class Pie_Utils {
      * @return boolean
      */
     public static boolean isWin() {
-        return OSInfo.getOSType().equals(OSInfo.OSType.WINDOWS);
+        Pie_OSValidator os = new Pie_OSValidator();
+        return os.isWindows();
     }
 
     /** ***********************************************<br>
@@ -381,9 +348,9 @@ public class Pie_Utils {
      * @return boolean
      */
     public static boolean isUnix() {
-        return OSInfo.getOSType().equals(OSInfo.OSType.LINUX);
+        Pie_OSValidator os = new Pie_OSValidator();
+        return os.isUnix();
     }
-
 
 }
 
