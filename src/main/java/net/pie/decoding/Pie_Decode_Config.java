@@ -137,7 +137,8 @@ public class Pie_Decode_Config {
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message); // Allows the user to collect a message for their system
-            return;
+            if (!getLog_level().equals(Level.INFO))
+                return;
         }
 
         System.out.println(message); // Displays messages in the console

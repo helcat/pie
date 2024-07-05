@@ -162,8 +162,9 @@ public class Pie_Decode {
 
         if (isEncrypted()) {
             message = getConfig().getEncryption() != null ? getConfig().getEncryption().decrypt(getConfig(), message) : message;
-            if (message == null || message.length == 0 || getConfig().isError()) {
-                getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_FAILED, getConfig().getLanguage()));
+            if (message == null || message.length == 0) {
+                if (!getConfig().isError())
+                    getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.DECRYPTION_FAILED, getConfig().getLanguage()));
                 return null;
                 }
         }

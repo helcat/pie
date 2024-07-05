@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public class Pie_Mac_Address {
-    private List<Integer> mac_addresses = new ArrayList<>();
+    private List<String> mac_addresses = new ArrayList<>();
 
     public void getAddresses() {
         Enumeration<NetworkInterface> networkInterfaces = null;
@@ -30,17 +30,17 @@ public class Pie_Mac_Address {
                     for (int i = 0; i < hardwareAddress.length; i++)
                         hexadecimalFormat[i] = String.format("%02X", hardwareAddress[i]);
                     mac = String.join("-", hexadecimalFormat);
-                    getMac_addresses().add(mac.hashCode());
+                    getMac_addresses().add(mac);
                 }
             }
         } catch (SocketException ignored) { }
     }
 
-    public List<Integer> getMac_addresses() {
+    public List<String> getMac_addresses() {
         return mac_addresses;
     }
 
-    public void setMac_addresses(List<Integer> mac_addresses) {
+    public void setMac_addresses(List<String> mac_addresses) {
         this.mac_addresses = mac_addresses;
     }
 }

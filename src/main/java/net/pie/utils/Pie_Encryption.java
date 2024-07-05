@@ -31,6 +31,7 @@ public class Pie_Encryption {
     private SecretKey key = null;
     private Pie_Word error_message = null;
     private boolean was_Encrypted = false;
+    private boolean using_certificate = false;
 
     public Pie_Encryption() {
 
@@ -50,8 +51,12 @@ public class Pie_Encryption {
 
         } else if (parm instanceof File && Pie_Utils.isFile(((File) parm))) {
             Pie_Certificate certificate = new Pie_Certificate();
-            if (!certificate.read_Certificate((File) parm))
+            if (!certificate.read_Certificate((File) parm) || Pie_Utils.isEmpty(certificate.getPassword())) {
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
+            }else{
+                setUsing_certificate(true);
+                setPassword(certificate.getPassword());
+            }
 
         } else if (parm instanceof String) {
             setPassword((String) parm);
@@ -93,6 +98,8 @@ public class Pie_Encryption {
 
         if (getKey() == null) {
             if (!Pie_Utils.isEmpty(getPassword())) {
+                if (isUsing_certificate())
+                    config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
                 Pie_Word word = createKey();
                 if (word != null)
                     config.logging(Level.SEVERE, Pie_Word.translate(word, config.getLanguage()));
@@ -171,6 +178,8 @@ public class Pie_Encryption {
             return cipher.doFinal(encryptedData);
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            config.logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCRYPTION_ERROR, config.getLanguage()));
+            config.setError(true);
             return null;
         }
     }
@@ -205,6 +214,14 @@ public class Pie_Encryption {
 
     private void setError_message(Pie_Word error_message) {
         this.error_message = error_message;
+    }
+
+    public boolean isUsing_certificate() {
+        return using_certificate;
+    }
+
+    public void setUsing_certificate(boolean using_certificate) {
+        this.using_certificate = using_certificate;
     }
 }
 

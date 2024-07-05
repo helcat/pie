@@ -82,14 +82,14 @@ public class Pie_Certificate {
         Pie_Encode_Config config = new Pie_Encode_Config();
         config.setDemo_mode(true);
 
-        setPassword(getRandomSpecialChars());
+        String password = getRandomSpecialChars();
 
         File cert = Pie_Utils.file_concat(folder,UUID.randomUUID().toString()+".pie");
 
         Pie_Encode_Config encoding_config = new Pie_Encode_Config(Pie_Encode_Mode.M_1,
                 Pie_Option.CREATE_CERTIFICATE, Level.INFO, Pie_Option.DEMO_MODE, Level.INFO,
                 Pie_Option.OVERWRITE_FILE,
-            new Pie_Encode_Source(new Pie_Text(getPassword(), cert.getName())),
+            new Pie_Encode_Source(new Pie_Text(password, cert.getName())),
             new Pie_Directory(cert.getParentFile())
         );
 

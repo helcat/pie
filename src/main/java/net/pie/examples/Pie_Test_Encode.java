@@ -40,7 +40,7 @@ public class Pie_Test_Encode {
             .add_Log_Level(Level.OFF)										// Optional logging level Default OFF
             .add_Max_MB(200)						                    // Optional largest file allowed before slicing Default is 200 MB
             .add_Mode(Pie_Encode_Mode.M_2)								    // Optional Default is Pie_Encode_Mode.M_2 See Pie_Encode_Mode Examples
-            .add_Encryption(new Pie_Encryption("my password"))		// Optional Encryption. See Encryption Examples
+            .add_Encryption(new Pie_Encryption("1234567890abcdefghijklmnopqrstuvwxyz!£$%"))		// Optional Encryption. See Encryption Examples
             .add_Shape(Pie_Shape.SHAPE_SQUARE)								// Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
             .add_Option(Pie_Option.OVERWRITE_FILE)		                    // Optional set Pie_Option's as required. See Pie_Option examples
             .build();														// Build the Pie_Config
