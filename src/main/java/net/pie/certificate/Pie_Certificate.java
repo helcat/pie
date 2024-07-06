@@ -13,7 +13,7 @@ import net.pie.decoding.Pie_Decode_Config;
 import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
-import net.pie.encoding.Pie_Encode_Config_Builder;
+import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Word;
@@ -100,7 +100,7 @@ public class Pie_Certificate {
 
         File cert = Pie_Utils.file_concat(folder,UUID.randomUUID().toString()+".pie");
 
-        Pie_Encode_Config_Builder builder = new Pie_Encode_Config_Builder()
+        Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Log_Level(Level.INFO)
                 .add_Mode(Pie_Encode_Mode.M_1)
                 .add_Option(Pie_Option.CREATE_CERTIFICATE, Pie_Option.OVERWRITE_FILE)
@@ -116,7 +116,7 @@ public class Pie_Certificate {
             return null;
         }else{
             if (verify_Certificate(cert)) {
-                System.out.println(encode.getOutput_file_name());
+                System.out.println(encode.getOutput_location());
                 config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
                 return cert;
             }else{
@@ -150,11 +150,11 @@ public class Pie_Certificate {
         this.password = password;
     }
 
-    public boolean isDemo_mode() {
+    private boolean isDemo_mode() {
         return demo_mode;
     }
 
-    public void setDemo_mode(boolean demo_mode) {
+    private void setDemo_mode(boolean demo_mode) {
         this.demo_mode = demo_mode;
     }
 }

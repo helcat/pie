@@ -25,7 +25,7 @@ import java.util.logging.Level;
 public class Pie_Encode {
     private Pie_Encode_Config config;
     private BufferedImage output_Image = null;
-    private String output_file_name = null;
+    private String output_location = null;
 
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
@@ -38,7 +38,7 @@ public class Pie_Encode {
         ImageIO.setUseCache(false);
         setConfig(config);
         setOutput_Image(null);
-        setOutput_file_name(null);
+        setOutput_location(null);
         getConfig().validate_Encoding_Parameters();
 
         if (getConfig() == null || getConfig().isError()) {
@@ -404,7 +404,7 @@ public class Pie_Encode {
                         " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, getConfig().getLanguage()));
                 return false;
             }
-            setOutput_file_name(file.getPath());
+            setOutput_location(file.getPath());
             try {
                 return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), file);
             } catch (IOException e) {
@@ -529,11 +529,11 @@ public class Pie_Encode {
         this.output_Image = output_Image;
     }
 
-    public String getOutput_file_name() {
-        return output_file_name;
+    public String getOutput_location() {
+        return output_location;
     }
 
-    public void setOutput_file_name(String output_file_name) {
-        this.output_file_name = output_file_name;
+    public void setOutput_location(String output_location) {
+        this.output_location = output_location;
     }
 }

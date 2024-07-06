@@ -11,7 +11,7 @@ git push origin main
 
 import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
-import net.pie.encoding.Pie_Encode_Config_Builder;
+import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
@@ -34,7 +34,7 @@ public class Pie_Test_Encode {
     }
 
     public Pie_Test_Encode(String arg) {
-        Pie_Encode_Config config = new Pie_Encode_Config_Builder()
+        Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
             //.add_Encode_Source(new Pie_Encode_Source(new Pie_Text("terry")))	// File to be encoded
             .add_Encode_Source(new File(
                 Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) +
@@ -50,6 +50,6 @@ public class Pie_Test_Encode {
 
         Pie_Encode encode = new Pie_Encode(config);
 
-        System.out.println(encode.getOutput_file_name());
+        System.out.println(encode.getOutput_location());
     }
 }

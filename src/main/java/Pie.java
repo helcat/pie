@@ -4,7 +4,7 @@ import net.pie.decoding.Pie_Decode_Config;
 import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
-import net.pie.encoding.Pie_Encode_Config_Builder;
+import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Shape;
@@ -270,7 +270,7 @@ public class Pie {
      * java -cp .\pie-1.3.jar Pie -encode <br>
      */
     private void encode() {
-        Pie_Encode_Config_Builder builder = new Pie_Encode_Config_Builder()
+        Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(getSource())                 // File to be encoded
                 .add_Directory(getDirectory())  	            // Folder to place encoded file
                 .add_Shape(getShape())                          // Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
@@ -290,7 +290,7 @@ public class Pie {
         Pie_Encode encode = new Pie_Encode(config);
 
         if (getLog_level().equals(Level.INFO))
-            System.out.println(encode.getOutput_file_name());
+            System.out.println(encode.getOutput_location());
     }
 
     /** ******************************************************<br>

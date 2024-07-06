@@ -19,7 +19,7 @@ import java.util.logging.Level;
 
 /** **************************************************************<br>
  * Usage<br>
- Pie_Encode encode = new Pie_Encode(new Pie_Encode_Config_Builder()<br>
+ Pie_Encode encode = new Pie_Encode(new Pie_Encoder_Config_Builder()<br>
  .add_Option(Pie_Option.OVERWRITE_FILE)<br>
  .add_Mode(Pie_Encode_Mode.THREE)<br>
  .add_Language("fr")<br>
@@ -31,7 +31,7 @@ import java.util.logging.Level;
  */
 
 
-public class Pie_Encode_Config_Builder {
+public class Pie_Encoder_Config_Builder {
     private List<Pie_Option> pie_options = new ArrayList<>();
     private Pie_Max_MB max_mb = new Pie_Max_MB(500);
     private Pie_Zip encoder_storage = new Pie_Zip();
@@ -48,7 +48,7 @@ public class Pie_Encode_Config_Builder {
      * @param options
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Option(Pie_Option... options) {
+    public Pie_Encoder_Config_Builder add_Option(Pie_Option... options) {
         if (options != null)
             for (Pie_Option option : options) {
                 if (option != null && !this.pie_options.contains(option))
@@ -62,7 +62,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Shape)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Shape(Object option) {
+    public Pie_Encoder_Config_Builder add_Shape(Object option) {
         if (option != null) {
             if (option instanceof Pie_Shape) {
                 this.encoder_shape = (Pie_Shape) option;
@@ -87,7 +87,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (log_level)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Log_Level(Level option) {
+    public Pie_Encoder_Config_Builder add_Log_Level(Level option) {
         if (option != null)
             this.log_level = option;
         return this;
@@ -98,7 +98,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Language)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Language(Object option) {
+    public Pie_Encoder_Config_Builder add_Language(Object option) {
         if (option != null) {
             if (option instanceof  Pie_Language)
                 this.language = (Pie_Language) option;
@@ -113,7 +113,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Object)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Directory(Object option) {
+    public Pie_Encoder_Config_Builder add_Directory(Object option) {
         if (option != null) {
             if (option instanceof  Pie_Directory)
                 this.directory = (Pie_Directory) option;
@@ -128,7 +128,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Encode_Source)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Encode_Source(Object option) {
+    public Pie_Encoder_Config_Builder add_Encode_Source(Object option) {
         if (option != null) {
             if (option instanceof Pie_Encode_Source)
                 this.encoder_source = (Pie_Encode_Source) option;
@@ -143,7 +143,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Encode_Mode)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Mode(Object option) {
+    public Pie_Encoder_Config_Builder add_Mode(Object option) {
         if (option != null) {
             if (option instanceof Pie_Encode_Mode) {
                 this.encoder_mode = (Pie_Encode_Mode) option;
@@ -169,7 +169,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Max_MB)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Max_MB(Object option) {
+    public Pie_Encoder_Config_Builder add_Max_MB(Object option) {
         if (option != null) {
             if (option instanceof Pie_Max_MB)
                 this.max_mb = (Pie_Max_MB) option;
@@ -185,7 +185,7 @@ public class Pie_Encode_Config_Builder {
      * @param option (Pie_Option)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encode_Config_Builder add_Encryption(Object option) {
+    public Pie_Encoder_Config_Builder add_Encryption(Object option) {
         if (option != null) {
             if (option instanceof Pie_Encryption) {
                 this.encryption = (Pie_Encryption) option;
