@@ -8,8 +8,6 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
-import sun.awt.OSInfo;
-
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
