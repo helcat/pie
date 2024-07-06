@@ -9,7 +9,9 @@ package net.pie.utils;
  */
 
 import net.pie.certificate.Pie_Certificate;
+import net.pie.decoding.Pie_Decode;
 import net.pie.decoding.Pie_Decode_Config;
+import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.encoding.Pie_Encode_Config;
 import net.pie.enums.*;
 
@@ -50,12 +52,11 @@ public class Pie_Encryption {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File && Pie_Utils.isFile(((File) parm))) {
-            Pie_Certificate certificate = new Pie_Certificate();
-            if (!certificate.read_Certificate((File) parm) || Pie_Utils.isEmpty(certificate.getPassword())) {
+            if (!read_Certificate((File) parm) || Pie_Utils.isEmpty(getPassword())) {
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
             }else{
                 setUsing_certificate(true);
-                setPassword(certificate.getPassword());
+                setPassword(getPassword());
             }
 
         } else if (parm instanceof String) {
@@ -66,6 +67,29 @@ public class Pie_Encryption {
         }
     }
 
+    /** **************************************************<br>
+     * Read Certificate copy from Pie_Certificate to make it private
+     * @param file File Certificate
+     * @return boolean
+     */
+    private boolean read_Certificate(File file) {
+        if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
+            return false;
+        String key_text = null;
+        Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
+        config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
+        config_builder.add_Decode_Source(file);
+        Pie_Decode decoded = new Pie_Decode(config_builder.build());
+        if (decoded.getOutputStream() != null) {
+            if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
+                ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
+                key_text = stream.toString();
+            }
+        }
+
+        setPassword(Pie_Utils.isEmpty(key_text) ? null : key_text);
+        return !Pie_Utils.isEmpty(key_text);
+    }
     /** **************************************************<br>
      * Create a key
      */

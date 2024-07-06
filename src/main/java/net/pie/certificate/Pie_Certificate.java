@@ -28,7 +28,6 @@ import java.util.stream.IntStream;
 
 public class Pie_Certificate {
 
-    private String password = null;
     private boolean demo_mode = false;
 
     public Pie_Certificate(boolean demo_mode) {
@@ -51,11 +50,9 @@ public class Pie_Certificate {
 
         Pie_Decode_Config config = config_builder.build();
         if (read_Certificate(file)) {
-            setPassword(null);
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
-        };
-        setPassword(null);
+        }
         config.logging(Level.INFO, Pie_Word.translate(Pie_Word.ERROR, config.getLanguage()));
         return false;
     }
@@ -65,7 +62,7 @@ public class Pie_Certificate {
      * @param file File Certificate
      * @return boolean
      */
-    public boolean read_Certificate(File file) {
+    private boolean read_Certificate(File file) {
         if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
             return false;
         String key_text = null;
@@ -82,7 +79,6 @@ public class Pie_Certificate {
             }
         }
 
-        setPassword(Pie_Utils.isEmpty(key_text) ? null : key_text);
         return !Pie_Utils.isEmpty(key_text);
     }
 
@@ -140,14 +136,6 @@ public class Pie_Certificate {
         return charList.stream()
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    private void setPassword(String password) {
-        this.password = password;
     }
 
     private boolean isDemo_mode() {

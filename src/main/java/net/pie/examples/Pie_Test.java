@@ -19,7 +19,7 @@ public class Pie_Test {
     public static File source2 = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "encode_test/Test_File.jpg"));
     public static File encode_folder = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "encode_test"));
     public static File decode_folder = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "decode_test"));
-    public static File certificate = null;
+    public static File certificate_file = null;
 
     public static void main(String[] args) {
         new Pie_Test();
@@ -29,14 +29,38 @@ public class Pie_Test {
      * <b>Pie Decode</b><br>
      **/
     public Pie_Test() {
-        encode_Stage_1();   // No Encryption
-        encode_Stage_2();   // Normal Encryption
+        create_certificate();   // Create a certificate
+        verify_certificate();   // Verify a certificate
+        encode_Stage_1();       // No Encryption
+        encode_Stage_2();       // Normal Encryption
     }
 
+    /** ***********************************************<br>
+     * create certificate
+     */
     public void create_certificate() {
-        Pie_Certificate certificate = new Pie_Certificate();
+        if (certificate_file == null || !certificate_file.exists()) {
+            Pie_Certificate certificate = new Pie_Certificate();
+            certificate_file = certificate.create_Certificate(encode_folder);
+        }
     }
 
+    /** ***********************************************<br>
+     * create certificate
+     */
+    public void verify_certificate() {
+        if (certificate_file != null && certificate_file.exists()) {
+            Pie_Certificate certificate = new Pie_Certificate();
+            if (!certificate.verify_Certificate(certificate_file)) {
+                System.out.println("Invalid Certificate");
+                System.exit(1);
+            }
+            System.out.println("Valid Certificate");
+        }else{
+            System.out.println("Missing Certificate");
+            System.exit(1);
+        }
+    }
 
     /** ***********************************************<br>
      * Encode_Stage_1 No Encryption
