@@ -49,7 +49,8 @@ public class Pie_Certificate {
             config_builder.add_Option(Pie_Option.DEMO_MODE);
 
         Pie_Decode_Config config = config_builder.build();
-        if (read_Certificate(file)) {
+
+        if (file != null && file.exists() && file.isFile() && read_Certificate(file)) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
         }
