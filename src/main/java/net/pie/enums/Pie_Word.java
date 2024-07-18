@@ -26,6 +26,8 @@ public enum Pie_Word {
 	ENTER_CERTIFICATE ("Enter Certificate", "Entrez le certificat", "Inserisci il certificato", "Ingresar certificado"),
 	ENTER_DIRECTORY("Enter Directory", "Entrer dans le répertoire", "Entra nella Rubrica", "Ingresar al directorio"),
 	ENTER_SOURCE_FILE ("Enter Source File", "Entrez le fichier source", "Inserisci il file di origine", "Ingrese el archivo fuente"),
+	ENTER_SOURCE_TEXT("Enter Source Text","Saisir le texte source","Inserisci il testo sorgente","Ingrese el texto fuente"),
+	ENTER_FILE_NAME("Enter A File Name","Entrez un nom de fichier","Inserisci un nome file","Ingrese un nombre de archivo"),
 
 	CERTIFICATE_NOT_CREATED ("Was unable to create a certificate file", "Impossible de créer un fichier de certificat",
 					"Impossibile creare un file di certificato", "No se pudo crear un archivo de certificado"),
@@ -238,7 +240,9 @@ public enum Pie_Word {
 	DEFAULT ("Default", "Défaut", "Predefinito", "Por defecto"),
 
 	LEAVE_BLANK("Leave blank if not required","Laisser vide si ce n'est pas nécessaire",
-			"Lasciare vuoto se non richiesto", "Dejar en blanco si no es necesario")
+			"Lasciare vuoto se non richiesto", "Dejar en blanco si no es necesario"),
+
+	NAME ("Name","Nom","Nome","Nombre")
 	;
 
 	private String en;

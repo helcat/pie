@@ -67,7 +67,8 @@ public class Pie_Decode {
             else
                 setup_FileOutputstream();
             try {
-                getOutputStream().write(message);
+                if (getOutputStream() != null)
+                    getOutputStream().write(message);
             } catch (IOException e) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.WRITING_TO_STREAM_ERROR, getConfig().getLanguage()) +
                         " : " + e.getMessage());
@@ -81,7 +82,7 @@ public class Pie_Decode {
             else
                 setup_FileOutputstream();
 
-            if (!getConfig().isError()) {
+            if (getOutputStream() != null && !getConfig().isError()) {
                 while (processing_file < getTotal_files()) {
                     try {
                         getOutputStream().write(message);

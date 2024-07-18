@@ -5,15 +5,14 @@ import net.pie.decoding.Pie_Decoder_Config_Builder;
 import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
 import net.pie.encoding.Pie_Encoder_Config_Builder;
-import net.pie.enums.Pie_Encode_Mode;
-import net.pie.enums.Pie_Option;
-import net.pie.enums.Pie_Shape;
-import net.pie.enums.Pie_Word;
+import net.pie.enums.*;
 import net.pie.utils.Pie_Encryption;
 import net.pie.utils.Pie_Max_MB;
+import net.pie.utils.Pie_Text;
 import net.pie.utils.Pie_Utils;
 
-import java.io.File;
+import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.logging.Level;
 
@@ -35,7 +34,9 @@ public class Pie {
     private boolean verifyCertificate = false;
     private boolean prompt = false;
 
-    private File source = null;
+    private Object source = null;
+    private Pie_Text text = null;
+    private String filename = null; // Only used for encoding text.
     private File directory = null;
     private File certificate = null;
     private Pie_Shape shape = Pie_Shape.SHAPE_RECTANGLE;
@@ -56,6 +57,8 @@ public class Pie {
      * -encode<br>
      * -overwrite (Optional default false overwrites the current encoded file)<br>
      * -file "C:\Users\terry\Desktop\tomato.png"<br>
+     * -text "My Text Message"<br>
+     * -name "My_File" (Only Use with -text)<br>
      * -directory "C:\Users\terry\Desktop\" (Optional default desktop)<br>
      * -shape square (Optional default Rectangle encode only)<br>
      * -mode one (Optional encoding mode default is two, encode only)<br>
@@ -72,6 +75,8 @@ public class Pie {
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
+     *
+     * .\jre17\bin\java -cp .\pie-1.3.jar Pie -encode -text "hello World" -encryption "my password"
      *
      * java -cp .\pie-1.3.jar Pie -make_certificate -directory "C:\Users\terry\Desktop"<br><br>
      *
@@ -97,6 +102,7 @@ public class Pie {
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
                     source_file(arg.substring(1), value);
+                    source_filename(arg.substring(1), value);
                     directory_file(arg.substring(1), value);
                     encode_shape(arg.substring(1), value);
                     encode_mode(arg.substring(1), value);
@@ -189,7 +195,8 @@ public class Pie {
      */
     private void verifyCertificate() {
         Pie_Certificate cert = new Pie_Certificate();
-        cert.verify_Certificate(getSource());
+        if (getSource() instanceof File)
+            cert.verify_Certificate((File) getSource());
     }
 
     /** **************************************************<br>
@@ -233,6 +240,13 @@ public class Pie {
         Pie_Decode_Config config = builder.build();
         Pie_Decode decode = new Pie_Decode(config);
         System.out.println(decode.isDecoding_Error() ? decode.getDecoding_Error_Message() :  "");
+        if (decode.getOutputStream() != null && !decode.isDecoding_Error() &&
+                Objects.requireNonNull(decode.getSource_type()) == Pie_Source_Type.TEXT) {
+            try {
+                System.out.println(((ByteArrayOutputStream) decode.getOutputStream()).toString("UTF-8"));
+            } catch (UnsupportedEncodingException ignored) {
+            }
+        }
     }
 
     /** **************************************************<br>
@@ -240,12 +254,9 @@ public class Pie {
      * java -cp .\pie-1.3.jar Pie -decode -prompt<br>
      */
     private void prompt_decode(Scanner scanner) {
-        if (getSource() == null) {
-            File file = null;
-            while (file == null) {
-                file = check_Prompt_Source(scanner);
-            }
-        }
+        if (getSource() == null)
+            if (!check_Prompt_Source(scanner))
+                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
         if (getDirectory() == null) {
             File folder = null;
@@ -270,6 +281,15 @@ public class Pie {
      * java -cp .\pie-1.3.jar Pie -encode <br>
      */
     private void encode() {
+        if (getSource() == null && getText() == null) {
+            quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
+        }
+        if (getSource() == null && getText() != null) {
+            if (!Pie_Utils.isEmpty(getFilename()))
+                getText().setFile_name(getFilename());
+            setSource(getText());
+        }
+
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(getSource())                 // File to be encoded
                 .add_Directory(getDirectory())  	            // Folder to place encoded file
@@ -299,10 +319,9 @@ public class Pie {
      */
     private void prompt_encode(Scanner scanner) {
         if (getSource() == null) {
-            File file = null;
-            while (file == null) {
-                file = check_Prompt_Source(scanner);
-            }
+            Object file = check_Prompt_Source(scanner);
+            if (check_Prompt_Source_Text(scanner))
+                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
         }
 
         if (getDirectory() == null) {
@@ -333,7 +352,7 @@ public class Pie {
         if (!isDecode() && !isEncode() && !isMakeCertificate() && !isVerifyCertificate())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
 
-        if (!isMakeCertificate() && getSource() == null)
+        if (!isMakeCertificate() && (getSource() == null && getText() == null))
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
         if (getDirectory() == null)
@@ -424,13 +443,47 @@ public class Pie {
      * Source file
      */
     private void source_file(String key, String value) {
+        if (Pie_Utils.isEmpty(value)) {
+            setSource(null);
+            setText(null);
+            return;
+        }
+
         if (Pie_Word.is_in_Translation(Pie_Word.FILE, key)) {
+            setText(null);
             try {
-                setSource(new File(value.replace("\"", "")));
-                if (getSource() == null || !getSource().exists() || !getSource().isFile())
+                File source_file = new File(value.replace("\"", ""));
+                if (!source_file.exists() || !source_file.isFile()) {
                     setSource(null);
+                }else {
+                    setSource(source_file);
+                }
             } catch (Exception ignored) {  }
         }
+        if (Pie_Word.is_in_Translation(Pie_Word.TEXT, key)) {
+            try {
+                setSource(null);
+                setText(new Pie_Text(value));
+            } catch (Exception ignored) {  }
+        }
+    }
+
+    /** **************************************************<br>
+     * Source file Name
+     */
+    private void source_filename(String key, String value) {
+        if (Pie_Utils.isEmpty(value)) {
+            setFilename(null);
+            return;
+        }
+
+        if (Pie_Word.is_in_Translation(Pie_Word.NAME, key)) {
+            try {
+                setFilename(value.replace("\"", ""));
+            } catch (Exception ignored) {  }
+        }
+        if (Pie_Utils.isEmpty(value))
+            setFilename(null);
     }
 
     /** **************************************************<br>
@@ -660,22 +713,43 @@ public class Pie {
      * @param scanner Scanner
      * @return File
      */
-    private File check_Prompt_Source(Scanner scanner) {
+    private boolean check_Prompt_Source(Scanner scanner) {
         File file;
         try {
             System.out.println(Pie_Word.translate(Pie_Word.ENTER_SOURCE_FILE));
             String in = scanner.nextLine().replace("\"", "");
             if (in.isEmpty())
-                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
+                return false;
             file = new File(in);
-            if (!file.exists() || !file.isFile())
+            if (!file.exists() || !file.isFile()) {
                 file = null;
-            else
+            }else {
                 setSource(file);
-        } catch (Exception e) {
-            file = null;
-        }
-        return file;
+                return true;
+            }
+        } catch (Exception ignored) { }
+        return false;
+    }
+
+    /** **************************************************<br>
+     * check Prompt Source Text
+     * @param scanner Scanner
+     * @return File
+     */
+    private boolean check_Prompt_Source_Text(Scanner scanner) {
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.ENTER_SOURCE_TEXT));
+            String in = scanner.nextLine().replace("\"", "");
+            if (in.isEmpty())
+                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
+
+            System.out.println(Pie_Word.translate(Pie_Word.ENTER_FILE_NAME));
+            String in_filename = scanner.nextLine().replace("\"", "");
+
+            setSource(new Pie_Text(in, in_filename));
+            return true;
+        } catch (Exception ignored) { }
+        return false;
     }
 
     /** **************************************************<br>
@@ -712,11 +786,11 @@ public class Pie {
         this.decode = decode;
     }
 
-    public File getSource() {
+    public Object getSource() {
         return source;
     }
 
-    public void setSource(File source) {
+    public void setSource(Object source) {
         this.source = source;
     }
 
@@ -806,5 +880,21 @@ public class Pie {
 
     public void setPrompt(boolean prompt) {
         this.prompt = prompt;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public Pie_Text getText() {
+        return text;
+    }
+
+    public void setText(Pie_Text text) {
+        this.text = text;
     }
 }
