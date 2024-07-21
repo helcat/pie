@@ -1,4 +1,4 @@
-import net.pie.command.prompt;
+package net.pie.command;
 
 /** **********************************************<br>
  * PIE Pixel Image Encode
@@ -12,7 +12,7 @@ import net.pie.command.prompt;
  * Instead of java -cp .\pie-1.3.jar net.pie.command.Start which is the main class<br>
  */
 
-public class Pie {
+public class Start {
 
     public static void main(String[] args) {
         if (args == null || args.length == 0)

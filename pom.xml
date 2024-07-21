@@ -70,6 +70,8 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <classpathPrefix>net/</classpathPrefix>
+                            <mainClass>net.pie.command.Start</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Built-By>${written.by}</Built-By>
