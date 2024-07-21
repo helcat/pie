@@ -67,6 +67,9 @@ public class Pie {
      * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
+     * .\jre17\bin\java -cp .\pie-1.3.jar Pie -encode -text "hello World" -name "My_File" -encryption "my password"
+     *
+     *
      * java -cp .\pie-1.3.jar Pie<br>
      * -decode<br>
      * -overwrite (Optional default false overwrites the current decoded file)<br>
@@ -75,8 +78,6 @@ public class Pie {
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
-     *
-     * .\jre17\bin\java -cp .\pie-1.3.jar Pie -encode -text "hello World" -encryption "my password"
      *
      * java -cp .\pie-1.3.jar Pie -make_certificate -directory "C:\Users\terry\Desktop"<br><br>
      *
