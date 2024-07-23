@@ -10,6 +10,10 @@ package net.pie.command;
  *
  * This class allows for * java -cp .\pie-1.3.jar Pie<br>
  * Instead of java -cp .\pie-1.3.jar net.pie.command.Start which is the main class<br>
+ *
+ * Convert to C
+ * Use Graavml
+ * .\native-image.cmd --shared -jar ..\..\pie-1.3.jar -o ..\..\..\pie
  */
 
 public class Start {

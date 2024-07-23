@@ -29,6 +29,7 @@ import java.util.logging.LogRecord;
  * @see Pie_Encryption
  * @see Pie_Decode_Source
  * @see Pie_Directory
+ * @see Pie_PreFix
  *
  **/
 public class Pie_Decode_Config {
@@ -39,6 +40,7 @@ public class Pie_Decode_Config {
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private String error_message = null;
+    private Pie_PreFix prefix = null;
 
     private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
@@ -67,6 +69,9 @@ public class Pie_Decode_Config {
             switch (o.getClass().getSimpleName()) {
                 case "Pie_Language" :
                     setLanguage( (Pie_Language) o);
+                    break;
+                case "Pie_PreFix" :
+                    setPrefix( (Pie_PreFix) o);
                     break;
                 case "Pie_Option":
                     opt = (Pie_Option) o;
@@ -236,6 +241,14 @@ public class Pie_Decode_Config {
 
     public void setDirectory(Pie_Directory directory) {
         this.directory = directory;
+    }
+
+    public Pie_PreFix getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(Pie_PreFix prefix) {
+        this.prefix = prefix;
     }
 
     /** ******************************************************************<br>

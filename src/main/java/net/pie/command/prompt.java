@@ -8,14 +8,11 @@ import net.pie.encoding.Pie_Encode;
 import net.pie.encoding.Pie_Encode_Config;
 import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.*;
-import net.pie.utils.Pie_Encryption;
-import net.pie.utils.Pie_Max_MB;
-import net.pie.utils.Pie_Text;
-import net.pie.utils.Pie_Utils;
+import net.pie.utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -37,6 +34,7 @@ public class prompt {
     private boolean makeCertificate = false;
     private boolean verifyCertificate = false;
     private boolean prompt = false;
+    private boolean console = false;
 
     private Object source = null;
     private Pie_Text text = null;
@@ -48,6 +46,7 @@ public class prompt {
     private Level log_level = Level.SEVERE;
     private Pie_Max_MB maxmb = new Pie_Max_MB();
     private String encryption_phrase = null;
+    private Pie_PreFix prefix = null;
 
     /** **************************************************<br>
      * Process Parameters : <br>
@@ -63,6 +62,7 @@ public class prompt {
      * -maxMB 200 (Optional Maximum MB Encoded File. Default 500 before zipped and sliced)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
+     * -prefix "myPrefix" prefix's some text before the file name.
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
      * .\jre17\bin\java -cp .\pie-1.3.jar Pie -encode -text "hello World" -name "My_File" -encryption "my password"
@@ -75,7 +75,8 @@ public class prompt {
      * -directory "C:\Users\terry\Desktop\shared"  (Optional default desktop)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
      * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
-     * -log information (Optional, Off, Information, Severe (Default))<br><br>
+     * -log information (Optional, Off, Information, Severe (Default))<br>
+     * -console display text when decoded on the console<br><br>
      *
      * java -cp .\pie-1.3.jar Pie -make_certificate -directory "C:\Users\terry\Desktop"<br><br>
      *
@@ -97,9 +98,11 @@ public class prompt {
                 check_Certificate(arg.substring(1));
                 check_Verify(arg.substring(1));
                 check_Prompt(arg.substring(1));
+                check_Console(arg.substring(1));
 
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
+                    prefix(arg.substring(1), value);
                     source_file(arg.substring(1), value);
                     source_filename(arg.substring(1), value);
                     directory_file(arg.substring(1), value);
@@ -228,13 +231,20 @@ public class prompt {
                 .add_Directory(getDirectory())  	            // Folder to place encoded file
                 .add_Log_Level(getLog_level());					// Optional logging level Default SEVERE
 
+        if (getPrefix() != null)
+            builder.add_Prefix(getPrefix());	                // Optional Prefix
+
         if (!Pie_Utils.isEmpty(getEncryption_phrase()))
             builder.add_Encryption(new Pie_Encryption(getEncryption_phrase()));	// Optional Encryption. See Encryption Examples
+
         else if (getCertificate() != null)
             builder.add_Encryption(new Pie_Encryption(getCertificate()));	    // Optional Encryption. See Encryption Examples
 
         if (isOverwrite())
             builder.add_Option(Pie_Option.OVERWRITE_FILE);
+
+        if (isConsole())
+            builder.add_Option(Pie_Option.CONSOLE);
 
         Pie_Decode_Config config = builder.build();
         Pie_Decode decode = new Pie_Decode(config);
@@ -243,8 +253,9 @@ public class prompt {
                 Objects.requireNonNull(decode.getSource_type()) == Pie_Source_Type.TEXT) {
             try {
                 System.out.println(((ByteArrayOutputStream) decode.getOutputStream()).toString("UTF-8"));
-            } catch (UnsupportedEncodingException ignored) {
-            }
+                decode.getOutputStream().close();
+            } catch (IOException ignored) { }
+
         }
     }
 
@@ -270,7 +281,7 @@ public class prompt {
             if (Pie_Utils.isEmpty(getEncryption_phrase()) && getCertificate() == null)
                 check_Prompt_Certificate(scanner);
         }
-
+        check_Prompt_Prefix(scanner);
         check_Prompt_Overwrite(scanner);
         check_Prompt_Log(scanner);
     }
@@ -342,6 +353,9 @@ public class prompt {
         check_Prompt_Shape(scanner);
         check_Prompt_Mode(scanner);
         check_Prompt_MaxMB(scanner);
+
+        if (getText() != null)
+            check_Prompt_Console(scanner);
     }
 
     /** **************************************************<br>
@@ -368,6 +382,16 @@ public class prompt {
 
         if (getLog_level() == null)
             setLog_level(Level.SEVERE);
+    }
+
+    /** **************************************************<br>
+     * Prefix
+     */
+    private void prefix(String key, String value) {
+        if (Pie_Word.is_in_Translation(Pie_Word.PREFIX, key)) {
+            if (value != null && !value.isEmpty())
+                setPrefix(new Pie_PreFix(value));
+        }
     }
 
     /** **************************************************<br>
@@ -548,6 +572,15 @@ public class prompt {
     }
 
     /** **************************************************<br>
+     * check Console
+     */
+    private void check_Console(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.CONSOLE, mode))
+            setConsole(true);
+    }
+
+
+    /** **************************************************<br>
      * check Prompt
      */
     private void check_Prompt(String mode) {
@@ -642,6 +675,21 @@ public class prompt {
     }
 
     /** **************************************************<br>
+     * check Prompt Console
+     * @param scanner Scanner
+     */
+    private void check_Prompt_Console(Scanner scanner) {
+        setConsole(false);
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.CONSOLE)+" (Y/n) "+
+                    Pie_Word.translate(Pie_Word.DEFAULT)+" \"Y\"");
+            String in = scanner.nextLine().replace("\"", "");
+            if (in.equalsIgnoreCase("y"))
+                setConsole(true);
+        } catch (Exception ignored) {  }
+    }
+
+    /** **************************************************<br>
      * check Prompt Overwrite
      * @param scanner Scanner
      */
@@ -655,6 +703,22 @@ public class prompt {
                 setOverwrite(false);
         } catch (Exception ignored) {  }
     }
+
+    /** **************************************************<br>
+     * check Prompt Prefix
+     * @param scanner Scanner
+     */
+    private void check_Prompt_Prefix(Scanner scanner) {
+        setOverwrite(true);
+        try {
+            System.out.println(Pie_Word.translate(Pie_Word.PREFIX));
+            String in = scanner.nextLine().replace("\"", "");
+            if (!Pie_Utils.isEmpty(in))
+                setPrefix(new Pie_PreFix(in));
+        } catch (Exception ignored) {  }
+    }
+
+
 
     /** **************************************************<br>
      * check Prompt Encryption Phrase
@@ -895,5 +959,21 @@ public class prompt {
 
     public void setText(Pie_Text text) {
         this.text = text;
+    }
+
+    public boolean isConsole() {
+        return console;
+    }
+
+    public void setConsole(boolean console) {
+        this.console = console;
+    }
+
+    public Pie_PreFix getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(Pie_PreFix prefix) {
+        this.prefix = prefix;
     }
 }

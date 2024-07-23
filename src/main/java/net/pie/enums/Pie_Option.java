@@ -20,6 +20,7 @@ public enum Pie_Option {
     DEMO_MODE,
     CREATE_CERTIFICATE,
     DECODE_CERTIFICATE,
+    CONSOLE
     ;
 
 }

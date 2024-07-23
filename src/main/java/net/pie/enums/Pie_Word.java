@@ -242,7 +242,11 @@ public enum Pie_Word {
 	LEAVE_BLANK("Leave blank if not required","Laisser vide si ce n'est pas nécessaire",
 			"Lasciare vuoto se non richiesto", "Dejar en blanco si no es necesario"),
 
-	NAME ("Name","Nom","Nome","Nombre")
+	NAME ("Name","Nom","Nome","Nombre"),
+
+	CONSOLE ("Console", "Console", "Consolle", "Consola"),
+
+	PREFIX ("Prefix", "Préfixe", "Prefisso", "Prefijo")
 	;
 
 	private String en;

@@ -44,6 +44,7 @@ public class Pie_Decode {
         setEncrypted(false);
         setOutputStream(null);
         setOutput_location(null);
+        boolean text_decoding_to_console = false;
 
         if (!getConfig().validate_Decoding_Parameters())
             return;
@@ -62,7 +63,8 @@ public class Pie_Decode {
         }
 
         if (getSource_type().equals(Pie_Source_Type.TEXT)) { // Text
-            if (getConfig().getDirectory() == null)
+            text_decoding_to_console = getConfig().getOptions().contains(Pie_Option.CONSOLE);
+            if (text_decoding_to_console || getConfig().getDirectory() == null)
                 setOutputStream(new ByteArrayOutputStream());
             else
                 setup_FileOutputstream();
@@ -103,7 +105,7 @@ public class Pie_Decode {
         message = null;
 
         try { // Don't close if there is no directory, allows user to get outputstream
-            if (getConfig().getDirectory() != null && getOutputStream() != null) {
+            if (!text_decoding_to_console && getConfig().getDirectory() != null && getOutputStream() != null) {
                 getOutputStream().close();
                 setOutputStream(null);
             }
@@ -124,7 +126,11 @@ public class Pie_Decode {
      * setup FileOutputstream
      */
     private void setup_FileOutputstream() {
-        String file_name = getConfig().getDirectory().getFilename();
+        String file_name =
+                (getConfig().getPrefix() != null && !Pie_Utils.isEmpty(getConfig().getPrefix().getText()) ?
+                    getConfig().getPrefix().getText() : "") + getConfig().getDirectory().getFilename();
+        if (getSource_type().equals(Pie_Source_Type.TEXT) && !file_name.toLowerCase().endsWith(".txt"))
+            file_name = file_name + ".txt";
         if (Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder())) {
             File decoded_file = new File(getConfig().getDirectory().getLocal_folder() + File.separator + file_name);
             try {

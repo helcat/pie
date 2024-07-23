@@ -44,6 +44,7 @@ public class Pie_Decoder_Config_Builder {
     private Pie_Directory directory = null;
     private Pie_Language language = null;
     private Level log_level = Level.SEVERE;
+    private Pie_PreFix prefix = null;
 
     /** *********************************************************<br>
      * Add Pie Options, Be be single or multiple
@@ -56,6 +57,16 @@ public class Pie_Decoder_Config_Builder {
                 if (option != null && !this.pie_options.contains(option))
                     this.pie_options.add(option);
             }
+        return this;
+    }
+
+    /** *********************************************************<br>
+     * Add Pie Prefix
+     * @return (Pie_Decoder_Config_Builder)
+     */
+    public Pie_Decoder_Config_Builder add_Prefix(Pie_PreFix options) {
+        if (options != null)
+            setPrefix(options);
         return this;
     }
 
@@ -181,6 +192,9 @@ public class Pie_Decoder_Config_Builder {
         if (log_level != null)
             options.add(log_level);
 
+        if (prefix != null)
+            options.add(prefix);
+
         return new Pie_Decode_Config(options);
     }
 
@@ -198,6 +212,14 @@ public class Pie_Decoder_Config_Builder {
 
     public void setDirectory(Pie_Directory directory) {
         this.directory = directory;
+    }
+
+    public Pie_PreFix getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(Pie_PreFix prefix) {
+        this.prefix = prefix;
     }
 }
 
