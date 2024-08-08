@@ -22,7 +22,7 @@ public enum Pie_Word {
 			"Errore nessuna opzione di configurazione", "Error sin opciones de configuración"),
 
 	INVALID_FOLDER ("Invalid directory" ,"Répertoire invalide" , "Cartella non valida", "Directorio invalido"),
-
+	CONFIGURATION_ERROR ("Configuration Error","Erreur de configuration","Errore di configurazione","Error de configuración"),
 	ENTER_CERTIFICATE ("Enter Certificate", "Entrez le certificat", "Inserisci il certificato", "Ingresar certificado"),
 	ENTER_DIRECTORY("Enter Directory", "Entrer dans le répertoire", "Entra nella Rubrica", "Ingresar al directorio"),
 	ENTER_SOURCE_FILE ("Enter Source File", "Entrez le fichier source", "Inserisci il file di origine", "Ingrese el archivo fuente"),

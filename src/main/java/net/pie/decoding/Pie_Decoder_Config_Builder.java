@@ -64,9 +64,9 @@ public class Pie_Decoder_Config_Builder {
      * Add Pie Prefix
      * @return (Pie_Decoder_Config_Builder)
      */
-    public Pie_Decoder_Config_Builder add_Prefix(Pie_PreFix options) {
+    public Pie_Decoder_Config_Builder add_Prefix(String options) {
         if (options != null)
-            setPrefix(options);
+            setPrefix(new Pie_PreFix(options));
         return this;
     }
 

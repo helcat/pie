@@ -35,6 +35,15 @@ public class Pie_Encode {
      * @see Pie_Encode_Config
      **/
     public Pie_Encode (Pie_Encode_Config config) {
+        if (config == null)
+            return;
+
+        if (config.isError()) {
+                System.out.println(!Pie_Utils.isEmpty(config.getError_message()) ? config.getError_message() :
+                        Pie_Word.translate(Pie_Word.CONFIGURATION_ERROR, getConfig().getLanguage()));
+            return;
+        }
+
         ImageIO.setUseCache(false);
         setConfig(config);
         setOutput_Image(null);

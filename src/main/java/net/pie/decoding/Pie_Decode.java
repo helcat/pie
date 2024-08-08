@@ -38,6 +38,15 @@ public class Pie_Decode {
      * @param config configuration file
      **/
     public Pie_Decode(Pie_Decode_Config config) {
+        if (config == null)
+            return;
+
+        if (config.isError()) {
+            System.out.println(!Pie_Utils.isEmpty(config.getError_message()) ? config.getError_message() :
+                    Pie_Word.translate(Pie_Word.CONFIGURATION_ERROR, getConfig().getLanguage()));
+            return;
+        }
+
         setConfig(config);
         ImageIO.setUseCache(false);
         setTotal_files(0);

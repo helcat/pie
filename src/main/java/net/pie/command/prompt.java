@@ -231,8 +231,8 @@ public class prompt {
                 .add_Directory(getDirectory())  	            // Folder to place encoded file
                 .add_Log_Level(getLog_level());					// Optional logging level Default SEVERE
 
-        if (getPrefix() != null)
-            builder.add_Prefix(getPrefix());	                // Optional Prefix
+        if (getPrefix() != null && !Pie_Utils.isEmpty(getPrefix().getText()))
+            builder.add_Prefix(getPrefix().getText());	        // Optional Prefix
 
         if (!Pie_Utils.isEmpty(getEncryption_phrase()))
             builder.add_Encryption(new Pie_Encryption(getEncryption_phrase()));	// Optional Encryption. See Encryption Examples
