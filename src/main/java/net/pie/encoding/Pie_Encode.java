@@ -514,7 +514,7 @@ public class Pie_Encode {
             getConfig().logging(Level.WARNING,Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage()) +
                     " : " + file.getName() +
                     (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, getConfig().getLanguage())+")" : ""));
-
+        setOutput_location(file.getPath());
         return file;
     }
 

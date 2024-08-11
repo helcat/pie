@@ -124,6 +124,11 @@ public class Pie_Decode {
             getConfig().getDecode_source().close();
         } catch (Exception ignored) {  }
 
+        try {
+            if (getConfig().getDecode_source() != null && getConfig().getDecode_source().getZip_Object() != null)
+                getConfig().getDecode_source().getZip_Object().closeZip();
+        } catch (Exception ignored) {  }
+
         if (!getConfig().isError())
             try {
                 getConfig().logging(Level.INFO, Pie_Word.translate(Pie_Word.DECODING_COMPLETE, getConfig().getLanguage()));

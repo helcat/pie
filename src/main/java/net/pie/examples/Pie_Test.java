@@ -23,6 +23,7 @@ public class Pie_Test {
 
     public static File encode_folder = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "encode_test"));
     public static File decode_folder = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "decode_test"));
+    public static File complete_folder = new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), "complete"));
     public static File certificate_file = null;
 
     public static void main(String[] args) {
@@ -35,10 +36,15 @@ public class Pie_Test {
     public Pie_Test() {
         create_certificate();   // Create a certificate
         verify_certificate();   // Verify a certificate
-        encode_Stage_1();       // No Encryption
-        encode_Stage_2();       // Normal Encryption
-        encode_Stage_3();       // Certificate Encryption
-        encode_Stage_4();       // Certificate, Shape and Zip
+        String ok = "Failed";
+        if (encode_Stage_1())               // No Encryption
+            if (encode_Stage_2())           // Normal Encryption
+                if (encode_Stage_3())       // Certificate Encryption
+                    if (encode_Stage_4())   // Certificate, Shape and Zip
+                        ok = "Success";
+
+        System.out.println(ok);
+
     }
 
     /** ***********************************************<br>
@@ -71,12 +77,12 @@ public class Pie_Test {
     /** ***********************************************<br>
      * Encode_Stage_1 No Encryption
      */
-    public void encode_Stage_1 () {
+    public boolean encode_Stage_1 () {
         System.out.println("Testing Encoding Config Builder - No Encryption");
 
         Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(source1)					                            // File to be encoded
-                .add_Directory(encode_folder)   		                                // Folder to place encoded file
+                .add_Directory(decode_folder)   		                                // Folder to place encoded file
                 .add_Log_Level(Level.INFO)												// Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
                 .build();																// Build the Pie_Config
@@ -84,56 +90,57 @@ public class Pie_Test {
         Pie_Encode encoded = new Pie_Encode(config);
         if (encoded.isEncoding_Error()) {
             System.out.println(encoded.getEncoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String encoded_image = encoded.getOutput_location();
         System.out.println(encoded_image + " -> Created");
 
-        decode_Stage_1(encoded_image);
-    }
-
-    /** ***********************************************<br>
-     * decode_Stage_1 Encryption
-     * @param encoded_file String
-     */
-    public void decode_Stage_1 (String encoded_file) {
+        // Decode
         System.out.println("Testing Decoding Config Builder - No Encryption");
-        File encoded_source = new File(encoded_file);
+        File encoded_source = new File(encoded_image);
 
-        Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
+        Pie_Decode_Config decode_config = new Pie_Decoder_Config_Builder()
                 .add_Decode_Source(encoded_source)					                    // File to be decoded
-                .add_Directory(decode_folder)   		                                // Folder to place decoded file
+                .add_Directory(complete_folder)   		                                // Folder to place decoded file
                 .add_Log_Level(Level.INFO)												// Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
                 .build();																// Build the Pie_Config
 
-        Pie_Decode decoded = new Pie_Decode(config);
+        Pie_Decode decoded = new Pie_Decode(decode_config);
         if (decoded.isDecoding_Error()) {
             System.out.println(decoded.getDecoding_Error_Message());
             System.exit(1);
         }
 
         String decoded_image = decoded.getOutput_location();
-        System.out.println(decoded_image + " -> Decoded To");
+        if (Pie_Utils.isEmpty(decoded_image))
+            return false;
+
+        System.out.println("Decoded To -> " + decoded_image);
 
         if (encoded_source.delete())
             System.out.println(encoded_source + " -> Deleted");
+        else
+            return false;
 
         if (new File(decoded_image).delete())
             System.out.println(decoded_image + " -> Deleted");
+        else
+            return false;
 
+        return true;
     }
 
     /** ***********************************************<br>
      * Encode_Stage_2 - Normal Encryption - Transparent Image
      */
-    public void encode_Stage_2 () {
+    public boolean encode_Stage_2 () {
         System.out.println("Testing Encoding Config Builder - Normal Encryption - Transparent Image");
 
         Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(source2)					                                // File to be encoded
-                .add_Directory(encode_folder)   		                                    // Folder to place encoded file
+                .add_Directory(decode_folder)   		                                    // Folder to place encoded file
                 .add_Log_Level(Level.INFO)												    // Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								        // Optional Overwrite the file if exists
                 .add_Encryption("This is a normal phrase for Encryption")             // Optional Text Encryption
@@ -143,56 +150,58 @@ public class Pie_Test {
         Pie_Encode encoded = new Pie_Encode(config);
         if (encoded.isEncoding_Error()) {
             System.out.println(encoded.getEncoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String encoded_image = encoded.getOutput_location();
+        if (Pie_Utils.isEmpty(encoded_image))
+            return false;
+
         System.out.println(encoded_image + " -> Created");
 
-        decode_Stage_2(encoded_image);
-    }
-
-    /** ***********************************************<br>
-     * decode_Stage_2 - Normal Encryption - Transparent Image
-     * @param encoded_file String
-     */
-    public void decode_Stage_2 (String encoded_file) {
+        // Decode
         System.out.println("Testing Decoding Config Builder - Normal Encryption");
-        File encoded_source = new File(encoded_file);
+        File encoded_source = new File(encoded_image);
 
-        Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
+        Pie_Decode_Config decode_config = new Pie_Decoder_Config_Builder()
                 .add_Decode_Source(encoded_source)					                    // File to be decoded
-                .add_Directory(decode_folder)   		                                // Folder to place decoded file
+                .add_Directory(complete_folder)   		                                // Folder to place decoded file
                 .add_Encryption("This is a normal phrase for Encryption")        // Required if Text Encryption
                 .add_Log_Level(Level.INFO)												// Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
                 .build();																// Build the Pie_Config
 
-        Pie_Decode decoded = new Pie_Decode(config);
+        Pie_Decode decoded = new Pie_Decode(decode_config);
         if (decoded.isDecoding_Error()) {
             System.out.println(decoded.getDecoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String decoded_image = decoded.getOutput_location();
-        System.out.println(decoded_image + " -> Decoded To");
+        System.out.println("Decoded To -> " + decoded_image );
 
         if (encoded_source.delete())
             System.out.println(encoded_source + " -> Deleted");
+        else
+            return false;
 
         if (new File(decoded_image).delete())
             System.out.println(decoded_image + " -> Deleted");
+        else
+            return false;
+
+        return true;
     }
 
     /** ***********************************************<br>
      * Encode_Stage_3 - Certificate Encryption
      */
-    public void encode_Stage_3 () {
+    public boolean encode_Stage_3 () {
         System.out.println("Testing Encoding Config Builder - Certificate Encryption");
 
         Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(source3)					                                // File to be encoded
-                .add_Directory(encode_folder)   		                                    // Folder to place encoded file
+                .add_Directory(decode_folder)   		                                    // Folder to place encoded file
                 .add_Log_Level(Level.INFO)												    // Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								        // Optional Overwrite the file if exists
                 .add_Encryption(certificate_file)                                           // Optional Certificate Encryption
@@ -202,57 +211,58 @@ public class Pie_Test {
         Pie_Encode encoded = new Pie_Encode(config);
         if (encoded.isEncoding_Error()) {
             System.out.println(encoded.getEncoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String encoded_image = encoded.getOutput_location();
+        if (Pie_Utils.isEmpty(encoded_image))
+            return false;
+
         System.out.println(encoded_image + " -> Created");
 
-        decode_Stage_3(encoded_image);
-    }
-
-    /** ***********************************************<br>
-     * decode_Stage_3 - Certificate Encryption
-     * @param encoded_file String
-     */
-    public void decode_Stage_3 (String encoded_file) {
+        // Decode
         System.out.println("Testing Decoding Config Builder - Certificate Encryption");
-        File encoded_source = new File(encoded_file);
+        File encoded_source = new File(encoded_image);
 
-        Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
+        Pie_Decode_Config decode_config = new Pie_Decoder_Config_Builder()
                 .add_Decode_Source(encoded_source)					                    // File to be decoded
-                .add_Directory(decode_folder)   		                                // Folder to place decoded file
+                .add_Directory(complete_folder)   		                                // Folder to place decoded file
                 .add_Encryption(certificate_file)                                       // Required if Certificate Encryption
                 .add_Log_Level(Level.INFO)												// Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
                 .build();																// Build the Pie_Config
 
-        Pie_Decode decoded = new Pie_Decode(config);
+        Pie_Decode decoded = new Pie_Decode(decode_config);
         if (decoded.isDecoding_Error()) {
             System.out.println(decoded.getDecoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String decoded_image = decoded.getOutput_location();
-        System.out.println(decoded_image + " -> Decoded To");
+        System.out.println("Decoded To -> " + decoded_image);
 
         if (encoded_source.delete())
             System.out.println(encoded_source + " -> Deleted");
+        else
+            return false;
 
         if (new File(decoded_image).delete())
             System.out.println(decoded_image + " -> Deleted");
+        else
+            return false;
 
+        return true;
     }
 
     /** ***********************************************<br>
      * Encode_Stage_4 - Certificate Encryption - Zip and Shape
      */
-    public void encode_Stage_4 () {
+    public boolean encode_Stage_4 () {
         System.out.println("Testing Encoding Config Builder - Certificate Encryption - Create Zip - Change Shape");
 
         Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(source4)					                                // File to be encoded
-                .add_Directory(encode_folder)   		                                    // Folder to place encoded file
+                .add_Directory(decode_folder)   		                                    // Folder to place encoded file
                 .add_Log_Level(Level.INFO)												    // Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								        // Optional Overwrite the file if exists
                 .add_Encryption(certificate_file)                                           // Optional Certificate Encryption
@@ -264,35 +274,31 @@ public class Pie_Test {
         Pie_Encode encoded = new Pie_Encode(config);
         if (encoded.isEncoding_Error()) {
             System.out.println(encoded.getEncoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String encoded_image = encoded.getOutput_location();
+        if (Pie_Utils.isEmpty(encoded_image))
+            return false;
+
         System.out.println(encoded_image + " -> Created");
 
-        decode_Stage_4(encoded_image); // Null getOutput_location not adding location on zip
-    }
-
-    /** ***********************************************<br>
-     * decode_Stage_3 - Certificate Encryption Decode Zip
-     * @param encoded_file String
-     */
-    public void decode_Stage_4 (String encoded_file) {
+        // Decode
         System.out.println("Testing Decoding Config Builder - Certificate Encryption");
-        File encoded_source = new File(encoded_file);
+        File encoded_source = new File(encoded_image);
 
-        Pie_Decode_Config config = new Pie_Decoder_Config_Builder()
+        Pie_Decode_Config decode_config = new Pie_Decoder_Config_Builder()
                 .add_Decode_Source(encoded_source)					                    // File to be decoded
-                .add_Directory(decode_folder)   		                                // Folder to place decoded file
+                .add_Directory(complete_folder)   		                                // Folder to place decoded file
                 .add_Encryption(certificate_file)                                       // Required if Certificate Encryption
                 .add_Log_Level(Level.INFO)												// Optional logging level
                 .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
                 .build();																// Build the Pie_Config
 
-        Pie_Decode decoded = new Pie_Decode(config);
+        Pie_Decode decoded = new Pie_Decode(decode_config);
         if (decoded.isDecoding_Error()) {
             System.out.println(decoded.getDecoding_Error_Message());
-            System.exit(1);
+            return false;
         }
 
         String decoded_image = decoded.getOutput_location();
@@ -300,12 +306,20 @@ public class Pie_Test {
 
         if (encoded_source.delete())
             System.out.println(encoded_source + " -> Deleted");
+        else
+            return false;
 
         if (new File(decoded_image).delete())
             System.out.println(decoded_image + " -> Deleted");
+        else
+            return false;
 
         if (certificate_file.delete())
             System.out.println(certificate_file + " -> Deleted");
+        else
+            return false;
+
+        return true;
 
     }
 }
