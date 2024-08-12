@@ -12,6 +12,7 @@ import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Shape;
 import net.pie.utils.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.logging.Level;
 
@@ -37,13 +38,19 @@ public class Pie_Test {
         create_certificate();   // Create a certificate
         verify_certificate();   // Verify a certificate
         String ok = "Failed";
+
         if (encode_Stage_1())               // No Encryption
             if (encode_Stage_2())           // Normal Encryption
                 if (encode_Stage_3())       // Certificate Encryption
                     if (encode_Stage_4())   // Certificate, Shape and Zip
                         ok = "Success";
-
         System.out.println(ok);
+
+        if (encode_get_Bufferedimage())
+            System.out.println("Bytes Created");
+        else
+            System.out.println("Bytes Failed");
+
 
     }
 
@@ -72,6 +79,45 @@ public class Pie_Test {
             System.out.println("Missing Certificate");
             System.exit(1);
         }
+    }
+
+    /** ***********************************************<br>
+     * Encode_get bufferedImage
+     */
+    public boolean encode_get_Bufferedimage () {
+        System.out.println("Testing Encoding No Directory");
+
+        Pie_Encode_Config config = new Pie_Encoder_Config_Builder()
+                .add_Encode_Source(source4)					                            // File to be encoded
+                .add_Log_Level(Level.INFO)												// Optional logging level
+                .add_Option(Pie_Option.OVERWRITE_FILE)								    // Optional Overwrite the file if exists
+                .add_Max_MB(50)
+                .build();																// Build the Pie_Config
+
+        Pie_Encode encoded = new Pie_Encode(config);
+        if (encoded.isEncoding_Error()) {
+            System.out.println(encoded.getEncoding_Error_Message());
+            return false;
+        }
+
+        String encoded_image = encoded.getOutput_location();
+        if (Pie_Utils.isEmpty(encoded_image)) {
+            System.out.println("encoded_image is null -> Ok");
+            if (encoded.getOutput_Image() != null) {
+                System.out.println("Buffered Image Created -> Ok");
+                ByteArrayInputStream bytes = encoded.getBufferedImageBytes();
+                // Do something with bytes
+                System.out.println("Available Bytes - " + bytes.available());
+            }
+        }else{
+            System.out.println(encoded_image + " Created -> Ok");
+            // Do something with temp file.
+            if (new File(encoded_image).delete()) {
+                System.out.println(encoded_image + " Deleted -> Ok");
+            }
+        }
+
+        return true;
     }
 
     /** ***********************************************<br>

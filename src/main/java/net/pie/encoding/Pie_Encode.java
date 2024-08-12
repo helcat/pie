@@ -9,6 +9,7 @@ package net.pie.encoding;
  */
 
 import net.pie.enums.*;
+import net.pie.utils.Pie_Directory;
 import net.pie.utils.Pie_Encode_Source;
 import net.pie.utils.Pie_Size;
 import net.pie.utils.Pie_Utils;
@@ -177,7 +178,9 @@ public class Pie_Encode {
         }
 
         // Process the image - send to destination if required
-        if (getConfig().getDirectory() != null) {
+        if (total_files > 1 || getConfig().getDirectory() != null) {
+            if (total_files > 1 && getConfig().getDirectory() != null)
+                getConfig().setDirectory(new Pie_Directory());
             if (!save_Encoded_Image(data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name())) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
                 data_image = null;
@@ -460,6 +463,12 @@ public class Pie_Encode {
      * @param source_filename (int)
      */
     private String getZip_File_Name(String source_filename) {
+        if (getConfig().getDirectory() == null)
+            getConfig().setDirectory(new Pie_Directory());
+
+        if (getConfig().getDirectory().getLocal_folder() == null)
+            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
+
         String name = Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
                 source_filename  : getConfig().getDirectory().getLocal_folder().getName();
         if (!name.toLowerCase().endsWith(".zip"))
@@ -503,6 +512,9 @@ public class Pie_Encode {
      * @param name (int)
      */
     private File create_Zip_File(String name) {
+        if (getConfig().getDirectory().getLocal_folder() == null)
+            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
+
         boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
         File file = new File(Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
                 getConfig().getDirectory().getLocal_folder().getAbsolutePath() + File.separator + name
@@ -518,6 +530,25 @@ public class Pie_Encode {
         return file;
     }
 
+    /** ********************************************<br>
+     * get BufferedImage as Bytes (User Option)
+     * @return BufferedImage
+     */
+    public ByteArrayInputStream getBufferedImageBytes() {
+        if (getOutput_Image() != null) {
+            final ByteArrayOutputStream output = new ByteArrayOutputStream() {
+                @Override
+                public synchronized byte[] toByteArray() {
+                    return this.buf;
+                }
+            };
+            try {
+                ImageIO.write(getOutput_Image(), "png", output);
+                return new ByteArrayInputStream(output.toByteArray(), 0, output.size());
+            } catch (IOException ignored) { }
+        }
+        return null;
+    }
 
     private void setConfig(Pie_Encode_Config config) {
         this.config = config;

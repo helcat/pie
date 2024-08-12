@@ -289,7 +289,9 @@ public class Pie_Encode_Config {
         this.encoder_storage = encoder_storage;
     }
 
-
+    public void setDirectory(Pie_Directory directory) {
+        this.directory = directory;
+    }
 }
 
 
