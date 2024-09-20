@@ -13,20 +13,17 @@ import net.pie.utils.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.logging.Level;
 
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
+ * PIE Pixel Image Encode<br>
  * pixel.image.encode@gmail.com
  */
 
-public class prompt {
+public class Pie_Prompt {
 
     private boolean encode = false;
     private boolean decode = false;
@@ -35,6 +32,7 @@ public class prompt {
     private boolean verifyCertificate = false;
     private boolean prompt = false;
     private boolean console = false;
+    private boolean encode_To_Base64 = false;
 
     private Object source = null;
     private Pie_Text text = null;
@@ -50,45 +48,45 @@ public class prompt {
 
     /** **************************************************<br>
      * Process Parameters : <br>
-     * java -cp .\pie-1.3.jar Pie<br>
+     * java -cp .\pie-x.x.jar Pie<br>
      * -encode<br>
      * -overwrite (Optional default false overwrites the current encoded file)<br>
-     * -file "C:\Users\terry\Desktop\tomato.png"<br>
+     * -file "C:\tomato.png"<br>
      * -text "My Text Message"<br>
      * -name "My_File" (Only Use with -text)<br>
-     * -directory "C:\Users\terry\Desktop\" (Optional default desktop)<br>
+     * -directory "C:\" (Optional default desktop)<br>
      * -shape square (Optional default Rectangle encode only)<br>
      * -mode one (Optional encoding mode default is two, encode only)<br>
      * -maxMB 200 (Optional Maximum MB Encoded File. Default 500 before zipped and sliced)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
-     * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
+     * -certificate "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
      * -prefix "myPrefix" prefix's some text before the file name.
      * -log information (Optional, Off, Information, Severe (Default))<br><br>
      *
-     * .\jre17\bin\java -cp .\pie-1.3.jar Pie -encode -text "hello World" -name "My_File" -encryption "my password"
+     * .\jre17\bin\java -cp .\pie-x.x.jar Pie -encode -text "hello World" -name "My_File" -encryption "my password"
      *
      *
-     * java -cp .\pie-1.3.jar Pie<br>
+     * java -cp .\pie-x.x.jar Pie<br>
      * -decode<br>
      * -overwrite (Optional default false overwrites the current decoded file)<br>
-     * -file "C:\Users\terry\Desktop\enc_1_tomato.png"<br>
-     * -directory "C:\Users\terry\Desktop\shared"  (Optional default desktop)<br>
+     * -file "C:\enc_1_tomato.png"<br>
+     * -directory "C:\shared"  (Optional default desktop)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
-     * -certificate "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
+     * -certificate "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
      * -log information (Optional, Off, Information, Severe (Default))<br>
      * -console display text when decoded on the console<br><br>
      *
-     * java -cp .\pie-1.3.jar Pie -make_certificate -directory "C:\Users\terry\Desktop"<br><br>
+     * java -cp .\pie-x.4.jar Pie -make_certificate -directory "C:\"<br><br>
+     * java -cp .\pie-x.x.jar Pie -verify_certificate -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
      *
-     * java -cp .\pie-1.3.jar Pie -verify_certificate -file "C:\Users\terry\Desktop\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
+     * java -cp .\pie-x-x.jar Pie -encode_file_to_base64 -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" -directory "C:\" (Optional)<br>
      */
 
     /** ***************************************************************************<br>
      * Full encoding runnable Example
-     * java -cp .\pie-1.3.jar Pie -encode -file "C:\Users\terry\Desktop\tomato.png" -directory "C:\Users\terry\Desktop" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
+     * java -cp .\pie-x.x.jar Pie -encode -file "C:\tomato.png" -directory "C:\" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
      */
-
-    public prompt(String[] args) {
+    public Pie_Prompt(String[] args) {
         int count = 0;
         String value;
         for (String arg : args) {
@@ -99,6 +97,7 @@ public class prompt {
                 check_Verify(arg.substring(1));
                 check_Prompt(arg.substring(1));
                 check_Console(arg.substring(1));
+                check_Encode_To_Base64(arg.substring(1));
 
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
@@ -162,13 +161,17 @@ public class prompt {
             verifyCertificate();
         }
 
+        else if (isEncode_To_Base64()) {
+            base64File();
+        }
+
         if (scanner != null)
             scanner.close();
     }
 
     /** **************************************************<br>
      * Prompt - Verify Certificate
-     *  java -cp .\pie-1.3.jar Pie -verify_certificate -prompt
+     *  java -cp .\pie-x.x.jar Pie -verify_certificate -prompt
      */
     private void prompt_verifyCertificate(Scanner scanner) {
         if (getSource() == null) {
@@ -193,6 +196,14 @@ public class prompt {
     }
 
     /** **************************************************<br>
+     * check encode file to base64
+     */
+    private void check_Encode_To_Base64(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.ENCODE_FILE_TO_BASE64, mode))
+            setEncode_To_Base64(true);
+    }
+
+    /** **************************************************<br>
      * Verify Certificate
      */
     private void verifyCertificate() {
@@ -203,13 +214,34 @@ public class prompt {
 
     /** **************************************************<br>
      * Prompt - create Certificate
-     *  java -cp .\pie-1.3.jar Pie -make_certificate -prompt
+     *  java -cp .\pie-x.x.jar Pie -make_certificate -prompt
      */
     private void prompt_createCertificate(Scanner scanner) {
         if (getDirectory() == null) {
             File folder = null;
             while (folder == null) {
                 folder = check_Prompt_Directory(scanner, true);
+            }
+        }
+    }
+
+    /** **************************************************<br>
+     * base64 File
+     *  java -cp .\pie-x-x.jar Pie
+     *  -encode_file_to_base64
+     *  -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"
+     *  -directory "C:\" (Optional)<br> -- Will throw out to console if not entered
+     */
+    private void base64File() {
+        Pie_Utils utils = new Pie_Utils();
+        if (getSource() != null && getSource() instanceof File) {
+            String encoded = utils.encodeFileToBase64((File) getSource());
+            if (getDirectory() == null) {
+                System.out.println(encoded);
+            }else{
+                File output = Pie_Utils.file_concat(getDirectory(), ((File) getSource()).getName() + ".txt");
+                utils.write_String_To_File(encoded, output);
+                System.out.println(output.getAbsoluteFile());
             }
         }
     }
@@ -261,7 +293,7 @@ public class prompt {
 
     /** **************************************************<br>
      * Prompt - decode
-     * java -cp .\pie-1.3.jar Pie -decode -prompt<br>
+     * java -cp .\pie-x.x.jar Pie -decode -prompt<br>
      */
     private void prompt_decode(Scanner scanner) {
         if (getSource() == null)
@@ -281,6 +313,7 @@ public class prompt {
             if (Pie_Utils.isEmpty(getEncryption_phrase()) && getCertificate() == null)
                 check_Prompt_Certificate(scanner);
         }
+
         check_Prompt_Prefix(scanner);
         check_Prompt_Overwrite(scanner);
         check_Prompt_Log(scanner);
@@ -288,12 +321,13 @@ public class prompt {
 
     /** **************************************************<br>
      * encode
-     * java -cp .\pie-1.3.jar Pie -encode <br>
+     * java -cp .\pie-x.x.jar Pie -encode <br>
      */
     private void encode() {
         if (getSource() == null && getText() == null) {
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
         }
+
         if (getSource() == null && getText() != null) {
             if (!Pie_Utils.isEmpty(getFilename()))
                 getText().setFile_name(getFilename());
@@ -324,7 +358,7 @@ public class prompt {
     }
 
     /** ******************************************************<br>
-     * java -cp .\pie-1.3.jar Pie -encode -prompt<br>
+     * java -cp .\pie-x.x.jar Pie -encode -prompt<br>
      * @param scanner Scanner
      */
     private void prompt_encode(Scanner scanner) {
@@ -362,13 +396,13 @@ public class prompt {
      * validate
      */
     private void validate() {
-        if (!isDecode() && !isEncode() && !isMakeCertificate() && !isVerifyCertificate())
+        if (!isDecode() && !isEncode() && !isMakeCertificate() && !isVerifyCertificate() && !isEncode_To_Base64())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
 
         if (!isMakeCertificate() && (getSource() == null && getText() == null))
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
-        if (getDirectory() == null)
+        if (getDirectory() == null && !isEncode_To_Base64())
             setDirectory(Pie_Utils.getDesktop());
 
         if (getShape() == null)
@@ -975,5 +1009,13 @@ public class prompt {
 
     public void setPrefix(Pie_PreFix prefix) {
         this.prefix = prefix;
+    }
+
+    public boolean isEncode_To_Base64() {
+        return encode_To_Base64;
+    }
+
+    public void setEncode_To_Base64(boolean encode_To_Base64) {
+        this.encode_To_Base64 = encode_To_Base64;
     }
 }

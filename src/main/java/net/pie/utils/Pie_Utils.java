@@ -11,9 +11,11 @@ package net.pie.utils;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
+import java.util.Base64;
 import java.util.Date;
 import java.util.zip.*;
 
@@ -314,11 +316,43 @@ public class Pie_Utils {
                 writer.close();
             } catch (IOException ignored) {
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {  }
+    }
+
+    /** *****************************************************<br>
+     * Write bytes to a text file, Used to debug.
+     * @param message (Byte[])
+     * @param out (File)
+     */
+    public void write_String_To_File (String message, File out) {
+        try (FileWriter writer = new FileWriter(out)) {
+            try {
+                writer.write(message);
+                writer.close();
+            } catch (IOException ignored) {
+            }
+        } catch (IOException ignored) {
         }
     }
 
+    /** *****************************************************<br>
+     *
+     * @param file File
+     * @return Base64 String
+     */
+    public String encodeFileToBase64(File file) {
+        try {
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (IOException ignored) {  }
+        return null;
+    }
+
+    /** *****************************************************<br>
+     * Really handy method for finding out if a string is not null or blank
+     * @param in String
+     * @return boolean
+     */
     public static boolean isEmpty(String in) {
         return in == null || in.trim().isEmpty();
     }
