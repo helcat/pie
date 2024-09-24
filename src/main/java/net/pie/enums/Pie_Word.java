@@ -1,10 +1,6 @@
 package net.pie.enums;
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
+ * PIE Pixel Image Encode<br>
  * pixel.image.encode@gmail.com
  */
 
@@ -224,6 +220,7 @@ public enum Pie_Word {
 	DECODE ("Decode", "Décoder", "Decodificare", "Descodificar"),
 
 	ENCODE_FILE_TO_BASE64 ("encode_file_to_base64", "encoder_le_fichier_en_base64", "codificare_il_file_in_base64", "codificar_archivo_en_base64"),
+	DECODE_BASE64_FILE ("decode_base64_file", "décoder_le_fichier_base64", "decodificare_il_file_base64", "decodificar_archivo_base64"),
 
 	DIRECTORY ("Directory", "Annuaire", "Direttorio", "Directorio"),
 
@@ -248,7 +245,9 @@ public enum Pie_Word {
 
 	CONSOLE ("Console", "Console", "Consolle", "Consola"),
 
-	PREFIX ("Prefix", "Préfixe", "Prefisso", "Prefijo")
+	PREFIX ("Prefix", "Préfixe", "Prefisso", "Prefijo"),
+
+	BASE64 ("base64", "base64", "base64", "base64")
 	;
 
 	private String en;

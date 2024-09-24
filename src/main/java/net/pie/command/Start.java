@@ -3,17 +3,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024<br>
- * pixel.image.encode@gmail.com<br>
+ * PIE Pixel Image Encode<br>
+ * pixel.image.encode@gmail.com
  *
  * This class allows for * java -cp .\pie-1.3.jar Pie<br>
  * Instead of java -cp .\pie-1.3.jar net.pie.command.Start which is the main class<br>

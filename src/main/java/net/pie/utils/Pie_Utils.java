@@ -19,6 +19,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.zip.*;
 
+import static java.nio.file.Files.readAllBytes;
+
 public class Pie_Utils {
 
     public Pie_Utils() {
@@ -324,7 +326,7 @@ public class Pie_Utils {
      * @param message (Byte[])
      * @param out (File)
      */
-    public void write_String_To_File (String message, File out) {
+    public static void write_String_To_File (String message, File out) {
         try (FileWriter writer = new FileWriter(out)) {
             try {
                 writer.write(message);
@@ -336,14 +338,12 @@ public class Pie_Utils {
     }
 
     /** *****************************************************<br>
-     *
-     * @param file File
-     * @return Base64 String
+     * Read bytes from a text file
+     * @param in (File)
      */
-    public String encodeFileToBase64(File file) {
+    public static byte[] read_Bytes_From_File (File in) {
         try {
-            byte[] fileContent = Files.readAllBytes(file.toPath());
-            return Base64.getEncoder().encodeToString(fileContent);
+            return Files.readAllBytes(in.toPath());
         } catch (IOException ignored) {  }
         return null;
     }
