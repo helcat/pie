@@ -48,7 +48,7 @@ public class Pie_Encryption {
             setKey((SecretKey) parm);
 
         } else if (parm instanceof File && Pie_Utils.isFile(((File) parm))) {
-            if (!read_Certificate((File) parm) || Pie_Utils.isEmpty(getPassword())) {
+            if (!read_Certificate(parm) || Pie_Utils.isEmpty(getPassword())) {
                 setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
             }else{
                 setUsing_certificate(true);
@@ -68,13 +68,17 @@ public class Pie_Encryption {
      * @param file File Certificate
      * @return boolean
      */
-    private boolean read_Certificate(File file) {
-        if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
-            return false;
+    private boolean read_Certificate(Object item) {
+        if (item instanceof  File) {
+            if (!Pie_Utils.isFile((File) item) || !((File) item).getName().toLowerCase().endsWith(".pie"))
+                return false;
+        }else if (item instanceof Pie_Base64) {
+            item = new ByteArrayInputStream(((Pie_Base64) item).decode_to_bytes());
+        }
         String key_text = null;
         Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
         config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
-        config_builder.add_Decode_Source(file);
+        config_builder.add_Decode_Source(item);
         Pie_Decode decoded = new Pie_Decode(config_builder.build());
         if (decoded.getOutputStream() != null) {
             if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {

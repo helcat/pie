@@ -1,12 +1,9 @@
 package net.pie.enums;
 
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3<br>
- * Copyright Terry Clarke 2024<br>
- * pixel.image.encode@gmail.com
+ * PIE Pixel Image Encode<br>
+ * pixel.image.encode@gmail.com<br>
+ *<br>
  **/
 
 /** **********************************************<br>

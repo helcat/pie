@@ -1,11 +1,8 @@
 package net.pie.utils;
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
- * pixel.image.encode@gmail.com
+ * PIE Pixel Image Encode<br>
+ * pixel.image.encode@gmail.com<br>
+ *<br>
  */
 
 import javax.swing.filechooser.FileSystemView;
@@ -15,11 +12,8 @@ import java.nio.file.Files;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
-import java.util.Base64;
 import java.util.Date;
 import java.util.zip.*;
-
-import static java.nio.file.Files.readAllBytes;
 
 public class Pie_Utils {
 

@@ -1,11 +1,8 @@
 package net.pie.decoding;
 /** **********************************************<br>
- * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
- * pixel.image.encode@gmail.com
+ * PIE Pixel Image Encode<br>
+ * pixel.image.encode@gmail.com<br>
+ *<br>
  */
 import net.pie.enums.*;
 import net.pie.utils.Pie_Utils;

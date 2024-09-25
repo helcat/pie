@@ -247,7 +247,12 @@ public enum Pie_Word {
 
 	PREFIX ("Prefix", "Préfixe", "Prefisso", "Prefijo"),
 
-	BASE64 ("base64", "base64", "base64", "base64")
+	BASE64_FILE("base64_file", "fichier_base64", "file_base64", "archivo_base64"),
+
+	HELP ("help" , "aide", "aiuto", "ayuda"),
+
+	PIE_BLOG ("https://virtuware.blogspot.com/" , "https://virtuware.blogspot.com/",
+			"https://virtuware.blogspot.com/", "https://virtuware.blogspot.com/")
 	;
 
 	private String en;

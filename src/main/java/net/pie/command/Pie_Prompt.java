@@ -12,7 +12,6 @@ import net.pie.utils.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
@@ -36,16 +35,16 @@ public class Pie_Prompt {
     private boolean decode_Base64_File = false;
 
     private Object source = null;
-    private Pie_Text text = null;
     private String filename = null; // Only used for encoding text.
     private File directory = null;
-    private File certificate = null;
+    private Object certificate = null;
     private Pie_Shape shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Mode mode = Pie_Encode_Mode.M_2;
     private Level log_level = Level.SEVERE;
     private Pie_Max_MB maxmb = new Pie_Max_MB();
     private String encryption_phrase = null;
     private Pie_PreFix prefix = null;
+    private Pie_Base64 pie_base64 = null;
 
     /** **************************************************<br>
      * Process Parameters : <br>
@@ -60,9 +59,13 @@ public class Pie_Prompt {
      * -mode one (Optional encoding mode default is two, encode only)<br>
      * -maxMB 200 (Optional Maximum MB Encoded File. Default 500 before zipped and sliced)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
+     *
      * -certificate "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
+     * -certificate "base64-String" (Optional encryption or certificate a string assumes it's a base64 String of a pie certificate)<br>
+     *
      * -prefix "myPrefix" prefix's some text before the file name.
-     * -log information (Optional, Off, Information, Severe (Default))<br><br>
+     * -log information (Optional, Off, Information, Severe (Default))<br>
+     * -base64 "base64 string"<br>
      *
      * .\jre17\bin\java -cp .\pie-x.x.jar Pie -encode -text "hello World" -name "My_File" -encryption "my password"
      *
@@ -73,7 +76,10 @@ public class Pie_Prompt {
      * -file "C:\enc_1_tomato.png"<br>
      * -directory "C:\shared"  (Optional default desktop)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
+     *
      * -certificate "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
+     * -certificate "base64-String" (Optional encryption or certificate a string assumes it's a base64 String of a pie certificate)<br>
+     *
      * -log information (Optional, Off, Information, Severe (Default))<br>
      * -console display text when decoded on the console<br><br>
      *
@@ -82,7 +88,7 @@ public class Pie_Prompt {
      *
      * java -cp .\pie-x-x.jar Pie -encode_file_to_base64 -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" -directory "C:\" (Optional)<br>
      * java -cp .\pie-x-x.jar Pie -decode_base64_file -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie.txt" -directory "C:\" (Optional) -name "name of file"<br>
-     * java -cp .\pie-x-x.jar Pie -decode_base64_file -base64 "base64-String" -directory "C:\" (Optional) -name "name of file"<br>
+     * java -cp .\pie-x-x.jar Pie -decode_base64_file -base64_file "base64-String" -directory "C:\" (Optional) -name "name of file"<br>
      */
 
     /** ***************************************************************************<br>
@@ -94,13 +100,16 @@ public class Pie_Prompt {
         String value;
         for (String arg : args) {
             if (arg.startsWith("-")) {
+                if (check_help(arg.substring(1)))
+                    return;// -help
+
                 check_mode(arg.substring(1));                   // -encode -decode
                 check_Overwrite(arg.substring(1));              // -overwrite
                 check_Certificate(arg.substring(1));            // -make_certificate
                 check_Verify(arg.substring(1));                 // -verify_certificate
                 check_Prompt(arg.substring(1));                 // -prompt
                 check_Console(arg.substring(1));                // -console
-                check_Base64(arg.substring(1));       // -encode_file_to_base64 -decode_base64-file
+                check_Base64(arg.substring(1));                 // -encode_file_to_base64 -decode_base64-file
 
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
@@ -243,14 +252,15 @@ public class Pie_Prompt {
      *  Will throw out to console if not entered
      */
     private void base64File() {
-        Pie_Base64 b64 = new Pie_Base64();
         if (getSource() != null && getSource() instanceof File) {
-            b64.encode_file((File) getSource());
+            Pie_Base64 b64 = new Pie_Base64().encode_file((File) getSource());
             if (!Pie_Utils.isEmpty(b64.getText())) {
                 if (getDirectory() == null) {
                     System.out.println(b64.getText());
                 } else {
-                    System.out.println(b64.write_base64_to_File(Pie_Utils.file_concat(getDirectory(), ((File) getSource()).getName() + ".txt")));
+                    File output_file = Pie_Utils.file_concat(getDirectory(), ((File) getSource()).getName() + ".txt");
+                    if (b64.write_base64_to_File(output_file))
+                        System.out.println(output_file.getAbsolutePath());
                 }
             }
         }
@@ -268,16 +278,12 @@ public class Pie_Prompt {
     private void decodeBase64File() {
         if (Pie_Utils.isEmpty(getFilename()))
             setFilename(Pie_Word.translate(Pie_Word.UNKNOWN));
-        Pie_Base64 b64 = new Pie_Base64();
-        if (getSource() != null && getSource() instanceof File) {
-            try (FileOutputStream fos = new FileOutputStream(Pie_Utils.file_concat(getDirectory(),getFilename()))) {
-                fos.write(b64.decodeBase64ToBytes(Pie_Utils.read_Bytes_From_File((File) getSource())));
-            } catch (IOException ignored) {  }
-        }
+        if (getSource() != null && getSource() instanceof File)
+           new Pie_Base64().decode_file_to_file((File) getSource(),Pie_Utils.file_concat(getDirectory(),getFilename()) );
+
+        else if (getSource() != null && getSource() instanceof Pie_Base64)
+           ((Pie_Base64) getSource()).decode_base64_write_to_File(Pie_Utils.file_concat(getDirectory(), getFilename()) );
     }
-
-
-
 
     /** **************************************************<br>
      * Certificate
@@ -357,14 +363,13 @@ public class Pie_Prompt {
      * java -cp .\pie-x.x.jar Pie -encode <br>
      */
     private void encode() {
-        if (getSource() == null && getText() == null) {
+        if (getSource() == null) {
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
         }
 
-        if (getSource() == null && getText() != null) {
+        if (getSource() != null && getSource() instanceof Pie_Text) {
             if (!Pie_Utils.isEmpty(getFilename()))
-                getText().setFile_name(getFilename());
-            setSource(getText());
+                ((Pie_Text) getSource()).setFile_name(getFilename());
         }
 
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
@@ -421,7 +426,7 @@ public class Pie_Prompt {
         check_Prompt_Mode(scanner);
         check_Prompt_MaxMB(scanner);
 
-        if (getText() != null)
+        if (getSource() != null && getSource() instanceof  Pie_Text)
             check_Prompt_Console(scanner);
     }
 
@@ -434,7 +439,7 @@ public class Pie_Prompt {
                 !isDecode_Base64_File())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
 
-        if (!isMakeCertificate() && (getSource() == null && getText() == null))
+        if (!isMakeCertificate() && getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
         if (getDirectory() == null && !isEncode_To_Base64())
@@ -537,12 +542,10 @@ public class Pie_Prompt {
     private void source_file(String key, String value) {
         if (Pie_Utils.isEmpty(value)) {
             setSource(null);
-            setText(null);
             return;
         }
 
         else if (Pie_Word.is_in_Translation(Pie_Word.FILE, key)) {
-            setText(null);
             try {
                 File source_file = new File(value.replace("\"", ""));
                 if (!source_file.exists() || !source_file.isFile()) {
@@ -555,15 +558,13 @@ public class Pie_Prompt {
 
         else if (Pie_Word.is_in_Translation(Pie_Word.TEXT, key)) {
             try {
-                setSource(null);
-                setText(new Pie_Text(value));
+                setSource(new Pie_Text(value));
             } catch (Exception ignored) {  }
         }
 
-        else if (Pie_Word.is_in_Translation(Pie_Word.BASE64, key)) {    // -base64
+        else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_FILE, key)) {    // -base64
             try {
-                setSource(null);
-                setText(new Pie_Text(value));
+                setSource(new Pie_Base64(value));
             } catch (Exception ignored) {  }
         }
     }
@@ -592,10 +593,14 @@ public class Pie_Prompt {
     private void certificate_file(String key, String value) {
         if (Pie_Word.is_in_Translation(Pie_Word.CERTIFICATE, key)) {
             try {
-                setCertificate(new File(value.replace("\"", "")));
-                if (getCertificate() == null || !getCertificate().exists() || !getCertificate().isFile())
-                    setCertificate(null);
-                else
+                if (Pie_Base64.isBase64(value)) {
+                    setCertificate(new Pie_Base64(value));
+                }else {
+                    File cert = new File(value.replace("\"", ""));
+                    if (cert.exists() && cert.isFile())
+                        setCertificate(cert);
+                }
+                if (getCertificate() != null)
                     setEncryption_phrase(null);
             } catch (Exception ignored) {  }
         }
@@ -623,6 +628,18 @@ public class Pie_Prompt {
         else if (Pie_Word.is_in_Translation(Pie_Word.DECODE, mode))
             setDecode(true);
     }
+
+    /** **************************************************<br>
+     * Check Help - Go to Blog
+     */
+    private boolean check_help(String mode) {
+        if (Pie_Word.is_in_Translation(Pie_Word.HELP, mode)) {
+            Pie_Browser_Launch.openURL(Pie_Word.translate(Pie_Word.PIE_BLOG));
+            return true;
+        }
+        return false;
+    }
+
 
     /** **************************************************<br>
      * check Overwrite
@@ -982,11 +999,11 @@ public class Pie_Prompt {
         this.encryption_phrase = encryption_phrase;
     }
 
-    public File getCertificate() {
+    public Object getCertificate() {
         return certificate;
     }
 
-    public void setCertificate(File certificate) {
+    public void setCertificate(Object certificate) {
         this.certificate = certificate;
     }
 
@@ -1030,14 +1047,6 @@ public class Pie_Prompt {
         this.filename = filename;
     }
 
-    public Pie_Text getText() {
-        return text;
-    }
-
-    public void setText(Pie_Text text) {
-        this.text = text;
-    }
-
     public boolean isConsole() {
         return console;
     }
@@ -1068,5 +1077,13 @@ public class Pie_Prompt {
 
     public void setDecode_Base64_File(boolean decode_Base64_File) {
         this.decode_Base64_File = decode_Base64_File;
+    }
+
+    public Pie_Base64 getPie_base64() {
+        return pie_base64;
+    }
+
+    public void setPie_base64(Pie_Base64 pie_base64) {
+        this.pie_base64 = pie_base64;
     }
 }
