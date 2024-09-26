@@ -40,47 +40,62 @@ public class Pie_Certificate {
 
     /** **************************************************<br>
      * Verify Certificate
-     * @param file File
+     * @param item Object
      * @return boolean
      */
-    public boolean verify_Certificate(File file) {
+    public boolean verify_Certificate(Object item) {
+        if (item == null)
+            return false;
+
         Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
         if (isDemo_mode())
             config_builder.add_Option(Pie_Option.DEMO_MODE);
 
         Pie_Decode_Config config = config_builder.build();
 
-        if (file != null && file.exists() && file.isFile() && read_Certificate(file)) {
+        if (item instanceof  File && ((File) item).exists() && ((File) item).isFile() && read_Certificate(item)) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
         }
+
+        if (item instanceof Pie_Base64 && read_Certificate(item)) {
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
+            return true;
+        }
+
         config.logging(Level.INFO, Pie_Word.translate(Pie_Word.ERROR, config.getLanguage()));
         return false;
     }
 
     /** **************************************************<br>
      * Read Certificate
-     * @param file File Certificate
+     * @param item File Certificate
      * @return boolean
      */
-    private boolean read_Certificate(File file) {
-        if (!Pie_Utils.isFile(file) || !file.getName().toLowerCase().endsWith(".pie"))
+    private boolean read_Certificate(Object item) {
+        if (item instanceof File && (!Pie_Utils.isFile(((File) item)) || !((File) item).getName().toLowerCase().endsWith(".pie")))
             return false;
-        String key_text = null;
-        Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
-        if (isDemo_mode())
-            config_builder.add_Option(Pie_Option.DEMO_MODE);
-        config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
-        config_builder.add_Decode_Source(file);
-        Pie_Decode decoded = new Pie_Decode(config_builder.build());
-        if (decoded.getOutputStream() != null) {
-            if (decoded.getOutputStream() instanceof  ByteArrayOutputStream) {
-                ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
-                key_text = stream.toString();
-            }
-        }
+        else if (item instanceof Pie_Base64 && Pie_Utils.isEmpty(((Pie_Base64) item).getText()))
+            return false;
 
-        return !Pie_Utils.isEmpty(key_text);
+        if (item instanceof Pie_Base64 || item instanceof File) {
+            String key_text = null;
+            Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
+            if (isDemo_mode())
+                config_builder.add_Option(Pie_Option.DEMO_MODE);
+            config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
+            config_builder.add_Decode_Source(item);
+            Pie_Decode decoded = new Pie_Decode(config_builder.build());
+            if (decoded.getOutputStream() != null) {
+                if (decoded.getOutputStream() instanceof ByteArrayOutputStream) {
+                    ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
+                    key_text = stream.toString();
+                }
+            }
+
+            return !Pie_Utils.isEmpty(key_text);
+        }
+        return  false;
     }
 
     /** **************************************************<br>

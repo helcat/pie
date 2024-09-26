@@ -85,6 +85,7 @@ public class Pie_Prompt {
      *
      * java -cp .\pie-x.4.jar Pie -make_certificate -directory "C:\"<br><br>
      * java -cp .\pie-x.x.jar Pie -verify_certificate -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
+     * java -cp .\pie-x.x.jar Pie -verify_certificate -base64_file "base64-String"<br><br>
      *
      * java -cp .\pie-x-x.jar Pie -encode_file_to_base64 -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" -directory "C:\" (Optional)<br>
      * java -cp .\pie-x-x.jar Pie -decode_base64_file -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie.txt" -directory "C:\" (Optional) -name "name of file"<br>
@@ -101,7 +102,7 @@ public class Pie_Prompt {
         for (String arg : args) {
             if (arg.startsWith("-")) {
                 if (check_help(arg.substring(1)))
-                    return;// -help
+                    return;                                                // -help
 
                 check_mode(arg.substring(1));                   // -encode -decode
                 check_Overwrite(arg.substring(1));              // -overwrite
@@ -228,6 +229,8 @@ public class Pie_Prompt {
         Pie_Certificate cert = new Pie_Certificate();
         if (getSource() instanceof File)
             cert.verify_Certificate((File) getSource());
+        if (getSource() instanceof Pie_Base64)
+            cert.verify_Certificate((Pie_Base64) getSource());
     }
 
     /** **************************************************<br>

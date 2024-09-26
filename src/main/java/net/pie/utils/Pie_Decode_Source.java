@@ -51,6 +51,7 @@ public class Pie_Decode_Source {
             case "URL":
             case "Pie_URL":
             case "InputStream":
+            case "ByteArrayInputStream":
                 break;
             default:
                 setDecode_object(null);

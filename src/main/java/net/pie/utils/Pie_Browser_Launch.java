@@ -19,8 +19,6 @@ public class Pie_Browser_Launch {
             "galeon", "kazehakase", "mozilla", "netscape"
     };
 
-    private static final String ERR_MSG = "Error attempting to launch web browser";
-
     public static void openURL(String url) {
         // Attempt to use Desktop API (preferred for modern systems)
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
@@ -41,10 +39,10 @@ public class Pie_Browser_Launch {
 
         try {
             // Use platform-specific commands for more reliable launching
-            if (isMac()) {
+            if (Pie_Utils.isMac()) {
                 Runtime.getRuntime().exec(new String[]{"open", url});
 
-            } else if (isWindows()) {
+            } else if (Pie_Utils.isWin()) {
                 Runtime.getRuntime().exec(new String[]{"rundll32", "url.dll", "FileProtocolHandler", url});
 
             } else {
@@ -68,14 +66,6 @@ public class Pie_Browser_Launch {
                 .findFirst();
 
         return availableBrowser.orElse(null);
-    }
-
-    private static boolean isMac() {
-        return System.getProperty("os.name").toLowerCase().startsWith("mac");
-    }
-
-    private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().startsWith("win");
     }
 }
 

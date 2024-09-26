@@ -17,7 +17,6 @@ public enum Pie_Word {
 			"Error no configuration options", "Erreur aucune option de configuration",
 			"Errore nessuna opzione di configurazione", "Error sin opciones de configuración"),
 
-	INVALID_FOLDER ("Invalid directory" ,"Répertoire invalide" , "Cartella non valida", "Directorio invalido"),
 	CONFIGURATION_ERROR ("Configuration Error","Erreur de configuration","Errore di configurazione","Error de configuración"),
 	ENTER_CERTIFICATE ("Enter Certificate", "Entrez le certificat", "Inserisci il certificato", "Ingresar certificado"),
 	ENTER_DIRECTORY("Enter Directory", "Entrer dans le répertoire", "Entra nella Rubrica", "Ingresar al directorio"),
@@ -32,9 +31,6 @@ public enum Pie_Word {
 
 	ENCRYPTION_ERROR_NO_KEY ("Encryption Error - Cannot create key", "Erreur de cryptage - Impossible de créer la clé",
 			"Errore di crittografia: impossibile creare la chiave", "Error de cifrado: no se puede crear la clave"),
-
-	ENCRYPTION_PASS_ERROR ("Encrypted password is invalid", "Le mot de passe crypté n'est pas valide",
-			"La password crittografata non è valida", "La contraseña cifrada no es válida"),
 
 	ENCRYPTION_PASS_SIZE_ERROR ("Encrypted password size less than 6 long", "Taille du mot de passe crypté inférieure à 6",
 			"La dimensione della password crittografata è inferiore a 6", "Tamaño de contraseña cifrada inferior a 6"),
@@ -58,8 +54,6 @@ public enum Pie_Word {
 	CERTIFICATE_VERIFIED ("Certificate Verified","Certificat vérifié", "Certificato verificato",
 			"Certificado verificado"),
 
-	PIE_CERTIFICATE ("pie_certificate", "pie_certificat", "pie_certificato", "pie_certificado"),
-
 	NO_SOURCE ("No Source","Aucune source", "Nessuna fonte", "Sin fuentes"),
 
 	NO_DIRECTORY_ENTERED ("No Directory Entered", "Aucun répertoire entré","Nessuna directory inserita", "No se ingresó ningún directorio"),
@@ -67,16 +61,11 @@ public enum Pie_Word {
 	ENCODING_STRING_REQUIRED ("Encoding String is required", "La chaîne d'encodage est requise",
 			 "La stringa di codifica è obbligatoria", "Se requiere cadena de codificación"),
 
-	INVALID_FILE ("Invalid File", "Fichier non valide", "File non valido", "Archivo inválido"),
-
 	NO_DECODE_OBJECT ("No Decode Object Found", "Aucun objet de décodage trouvé", "Nessun oggetto di decodifica trovato",
 			"No se encontró ningún objeto de decodificación"),
 
 	UNABLE_TO_DECODE ("Unable to decode object", "Impossible de décoder l'objet", "Impossibile decodificare l'oggetto",
 			"No se puede decodificar el objeto"),
-
-	INVALID_DECODING_DESTINATION ("Invalid Decoding destination", "Destination de décodage invalide",
-			"Destinazione di decodifica non valida", "Destino de decodificación no válido"),
 
 	DOWNLOAD_FAILED ("Download Failed", "Échec du téléchargement", "Scaricamento fallito", "Descarga fracasó"),
 
@@ -119,9 +108,6 @@ public enum Pie_Word {
 
 	FILE_EXISTS ("File Exists", "Le fichier existe", "Il file esiste", "El archivo existe"),
 
-	CAN_NOT_OVERWRITE_ORIGINAL_FILE ("Cannot overwrite the original file", "Impossible d'écraser le fichier d'origine",
-			"Impossibile sovrascrivere il file originale", "No se puede sobrescribir el archivo original"),
-
 	OVERWRITING_File("Overwriting File", "Fichier d'écrasement", "Sovrascrittura del file", "Sobrescribir archivo"),
 
 	TEXT ("text", "texte", "testo", "texto"),
@@ -136,15 +122,6 @@ public enum Pie_Word {
 	DECODING_FAILED_SOURCE ("Decoding Failed : Source required", "Échec du décodage : source requise",
 			"Decodifica non riuscita: sorgente richiesta", "Error de decodificación: fuente requerida"),
 
-	DECODING_FAILED_DEST_SOURCE ("Decoding Failed : Source destination required", "Échec du décodage : source destination requise",
-			"Decodifica non riuscita: destinazione di origine richiesta", "Error de decodificación: se requiere destino de origen"),
-
-	DEST_FILE_DELETED ("Destination File Deleted", "Fichier de destination supprimé",
-			"Archivo de destino eliminado", "Decodificado a variable - Disponible usando"),
-
-	DECODED_TO_VALUE_USING ("Decoded To Variable - Available using", "Décodé en variable - Disponible en utilisant",
-	"Decodificato in variabile: disponibile utilizzando","Decodificado a variable - Disponible usando" ),
-
 	WRITING_TO_STREAM_ERROR ("Writing to stream error", "Erreur d'écriture dans le flux", "Errore di scrittura nello streaming",
 			"Error al escribir en la secuencia"),
 
@@ -154,8 +131,6 @@ public enum Pie_Word {
 
 	DECRYPTION_FAILED ("Decryption Failed", "Échec du décryptage", "Decrittografia non riuscita","Error de descifrado"),
 
-	BASE_ENCODING_ERROR ("Base Encoding Error", "Erreur d'encodage de base", "Errore di codifica di base", "Error de codificación base"),
-
 	INVALID_ENCODED_IMAGE ("Invalid Encoded Image", "Image codée invalide", "Immagine codificata non valida", "Imagen codificada no válida"),
 
 	INVALID_ENCODED_FILE ("Invalid Encoded File", "Fichier codé invalide", "File codificato non valido", "Archivo codificado no válido"),
@@ -164,8 +139,6 @@ public enum Pie_Word {
 
 	DECODING_COLLECTING_FILE ("Decoding : Collecting file", "Décodage : Collecte de fichier", "Decodifica: raccolta di file",
 			"Decodificación: recopilación de archivos"),
-
-	CANNOT_BE_USED_WITH ("cannot be used with", "ne peut pas être utilisé avec", "non può essere utilizzato con", "no se puede utilizar con"),
 
 	ERROR ("Error","Erreur", "Errore", "Error"),
 
@@ -181,8 +154,6 @@ public enum Pie_Word {
 
 	ENCODING_COMPLETE ("Encoding Complete", "Encodage terminé", "Codifica completata", "Codificación completa"),
 
-	COMPRESSION_FAILED ("Compression Failed", "Échec de la compression", "Compressione non riuscita", "Fallo de compresión"),
-
 	UNABLE_To_READ_FILE ("Unable to read file", "Impossible de lire le fichier", "Impossibile leggere il file",
 			"Imposible leer el archivo"),
 
@@ -191,9 +162,6 @@ public enum Pie_Word {
 
 	UNEXPRECTED_FILE_COUNT ("Unexpected file count.", "Nombre de fichiers inattendu", "Conteggio file imprevisto",
 			"Recuento de archivos inesperado"),
-
-	GENERATING_IMAGE_SIZE ("Generating Image Size", "Génération de la taille de l'image", "Generazione della dimensione dell'immagine",
-			"Generando tamaño de imagen"),
 
 	IMAGE_SIZE_WOULD_BE ("Image Size Would be", "La taille de l'image serait", "La dimensione dell'immagine sarebbe",
 			"El tamaño de la imagen sería"),

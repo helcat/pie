@@ -116,6 +116,9 @@ public class Pie_Decoder_Config_Builder {
             if (option instanceof Pie_Decode_Source) {
                 this.decode_source = (Pie_Decode_Source) option;
 
+            }else if (option instanceof Pie_Base64) {
+                this.decode_source = new Pie_Decode_Source(new ByteArrayInputStream(((Pie_Base64) option).decode_to_bytes()));
+
             }else if (option instanceof File) {
                 this.decode_source = new Pie_Decode_Source((File) option);
 
