@@ -302,7 +302,7 @@ public class Pie_Utils {
      * @param message (Byte[])
      * @param out (File)
      */
-    public void write_Bytes_To_File (byte[] message, File out) {
+    public static void write_Bytes_To_File (byte[] message, File out) {
         try (FileWriter writer = new FileWriter(out)) {
             try {
                 for (byte b : message) {

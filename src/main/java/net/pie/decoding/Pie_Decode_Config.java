@@ -39,7 +39,6 @@ public class Pie_Decode_Config {
     private String error_message = null;
     private Pie_PreFix prefix = null;
 
-    private boolean demo_mode = false;
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
     public Pie_Decode_Config(Object... options) {
@@ -72,8 +71,6 @@ public class Pie_Decode_Config {
                     break;
                 case "Pie_Option":
                     opt = (Pie_Option) o;
-                    if (opt.equals(Pie_Option.DEMO_MODE))
-                        setDemo_mode(true);
                     getOptions().add(opt);
                     break;
                 case "Pie_Encryption":
@@ -131,14 +128,10 @@ public class Pie_Decode_Config {
         if (isError() || getLog_level().equals(Level.OFF) || getOptions().contains(Pie_Option.DECODE_CERTIFICATE))
             return;
 
-        if (isDemo_mode()) { // Used in demo to fill up a text area
-            Pie_Utils.console_out(level.toString() + " : " + message);
-            return;
-        }
-
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message); // Allows the user to collect a message for their system
+
             if (!getLog_level().equals(Level.INFO))
                 return;
         }
@@ -211,14 +204,6 @@ public class Pie_Decode_Config {
     public void setError_message(String error_message) {
         if (this.isError())
             this.error_message = error_message;
-    }
-
-    public boolean isDemo_mode() {
-        return demo_mode;
-    }
-
-    public void setDemo_mode(boolean demo_mode) {
-        this.demo_mode = demo_mode;
     }
 
     public String getLanguage() {

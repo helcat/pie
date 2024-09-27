@@ -144,12 +144,6 @@ public class Pie_Encode_Config {
         if (isError() || getLog_level().equals(Level.OFF))
             return;
 
-        // Used in demo to fill up a text area
-        if (getOptions() != null && getOptions().contains(Pie_Option.DEMO_MODE)) {
-            Pie_Utils.console_out(level.toString() + " : " + message);
-            return;
-        }
-
         if (level.equals(Level.SEVERE)) {
             setError(true);
             setError_message(message); // Allows the user to collect a message for their system

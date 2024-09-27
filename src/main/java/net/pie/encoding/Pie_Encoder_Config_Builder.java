@@ -193,6 +193,9 @@ public class Pie_Encoder_Config_Builder {
             } else if (option instanceof File) {
                 this.encryption = new Pie_Encryption((File) option);
 
+            } else if (option instanceof Pie_Base64) {
+                this.encryption = new Pie_Encryption((Pie_Base64) option);
+
             } else if (option instanceof String) {
                 this.encryption = new Pie_Encryption((String) option);
 

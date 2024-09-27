@@ -84,7 +84,6 @@ public class Pie_Decode {
             }
 
         }else if (getSource_type().equals(Pie_Source_Type.FILE)) { // File
-
             if (getConfig().getDirectory() == null)
                 setOutputStream(new ByteArrayOutputStream());
             else

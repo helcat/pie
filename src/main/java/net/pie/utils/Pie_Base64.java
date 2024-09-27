@@ -4,6 +4,7 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class Pie_Base64 {
         setText(in);
     }
 
+
     /** *****************************************<br>
      * decode a 64 string
      * @return String
@@ -39,6 +41,14 @@ public class Pie_Base64 {
         return this;
     }
 
+    /** *****************************************<br>
+     * encode bytes to a 64 string
+     * @return String
+     */
+    public Pie_Base64 encode(byte[] array) {
+        setText(new String(Base64.getEncoder().encode(array), StandardCharsets.UTF_8));
+        return this;
+    }
     /** *****************************************<br>
      * decode a 64 string
      * @return String
@@ -88,6 +98,16 @@ public class Pie_Base64 {
         return false;
     }
 
+    public boolean isBase64() {
+        try {
+            if (Pie_Utils.isEmpty(getText()))
+                return false;
+            Base64.getDecoder().decode(getText());
+            return true;
+        } catch (IllegalArgumentException ignored) {  }
+        return false;
+    }
+
     /** *****************************************<br>
      * write the encoded string to a file, set text first.
      * @param file File
@@ -106,8 +126,10 @@ public class Pie_Base64 {
      */
     public void decode_base64_write_to_File(File file) {
         try {
-            decode();
-            Pie_Utils.write_String_To_File(getText(), file);
+            if (Pie_Utils.isEmpty(getText()))
+                return;
+            byte[] bytes = Base64.getDecoder().decode(getText().getBytes(StandardCharsets.UTF_8));
+            Pie_Utils.write_Bytes_To_File(bytes, file);
         }catch (Exception ignored) {}
     }
 

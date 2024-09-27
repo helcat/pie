@@ -46,6 +46,21 @@ public class Pie_Encryption {
 
         if (parm instanceof SecretKey) {
             setKey((SecretKey) parm);
+        } else if (parm instanceof Pie_Base64 && !Pie_Utils.isEmpty (((Pie_Base64) parm).getText())) {
+            if (!read_Certificate((Pie_Base64) parm)) {
+                if (((Pie_Base64) parm).isBase64()) {
+                    setPassword(((Pie_Base64) parm).decode().getText());
+                }else{
+                    setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
+                }
+            }else{
+                if (!Pie_Utils.isEmpty(getPassword())) {
+                    setUsing_certificate(true);
+                    setPassword(getPassword());
+                }else{
+                    setError_message(Pie_Word.ENCRYPTION_FILE_INVALID);
+                }
+            }
 
         } else if (parm instanceof File && Pie_Utils.isFile(((File) parm))) {
             if (!read_Certificate(parm) || Pie_Utils.isEmpty(getPassword())) {
@@ -65,13 +80,14 @@ public class Pie_Encryption {
 
     /** **************************************************<br>
      * Read Certificate copy from Pie_Certificate to make it private
-     * @param file File Certificate
+     * @param item Object Certificate
      * @return boolean
      */
     private boolean read_Certificate(Object item) {
         if (item instanceof  File) {
             if (!Pie_Utils.isFile((File) item) || !((File) item).getName().toLowerCase().endsWith(".pie"))
                 return false;
+
         }else if (item instanceof Pie_Base64) {
             item = new ByteArrayInputStream(((Pie_Base64) item).decode_to_bytes());
         }

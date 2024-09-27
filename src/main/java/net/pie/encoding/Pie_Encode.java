@@ -17,6 +17,8 @@ import net.pie.utils.Pie_Utils;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -546,6 +548,21 @@ public class Pie_Encode {
                 ImageIO.write(getOutput_Image(), "png", output);
                 return new ByteArrayInputStream(output.toByteArray(), 0, output.size());
             } catch (IOException ignored) { }
+        }
+        return null;
+    }
+
+    /** ********************************************<br>
+     * convert image To ByteArray
+     * @return byte[]
+     */
+    public byte[] convertToByteArray() {
+        if (getOutput_Image() != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                ImageIO.write(getOutput_Image(), "png", baos);
+                return baos.toByteArray();
+            } catch (IOException ignored) {  }
         }
         return null;
     }

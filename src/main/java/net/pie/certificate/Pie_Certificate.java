@@ -18,6 +18,8 @@ import net.pie.enums.Pie_Encode_Mode;
 import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Word;
 import net.pie.utils.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.security.SecureRandom;
@@ -27,12 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Pie_Certificate {
-
-    private boolean demo_mode = false;
-
-    public Pie_Certificate(boolean demo_mode) {
-        setDemo_mode(demo_mode);
-    }
 
     public Pie_Certificate() {
 
@@ -48,9 +44,6 @@ public class Pie_Certificate {
             return false;
 
         Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
-        if (isDemo_mode())
-            config_builder.add_Option(Pie_Option.DEMO_MODE);
-
         Pie_Decode_Config config = config_builder.build();
 
         if (item instanceof  File && ((File) item).exists() && ((File) item).isFile() && read_Certificate(item)) {
@@ -81,8 +74,6 @@ public class Pie_Certificate {
         if (item instanceof Pie_Base64 || item instanceof File) {
             String key_text = null;
             Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
-            if (isDemo_mode())
-                config_builder.add_Option(Pie_Option.DEMO_MODE);
             config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
             config_builder.add_Decode_Source(item);
             Pie_Decode decoded = new Pie_Decode(config_builder.build());
@@ -96,6 +87,43 @@ public class Pie_Certificate {
             return !Pie_Utils.isEmpty(key_text);
         }
         return  false;
+    }
+
+    /** **************************************************<br>
+     * create Base64 Certificate<br>
+     * Generates a certificate of bewteen 100 - 700 random byte charactors between 1 - 255 each
+     * @return (String)
+     */
+    public String create_base64_Certificate() {
+        Pie_Encode_Config config = new Pie_Encode_Config();
+        String password = getRandomSpecialChars();
+
+        Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
+                .add_Log_Level(Level.INFO)
+                .add_Mode(Pie_Encode_Mode.M_2)
+                .add_Option(Pie_Option.CREATE_CERTIFICATE)
+                .add_Encode_Source(new Pie_Text(password));
+        Pie_Encode encode = new Pie_Encode(builder.build());
+
+        if (encode.isEncoding_Error()) {
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+            return null;
+        }else{
+            byte[] cert = encode.convertToByteArray();
+            if (cert != null && cert.length > 0) {
+                Pie_Base64 cert_base64 = new Pie_Base64().encode(cert);
+                if (verify_Certificate(cert_base64)) {
+                    config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
+                    return cert_base64.getText();
+                }else{
+                    config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+                    return null;
+                }
+            }else{
+                config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+                return null;
+            }
+        }
     }
 
     /** **************************************************<br>
@@ -118,9 +146,6 @@ public class Pie_Certificate {
                 .add_Option(Pie_Option.CREATE_CERTIFICATE, Pie_Option.OVERWRITE_FILE)
                 .add_Encode_Source(new Pie_Text(password, cert.getName()))
                 .add_Directory(cert.getParentFile());
-        if (isDemo_mode())
-            builder.add_Option(Pie_Option.DEMO_MODE);
-
         Pie_Encode encode = new Pie_Encode(builder.build());
 
         if (encode.isEncoding_Error()) {
@@ -154,13 +179,6 @@ public class Pie_Certificate {
                 .toString();
     }
 
-    private boolean isDemo_mode() {
-        return demo_mode;
-    }
-
-    private void setDemo_mode(boolean demo_mode) {
-        this.demo_mode = demo_mode;
-    }
 }
 
 

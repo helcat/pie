@@ -293,7 +293,15 @@ public class Pie_Prompt {
      */
     private void createCertificate() {
         Pie_Certificate cert = new Pie_Certificate();
-        cert.create_Certificate(getDirectory());
+        if (getDirectory() != null) {
+            cert.create_Certificate(getDirectory());
+        }else{
+            String output = cert.create_base64_Certificate();
+            if (!Pie_Utils.isEmpty(output))
+                System.out.println(output);
+            else
+                System.out.println(Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED));
+        }
     }
 
     /** **************************************************<br>
@@ -445,7 +453,7 @@ public class Pie_Prompt {
         if (!isMakeCertificate() && getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
-        if (getDirectory() == null && !isEncode_To_Base64())
+        if (getDirectory() == null && !isEncode_To_Base64() && !isMakeCertificate())
             setDirectory(Pie_Utils.getDesktop());
 
         if (getShape() == null)
@@ -567,7 +575,8 @@ public class Pie_Prompt {
 
         else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_FILE, key)) {    // -base64
             try {
-                setSource(new Pie_Base64(value));
+                if (Pie_Base64.isBase64(value))
+                    setSource(new Pie_Base64(value));
             } catch (Exception ignored) {  }
         }
     }
