@@ -187,8 +187,8 @@ public enum Pie_Word {
 	ENCODE ("Encode", "Encoder", "Codificare", "Codificar"),
 	DECODE ("Decode", "Décoder", "Decodificare", "Descodificar"),
 
-	ENCODE_FILE_TO_BASE64 ("encode_file_to_base64", "encoder_le_fichier_en_base64", "codificare_il_file_in_base64", "codificar_archivo_en_base64"),
-	DECODE_BASE64_FILE ("decode_base64_file", "décoder_le_fichier_base64", "decodificare_il_file_base64", "decodificar_archivo_base64"),
+	BASE64_ENCODE("base64_encode", "encodage_bBase64", "codifica_base64", "codificación_base64"),
+	BASE64_DECODE("base64_decode", "décodage_base64", "decodifica_base64", "decodificación_base64"),
 
 	DIRECTORY ("Directory", "Annuaire", "Direttorio", "Directorio"),
 

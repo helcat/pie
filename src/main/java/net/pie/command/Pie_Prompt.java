@@ -31,8 +31,8 @@ public class Pie_Prompt {
     private boolean verifyCertificate = false;
     private boolean prompt = false;
     private boolean console = false;
-    private boolean encode_To_Base64 = false;
-    private boolean decode_Base64_File = false;
+    private boolean base64_encode = false;
+    private boolean base64_decode = false;
 
     private Object source = null;
     private String filename = null; // Only used for encoding text.
@@ -87,7 +87,8 @@ public class Pie_Prompt {
      * java -cp .\pie-x.x.jar Pie -verify_certificate -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
      * java -cp .\pie-x.x.jar Pie -verify_certificate -base64_file "base64-String"<br><br>
      *
-     * java -cp .\pie-x-x.jar Pie -encode_file_to_base64 -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" -directory "C:\" (Optional)<br>
+     * java -cp .\pie-x-x.jar Pie -base64_encode -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" -directory "C:\" (Optional)<br>
+     *
      * java -cp .\pie-x-x.jar Pie -decode_base64_file -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie.txt" -directory "C:\" (Optional) -name "name of file"<br>
      * java -cp .\pie-x-x.jar Pie -decode_base64_file -base64_file "base64-String" -directory "C:\" (Optional) -name "name of file"<br>
      */
@@ -174,12 +175,12 @@ public class Pie_Prompt {
             verifyCertificate();
         }
 
-        else if (isEncode_To_Base64()) {
-            base64File();
+        else if (isBase64_encode()) {
+            base64_Encode();
         }
 
-        else if (isDecode_Base64_File()) {
-            decodeBase64File();
+        else if (isBase64_decode()) {
+            base64_Decode();
         }
 
         if (scanner != null)
@@ -216,10 +217,10 @@ public class Pie_Prompt {
      * check encode / decode file (base64)
      */
     private void check_Base64(String mode) {
-        if (Pie_Word.is_in_Translation(Pie_Word.ENCODE_FILE_TO_BASE64, mode))
-            setEncode_To_Base64(true);
-        else if (Pie_Word.is_in_Translation(Pie_Word.DECODE_BASE64_FILE, mode))
-            setDecode_Base64_File(true);
+        if (Pie_Word.is_in_Translation(Pie_Word.BASE64_ENCODE, mode))
+            setBase64_encode(true);
+        else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_DECODE, mode))
+            setBase64_decode(true);
     }
 
     /** **************************************************<br>
@@ -254,14 +255,17 @@ public class Pie_Prompt {
      *  -directory "C:\" (Optional)<br>
      *  Will throw out to console if not entered
      */
-    private void base64File() {
+    private void base64_Encode() {
         if (getSource() != null && getSource() instanceof File) {
             Pie_Base64 b64 = new Pie_Base64().encode_file((File) getSource());
             if (!Pie_Utils.isEmpty(b64.getText())) {
                 if (getDirectory() == null) {
                     System.out.println(b64.getText());
                 } else {
-                    File output_file = Pie_Utils.file_concat(getDirectory(), ((File) getSource()).getName() + ".txt");
+                    String file_name = ((File) getSource()).getName() + ".txt";
+                    if (!Pie_Utils.isEmpty(getFilename()))
+                        file_name = getFilename() + (file_name.toLowerCase().endsWith(".txt") ? "" : ".txt");
+                    File output_file = Pie_Utils.file_concat(getDirectory(), file_name);
                     if (b64.write_base64_to_File(output_file))
                         System.out.println(output_file.getAbsolutePath());
                 }
@@ -278,7 +282,7 @@ public class Pie_Prompt {
      *  -name
      *  Warning will replace file if found.
      */
-    private void decodeBase64File() {
+    private void base64_Decode() {
         if (Pie_Utils.isEmpty(getFilename()))
             setFilename(Pie_Word.translate(Pie_Word.UNKNOWN));
         if (getSource() != null && getSource() instanceof File)
@@ -314,6 +318,9 @@ public class Pie_Prompt {
                 .add_Log_Level(getLog_level());					// Optional logging level Default SEVERE
 
         if (getPrefix() != null && !Pie_Utils.isEmpty(getPrefix().getText()))
+            builder.add_Prefix(getPrefix().getText());	        // Optional Prefix
+
+        if ( !Pie_Utils.isEmpty(getFilename()))
             builder.add_Prefix(getPrefix().getText());	        // Optional Prefix
 
         if (!Pie_Utils.isEmpty(getEncryption_phrase()))
@@ -446,14 +453,14 @@ public class Pie_Prompt {
      */
     private void validate() {
         if (!isDecode() && !isEncode() && !isMakeCertificate() &&
-                !isVerifyCertificate() && !isEncode_To_Base64() &&
-                !isDecode_Base64_File())
+                !isVerifyCertificate() && !isBase64_encode() &&
+                !isBase64_decode())
             quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
 
         if (!isMakeCertificate() && getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
-        if (getDirectory() == null && !isEncode_To_Base64() && !isMakeCertificate())
+        if (getDirectory() == null && !isBase64_encode() && !isMakeCertificate())
             setDirectory(Pie_Utils.getDesktop());
 
         if (getShape() == null)
@@ -1075,20 +1082,20 @@ public class Pie_Prompt {
         this.prefix = prefix;
     }
 
-    public boolean isEncode_To_Base64() {
-        return encode_To_Base64;
+    public boolean isBase64_encode() {
+        return base64_encode;
     }
 
-    public void setEncode_To_Base64(boolean encode_To_Base64) {
-        this.encode_To_Base64 = encode_To_Base64;
+    public void setBase64_encode(boolean base64_encode) {
+        this.base64_encode = base64_encode;
     }
 
-    public boolean isDecode_Base64_File() {
-        return decode_Base64_File;
+    public boolean isBase64_decode() {
+        return base64_decode;
     }
 
-    public void setDecode_Base64_File(boolean decode_Base64_File) {
-        this.decode_Base64_File = decode_Base64_File;
+    public void setBase64_decode(boolean base64_decode) {
+        this.base64_decode = base64_decode;
     }
 
     public Pie_Base64 getPie_base64() {

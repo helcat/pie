@@ -1,17 +1,15 @@
 package net.pie.utils;
 /** **********************************************<br>
  * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
  * pixel.image.encode@gmail.com
  */
 
 import net.pie.enums.Pie_Word;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -20,6 +18,8 @@ import java.net.URL;
  */
 public class Pie_URL {
     private URL url = null;
+    private String basic_auth = null;
+    private boolean follow_redirects = true;
     private String error_message = null;
 
     public Pie_URL(String url) {
@@ -32,10 +32,33 @@ public class Pie_URL {
     }
 
     /** *****************************************<br>
+     * Direct URL Parameter
+     * @param url URL
+     */
+    public Pie_URL(URL url) {
+        error_message = null;
+        setUrl(url);
+    }
+
+    /** *****************************************<br>
      * return an InputStream from the URL
      * @return InputStream
      */
     public InputStream getInputStream() {
+        if (getUrl() != null && (Pie_Utils.isEmpty(getError_message())) && Pie_Utils.isEmpty(getBasic_auth())) {
+            return collectInputStream();
+        }
+        else if (getUrl() != null && (Pie_Utils.isEmpty(getError_message())) && !Pie_Utils.isEmpty(getBasic_auth())) {
+            return collectAuthInputStream();
+        }
+        return null;
+    }
+
+    /** *****************************************<br>
+     * return an InputStream from the URL
+     * @return InputStream
+     */
+    public InputStream collectInputStream() {
         if (getUrl() != null && (Pie_Utils.isEmpty(getError_message()))) {
             try {
                 return getUrl().openStream();
@@ -43,54 +66,44 @@ public class Pie_URL {
                 error_message = Pie_Word.translate(Pie_Word.URL_ERROR) + " : " + e.getMessage();
             }
         }else{
-                error_message = Pie_Word.translate(Pie_Word.URL_ERROR);
+            error_message = Pie_Word.translate(Pie_Word.URL_ERROR);
         }
         return null;
     }
 
     /** *****************************************<br>
-     * launch a website from Pie_URL<br>
-     * Not used within PIE.
+     * return an InputStream from the URL
+     * @return InputStream
      */
-    public void launch() {
+    public InputStream collectAuthInputStream() {
         if (getUrl() != null && (Pie_Utils.isEmpty(getError_message()))) {
             try {
-                if (Pie_Utils.isMac()) {
-                    Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
-                    Method openURL = fileMgr.getDeclaredMethod("openURL",
-                            new Class[]{String.class});
-                    openURL.invoke(null, new Object[]{getUrl().toString()});
-                } else if (Pie_Utils.isWin())
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + getUrl().toString());
-                else { //assume Unix or Linux
-                    String[] browsers = {
-                            "google-chrome", "firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape",
-                            "seamonkey", "galeon", "kazehakase"};
-                    String browser = null;
-                    for (int count = 0; count < browsers.length && browser == null; count++)
-                        if (Runtime.getRuntime().exec(
-                                new String[]{"which", browsers[count]}).waitFor() == 0)
-                            browser = browsers[count];
-                    if (browser == null) {
-                        error_message = Pie_Word.translate(Pie_Word.NO_BROWSER);
-                        return;
-                    }else {
-                        Runtime.getRuntime().exec(new String[]{browser, getUrl().toString()});
-                    }
+                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                connection.setRequestProperty("Authorization", "Basic " + getBasic_auth());
+                connection.setReadTimeout(0); 		// unlimited
+                connection.setConnectTimeout(0);  	// unlimited
+                connection.setRequestProperty("Content-Length", "0");
+                connection.setInstanceFollowRedirects(isFollow_redirects());
+
+                if(connection.getResponseCode() > 299) {
+                    //setMessage(connection.getResponseMessage());
+                    //setStatus(connection.getResponseCode());
+                    connection.disconnect();
+                    return null;
                 }
 
-            } catch (Exception e) {
-                try {
-                    Class<?> d = Class.forName("java.awt.Desktop");
-                    d.getDeclaredMethod("browse", new Class[]{java.net.URI.class}).invoke(
-                            d.getDeclaredMethod("getDesktop").invoke(null),
-                            new Object[]{java.net.URI.create(getUrl().toString())});
-                } catch (Exception e2) {
-                    error_message = Pie_Word.translate(Pie_Word.NO_BROWSER) + " " + e2.getMessage();
-                    return;
-                }
+               // setMessage(connection.getResponseMessage());
+               // setStatus(connection.getResponseCode());
+
+                return connection.getInputStream();
+
+            } catch (IOException e) {
+                error_message = Pie_Word.translate(Pie_Word.URL_ERROR) + " : " + e.getMessage();
             }
+        }else{
+            error_message = Pie_Word.translate(Pie_Word.URL_ERROR);
         }
+        return null;
     }
 
     public URL getUrl() {
@@ -103,6 +116,22 @@ public class Pie_URL {
 
     public String getError_message() {
         return error_message;
+    }
+
+    public String getBasic_auth() {
+        return basic_auth;
+    }
+
+    public void setBasic_auth(String basic_auth) {
+        this.basic_auth = basic_auth;
+    }
+
+    public boolean isFollow_redirects() {
+        return follow_redirects;
+    }
+
+    public void setFollow_redirects(boolean follow_redirects) {
+        this.follow_redirects = follow_redirects;
     }
 }
 

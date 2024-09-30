@@ -4,7 +4,6 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -129,7 +128,12 @@ public class Pie_Base64 {
             if (Pie_Utils.isEmpty(getText()))
                 return;
             byte[] bytes = Base64.getDecoder().decode(getText().getBytes(StandardCharsets.UTF_8));
-            Pie_Utils.write_Bytes_To_File(bytes, file);
+            if (bytes != null) {
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(bytes);
+                } catch (IOException ignored) {
+                }
+            }
         }catch (Exception ignored) {}
     }
 
