@@ -52,7 +52,9 @@ public class Pie_Decode_Source {
             case "Pie_URL":
             case "InputStream":
             case "ByteArrayInputStream":
+            case "Pie_Base64" :
                 break;
+
             default:
                 setDecode_object(null);
                 setError_code(Pie_Word.UNABLE_TO_DECODE);

@@ -52,9 +52,10 @@ public class Pie_Prompt {
      * -encode<br>
      * -overwrite (Optional default false overwrites the current encoded file)<br>
      * -file "C:\tomato.png"<br>
+     * -base64_file "base64-String"<br>
      * -text "My Text Message"<br>
      * -name "My_File" (Only Use with -text or -decode_base64_file)<br>
-     * -directory "C:\" (Optional default desktop)<br>
+     * -directory "C:\" (Optional)<br>
      * -shape square (Optional default Rectangle encode only)<br>
      * -mode one (Optional encoding mode default is two, encode only)<br>
      * -maxMB 200 (Optional Maximum MB Encoded File. Default 500 before zipped and sliced)<br>
@@ -74,7 +75,7 @@ public class Pie_Prompt {
      * -decode<br>
      * -overwrite (Optional default false overwrites the current decoded file)<br>
      * -file "C:\enc_1_tomato.png"<br>
-     * -directory "C:\shared"  (Optional default desktop)<br>
+     * -directory "C:\shared"  (Optional)<br>
      * -encryption "my password"  (Optional encryption or certificate)<br>
      *
      * -certificate "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie" (Optional encryption or certificate)<br>
@@ -83,7 +84,7 @@ public class Pie_Prompt {
      * -log information (Optional, Off, Information, Severe (Default))<br>
      * -console display text when decoded on the console<br><br>
      *
-     * java -cp .\pie-x.4.jar Pie -make_certificate -directory "C:\"<br><br>
+     * java -cp .\pie-x.x.jar Pie -make_certificate -directory "C:\"<br><br>
      * java -cp .\pie-x.x.jar Pie -verify_certificate -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie"<br><br>
      * java -cp .\pie-x.x.jar Pie -verify_certificate -base64_file "base64-String"<br><br>
      *
@@ -111,7 +112,7 @@ public class Pie_Prompt {
                 check_Verify(arg.substring(1));                 // -verify_certificate
                 check_Prompt(arg.substring(1));                 // -prompt
                 check_Console(arg.substring(1));                // -console
-                check_Base64(arg.substring(1));                 // -encode_file_to_base64 -decode_base64-file
+                check_Base64(arg.substring(1));                 // -base64_encode -base64_decode
 
                 if (args.length > (count + 1)) {
                     value = args[count + 1].replace("\"", "");
@@ -242,7 +243,7 @@ public class Pie_Prompt {
         if (getDirectory() == null) {
             File folder = null;
             while (folder == null) {
-                folder = check_Prompt_Directory(scanner, true);
+                folder = check_Prompt_Directory(scanner);
             }
         }
     }
@@ -278,7 +279,7 @@ public class Pie_Prompt {
      *  java -cp .\pie-x-x.jar Pie<br>
      *  -decode_base64_file<br>
      *  -file "C:\b9efdf22-9db5-408a-ab86-5b84a140ebdf.pie.txt"<br>
-     *  -directory "C:\" (Optional. Desktop is Default) <br>
+     *  -directory "C:\" (Optional) <br>
      *  -name
      *  Warning will replace file if found.
      */
@@ -320,14 +321,14 @@ public class Pie_Prompt {
         if (getPrefix() != null && !Pie_Utils.isEmpty(getPrefix().getText()))
             builder.add_Prefix(getPrefix().getText());	        // Optional Prefix
 
-        if ( !Pie_Utils.isEmpty(getFilename()))
-            builder.add_Prefix(getPrefix().getText());	        // Optional Prefix
-
         if (!Pie_Utils.isEmpty(getEncryption_phrase()))
             builder.add_Encryption(new Pie_Encryption(getEncryption_phrase()));	// Optional Encryption. See Encryption Examples
 
         else if (getCertificate() != null)
             builder.add_Encryption(new Pie_Encryption(getCertificate()));	    // Optional Encryption. See Encryption Examples
+
+        if (!Pie_Utils.isEmpty(getFilename()))
+            builder.add_File_Name(getFilename());
 
         if (isOverwrite())
             builder.add_Option(Pie_Option.OVERWRITE_FILE);
@@ -336,6 +337,7 @@ public class Pie_Prompt {
             builder.add_Option(Pie_Option.CONSOLE);
 
         Pie_Decode_Config config = builder.build();
+
         Pie_Decode decode = new Pie_Decode(config);
         System.out.println(decode.isDecoding_Error() ? decode.getDecoding_Error_Message() :  "");
         if (decode.getOutputStream() != null && !decode.isDecoding_Error() &&
@@ -360,7 +362,7 @@ public class Pie_Prompt {
         if (getDirectory() == null) {
             File folder = null;
             while (folder == null) {
-                folder = check_Prompt_Directory(scanner, false);
+                folder = check_Prompt_Directory(scanner);
             }
         }
 
@@ -381,13 +383,17 @@ public class Pie_Prompt {
      * java -cp .\pie-x.x.jar Pie -encode <br>
      */
     private void encode() {
-        if (getSource() == null) {
+        if (getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-        }
 
         if (getSource() != null && getSource() instanceof Pie_Text) {
             if (!Pie_Utils.isEmpty(getFilename()))
                 ((Pie_Text) getSource()).setFile_name(getFilename());
+        }
+
+        if (getSource() != null && getSource() instanceof Pie_Base64) {
+            if (!Pie_Utils.isEmpty(getFilename()))
+                ((Pie_Base64) getSource()).setFile_name(getFilename());
         }
 
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
@@ -427,7 +433,7 @@ public class Pie_Prompt {
         if (getDirectory() == null) {
             File folder = null;
             while (folder == null) {
-                folder = check_Prompt_Directory(scanner, false);
+                folder = check_Prompt_Directory(scanner);
             }
         }
 
@@ -459,9 +465,6 @@ public class Pie_Prompt {
 
         if (!isMakeCertificate() && getSource() == null)
             quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-
-        if (getDirectory() == null && !isBase64_encode() && !isMakeCertificate())
-            setDirectory(Pie_Utils.getDesktop());
 
         if (getShape() == null)
             setShape(Pie_Shape.SHAPE_RECTANGLE);
@@ -583,7 +586,7 @@ public class Pie_Prompt {
         else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_FILE, key)) {    // -base64
             try {
                 if (Pie_Base64.isBase64(value))
-                    setSource(new Pie_Base64(value));
+                    setSource(new Pie_Base64(value, Pie_Source_Type.FILE));
             } catch (Exception ignored) {  }
         }
     }
@@ -613,7 +616,7 @@ public class Pie_Prompt {
         if (Pie_Word.is_in_Translation(Pie_Word.CERTIFICATE, key)) {
             try {
                 if (Pie_Base64.isBase64(value)) {
-                    setCertificate(new Pie_Base64(value));
+                    setCertificate(new Pie_Base64(value, Pie_Source_Type.FILE));
                 }else {
                     File cert = new File(value.replace("\"", ""));
                     if (cert.exists() && cert.isFile())
@@ -855,24 +858,11 @@ public class Pie_Prompt {
      * @param quit_on_empty boolean
      * @return File
      */
-    private File check_Prompt_Directory(Scanner scanner, boolean quit_on_empty) {
+    private File check_Prompt_Directory(Scanner scanner) {
         File folder;
         try {
-            if (quit_on_empty) {
-                System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY));
-            }else{
-                System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY) +
-                        " (" + Pie_Word.translate(Pie_Word.DEFAULT) + " : " + Pie_Utils.getDesktop().getName() + ")");
-            }
+            System.out.println(Pie_Word.translate(Pie_Word.ENTER_DIRECTORY));
             String in = scanner.nextLine().replace("\"", "");
-            if (quit_on_empty) {
-                if (in.isEmpty()) {
-                    quit(Pie_Word.translate(Pie_Word.NO_DIRECTORY_ENTERED));
-                }else{
-                    in = Pie_Utils.getDesktopPath();
-                    System.out.println(Pie_Word.translate(Pie_Word.DIRECTORY) + " : " + in);
-                }
-            }
             folder = new File(in);
             if (!folder.exists() || !folder.isDirectory())
                 folder = null;

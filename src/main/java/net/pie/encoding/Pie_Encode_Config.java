@@ -1,10 +1,6 @@
 package net.pie.encoding;
 /** **********************************************<br>
  * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
  * pixel.image.encode@gmail.com
  */
 
@@ -19,7 +15,7 @@ import java.util.logging.Level;
 /** *******************************************************************<br>
  * Starts a default configuration and sets up logging and options<br>
  * Encoding options. Pie_Option, Level, Pie_Encryption
- * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_Encode_Source, Pie_Directory<br>
+ * For encoding the following can be used. Pie_Shape, Pie_Encode_Mode, Pie_Encode_Source, Pie_Output<br>
  * Add parmeters in any order, or use an object list<br>
  * The Default is Log level is Level.SEVERE<br>
  * the Default zip options are Pie_ZIP_Name.AS_IS, Pie_ZIP_Option.ONLY_WHEN_EXTRA_FILES_REQUIRED<br>
@@ -29,7 +25,7 @@ import java.util.logging.Level;
  * @see Level
  * @see Pie_Encryption
  * @see Pie_Encode_Source
- * @see Pie_Directory
+ * @see Pie_Output
  *
  **/
 public class Pie_Encode_Config {
@@ -41,7 +37,7 @@ public class Pie_Encode_Config {
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
 
     private Pie_Encode_Source encoder_source = null;
-    private Pie_Directory directory = null;
+    private Pie_Output output = null;
 
     private Level log_level = Level.SEVERE;
     private boolean error = false;
@@ -96,7 +92,7 @@ public class Pie_Encode_Config {
                         return;
                     }
                     break;
-                case "Pie_Directory": this.directory = (Pie_Directory) o; break;
+                case "Pie_Output": this.output = (Pie_Output) o; break;
                 case "Pie_Max_MB": this.max_mb = (Pie_Max_MB) o; break;
                 case "Level": this.log_level = (Level) o; break;
             }
@@ -275,16 +271,16 @@ public class Pie_Encode_Config {
         this.language = language;
     }
 
-    public Pie_Directory getDirectory() {
-        return directory;
-    }
-
     private void setEncoder_storage(Pie_Zip encoder_storage) {
         this.encoder_storage = encoder_storage;
     }
 
-    public void setDirectory(Pie_Directory directory) {
-        this.directory = directory;
+    public Pie_Output getOutput() {
+        return output;
+    }
+
+    public void setOutput(Pie_Output output) {
+        this.output = output;
     }
 }
 

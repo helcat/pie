@@ -41,6 +41,7 @@ public class Pie_Decoder_Config_Builder {
     private Pie_Language language = null;
     private Level log_level = Level.SEVERE;
     private Pie_PreFix prefix = null;
+    private String file_name = null;
 
     /** *********************************************************<br>
      * Add Pie Options, Be be single or multiple
@@ -89,6 +90,17 @@ public class Pie_Decoder_Config_Builder {
     public Pie_Decoder_Config_Builder add_Log_Level(Level option) {
         if (option != null)
             this.log_level = option;
+        return this;
+    }
+
+    /** *********************************************************<br>
+     * Add alternate file name
+     * @param option (String)
+     * @return (Pie_Decoder_Config_Builder)
+     */
+    public Pie_Decoder_Config_Builder add_File_Name(String option) {
+        if (!Pie_Utils.isEmpty(option))
+            this.setFile_name(option);
         return this;
     }
 
@@ -194,7 +206,13 @@ public class Pie_Decoder_Config_Builder {
         if (prefix != null)
             options.add(prefix);
 
-        return new Pie_Decode_Config(options);
+        Pie_Decode_Config config = new Pie_Decode_Config(options);
+
+        if (!Pie_Utils.isEmpty(getFile_name()))
+            config.setFile_name(getFile_name());
+
+        return config;
+
     }
 
     public Pie_Language getLanguage() {
@@ -219,6 +237,14 @@ public class Pie_Decoder_Config_Builder {
 
     public void setPrefix(Pie_PreFix prefix) {
         this.prefix = prefix;
+    }
+
+    public String getFile_name() {
+        return file_name;
+    }
+
+    public void setFile_name(String file_name) {
+        this.file_name = file_name;
     }
 }
 

@@ -139,8 +139,10 @@ public class Pie_Decode {
         String file_name =
                 (getConfig().getPrefix() != null && !Pie_Utils.isEmpty(getConfig().getPrefix().getText()) ?
                     getConfig().getPrefix().getText() : "") + getConfig().getDirectory().getFilename();
+
         if (getSource_type().equals(Pie_Source_Type.TEXT) && !file_name.toLowerCase().endsWith(".txt"))
             file_name = file_name + ".txt";
+
         if (Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder())) {
             File decoded_file = new File(getConfig().getDirectory().getLocal_folder() + File.separator + file_name);
             try {
@@ -152,6 +154,7 @@ public class Pie_Decode {
 
                 setOutputStream(new FileOutputStream(decoded_file));
                 setOutput_location(decoded_file.getAbsolutePath());
+
             } catch (FileNotFoundException e) {
                 setOutputStream(null);
                 setOutput_location(null);
@@ -348,10 +351,13 @@ public class Pie_Decode {
                 List<String> partsList = stream.collect(Collectors.toList());
 
                 if (getConfig().getDirectory() != null &&
-                    Pie_Utils.isEmpty(getConfig().getDirectory().getFilename()))
-                    getConfig().getDirectory().setFilename(partsList.get(parm ++));
-                else
-                    parm ++;
+                    Pie_Utils.isEmpty(getConfig().getDirectory().getFilename())) {
+                    getConfig().getDirectory().setFilename(partsList.get(parm++));
+                    if (!Pie_Utils.isEmpty(getConfig().getFile_name()))
+                        getConfig().getDirectory().setFilename(getConfig().getFile_name()); // Override file name if entered.
+                }else {
+                    parm++;
+                }
 
                 setTotal_files(Integer.parseInt(partsList.get(parm ++).replaceAll("\\D", "")));    // 1
                 String files = partsList.get(parm ++);                                                              // 2

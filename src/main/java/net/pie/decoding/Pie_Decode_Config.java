@@ -38,6 +38,7 @@ public class Pie_Decode_Config {
     private boolean error = false;
     private String error_message = null;
     private Pie_PreFix prefix = null;
+    private String file_name = null;
 
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
@@ -254,6 +255,15 @@ public class Pie_Decode_Config {
 
     private void setDecode_source(Pie_Decode_Source decode_source) {
         this.decode_source = decode_source;
+    }
+
+
+    public String getFile_name() {
+        return file_name;
+    }
+
+    public void setFile_name(String file_name) {
+        this.file_name = file_name;
     }
 }
 

@@ -4,6 +4,9 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
+import net.pie.enums.Pie_Source_Type;
+import net.pie.enums.Pie_Word;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +17,8 @@ import static java.nio.file.Files.readAllBytes;
 
 public class Pie_Base64 {
     private String text = null;
+    private Pie_Source_Type type = Pie_Source_Type.TEXT;
+    private String file_name = Pie_Word.translate(Pie_Word.UNKNOWN);
 
     /** *****************************************<br>
      * Base 64 controller
@@ -26,7 +31,8 @@ public class Pie_Base64 {
      * Base 64 encode a string sets the text
      * @param in String
      */
-    public Pie_Base64(String in) {
+    public Pie_Base64(String in, Pie_Source_Type  type) {
+        setType(type);
         setText(in);
     }
 
@@ -169,6 +175,21 @@ public class Pie_Base64 {
 
     public void setText(String text) {
         this.text = text;
+    }
+    public Pie_Source_Type getType() {
+        return type;
+    }
+
+    public void setType(Pie_Source_Type type) {
+        this.type = type;
+    }
+
+    public String getFile_name() {
+        return file_name;
+    }
+
+    public void setFile_name(String file_name) {
+        this.file_name = file_name;
     }
 }
 

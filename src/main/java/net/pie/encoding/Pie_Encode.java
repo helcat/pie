@@ -179,9 +179,14 @@ public class Pie_Encode {
             return false;
         }
 
+        if (getConfig().getOutput() == null || !getConfig().getOutput().validate() ) {
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
+            return false;
+        }
+
         // Process the image - send to destination if required
-        if (total_files > 1 || getConfig().getDirectory() != null) {
-            if (total_files > 1 && getConfig().getDirectory() != null)
+        if (total_files > 1 || getConfig().getOutput() != null) {
+            if (total_files > 1 && getConfig().getOutput() != null)
                 getConfig().setDirectory(new Pie_Directory());
             if (!save_Encoded_Image(data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name())) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));

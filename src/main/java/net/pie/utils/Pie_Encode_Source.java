@@ -76,6 +76,20 @@ public class Pie_Encode_Source {
                     return;
                 setType(Pie_Source_Type.FILE);
                 break;
+
+            case  "Pie_Base64" :
+                Pie_Base64 b64 = (Pie_Base64) encode;
+                if (Pie_Utils.isEmpty(b64.getText())) {
+                    setError_code(Pie_Word.ENCODING_STRING_REQUIRED);
+                    return;
+                }
+                setType(b64.getType());
+                byte[] bytes = b64.decode_to_bytes();
+                setFile_name(b64.getFile_name());
+                setSource_size(bytes.length);
+                setInput(new ByteArrayInputStream(bytes));
+                break;
+
             case "Pie_Text" :
                 Pie_Text text = (Pie_Text) encode;
                 if (Pie_Utils.isEmpty(text.getText())) {
@@ -87,6 +101,7 @@ public class Pie_Encode_Source {
                 setFile_name(text.getFile_name());
                 setType(Pie_Source_Type.TEXT);
                 break;
+
             case "File" :
                 File f = (File) encode;
                 if (Pie_Utils.isFile(f)) {

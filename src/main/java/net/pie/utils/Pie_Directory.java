@@ -21,14 +21,6 @@ public class Pie_Directory {
     private String filename = null;
 
     /** *******************************************************************<br>
-     * <b>Pie_Directory</b><br>
-     * With no parameters
-     **/
-    public Pie_Directory() {
-        setLocal_folder(Pie_Utils.getTempFolder());
-    }
-
-    /** *******************************************************************<br>
      * <b>Pie_Encode_Destination</b><br>
      * With a file parameter, Pie_Encoded_Destination sets up a local file to save the encoded image to after the encoding process.
      **/

@@ -5,23 +5,22 @@ package net.pie.enums;
  *<br>
  */
 /** *******************************************************<br>
- * <b>Pie Source Type</b><br>
- * Sets the source type, which is encoded within the final file for decoding.<br>
- * Only set within the encoding procedure cannot be set by user.
+ * <b>Pie Output Type</b><br>
+ * Sets the Output type,
  **/
-public enum Pie_Source_Type {
-    NONE,
-    TEXT,
+public enum Pie_Output_Type {
+    BYTE_ARRAY,
+    BASE64,
     FILE,
     BASE64_FILE;
 
     /** *******************************************<br>
-     * <b>static method for get Pie_Source Type from saved ordinal when decoding</b>
+     * Pie_Output_Type
      * @param ordinal (int) comes from encoded file.
-     * @return Pie_Source_Type
+     * @return Pie_Output_Type
      */
-    public static Pie_Source_Type get(int ordinal) {
-        for (Pie_Source_Type s : Pie_Source_Type.values())
+    public static Pie_Output_Type get(int ordinal) {
+        for (Pie_Output_Type s : Pie_Output_Type.values())
             if (s.ordinal() == ordinal)
                 return s;
         return null;
