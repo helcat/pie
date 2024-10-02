@@ -27,7 +27,7 @@ import java.util.logging.Level;
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))<br>
  .add_Decode_Source(new Pie_Decode_Source(new File(<br>
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_To_Be_Encoded)))<br>
- .add_Decoded_Destination(new Pie_Decode_Destination(new File(<br>
+ .add_Output(new Pie_Output(new File(<br>
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + temp_Encoded_Image)))<br>
  .build());<br>
  */
@@ -37,7 +37,7 @@ public class Pie_Decoder_Config_Builder {
     private Pie_Encryption encryption = null;
 
     private Pie_Decode_Source decode_source = null;
-    private Pie_Directory directory = null;
+    private Pie_Output output = null;
     private Pie_Language language = null;
     private Level log_level = Level.SEVERE;
     private Pie_PreFix prefix = null;
@@ -105,16 +105,16 @@ public class Pie_Decoder_Config_Builder {
     }
 
     /** *********************************************************<br>
-     * Add Directory : File / String (Path)
+     * Add Pie_Output : File / String (Path)
      * @param option (Object)
      * @return (Pie_Decoder_Config_Builder)
      */
-    public Pie_Decoder_Config_Builder add_Directory(Object option) {
+    public Pie_Decoder_Config_Builder add_Output(Object option) {
         if (option != null) {
-            if (option instanceof  Pie_Directory)
-                this.directory = (Pie_Directory) option;
+            if (option instanceof  Pie_Output)
+                this.output = (Pie_Output) option;
             else
-                this.directory = new Pie_Directory(option);
+                this.output = new Pie_Output(option);
         }
         return this;
     }
@@ -197,8 +197,8 @@ public class Pie_Decoder_Config_Builder {
         if (decode_source != null)
             options.add(decode_source);
 
-        if (directory != null)
-            options.add(directory);
+        if (output != null)
+            options.add(output);
 
         if (log_level != null)
             options.add(log_level);
@@ -223,14 +223,6 @@ public class Pie_Decoder_Config_Builder {
         this.language = language;
     }
 
-    public Pie_Directory getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(Pie_Directory directory) {
-        this.directory = directory;
-    }
-
     public Pie_PreFix getPrefix() {
         return prefix;
     }
@@ -245,6 +237,14 @@ public class Pie_Decoder_Config_Builder {
 
     public void setFile_name(String file_name) {
         this.file_name = file_name;
+    }
+
+    public Pie_Output getOutput() {
+        return output;
+    }
+
+    public void setOutput(Pie_Output output) {
+        this.output = output;
     }
 }
 

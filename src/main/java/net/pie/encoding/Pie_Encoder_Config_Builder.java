@@ -26,7 +26,7 @@ import java.util.logging.Level;
  .add_Encryption(new Pie_Encryption(new File(<br>
         Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), File.separator) + "pie_Certificate.pie")))<br>
  .add_Encode_Source(new Pie_Encode_Source(new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), temp_To_Be_Encoded))<br>
- .add_Directory(new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), temp_Encoded_Image))<br>
+ .add_Output(new File(Pie_Utils.file_concat(Pie_Utils.getDesktopPath(), temp_Encoded_Image))<br>
  .build());<br>
  */
 
@@ -38,7 +38,7 @@ public class Pie_Encoder_Config_Builder {
     private Pie_Encode_Mode encoder_mode = Pie_Encode_Mode.M_2;
     private Pie_Shape encoder_shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Source encoder_source = null;
-    private Pie_Directory directory = null;
+    private Pie_Output output = null;
     private Pie_Language language = new Pie_Language("en");
     private Pie_Encryption encryption = null;
     private Level log_level = Level.SEVERE;
@@ -109,16 +109,16 @@ public class Pie_Encoder_Config_Builder {
     }
 
     /** *********************************************************<br>
-     * Add Directory : File / String (Path)
+     * Add Output : File / String (Path)
      * @param option (Object)
      * @return (Pie_ConfigBuilder)
      */
-    public Pie_Encoder_Config_Builder add_Directory(Object option) {
+    public Pie_Encoder_Config_Builder add_Output(Object option) {
         if (option != null) {
-            if (option instanceof  Pie_Directory)
-                this.directory = (Pie_Directory) option;
+            if (option instanceof  Pie_Output)
+                this.output = (Pie_Output) option;
             else
-                this.directory = new Pie_Directory(option);
+                this.output = new Pie_Output(option);
         }
         return this;
     }
@@ -237,8 +237,8 @@ public class Pie_Encoder_Config_Builder {
         if (encoder_source != null)
             options.add(encoder_source);
 
-        if (directory != null)
-            options.add(directory);
+        if (output != null)
+            options.add(output);
 
         if (log_level != null)
             options.add(log_level);
@@ -268,6 +268,14 @@ public class Pie_Encoder_Config_Builder {
 
     private void setPie_options(List<Pie_Option> pie_options) {
         this.pie_options = pie_options;
+    }
+
+    public Pie_Output getOutput() {
+        return output;
+    }
+
+    public void setOutput(Pie_Output output) {
+        this.output = output;
     }
 }
 

@@ -136,6 +136,7 @@ public enum Pie_Word {
 	INVALID_ENCODED_FILE ("Invalid Encoded File", "Fichier codé invalide", "File codificato non valido", "Archivo codificado no válido"),
 
 	DECODING_ERROR ("Decoding Error", "Erreur de décodage","Errore di decodifica", "Error de decodificación"),
+	DECODING_OUTPUT_REQUIRED ("Decoding Output Required", "Sortie de décodage requise", "Uscita di decodifica richiesta", "Salida de decodificación requerida"),
 
 	DECODING_COLLECTING_FILE ("Decoding : Collecting file", "Décodage : Collecte de fichier", "Decodifica: raccolta di file",
 			"Decodificación: recopilación de archivos"),
@@ -151,6 +152,9 @@ public enum Pie_Word {
 		"Protezione del sistema. È stato superato il numero massimo di file", "Proteccion del sistema. Se superó el número máximo de archivos"),
 
 	ENCODING_FAILED ("Encoding Failed", "Échec de l'encodage", "Codifica non riuscita", "Error de codificación"),
+	ENCODING_OUTPUT_REQUIRED("Encoding Failed Output Required", "Échec de l'encodage Sortie requise", "Codifica output non riuscita obbligatoria",
+			"Error de codificación Salida requerida"),
+	ENCODING_INVALID_OUTPUT ("Encoding Invalid Output", "Encodage d'une sortie invalide", "Codifica output non valida", "Codificación de salida no válida"),
 
 	ENCODING_COMPLETE ("Encoding Complete", "Encodage terminé", "Codifica completata", "Codificación completa"),
 

@@ -1,18 +1,11 @@
 package net.pie.encoding;
 /** **********************************************<br>
  * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
  * pixel.image.encode@gmail.com
  */
 
 import net.pie.enums.*;
-import net.pie.utils.Pie_Directory;
-import net.pie.utils.Pie_Encode_Source;
-import net.pie.utils.Pie_Size;
-import net.pie.utils.Pie_Utils;
+import net.pie.utils.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -27,9 +20,6 @@ import java.util.logging.Level;
 
 public class Pie_Encode {
     private Pie_Encode_Config config;
-    private BufferedImage output_Image = null;
-    private String output_location = null;
-
     /** ******************************************************<br>
      * <b>Pie_Encode</b><br>
      * Encode a file or text from Pie_Source using options from Pie_Encode_Config<br>
@@ -49,8 +39,6 @@ public class Pie_Encode {
 
         ImageIO.setUseCache(false);
         setConfig(config);
-        setOutput_Image(null);
-        setOutput_location(null);
         getConfig().validate_Encoding_Parameters();
 
         if (getConfig() == null || getConfig().isError()) {
@@ -171,7 +159,7 @@ public class Pie_Encode {
             return false;
         }
 
-        BufferedImage data_image = buildImage(image_size, originalArray, has_Been_Encrypted );
+        Pie_BufferedImage data_image = buildImage(image_size, originalArray, has_Been_Encrypted );
         originalArray = null;
         if (getConfig().isError()) {
             data_image = null;
@@ -179,15 +167,18 @@ public class Pie_Encode {
             return false;
         }
 
-        if (getConfig().getOutput() == null || !getConfig().getOutput().validate() ) {
-            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_FAILED, getConfig().getLanguage()));
+        if (getConfig().getOutput() == null) {
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_OUTPUT_REQUIRED, getConfig().getLanguage()));
+            return false;
+        }
+
+        if (!getConfig().getOutput().validate(total_files) ) {
+            getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_INVALID_OUTPUT, getConfig().getLanguage()));
             return false;
         }
 
         // Process the image - send to destination if required
-        if (total_files > 1 || getConfig().getOutput() != null) {
-            if (total_files > 1 && getConfig().getOutput() != null)
-                getConfig().setDirectory(new Pie_Directory());
+        if (total_files > 1 || Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(getConfig().getOutput().getOption())) {
             if (!save_Encoded_Image(data_image, file_number, total_files, getConfig().getEncoder_source().getFile_name())) {
                 getConfig().logging(Level.SEVERE, Pie_Word.translate(Pie_Word.ENCODED_IMAGE_WAS_NOT_SAVED, getConfig().getLanguage()));
                 data_image = null;
@@ -195,7 +186,7 @@ public class Pie_Encode {
             }
             data_image = null;
         }else {
-            setOutput_Image(data_image);
+            getConfig().getOutput().setOutput_Image(data_image);
         }
         return true;
     }
@@ -205,10 +196,10 @@ public class Pie_Encode {
      * @param size Pie_Size
      * @param originalArray byte[]
      * @param has_Been_Encrypted boolean
-     * @return BufferedImage
+     * @return Pie_BufferedImage
      */
-    private BufferedImage buildImage(Pie_Size size, byte[] originalArray, boolean has_Been_Encrypted) {
-        BufferedImage data_image = new BufferedImage(size.getWidth(), size.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    private Pie_BufferedImage buildImage(Pie_Size size, byte[] originalArray, boolean has_Been_Encrypted) {
+        Pie_BufferedImage data_image = new Pie_BufferedImage(size.getWidth(), size.getHeight());
         String rbg = getConfig().getEncoder_mode().getParm1();
         int x =0, y = 0, store_count = 0;
         boolean transparent = rbg.contains("T");
@@ -282,13 +273,13 @@ public class Pie_Encode {
 
     /** ******************************************************<br>
      * Add Pixel
-     * @param data_image BufferedImage
+     * @param data_image Pie_BufferedImage
      * @param x int
      * @param y int
      * @param store int[]
-     * @return BufferedImage
+     * @return Pie_BufferedImage
      */
-    private BufferedImage addPixel(BufferedImage data_image, int x, int y, int[] store) {
+    private Pie_BufferedImage addPixel(Pie_BufferedImage data_image, int x, int y, int[] store) {
         int c = new Color(store[0], store[1], store[2], store[3]).getRGB();
 
         data_image.setRGB(x, y, c);
@@ -405,7 +396,7 @@ public class Pie_Encode {
      * <b>save_Encoded_Image</b><br>
      * Send the image to the destination. Note when saving the encoded image. Extension must be "png"
      **/
-    private boolean save_Encoded_Image(BufferedImage image, int file_number, int total_files, String source_filename) {
+    private boolean save_Encoded_Image(Pie_BufferedImage image, int file_number, int total_files, String source_filename) {
         if (total_files > 1) {
             if (getConfig().getEncoder_storage().getFos() == null)
                 if (!getConfig().getEncoder_storage().start_Zip_Out_Stream(create_Zip_File(getZip_File_Name(source_filename)))) {
@@ -423,7 +414,6 @@ public class Pie_Encode {
                         " " + Pie_Word.translate(Pie_Word.OVERRIDE_FILE_REQUIRED, getConfig().getLanguage()));
                 return false;
             }
-            setOutput_location(file.getPath());
             try {
                 return ImageIO.write(image, Pie_Constants.IMAGE_TYPE.getParm2(), file);
             } catch (IOException e) {
@@ -533,69 +523,13 @@ public class Pie_Encode {
             getConfig().logging(Level.WARNING,Pie_Word.translate(Pie_Word.FILE_EXISTS, getConfig().getLanguage()) +
                     " : " + file.getName() +
                     (overwrite ? " ("+Pie_Word.translate(Pie_Word.OVERWRITING_File, getConfig().getLanguage())+")" : ""));
-        setOutput_location(file.getPath());
         return file;
-    }
-
-    /** ********************************************<br>
-     * get BufferedImage as Bytes (User Option)
-     * @return BufferedImage
-     */
-    public ByteArrayInputStream getBufferedImageBytes() {
-        if (getOutput_Image() != null) {
-            final ByteArrayOutputStream output = new ByteArrayOutputStream() {
-                @Override
-                public synchronized byte[] toByteArray() {
-                    return this.buf;
-                }
-            };
-            try {
-                ImageIO.write(getOutput_Image(), "png", output);
-                return new ByteArrayInputStream(output.toByteArray(), 0, output.size());
-            } catch (IOException ignored) { }
-        }
-        return null;
-    }
-
-    /** ********************************************<br>
-     * convert image To ByteArray
-     * @return byte[]
-     */
-    public byte[] convertToByteArray() {
-        if (getOutput_Image() != null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(getOutput_Image(), "png", baos);
-                return baos.toByteArray();
-            } catch (IOException ignored) {  }
-        }
-        return null;
     }
 
     private void setConfig(Pie_Encode_Config config) {
         this.config = config;
     }
-    private Pie_Encode_Config getConfig() {
+    public Pie_Encode_Config getConfig() {
         return config;
-    }
-
-    /** ********************************************<br>
-     * Used by Users in their programs
-     * @return BufferedImage
-     */
-    public BufferedImage getOutput_Image() {
-        return output_Image;
-    }
-
-    public void setOutput_Image(BufferedImage output_Image) {
-        this.output_Image = output_Image;
-    }
-
-    public String getOutput_location() {
-        return output_location;
-    }
-
-    public void setOutput_location(String output_location) {
-        this.output_location = output_location;
     }
 }

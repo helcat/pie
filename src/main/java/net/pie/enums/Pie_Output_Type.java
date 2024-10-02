@@ -25,6 +25,18 @@ public enum Pie_Output_Type {
                 return s;
         return null;
     }
+
+    /** *******************************************<br>
+     * Pie_Output_Type
+     * @param in (String)
+     * @return Pie_Output_Type
+     */
+    public static Pie_Output_Type get(String in) {
+        for (Pie_Output_Type s : Pie_Output_Type.values())
+            if (s.toString().equalsIgnoreCase(in))
+                return s;
+        return null;
+    }
 }
 
 

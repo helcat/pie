@@ -109,7 +109,7 @@ public class Pie_Certificate {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
             return null;
         }else{
-            byte[] cert = encode.convertToByteArray();
+            byte[] cert = encode.getConfig().getOutput().getOutput_Image().getBufferedImageBytes();
             if (cert != null && cert.length > 0) {
                 Pie_Base64 cert_base64 = new Pie_Base64().encode(cert);
                 if (verify_Certificate(cert_base64)) {
@@ -124,6 +124,16 @@ public class Pie_Certificate {
                 return null;
             }
         }
+    }
+
+    /**
+     * *************************************************<br>
+     * create Certificate File
+     * Generates a certificate of bewteen 100 - 700 random byte charactors between 1 - 255 each
+     * @return (File) Location to put the created Certificate
+     */
+    public File create_Certificate() {
+        return create_Certificate(null);
     }
 
     /** **************************************************<br>
@@ -153,7 +163,6 @@ public class Pie_Certificate {
             return null;
         }else{
             if (verify_Certificate(cert)) {
-                System.out.println(encode.getOutput_location());
                 config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
                 return cert;
             }else{

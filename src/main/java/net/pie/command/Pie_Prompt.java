@@ -36,7 +36,7 @@ public class Pie_Prompt {
 
     private Object source = null;
     private String filename = null; // Only used for encoding text.
-    private File directory = null;
+    private Object output = null;
     private Object certificate = null;
     private Pie_Shape shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Mode mode = Pie_Encode_Mode.M_2;
@@ -240,7 +240,7 @@ public class Pie_Prompt {
      *  java -cp .\pie-x.x.jar Pie -make_certificate -prompt
      */
     private void prompt_createCertificate(Scanner scanner) {
-        if (getDirectory() == null) {
+        if (getOutput() == null) {
             File folder = null;
             while (folder == null) {
                 folder = check_Prompt_Directory(scanner);
@@ -259,19 +259,51 @@ public class Pie_Prompt {
     private void base64_Encode() {
         if (getSource() != null && getSource() instanceof File) {
             Pie_Base64 b64 = new Pie_Base64().encode_file((File) getSource());
+            File output_file = null;
             if (!Pie_Utils.isEmpty(b64.getText())) {
-                if (getDirectory() == null) {
+                if (getOutput() == null) {
                     System.out.println(b64.getText());
                 } else {
-                    String file_name = ((File) getSource()).getName() + ".txt";
-                    if (!Pie_Utils.isEmpty(getFilename()))
-                        file_name = getFilename() + (file_name.toLowerCase().endsWith(".txt") ? "" : ".txt");
-                    File output_file = Pie_Utils.file_concat(getDirectory(), file_name);
-                    if (b64.write_base64_to_File(output_file))
+                    output_file = getOut_Put_File();
+                    if (output_file == null) {
+                        System.out.println(Pie_Word.translate(Pie_Word.ENCODING_OUTPUT_REQUIRED));
+                        return;
+                    }
+
+                    if (output_file.isDirectory()) {
+                        String file_name = ((File) getSource()).getName() + ".txt";
+                        if (!Pie_Utils.isEmpty(getFilename()))
+                            file_name = getFilename() + (file_name.toLowerCase().endsWith(".txt") ? "" : ".txt");
+                        output_file = Pie_Utils.file_concat(output_file, file_name);
+                    }
+
+                    else if (output_file.isFile()) {
+                        String file_name = output_file.getName() + (!output_file.getName().toLowerCase().endsWith(".txt") ? ".txt" : "");
+                        if (!Pie_Utils.isEmpty(getFilename()))
+                            file_name = getFilename() + (getFilename().toLowerCase().endsWith(".txt") ? "" : ".txt");
+                        output_file = Pie_Utils.file_concat(output_file.getParentFile(), file_name);
+                    }
+
+                    if (output_file.isFile() && b64.write_base64_to_File(output_file))
                         System.out.println(output_file.getAbsolutePath());
                 }
             }
         }
+    }
+
+    /** **************************************************<br>
+     * get the file if available from output
+     * @return File
+     */
+    private File getOut_Put_File() {
+        if (getOutput() == null)
+            return null;
+
+        if (getOutput() instanceof File && ((File) getOutput()).isDirectory() ||
+            getOutput() instanceof File && ((File) getOutput()).isFile())
+            return ((File) getOutput());
+
+        return null;
     }
 
     /** **************************************************<br>
@@ -284,13 +316,27 @@ public class Pie_Prompt {
      *  Warning will replace file if found.
      */
     private void base64_Decode() {
-        if (Pie_Utils.isEmpty(getFilename()))
-            setFilename(Pie_Word.translate(Pie_Word.UNKNOWN));
-        if (getSource() != null && getSource() instanceof File)
-           new Pie_Base64().decode_file_to_file((File) getSource(),Pie_Utils.file_concat(getDirectory(),getFilename()) );
+        File output_file = null;
 
-        else if (getSource() != null && getSource() instanceof Pie_Base64)
-           ((Pie_Base64) getSource()).decode_base64_write_to_File(Pie_Utils.file_concat(getDirectory(), getFilename()) );
+        if (getOutput() == null) {
+            System.out.println(Pie_Word.translate(Pie_Word.DECODING_OUTPUT_REQUIRED));
+
+        } else {
+            output_file = getOut_Put_File();
+            if (output_file == null) {
+                System.out.println(Pie_Word.translate(Pie_Word.DECODING_OUTPUT_REQUIRED));
+                return;
+            }
+
+            if (output_file.isDirectory())
+                output_file = Pie_Utils.file_concat(output_file, Pie_Utils.isEmpty(getFilename()) ? Pie_Word.translate(Pie_Word.UNKNOWN) : getFilename());
+
+            if (getSource() != null && getSource() instanceof File)
+               new Pie_Base64().decode_file_to_file((File) getSource(), output_file );
+
+            else if (getSource() != null && getSource() instanceof Pie_Base64)
+               ((Pie_Base64) getSource()).decode_base64_write_to_File(output_file);
+        }
     }
 
     /** **************************************************<br>
@@ -298,8 +344,9 @@ public class Pie_Prompt {
      */
     private void createCertificate() {
         Pie_Certificate cert = new Pie_Certificate();
-        if (getDirectory() != null) {
-            cert.create_Certificate(getDirectory());
+        File output_directory = getOut_Put_File();
+        if (output_directory != null && output_directory.isDirectory()) {
+            cert.create_Certificate(output_directory);
         }else{
             String output = cert.create_base64_Certificate();
             if (!Pie_Utils.isEmpty(output))
@@ -315,7 +362,7 @@ public class Pie_Prompt {
     private void decode() {
         Pie_Decoder_Config_Builder builder = new Pie_Decoder_Config_Builder()
                 .add_Decode_Source(getSource())                 // File to be Decoded
-                .add_Directory(getDirectory())  	            // Folder to place encoded file
+                .add_Output(getOutput())  	                // Folder to place encoded file
                 .add_Log_Level(getLog_level());					// Optional logging level Default SEVERE
 
         if (getPrefix() != null && !Pie_Utils.isEmpty(getPrefix().getText()))
@@ -398,7 +445,7 @@ public class Pie_Prompt {
 
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(getSource())                 // File to be encoded
-                .add_Directory(getDirectory())  	            // Folder to place encoded file
+                .add_Output(getDirectory())  	                // Folder to place encoded file
                 .add_Shape(getShape())                          // Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
                 .add_Mode(getMode())							// Optional Default is Pie_Encode_Mode.M_2 See Pie_Encode_Mode Examples
                 .add_Max_MB(getMaxmb())						    // Optional largest file allowed before slicing Default is 500 MB
@@ -414,9 +461,6 @@ public class Pie_Prompt {
 
         Pie_Encode_Config config = builder.build();
         Pie_Encode encode = new Pie_Encode(config);
-
-        if (getLog_level().equals(Level.INFO))
-            System.out.println(encode.getOutput_location());
     }
 
     /** ******************************************************<br>
@@ -855,7 +899,6 @@ public class Pie_Prompt {
     /** **************************************************<br>
      * check Prompt Directory
      * @param scanner Scanner
-     * @param quit_on_empty boolean
      * @return File
      */
     private File check_Prompt_Directory(Scanner scanner) {
@@ -958,14 +1001,6 @@ public class Pie_Prompt {
 
     public void setSource(Object source) {
         this.source = source;
-    }
-
-    public File getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(File directory) {
-        this.directory = directory;
     }
 
     public Pie_Shape getShape() {
@@ -1094,5 +1129,13 @@ public class Pie_Prompt {
 
     public void setPie_base64(Pie_Base64 pie_base64) {
         this.pie_base64 = pie_base64;
+    }
+
+    public Object getOutput() {
+        return output;
+    }
+
+    public void setOutput(Object output) {
+        this.output = output;
     }
 }

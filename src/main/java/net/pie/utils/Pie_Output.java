@@ -4,7 +4,6 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
-import net.pie.enums.Pie_Option;
 import net.pie.enums.Pie_Output_Type;
 
 import java.io.File;
@@ -21,6 +20,7 @@ public class Pie_Output {
     private File local_folder;
     private String filename = null;
     private Pie_Output_Type option = Pie_Output_Type.BYTE_ARRAY;
+    private Pie_BufferedImage output_Image = null;
 
     public Pie_Output(Pie_Output_Type type) {
         process(null, type);
@@ -37,8 +37,10 @@ public class Pie_Output {
         process(o,type);
     }
 
-    public boolean validate() {
+    public boolean validate(Integer number_off_files) {
         if (getOption() == null && getLocal_folder() == null)
+            return false;
+        if (number_off_files != null && number_off_files > 1 && (getOption() == null || !getOption().equals(Pie_Output_Type.FILE)))
             return false;
         return true;
     }
@@ -82,7 +84,7 @@ public class Pie_Output {
                         setOption(type);
 
                     } else {
-                        setOption(Pie_Output_Type.valueOf((String) o));
+                        setOption(Pie_Output_Type.get((String) o));
                     }
 
                 } catch (Exception ignored) { }
@@ -124,6 +126,14 @@ public class Pie_Output {
 
     public void setOption(Pie_Output_Type option) {
         this.option = option;
+    }
+
+    public Pie_BufferedImage getOutput_Image() {
+        return output_Image;
+    }
+
+    public void setOutput_Image(Pie_BufferedImage output_Image) {
+        this.output_Image = output_Image;
     }
 }
 
