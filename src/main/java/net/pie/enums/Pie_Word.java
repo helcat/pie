@@ -142,7 +142,7 @@ public enum Pie_Word {
 			"Decodificación: recopilación de archivos"),
 
 	ERROR ("Error","Erreur", "Errore", "Error"),
-
+	OUTPUT ("output", "sortir", "produzione", "producción"),
 	ALREADY_EXISTS ("Already Exists", "Existe déjà", "Esiste già", "Ya existe"),
 
 	CREATING_STREAM_ERROR ("Creating stream Error", "Erreur de création de flux", "Errore nella creazione del flusso",

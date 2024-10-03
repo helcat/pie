@@ -16,6 +16,7 @@ import net.pie.encoding.Pie_Encode_Config;
 import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.Pie_Encode_Mode;
 import net.pie.enums.Pie_Option;
+import net.pie.enums.Pie_Output_Type;
 import net.pie.enums.Pie_Word;
 import net.pie.utils.*;
 
@@ -96,13 +97,12 @@ public class Pie_Certificate {
      */
     public String create_base64_Certificate() {
         Pie_Encode_Config config = new Pie_Encode_Config();
-        String password = getRandomSpecialChars();
-
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Log_Level(Level.INFO)
                 .add_Mode(Pie_Encode_Mode.M_2)
                 .add_Option(Pie_Option.CREATE_CERTIFICATE)
-                .add_Encode_Source(new Pie_Text(password));
+                .add_Encode_Source(new Pie_Text(getRandomSpecialChars()))
+                .add_Output(Pie_Output_Type.BASE64);
         Pie_Encode encode = new Pie_Encode(builder.build());
 
         if (encode.isEncoding_Error()) {
@@ -155,7 +155,7 @@ public class Pie_Certificate {
                 .add_Mode(Pie_Encode_Mode.M_1)
                 .add_Option(Pie_Option.CREATE_CERTIFICATE, Pie_Option.OVERWRITE_FILE)
                 .add_Encode_Source(new Pie_Text(password, cert.getName()))
-                .add_Directory(cert.getParentFile());
+                .add_Output(cert.getParentFile());
         Pie_Encode encode = new Pie_Encode(builder.build());
 
         if (encode.isEncoding_Error()) {

@@ -292,15 +292,21 @@ public class Pie_Prompt {
     }
 
     /** **************************************************<br>
+     * check a file if available from output
+     * @return boolean
+     */
+    private boolean isOut_Put_File() {
+        if (getOutput() == null)
+            return false;
+
+        return getOutput() instanceof File && ((File) getOutput()).isDirectory() || getOutput() instanceof File && ((File) getOutput()).isFile();
+    }
+    /** **************************************************<br>
      * get the file if available from output
      * @return File
      */
     private File getOut_Put_File() {
-        if (getOutput() == null)
-            return null;
-
-        if (getOutput() instanceof File && ((File) getOutput()).isDirectory() ||
-            getOutput() instanceof File && ((File) getOutput()).isFile())
+        if (isOut_Put_File())
             return ((File) getOutput());
 
         return null;
@@ -406,7 +412,7 @@ public class Pie_Prompt {
             if (!check_Prompt_Source(scanner))
                 quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
 
-        if (getDirectory() == null) {
+        if (getOutput() == null) {
             File folder = null;
             while (folder == null) {
                 folder = check_Prompt_Directory(scanner);
@@ -445,7 +451,7 @@ public class Pie_Prompt {
 
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Encode_Source(getSource())                 // File to be encoded
-                .add_Output(getDirectory())  	                // Folder to place encoded file
+                .add_Output(getOutput())  	                    // Folder to place encoded file
                 .add_Shape(getShape())                          // Optional Default is Pie_Shape.SHAPE_RECTANGLE See Pie_Shape Examples
                 .add_Mode(getMode())							// Optional Default is Pie_Encode_Mode.M_2 See Pie_Encode_Mode Examples
                 .add_Max_MB(getMaxmb())						    // Optional largest file allowed before slicing Default is 500 MB
@@ -474,7 +480,7 @@ public class Pie_Prompt {
                 quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
         }
 
-        if (getDirectory() == null) {
+        if (getOutput() == null) {
             File folder = null;
             while (folder == null) {
                 folder = check_Prompt_Directory(scanner);
@@ -673,15 +679,17 @@ public class Pie_Prompt {
     }
 
     /** **************************************************<br>
-     * Directory file
+     * Do Output
      */
-    private void directory_file(String key, String value) {
-        if (Pie_Word.is_in_Translation(Pie_Word.DIRECTORY, key)) {
+    private void do_output(String key, String value) {
+        if (Pie_Word.is_in_Translation(Pie_Word.OUTPUT, key)) {
             try {
-                setDirectory(new File(value.replace("\"", "")));
-                if (getDirectory() == null || !getDirectory().exists() || !getDirectory().isDirectory())
-                    setDirectory(null);
-            } catch (Exception ignored) {  }
+                setOutput(new File(value.replace("\"", "")));
+            } catch (Exception ignored) {    }
+            if (!isOut_Put_File()) {
+                if (Pie_Output_Type.get(value) == null)
+                    setOutput(null);
+            }
         }
     }
 
