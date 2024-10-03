@@ -45,7 +45,7 @@ public class Pie_Encoder_Config_Builder {
 
     /** *********************************************************<br>
      * Add Pie Options, Be be single or multiple
-     * @param options
+     * @param options Pie_Option array
      * @return (Pie_ConfigBuilder)
      */
     public Pie_Encoder_Config_Builder add_Option(Pie_Option... options) {

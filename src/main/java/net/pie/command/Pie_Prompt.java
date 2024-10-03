@@ -119,7 +119,7 @@ public class Pie_Prompt {
                     prefix(arg.substring(1), value);            // -prefix "myPrefix"
                     source_file(arg.substring(1), value);
                     source_filename(arg.substring(1), value);
-                    directory_file(arg.substring(1), value);
+                    do_output(arg.substring(1), value);
                     encode_shape(arg.substring(1), value);
                     encode_mode(arg.substring(1), value);
                     max_MB(arg.substring(1), value);
@@ -918,7 +918,7 @@ public class Pie_Prompt {
             if (!folder.exists() || !folder.isDirectory())
                 folder = null;
             else
-                setDirectory(folder);
+                setOutput(folder);
         } catch (Exception e) {
             folder = null;
         }

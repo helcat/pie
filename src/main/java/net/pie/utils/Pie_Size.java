@@ -17,7 +17,6 @@ public class Pie_Size {
      * When using as a minimum size, when the encoded image is created and if the image is smaller than the size entered the image will be created at this size.<br>
      * and the main image is positioned as requested. If zero is used in any way the size is ignored..<br>
      * Note this is not a requirement.
-     * @see Pie_Config this component is set as an object within the configuration. (Pie_Config)
      **/
 
     public Pie_Size() {

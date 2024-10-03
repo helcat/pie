@@ -460,12 +460,6 @@ public class Pie_Encode {
      * @param source_filename (int)
      */
     private String getZip_File_Name(String source_filename) {
-        if (getConfig().getDirectory() == null)
-            getConfig().setDirectory(new Pie_Directory());
-
-        if (getConfig().getDirectory().getLocal_folder() == null)
-            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
-
         String name = Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
                 source_filename  : getConfig().getDirectory().getLocal_folder().getName();
         if (!name.toLowerCase().endsWith(".zip"))
@@ -480,9 +474,6 @@ public class Pie_Encode {
      * @return String
      */
     private String create_File_Name(int file_number, String source_filename) {
-        if (getConfig().getDirectory().getLocal_folder() == null)
-            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
-
         if (getConfig().getEncoder_storage() != null && getConfig().getEncoder_storage().getFos() != null) // Zip
             return file_number + "." + Pie_Constants.IMAGE_TYPE.getParm2();
 
@@ -509,9 +500,6 @@ public class Pie_Encode {
      * @param name (int)
      */
     private File create_Zip_File(String name) {
-        if (getConfig().getDirectory().getLocal_folder() == null)
-            getConfig().getDirectory().setLocal_folder(Pie_Utils.getTempFolder());
-
         boolean overwrite = getConfig().getOptions().contains(Pie_Option.OVERWRITE_FILE);
         File file = new File(Pie_Utils.isDirectory(getConfig().getDirectory().getLocal_folder()) ?
                 getConfig().getDirectory().getLocal_folder().getAbsolutePath() + File.separator + name
