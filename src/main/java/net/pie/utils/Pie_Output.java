@@ -5,6 +5,7 @@ package net.pie.utils;
  */
 
 import net.pie.enums.Pie_Output_Type;
+import net.pie.enums.Pie_Word;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,7 +18,8 @@ import java.util.Arrays;
  **/
 
 public class Pie_Output {
-    private File local_folder;
+    private String temp_folder_path = Pie_Utils.getTempFolder();
+    private String destination_folder_path = null;
     private String filename = null;
     private Pie_Output_Type option = Pie_Output_Type.BYTE_ARRAY;
     private Pie_BufferedImage output_Image = null;
@@ -27,22 +29,21 @@ public class Pie_Output {
     }
 
     public Pie_Output(Object o) {
-        process(o, Pie_Output_Type.FILE);
+        process(o, Pie_Output_Type.BYTE_ARRAY);
     }
 
     public Pie_Output(Object o, Pie_Output_Type type) {
         if (type == null)
-            type = Pie_Output_Type.FILE;
+            type = Pie_Output_Type.BYTE_ARRAY;
 
         process(o,type);
     }
 
+    public boolean validate() {
+        return validate(null);
+    }
     public boolean validate(Integer number_off_files) {
-        if (getOption() == null && getLocal_folder() == null)
-            return false;
-        if (number_off_files != null && number_off_files > 1 && (getOption() == null || !getOption().equals(Pie_Output_Type.FILE)))
-            return false;
-        return true;
+        return getOption() != null && (number_off_files == null || number_off_files <= 1 || (getOption() != null && getOption().equals(Pie_Output_Type.FILE)));
     }
 
     /** *****************************************************<br>
@@ -51,52 +52,24 @@ public class Pie_Output {
      * @param type Pie_Output_Type
      */
     public void process(Object o, Pie_Output_Type type) {
+        setOption(Pie_Output_Type.BYTE_ARRAY);
         if (o != null) {
-            if (o instanceof File) {
-                if (!Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type))
-                    type = Pie_Output_Type.FILE;
-
-                if (Pie_Utils.isDirectory((File) o)) {
-                    setLocal_folder((File) o);
-                    setOption(type);
+            if (o instanceof File && Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type) && fill_file_information((File) o) != null)
                     return;
-                } else if (Pie_Utils.isFile((File) o)) {
-                    setLocal_folder(((File) o).getParentFile());
-                    setFilename(((File) o).getName());
-                    setOption(type);
-                    return;
-                }
-            }
 
             if (o instanceof String) {
                 try {
                     File f = new File((String) o);
-                    if (Pie_Utils.isDirectory(f)) {
-                        if (!Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type))
-                            type = Pie_Output_Type.FILE;
-                        setLocal_folder(f);
-                        setOption(type);
-
-                    } else if (Pie_Utils.isFile(f)) {
-                        setLocal_folder(f.getParentFile());
-                        if (!Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type))
-                            type = Pie_Output_Type.FILE;
-                        setOption(type);
-
-                    } else {
-                        setOption(Pie_Output_Type.get((String) o));
-                    }
-
+                    if (fill_file_information(f) != null)
+                        return;
                 } catch (Exception ignored) { }
+                setOption(Pie_Output_Type.get((String) o));
             }
 
             if (getOption() == null)
                 setOption(Pie_Output_Type.BYTE_ARRAY);
 
         }else{
-            if (getOption() == null)
-                setOption(Pie_Output_Type.BYTE_ARRAY);
-
             try {
                 if (!Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type))
                     setOption(type);
@@ -104,14 +77,51 @@ public class Pie_Output {
         }
     }
 
-    public File getLocal_folder() {
-        return local_folder;
+    /** **********************************************<br>
+     * Do file information
+     */
+    private File fill_file_information(File f) {
+        if (isDirectory(f)) {
+            setDestination_folder_path(f.getAbsolutePath());
+            setFilename(null);
+            setOption(Pie_Output_Type.FILE);
+            return f;
+
+        } else if (isFile(f)) {
+            setDestination_folder_path(f.getParent());
+            setFilename(f.getName());
+            setOption(Pie_Output_Type.FILE);
+            return f;
+        }
+
+        return null;
     }
 
-    public void setLocal_folder(File local_folder) {
-        this.local_folder = local_folder;
+    /** **************************************************<br>
+     * check a file if available from output
+     * @return boolean
+     */
+    private boolean isOut_Put_File() {
+        return getOption().equals(Pie_Output_Type.FILE) && !Pie_Utils.isEmpty(getFilename());
     }
 
+    /** *******************************************************<br>
+     * is Directory ("isDirectory" does not check for a null)
+     * @param file File
+     * @return boolean
+     */
+    private boolean isDirectory(File file) {
+        return (file != null && file.exists() && file.isDirectory());
+    }
+
+    /** *******************************************************<br>
+     * IsFile does not check for a null. This is just to make it easier.
+     * @param file File
+     * @return boolean
+     */
+    private boolean isFile(File file) {
+        return (file != null && file.exists() && file.isFile());
+    }
     public String getFilename() {
         return filename;
     }
@@ -134,6 +144,22 @@ public class Pie_Output {
 
     public void setOutput_Image(Pie_BufferedImage output_Image) {
         this.output_Image = output_Image;
+    }
+
+    public String getDestination_folder_path() {
+        return destination_folder_path;
+    }
+
+    public void setDestination_folder_path(String destination_folder_path) {
+        this.destination_folder_path = destination_folder_path;
+    }
+
+    public String getTemp_folder_path() {
+        return temp_folder_path;
+    }
+
+    public void setTemp_folder_path(String temp_folder_path) {
+        this.temp_folder_path = temp_folder_path;
     }
 }
 

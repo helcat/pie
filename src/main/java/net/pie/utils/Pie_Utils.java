@@ -110,24 +110,6 @@ public class Pie_Utils {
     }
 
     /** *******************************************************<br>
-     * is Directory ("isDirectory" does not check for a null)
-     * @param file File
-     * @return boolean
-     */
-    public static boolean isDirectory(File file) {
-        return (file != null && file.exists() && file.isDirectory());
-    }
-
-    /** *******************************************************<br>
-     * IsFile does not check for a null. This is just to make it easier.
-     * @param file File
-     * @return boolean
-     */
-    public static boolean isFile(File file) {
-        return (file != null && file.exists() && file.isFile());
-    }
-
-    /** *******************************************************<br>
      * <b>get path to desktop</b><br>
      * STATIC METHOD. use Pie_Utils.getDesktopPath() note this is optional.<br>
      * Not required just handy if you need it.<br>
@@ -186,63 +168,29 @@ public class Pie_Utils {
     }
 
     /** **************************************************************<br>
-     * get a static folder. Some where files will never be deleted.
-     * Used for Pie_Demo not PIE. Assumes Windows or OSX
-     * @return (File)
-     */
-    public static File getStatic_Folder() {
-        return getStatic_Folder(null);
-    }
-    public static File getStatic_Folder(String folder_name) {
-        if (isEmpty(folder_name))
-            folder_name = "PIE_TEMP";
-
-        try {
-            String staticDirPath = System.getProperty("user.home");
-            if (isMac() && staticDirPath.startsWith(File.separator))
-                staticDirPath = file_concat(staticDirPath, file_concat("Library","Application Support"));
-            else if (isUnix() && staticDirPath.startsWith(File.separator))
-                staticDirPath = System.getProperty("java.io.tmpdir");
-            else
-                staticDirPath = System.getenv("APPDATA");
-
-            if (new File(staticDirPath).exists()) {
-                File folder = new File(file_concat(staticDirPath, folder_name));
-                if (folder.exists())
-                    return folder;
-                if (folder.mkdir())
-                    return folder;
-            }
-        } catch (Exception ignored) { }
-
-        return getTempFolder(folder_name);
-     }
-
-    /** **************************************************************<br>
      * Get a temp folder
      * @return (File)
      */
-    public static File getTempFolder()  {
-        return getTempFolder(null);
-    }
-    public static File getTempFolder(String folder_name)  {
-         if (isEmpty(folder_name ))
-             folder_name = "PIE_Temp";
+    public static String getTempFolder()  {
+        String filePath = null;
+        try {
+            File tempFile = File.createTempFile("pie_test", "pie_tmp");
+            filePath = tempFile.getAbsolutePath();
+            if (tempFile.delete())
+                return filePath;
+            tempFile.deleteOnExit();
+        } catch (IOException ignored) {  }
+
          // Use Temp Directory
          String tempDirPath = System.getProperty("java.io.tmpdir");
          if (isMac() && tempDirPath.startsWith(File.separator)) // Assume OSX / Ubuntu
-             tempDirPath = file_concat(tempDirPath, file_concat("tmp", folder_name));
-         else
-             tempDirPath = file_concat(tempDirPath ,folder_name); // Windows
+             tempDirPath = file_concat(tempDirPath, "tmp");
 
          File folder = new File(tempDirPath);
          if (folder.exists())
-             return folder;
+             return folder.getAbsolutePath();
 
-         if (folder.mkdirs())
-             return folder;
-
-         return folder;
+         return null;
      }
 
     /** **************************************************************<br>

@@ -1,6 +1,7 @@
 package net.pie.command;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import net.pie.enums.Pie_Word;
 
 import java.nio.charset.StandardCharsets;
 
@@ -21,7 +22,7 @@ public class Start implements RequestHandler<Object, byte[]> {
     public static void main(String[] args) {
         if (args == null || args.length == 0)
             System.exit(0);
-        new Pie_Prompt(args);
+        new Pie_Prompt(new Pie_Command_Map(args).getCommand_map());
     }
 
     /**

@@ -1,5 +1,7 @@
 package net.pie.command;
 
+import net.pie.enums.Pie_Word;
+
 /** **********************************************<br>
  * PIE Pixel Image Encode<br>
  * pixel.image.encode@gmail.com<br>
@@ -17,7 +19,7 @@ public class Start_Old {
     public static void main(String[] args) {
         if (args == null || args.length == 0)
             System.exit(0);
-        new Pie_Prompt(args);
+        new Pie_Prompt(new Pie_Command_Map(args).getCommand_map());
     }
 
 }

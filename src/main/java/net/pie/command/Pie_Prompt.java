@@ -13,6 +13,7 @@ import net.pie.utils.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -36,7 +37,7 @@ public class Pie_Prompt {
 
     private Object source = null;
     private String filename = null; // Only used for encoding text.
-    private Object output = null;
+    private Object output_source = null;
     private Object certificate = null;
     private Pie_Shape shape = Pie_Shape.SHAPE_RECTANGLE;
     private Pie_Encode_Mode mode = Pie_Encode_Mode.M_2;
@@ -98,7 +99,8 @@ public class Pie_Prompt {
      * Full encoding runnable Example
      * java -cp .\pie-x.x.jar Pie -encode -file "C:\tomato.png" -directory "C:\" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
      */
-    public Pie_Prompt(String[] args) {
+    public Pie_Prompt(Map<Pie_Word, Object> map) {
+
         int count = 0;
         String value;
         for (String arg : args) {
@@ -240,7 +242,7 @@ public class Pie_Prompt {
      *  java -cp .\pie-x.x.jar Pie -make_certificate -prompt
      */
     private void prompt_createCertificate(Scanner scanner) {
-        if (getOutput() == null) {
+        if (getOutput_source() == null) {
             File folder = null;
             while (folder == null) {
                 folder = check_Prompt_Directory(scanner);
@@ -261,7 +263,7 @@ public class Pie_Prompt {
             Pie_Base64 b64 = new Pie_Base64().encode_file((File) getSource());
             File output_file = null;
             if (!Pie_Utils.isEmpty(b64.getText())) {
-                if (getOutput() == null) {
+                if (getOutput_source() == null) {
                     System.out.println(b64.getText());
                 } else {
                     output_file = getOut_Put_File();
@@ -292,27 +294,6 @@ public class Pie_Prompt {
     }
 
     /** **************************************************<br>
-     * check a file if available from output
-     * @return boolean
-     */
-    private boolean isOut_Put_File() {
-        if (getOutput() == null)
-            return false;
-
-        return getOutput() instanceof File && ((File) getOutput()).isDirectory() || getOutput() instanceof File && ((File) getOutput()).isFile();
-    }
-    /** **************************************************<br>
-     * get the file if available from output
-     * @return File
-     */
-    private File getOut_Put_File() {
-        if (isOut_Put_File())
-            return ((File) getOutput());
-
-        return null;
-    }
-
-    /** **************************************************<br>
      * decode base64 File<br>
      *  java -cp .\pie-x-x.jar Pie<br>
      *  -decode_base64_file<br>
@@ -324,7 +305,7 @@ public class Pie_Prompt {
     private void base64_Decode() {
         File output_file = null;
 
-        if (getOutput() == null) {
+        if (getOutput_source() == null) {
             System.out.println(Pie_Word.translate(Pie_Word.DECODING_OUTPUT_REQUIRED));
 
         } else {
@@ -1139,11 +1120,11 @@ public class Pie_Prompt {
         this.pie_base64 = pie_base64;
     }
 
-    public Object getOutput() {
-        return output;
+    public Object getOutput_source() {
+        return output_source;
     }
 
-    public void setOutput(Object output) {
-        this.output = output;
+    public void setOutput_source(Object output_source) {
+        this.output_source = output_source;
     }
 }
