@@ -3,6 +3,7 @@ package net.pie.command;
 import net.pie.enums.*;
 import net.pie.utils.*;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -12,16 +13,17 @@ import java.util.logging.Level;
  */
 
 public class Pie_Command_Map {
-    private Map<Pie_Word, Object> command_map = new HashMap<>();
-    private Pie_Word error = null;
+    private final Map<Pie_Word, Object> command_map = new HashMap<>();
+    private Object error = null;
 
     /** ***************************************************************************<br>
-     * Map from command line
+     * Map from command line, Allows for Language translation, English, French Etc.
      */
     public Pie_Command_Map(String[] args) {
         int count = 0;
-        String value;
         Pie_Word key = null;
+        String value;
+
         List<Pie_Word> single_commands = Arrays.asList(Pie_Word.ENCODE, Pie_Word.DECODE, Pie_Word.HELP, Pie_Word.OVERWRITE, Pie_Word.MAKE_CERTIFICATE
                 ,Pie_Word.VERIFY_CERTIFICATE, Pie_Word.PROMPT, Pie_Word.CONSOLE, Pie_Word.BASE64_DECODE, Pie_Word.BASE64_ENCODE, Pie_Word.RECTANGLE, Pie_Word.SQUARE);
         List<Pie_Word> double_commands = Arrays.asList(Pie_Word.PREFIX, Pie_Word.FILE, Pie_Word.TEXT, Pie_Word.BASE64_FILE, Pie_Word.NAME, Pie_Word.CERTIFICATE,
@@ -38,13 +40,18 @@ public class Pie_Command_Map {
                     continue;
                 }
 
+                value = args[count + 1].replace("\"", "");
+                if (!value.startsWith("-"))
+                    continue;
+
                 for (Pie_Word key_value : double_commands) {
                     key = create_Key(key_value, arg.substring(1));
                     if (key != null) {
-                        getCommand_map().put(key, args[count + 1].replace("\"", ""));
+                        getCommand_map().put(key, value);
                         break;
                     }
                 }
+
                 if (key != null) {
                     count ++;
                     continue;
@@ -73,6 +80,7 @@ public class Pie_Command_Map {
     private void validate() {
         List<Pie_Word> has_One_Of_These = Arrays.asList(Pie_Word.ENCODE, Pie_Word.DECODE, Pie_Word.HELP, Pie_Word.MAKE_CERTIFICATE
                 ,Pie_Word.VERIFY_CERTIFICATE, Pie_Word.PROMPT, Pie_Word.BASE64_DECODE, Pie_Word.BASE64_ENCODE);
+
         boolean ok = false;
         for (Pie_Word p : has_One_Of_These) {
             ok = getCommand_map().containsKey(p);
@@ -116,6 +124,56 @@ public class Pie_Command_Map {
             getCommand_map().put(Pie_Word.LOG, Level.SEVERE);
         }else{
             check_Log(getCommand_map().get(Pie_Word.LOG));
+        }
+
+        ok = false;
+        List<Pie_Word> output_required = Arrays.asList(Pie_Word.ENCODE, Pie_Word.DECODE, Pie_Word.MAKE_CERTIFICATE,
+                Pie_Word.BASE64_DECODE, Pie_Word.BASE64_ENCODE);
+        if (!getCommand_map().containsKey(Pie_Word.OUTPUT)) {
+            for (Pie_Word p : output_required) {
+                ok = getCommand_map().containsKey(p);
+                if (ok)
+                    break;
+            }
+            if (ok)
+                getCommand_map().put(Pie_Word.OUTPUT, new Pie_Output(Pie_Output_Type.CONSOLE));
+        }else{
+            check_output(getCommand_map().get(Pie_Word.OUTPUT));
+        }
+    }
+
+    /** **************************************************<br>
+     * Check Output
+     * @param output Object
+     */
+    private void check_output(Object output) {
+        if (output == null) {
+            if (getCommand_map().containsKey(Pie_Word.ENCODE)) {
+                setError(Pie_Word.ENCODING_OUTPUT_REQUIRED);
+                return;
+            } else if (getCommand_map().containsKey(Pie_Word.DECODE)) {
+                setError(Pie_Word.DECODING_OUTPUT_REQUIRED);
+                return;
+            }
+            getCommand_map().put(Pie_Word.OUTPUT, new Pie_Output(Pie_Output_Type.CONSOLE));
+            return;
+        }else{
+            if (output instanceof String) {
+                String o = (String) output;
+                if (!o.toLowerCase().startsWith("http")) {
+                    try {
+                        File f = new File(o);
+                    } catch (Exception ignored) {
+                    }
+                }else{
+                    Pie_URL url = new Pie_URL(o);
+                    if (Pie_Utils.isEmpty(url.getError_message())) {
+                        setError(url.getError_message());
+                        return;
+                    }
+                    getCommand_map().put(Pie_Word.OUTPUT, url);
+                }
+            }
         }
     }
 
@@ -212,11 +270,11 @@ public class Pie_Command_Map {
         return command_map;
     }
 
-    public Pie_Word getError() {
+    public Object getError() {
         return error;
     }
 
-    public void setError(Pie_Word error) {
+    public void setError(Object error) {
         this.error = error;
     }
 }

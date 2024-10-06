@@ -12,7 +12,8 @@ public enum Pie_Output_Type {
     BYTE_ARRAY,
     BASE64,
     FILE,
-    BASE64_FILE;
+    BASE64_FILE,
+    CONSOLE;
 
     /** *******************************************<br>
      * Pie_Output_Type

@@ -2,6 +2,10 @@ package net.pie.encoding;
 /** **********************************************<br>
  * PIE Pixel Image Encode
  * pixel.image.encode@gmail.com
+ *
+ * Note there are a lot of cleared values that don't seem necessary but when
+ * reusing Pie I found if they are not cleared memory would not be released.
+ * By clearing these values memory allowed more image bytes.
  */
 
 import net.pie.enums.*;
@@ -199,7 +203,7 @@ public class Pie_Encode {
         Pie_BufferedImage data_image = new Pie_BufferedImage(size.getWidth(), size.getHeight());
         String rbg = getConfig().getEncoder_mode().getParm1();
         int x =0, y = 0, store_count = 0;
-        boolean transparent = rbg.contains("T");
+        //boolean transparent = rbg.contains("T"); - Might be used in the future
         rbg = rbg.replace("T", "");
 
         // Options
@@ -268,19 +272,19 @@ public class Pie_Encode {
         return data_image;
     }
 
-    /** ******************************************************<br>
+    /**
+     * *****************************************************<br>
      * Add Pixel
+     *
      * @param data_image Pie_BufferedImage
-     * @param x int
-     * @param y int
-     * @param store int[]
-     * @return Pie_BufferedImage
+     * @param x          int
+     * @param y          int
+     * @param store      int[]
      */
-    private Pie_BufferedImage addPixel(Pie_BufferedImage data_image, int x, int y, int[] store) {
+    private void addPixel(Pie_BufferedImage data_image, int x, int y, int[] store) {
         int c = new Color(store[0], store[1], store[2], store[3]).getRGB();
 
         data_image.setRGB(x, y, c);
-        return data_image;
     }
 
     /** ******************************************************<br>

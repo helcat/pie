@@ -1,6 +1,14 @@
 # <span style='color:CornflowerBlue'>PIE (Pixel Image Encoding)</span>
 For information and instructions go to the PIE Blog. https://virtuware.blogspot.com/
 
+Version 1.4 is under construction please use the release code only. Source this code will be changing. 
+Coming soon.
+New output command
+New AWS Lambda Ready Jar
+And much more see blog for 1.4 updates
+Also patching for War file deployment For Instant Encoding and Decoding.
+
+
 Overview :
 
 A FREE light weight library for encoding and encrypting files or text. This library can be used within your existing software, used on a command line using a console or within script files.
