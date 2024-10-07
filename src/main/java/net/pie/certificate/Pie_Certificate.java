@@ -1,10 +1,6 @@
 package net.pie.certificate;
 /** **********************************************<br>
  * PIE Pixel Image Encode
- * @author terry clarke
- * @since 1.0
- * @version 1.3
- * Copyright Terry Clarke 2024
  * pixel.image.encode@gmail.com
  */
 
@@ -66,8 +62,10 @@ public class Pie_Certificate {
      * @param item File Certificate
      * @return boolean
      */
-    private boolean read_Certificate(Object item) {
-        if (item instanceof File && (!Pie_Utils.isFile(((File) item)) || !((File) item).getName().toLowerCase().endsWith(".pie")))
+    private boolean read_Certificate(Pie_Decode_Config config, Object item) {
+        if (item instanceof File && (!config.getOu.isFile(((File) item)) || !((File) item).getName().toLowerCase().endsWith(".pie")))
+            return false;
+        else if (item instanceof Pie_Base64 && ((Pie_Base64) item).getFile() != null)
             return false;
         else if (item instanceof Pie_Base64 && Pie_Utils.isEmpty(((Pie_Base64) item).getText()))
             return false;
@@ -98,11 +96,11 @@ public class Pie_Certificate {
     public String create_base64_Certificate() {
         Pie_Encode_Config config = new Pie_Encode_Config();
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
-                .add_Log_Level(Level.INFO)
-                .add_Mode(Pie_Encode_Mode.M_2)
-                .add_Option(Pie_Option.CREATE_CERTIFICATE)
-                .add_Encode_Source(new Pie_Text(getRandomSpecialChars()))
-                .add_Output(Pie_Output_Type.BASE64);
+            .add_Log_Level(Level.INFO)
+            .add_Mode(Pie_Encode_Mode.M_2)
+            .add_Option(Pie_Option.CREATE_CERTIFICATE)
+            .add_Encode_Source(new Pie_Text(getRandomSpecialChars()))
+            .add_Output(Pie_Output_Type.BASE64);
         Pie_Encode encode = new Pie_Encode(builder.build());
 
         if (encode.isEncoding_Error()) {

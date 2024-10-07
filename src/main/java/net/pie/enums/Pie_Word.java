@@ -56,7 +56,7 @@ public enum Pie_Word {
 
 	NO_SOURCE ("No Source","Aucune source", "Nessuna fonte", "Sin fuentes"),
 
-	NO_DIRECTORY_ENTERED ("No Directory Entered", "Aucun répertoire entré","Nessuna directory inserita", "No se ingresó ningún directorio"),
+	OUTPUT_REQUIRED ("Output Required", "Sortie requise","Uscita richiesta", "Salida requerida"),
 
 	ENCODING_STRING_REQUIRED ("Encoding String is required", "La chaîne d'encodage est requise",
 			 "La stringa di codifica è obbligatoria", "Se requiere cadena de codificación"),
@@ -134,6 +134,7 @@ public enum Pie_Word {
 	INVALID_ENCODED_IMAGE ("Invalid Encoded Image", "Image codée invalide", "Immagine codificata non valida", "Imagen codificada no válida"),
 
 	INVALID_ENCODED_FILE ("Invalid Encoded File", "Fichier codé invalide", "File codificato non valido", "Archivo codificado no válido"),
+	INVALID_FILE ("Invalid File", "Fichier invalide", "File non valido", "Archivo no válido"),
 
 	DECODING_ERROR ("Decoding Error", "Erreur de décodage","Errore di decodifica", "Error de decodificación"),
 	DECODING_OUTPUT_REQUIRED ("Decoding Output Required", "Sortie de décodage requise", "Uscita di decodifica richiesta", "Salida de decodificación requerida"),
@@ -205,8 +206,6 @@ public enum Pie_Word {
 	SEVERE ("Severe", "Grave", "Acuto", "Severo"),
 
 	OVERWRITE ("Overwrite", "Écraser", "Sovrascrivi", "Sobrescribir"),
-
-	PROMPT ("Prompt", "Rapide", "Richiesta", "Inmediato"),
 
 	DEFAULT ("Default", "Défaut", "Predefinito", "Por defecto"),
 

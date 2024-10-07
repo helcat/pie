@@ -9,11 +9,8 @@ package net.pie.enums;
  * Sets the Output type,
  **/
 public enum Pie_Output_Type {
-    BYTE_ARRAY,
-    BASE64,
     FILE,
-    BASE64_FILE,
-    CONSOLE;
+    BASE64_FILE;
 
     /** *******************************************<br>
      * Pie_Output_Type

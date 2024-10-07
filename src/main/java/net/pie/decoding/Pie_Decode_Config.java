@@ -33,12 +33,12 @@ public class Pie_Decode_Config {
     private List<Pie_Option> options = new ArrayList<>();
     private Pie_Encryption encryption = null;
     private Pie_Decode_Source decode_source = null;
-    private Pie_Directory directory = null;
     private Level log_level = Level.SEVERE;
     private boolean error = false;
     private String error_message = null;
     private Pie_PreFix prefix = null;
     private String file_name = null;
+    private Pie_Output output = null;
 
     private Pie_Language language = new Pie_Language(Locale.getDefault().getLanguage().toLowerCase());
 
@@ -91,7 +91,7 @@ public class Pie_Decode_Config {
                         return;
                     }
                     break;
-                case "Pie_Directory": this.directory = (Pie_Directory) o; break;
+                case "Pie_Output": this.output = (Pie_Output) o; break;
             }
         }
 
@@ -218,20 +218,20 @@ public class Pie_Decode_Config {
         this.language = language;
     }
 
-    public Pie_Directory getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(Pie_Directory directory) {
-        this.directory = directory;
-    }
-
     public Pie_PreFix getPrefix() {
         return prefix;
     }
 
     public void setPrefix(Pie_PreFix prefix) {
         this.prefix = prefix;
+    }
+
+    public Pie_Output getOutput() {
+        return output;
+    }
+
+    public void setOutput(Pie_Output output) {
+        this.output = output;
     }
 
     /** ******************************************************************<br>

@@ -211,6 +211,9 @@ public class Pie_Decoder_Config_Builder {
         if (!Pie_Utils.isEmpty(getFile_name()))
             config.setFile_name(getFile_name());
 
+        if (config.getOutput() == null)
+            config.setOutput(new Pie_Output(Pie_Output_Type.BASE64));
+
         return config;
 
     }

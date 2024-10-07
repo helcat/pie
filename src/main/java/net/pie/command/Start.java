@@ -1,6 +1,7 @@
 package net.pie.command;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import net.pie.enums.Pie_Run_Type;
 import net.pie.enums.Pie_Word;
 import net.pie.utils.Pie_Utils;
 
@@ -21,22 +22,8 @@ import java.nio.charset.StandardCharsets;
 public class Start implements RequestHandler<Object, byte[]> {
 
     public static void main(String[] args) {
-        if (args == null || args.length == 0)
-            System.exit(0);
-
-        Pie_Command_Map mapping = new Pie_Command_Map(args);
-        if (mapping.getCommand_map().isEmpty())
-            System.exit(0);
-
-        if (mapping.getError() != null) {
-            if  (mapping.getError() instanceof String)
-                System.out.println((String) mapping.getError());
-            else
-                System.out.println(Pie_Word.translate((Pie_Word) mapping.getError()));
-            System.exit(0);
-        }
-
-        new Pie_Prompt(mapping.getCommand_map());
+        if (args != null && args.length > 0)
+            new Pie_Prompt(args, Pie_Run_Type.COMMAND_LINE);
     }
 
     /**

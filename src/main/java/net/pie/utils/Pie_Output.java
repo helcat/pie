@@ -4,11 +4,7 @@ package net.pie.utils;
  * pixel.image.encode@gmail.com
  */
 
-import net.pie.enums.Pie_Output_Type;
-import net.pie.enums.Pie_Word;
-
 import java.io.File;
-import java.util.Arrays;
 
 /** *******************************************************************<br>
  * <b>Pie_Output</b><br>
@@ -21,29 +17,11 @@ public class Pie_Output {
     private String temp_folder_path = Pie_Utils.getTempFolder();
     private String destination_folder_path = null;
     private String filename = null;
-    private Pie_Output_Type option = Pie_Output_Type.BYTE_ARRAY;
     private Pie_BufferedImage output_Image = null;
-
-    public Pie_Output(Pie_Output_Type type) {
-        process(null, type);
-    }
+    private Object error = null;
 
     public Pie_Output(Object o) {
-        process(o, Pie_Output_Type.BYTE_ARRAY);
-    }
-
-    public Pie_Output(Object o, Pie_Output_Type type) {
-        if (type == null)
-            type = Pie_Output_Type.BYTE_ARRAY;
-
-        process(o,type);
-    }
-
-    public boolean validate() {
-        return validate(null);
-    }
-    public boolean validate(Integer number_off_files) {
-        return getOption() != null && (number_off_files == null || number_off_files <= 1 || (getOption() != null && getOption().equals(Pie_Output_Type.FILE)));
+        process(o);
     }
 
     /** *****************************************************<br>
@@ -51,10 +29,9 @@ public class Pie_Output {
      * @param o Object
      * @param type Pie_Output_Type
      */
-    public void process(Object o, Pie_Output_Type type) {
-        setOption(Pie_Output_Type.BYTE_ARRAY);
+    public void process(Object o) {
         if (o != null) {
-            if (o instanceof File && Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type) && fill_file_information((File) o) != null)
+            if (o instanceof File && fill_file_information((File) o) != null)
                     return;
 
             if (o instanceof String) {
@@ -63,17 +40,7 @@ public class Pie_Output {
                     if (fill_file_information(f) != null)
                         return;
                 } catch (Exception ignored) { }
-                setOption(Pie_Output_Type.get((String) o));
             }
-
-            if (getOption() == null)
-                setOption(Pie_Output_Type.BYTE_ARRAY);
-
-        }else{
-            try {
-                if (!Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(type))
-                    setOption(type);
-            } catch (Exception ignored) { }
         }
     }
 
@@ -81,28 +48,23 @@ public class Pie_Output {
      * Do file information
      */
     private File fill_file_information(File f) {
-        if (isDirectory(f)) {
-            setDestination_folder_path(f.getAbsolutePath());
-            setFilename(null);
-            setOption(Pie_Output_Type.FILE);
-            return f;
+        try {
+            if (isDirectory(f)) {
+                setDestination_folder_path(f.getAbsolutePath());
+                setFilename(null);
+                return f;
 
-        } else if (isFile(f)) {
-            setDestination_folder_path(f.getParent());
-            setFilename(f.getName());
-            setOption(Pie_Output_Type.FILE);
-            return f;
-        }
+            } else if (isFile(f)) {
+                setDestination_folder_path(f.getParent());
+                setFilename(f.getName());
+                return f;
+            }
+        } catch (Exception ignored) { }
+
+        setDestination_folder_path(null);
+        setFilename(null);
 
         return null;
-    }
-
-    /** **************************************************<br>
-     * check a file if available from output
-     * @return boolean
-     */
-    private boolean isOut_Put_File() {
-        return getOption().equals(Pie_Output_Type.FILE) && !Pie_Utils.isEmpty(getFilename());
     }
 
     /** *******************************************************<br>
@@ -130,14 +92,6 @@ public class Pie_Output {
         this.filename = filename;
     }
 
-    public Pie_Output_Type getOption() {
-        return option;
-    }
-
-    public void setOption(Pie_Output_Type option) {
-        this.option = option;
-    }
-
     public Pie_BufferedImage getOutput_Image() {
         return output_Image;
     }
@@ -160,6 +114,14 @@ public class Pie_Output {
 
     public void setTemp_folder_path(String temp_folder_path) {
         this.temp_folder_path = temp_folder_path;
+    }
+
+    public Object getError() {
+        return error;
+    }
+
+    public void setError(Object error) {
+        this.error = error;
     }
 }
 

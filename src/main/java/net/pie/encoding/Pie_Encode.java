@@ -173,7 +173,7 @@ public class Pie_Encode {
             return false;
         }
 
-        if (!getConfig().getOutput().validate(total_files) ) {
+        if (total_files > 1 && !Arrays.asList(Pie_Output_Type.FILE, Pie_Output_Type.BASE64_FILE).contains(getConfig().getOutput().getOption())) {
             getConfig().logging(Level.SEVERE,Pie_Word.translate(Pie_Word.ENCODING_INVALID_OUTPUT, getConfig().getLanguage()));
             return false;
         }

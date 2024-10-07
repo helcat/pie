@@ -25,16 +25,6 @@ import java.util.logging.Level;
 
 public class Pie_Prompt {
 
-    private boolean encode = false;
-    private boolean decode = false;
-    private boolean overwrite = false;
-    private boolean makeCertificate = false;
-    private boolean verifyCertificate = false;
-    private boolean prompt = false;
-    private boolean console = false;
-    private boolean base64_encode = false;
-    private boolean base64_decode = false;
-
     private Object source = null;
     private String filename = null; // Only used for encoding text.
     private Object output_source = null;
@@ -96,158 +86,68 @@ public class Pie_Prompt {
      */
 
     /** ***************************************************************************<br>
+     * Configure parameters
+     * @param args String[]
+     * @param runtype Pie_Run_Type
+     */
+    public Pie_Prompt(String[] args, Pie_Run_Type runtype) {
+        if (args == null || args.length == 0)
+            System.exit(0);
+
+        Pie_Command_Map mapping = new Pie_Command_Map(args, runtype);
+        if (mapping.getCommand_map().isEmpty())
+            System.exit(0);
+
+        if (mapping.getError() != null) {
+            if  (mapping.getError() instanceof String)
+                System.out.println((String) mapping.getError());
+            else
+                System.out.println(Pie_Word.translate((Pie_Word) mapping.getError()));
+            System.exit(0);
+        }
+
+        process(mapping.getCommand_map(), runtype);
+    }
+
+    /** ***************************************************************************<br>
      * Full encoding runnable Example
      * java -cp .\pie-x.x.jar Pie -encode -file "C:\tomato.png" -directory "C:\" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
      */
-    public Pie_Prompt(Map<Pie_Word, Object> map) {
+    public void process(Map<Pie_Word, Object> map, Pie_Run_Type runtype) {
+        validate();
 
-        int count = 0;
-        String value;
-        for (String arg : args) {
-            if (arg.startsWith("-")) {
-                if (check_help(arg.substring(1)))
-                    return;                                                // -help
-
-                check_mode(arg.substring(1));                   // -encode -decode
-                check_Overwrite(arg.substring(1));              // -overwrite
-                check_Certificate(arg.substring(1));            // -make_certificate
-                check_Verify(arg.substring(1));                 // -verify_certificate
-                check_Prompt(arg.substring(1));                 // -prompt
-                check_Console(arg.substring(1));                // -console
-                check_Base64(arg.substring(1));                 // -base64_encode -base64_decode
-
-                if (args.length > (count + 1)) {
-                    value = args[count + 1].replace("\"", "");
-                    prefix(arg.substring(1), value);            // -prefix "myPrefix"
-                    source_file(arg.substring(1), value);
-                    source_filename(arg.substring(1), value);
-                    do_output(arg.substring(1), value);
-                    encode_shape(arg.substring(1), value);
-                    encode_mode(arg.substring(1), value);
-                    max_MB(arg.substring(1), value);
-                    encryption(arg.substring(1), value);
-                    certificate_file(arg.substring(1), value);
-                    log_levels(arg.substring(1), value);
-                }
-            }
-            count ++;
-        }
-
-        Scanner scanner = null;
-
-        // Validation
-        if (!isPrompt()) {
-            validate();
-        }else{
-            scanner = new Scanner(System.in);
-        }
-
-        // Encoding
-        if (isEncode()) {
-            if (isPrompt()) {
-                prompt_encode(scanner);
-                validate();
-            }
+        if (map.containsKey(Pie_Word.ENCODE))
             encode();
-        }
 
-        // Decoding
-        else if (isDecode()) {
-            if (isPrompt()) {
-                prompt_decode(scanner);
-                validate();
-            }
+        else if (map.containsKey(Pie_Word.DECODE))
             decode();
-        }
 
-        // Make Certificate
-        else if (isMakeCertificate()) {
-            if (isPrompt()) {
-                prompt_createCertificate(scanner);
-                validate();
-            }
+        else if (map.containsKey(Pie_Word.MAKE_CERTIFICATE))
             createCertificate();
-        }
 
-        // Verify Certificate
-        else if (isVerifyCertificate()) {
-            if (isPrompt()) {
-                prompt_verifyCertificate(scanner);
-                validate();
-            }
+        else if (map.containsKey(Pie_Word.VERIFY_CERTIFICATE))
             verifyCertificate();
-        }
 
-        else if (isBase64_encode()) {
+        else if (map.containsKey(Pie_Word.BASE64_ENCODE))
             base64_Encode();
-        }
 
-        else if (isBase64_decode()) {
+        else if (map.containsKey(Pie_Word.BASE64_DECODE))
             base64_Decode();
-        }
 
-        if (scanner != null)
-            scanner.close();
     }
 
-    /** **************************************************<br>
-     * Prompt - Verify Certificate
-     *  java -cp .\pie-x.x.jar Pie -verify_certificate -prompt
-     */
-    private void prompt_verifyCertificate(Scanner scanner) {
-        if (getSource() == null) {
-            File certificate = null;
-            String in;
-            while (certificate == null) {
-                try {
-                    System.out.println(Pie_Word.translate(Pie_Word.ENTER_CERTIFICATE));
-                    in = scanner.nextLine().replace("\"", "");
-                    if (in.isEmpty())
-                        quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-                    certificate = new File(in);
-                    if (!certificate.exists() || !certificate.isFile())
-                        certificate = null;
-                    else
-                        setSource(certificate);
-                } catch (Exception e) {
-                    certificate = null;
-                }
-            }
-        }
-    }
-
-    /** **************************************************<br>
-     * check encode / decode file (base64)
-     */
-    private void check_Base64(String mode) {
-        if (Pie_Word.is_in_Translation(Pie_Word.BASE64_ENCODE, mode))
-            setBase64_encode(true);
-        else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_DECODE, mode))
-            setBase64_decode(true);
-    }
 
     /** **************************************************<br>
      * Verify Certificate
      */
-    private void verifyCertificate() {
+    private void verifyCertificate(Map<Pie_Word, Object> map) {
         Pie_Certificate cert = new Pie_Certificate();
-        if (getSource() instanceof File)
-            cert.verify_Certificate((File) getSource());
-        if (getSource() instanceof Pie_Base64)
-            cert.verify_Certificate((Pie_Base64) getSource());
-    }
+        if (map.containsKey(Pie_Word.FILE))
+            cert.verify_Certificate((File) map.get(Pie_Word.FILE));
 
-    /** **************************************************<br>
-     * Prompt - create Certificate
-     *  java -cp .\pie-x.x.jar Pie -make_certificate -prompt
-     */
-    private void prompt_createCertificate(Scanner scanner) {
-        if (getOutput_source() == null) {
-            File folder = null;
-            while (folder == null) {
-                folder = check_Prompt_Directory(scanner);
-            }
-        }
+        if (map.containsKey(Pie_Word.BASE64_FILE))
+            cert.verify_Certificate((Pie_Base64) map.get(Pie_Word.BASE64_FILE));
+
     }
 
     /** **************************************************<br>
@@ -385,34 +285,6 @@ public class Pie_Prompt {
     }
 
     /** **************************************************<br>
-     * Prompt - decode
-     * java -cp .\pie-x.x.jar Pie -decode -prompt<br>
-     */
-    private void prompt_decode(Scanner scanner) {
-        if (getSource() == null)
-            if (!check_Prompt_Source(scanner))
-                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-
-        if (getOutput() == null) {
-            File folder = null;
-            while (folder == null) {
-                folder = check_Prompt_Directory(scanner);
-            }
-        }
-
-        if (getCertificate() == null && Pie_Utils.isEmpty(getEncryption_phrase())) {
-            check_Prompt_Phrase(scanner);
-
-            if (Pie_Utils.isEmpty(getEncryption_phrase()) && getCertificate() == null)
-                check_Prompt_Certificate(scanner);
-        }
-
-        check_Prompt_Prefix(scanner);
-        check_Prompt_Overwrite(scanner);
-        check_Prompt_Log(scanner);
-    }
-
-    /** **************************************************<br>
      * encode
      * java -cp .\pie-x.x.jar Pie -encode <br>
      */
@@ -448,41 +320,6 @@ public class Pie_Prompt {
 
         Pie_Encode_Config config = builder.build();
         Pie_Encode encode = new Pie_Encode(config);
-    }
-
-    /** ******************************************************<br>
-     * java -cp .\pie-x.x.jar Pie -encode -prompt<br>
-     * @param scanner Scanner
-     */
-    private void prompt_encode(Scanner scanner) {
-        if (getSource() == null) {
-            Object file = check_Prompt_Source(scanner);
-            if (check_Prompt_Source_Text(scanner))
-                quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-        }
-
-        if (getOutput() == null) {
-            File folder = null;
-            while (folder == null) {
-                folder = check_Prompt_Directory(scanner);
-            }
-        }
-
-        if (getCertificate() == null && Pie_Utils.isEmpty(getEncryption_phrase())) {
-            check_Prompt_Phrase(scanner);
-
-            if (Pie_Utils.isEmpty(getEncryption_phrase()) && getCertificate() == null)
-                check_Prompt_Certificate(scanner);
-        }
-
-        check_Prompt_Overwrite(scanner);
-        check_Prompt_Log(scanner);
-        check_Prompt_Shape(scanner);
-        check_Prompt_Mode(scanner);
-        check_Prompt_MaxMB(scanner);
-
-        if (getSource() != null && getSource() instanceof  Pie_Text)
-            check_Prompt_Console(scanner);
     }
 
     /** **************************************************<br>
@@ -585,40 +422,6 @@ public class Pie_Prompt {
                 setShape(Pie_Shape.SHAPE_RECTANGLE);
             else if (Pie_Word.is_in_Translation(Pie_Word.SQUARE, value))
                 setShape(Pie_Shape.SHAPE_SQUARE);
-        }
-    }
-
-    /** **************************************************<br>
-     * Source file
-     */
-    private void source_file(String key, String value) {
-        if (Pie_Utils.isEmpty(value)) {
-            setSource(null);
-            return;
-        }
-
-        else if (Pie_Word.is_in_Translation(Pie_Word.FILE, key)) {
-            try {
-                File source_file = new File(value.replace("\"", ""));
-                if (!source_file.exists() || !source_file.isFile()) {
-                    setSource(null);
-                }else {
-                    setSource(source_file);
-                }
-            } catch (Exception ignored) {  }
-        }
-
-        else if (Pie_Word.is_in_Translation(Pie_Word.TEXT, key)) {
-            try {
-                setSource(new Pie_Text(value));
-            } catch (Exception ignored) {  }
-        }
-
-        else if (Pie_Word.is_in_Translation(Pie_Word.BASE64_FILE, key)) {    // -base64
-            try {
-                if (Pie_Base64.isBase64(value))
-                    setSource(new Pie_Base64(value, Pie_Source_Type.FILE));
-            } catch (Exception ignored) {  }
         }
     }
 
@@ -1040,37 +843,7 @@ public class Pie_Prompt {
         this.certificate = certificate;
     }
 
-    public boolean isOverwrite() {
-        return overwrite;
-    }
 
-    public void setOverwrite(boolean overwrite) {
-        this.overwrite = overwrite;
-    }
-
-    public boolean isMakeCertificate() {
-        return makeCertificate;
-    }
-
-    public void setMakeCertificate(boolean makeCertificate) {
-        this.makeCertificate = makeCertificate;
-    }
-
-    public boolean isVerifyCertificate() {
-        return verifyCertificate;
-    }
-
-    public void setVerifyCertificate(boolean verifyCertificate) {
-        this.verifyCertificate = verifyCertificate;
-    }
-
-    public boolean isPrompt() {
-        return prompt;
-    }
-
-    public void setPrompt(boolean prompt) {
-        this.prompt = prompt;
-    }
 
     public String getFilename() {
         return filename;
@@ -1080,36 +853,12 @@ public class Pie_Prompt {
         this.filename = filename;
     }
 
-    public boolean isConsole() {
-        return console;
-    }
-
-    public void setConsole(boolean console) {
-        this.console = console;
-    }
-
     public Pie_PreFix getPrefix() {
         return prefix;
     }
 
     public void setPrefix(Pie_PreFix prefix) {
         this.prefix = prefix;
-    }
-
-    public boolean isBase64_encode() {
-        return base64_encode;
-    }
-
-    public void setBase64_encode(boolean base64_encode) {
-        this.base64_encode = base64_encode;
-    }
-
-    public boolean isBase64_decode() {
-        return base64_decode;
-    }
-
-    public void setBase64_decode(boolean base64_decode) {
-        this.base64_decode = base64_decode;
     }
 
     public Pie_Base64 getPie_base64() {

@@ -18,6 +18,7 @@ import static java.nio.file.Files.readAllBytes;
 public class Pie_Base64 {
     private String text = null;
     private Pie_Source_Type type = Pie_Source_Type.TEXT;
+    private File file = null;
     private String file_name = Pie_Word.translate(Pie_Word.UNKNOWN);
 
     /** *****************************************<br>
@@ -25,6 +26,16 @@ public class Pie_Base64 {
      */
     public Pie_Base64() {
 
+    }
+
+    /** *****************************************<br>
+     * Base 64 encode a string sets the text
+     * @param file File
+     * @param type Pie_Source_Type
+     */
+    public Pie_Base64(File file, Pie_Source_Type  type) {
+        setType(type);
+        setFile(file);
     }
 
     /** *****************************************<br>
@@ -190,6 +201,14 @@ public class Pie_Base64 {
 
     public void setFile_name(String file_name) {
         this.file_name = file_name;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 }
 
