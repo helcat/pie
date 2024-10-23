@@ -212,7 +212,7 @@ public class Pie_Decoder_Config_Builder {
             config.setFile_name(getFile_name());
 
         if (config.getOutput() == null)
-            config.setOutput(new Pie_Output(Pie_Output_Type.BASE64));
+            config.setOutput(new Pie_Output(Pie_Output_Type.BYTE_ARRAY));
 
         return config;
 

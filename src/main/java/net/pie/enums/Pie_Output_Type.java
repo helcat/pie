@@ -2,6 +2,7 @@ package net.pie.enums;
 /** **********************************************<br>
  * PIE Pixel Image Encode<br>
  * pixel.image.encode@gmail.com<br>
+ * Boolean type : used with verify certificate<br>
  *<br>
  */
 /** *******************************************************<br>
@@ -9,8 +10,12 @@ package net.pie.enums;
  * Sets the Output type,
  **/
 public enum Pie_Output_Type {
+    BYTE_ARRAY,
+    BASE64,
     FILE,
-    BASE64_FILE;
+    BASE64_FILE,
+    BOOLEAN;
+
 
     /** *******************************************<br>
      * Pie_Output_Type

@@ -41,14 +41,20 @@ public class Pie_Certificate {
             return false;
 
         Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
+        config_builder.setOutput(new Pie_Output(Pie_Output_Type.BOOLEAN));
         Pie_Decode_Config config = config_builder.build();
 
-        if (item instanceof  File && ((File) item).exists() && ((File) item).isFile() && read_Certificate(item)) {
+        if (item instanceof File && ((File) item).exists() && ((File) item).isFile() && read_Certificate(config, item)) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
         }
 
-        if (item instanceof Pie_Base64 && read_Certificate(item)) {
+        else if (item instanceof Pie_Base64 && read_Certificate(config, item)) {
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
+            return true;
+        }
+
+        else if (item instanceof ByteArrayInputStream && read_Certificate(config, item)) {
             config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_VERIFIED, config.getLanguage()));
             return true;
         }
@@ -58,33 +64,33 @@ public class Pie_Certificate {
     }
 
     /** **************************************************<br>
-     * Read Certificate
+     * Read Certificate<br>
      * @param item File Certificate
      * @return boolean
      */
     private boolean read_Certificate(Pie_Decode_Config config, Object item) {
-        if (item instanceof File && (!config.getOu.isFile(((File) item)) || !((File) item).getName().toLowerCase().endsWith(".pie")))
-            return false;
-        else if (item instanceof Pie_Base64 && ((Pie_Base64) item).getFile() != null)
-            return false;
-        else if (item instanceof Pie_Base64 && Pie_Utils.isEmpty(((Pie_Base64) item).getText()))
+        if (item instanceof File && (!config.getOutput().isFile(((File) item)) || !((File) item).getName().toLowerCase().endsWith(".pie")))
             return false;
 
-        if (item instanceof Pie_Base64 || item instanceof File) {
+        else if (item instanceof Pie_Base64 && ( ( (Pie_Base64) item).getFile() == null && Pie_Utils.isEmpty(((Pie_Base64) item).getText())))
+            return false;
+
+        try {
             String key_text = null;
             Pie_Decoder_Config_Builder config_builder = new Pie_Decoder_Config_Builder();
             config_builder.add_Option(Pie_Option.OVERWRITE_FILE, Pie_Option.DECODE_CERTIFICATE);
             config_builder.add_Decode_Source(item);
             Pie_Decode decoded = new Pie_Decode(config_builder.build());
+
             if (decoded.getOutputStream() != null) {
                 if (decoded.getOutputStream() instanceof ByteArrayOutputStream) {
                     ByteArrayOutputStream stream = (ByteArrayOutputStream) decoded.getOutputStream();
                     key_text = stream.toString();
                 }
             }
-
             return !Pie_Utils.isEmpty(key_text);
-        }
+        } catch (Exception ignored) { }
+
         return  false;
     }
 
@@ -124,6 +130,37 @@ public class Pie_Certificate {
         }
     }
 
+    /** **************************************************<br>
+     * create byte Certificate<br>
+     * Generates a certificate of bewteen 100 - 700 random byte charactors between 1 - 255 each
+     * @return (String)
+     */
+    public ByteArrayInputStream create_byte_Certificate() {
+        Pie_Encode_Config config = new Pie_Encode_Config();
+        Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
+                .add_Log_Level(Level.INFO)
+                .add_Mode(Pie_Encode_Mode.M_2)
+                .add_Option(Pie_Option.CREATE_CERTIFICATE)
+                .add_Encode_Source(new Pie_Text(getRandomSpecialChars()))
+                .add_Output(Pie_Output_Type.BYTE_ARRAY);
+        Pie_Encode encode = new Pie_Encode(builder.build());
+
+        if (encode.isEncoding_Error()) {
+            config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+            return null;
+        }else{
+            byte[] bytes = encode.getConfig().getOutput().getOutput_Image().getBufferedImageBytes();
+            ByteArrayInputStream bytearray = new ByteArrayInputStream(bytes);
+            if (verify_Certificate(bytearray)) {
+                config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_CREATED, config.getLanguage()));
+                return bytearray;
+            }else{
+                config.logging(Level.INFO, Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED, config.getLanguage()));
+                return null;
+            }
+        }
+    }
+
     /**
      * *************************************************<br>
      * create Certificate File
@@ -146,7 +183,7 @@ public class Pie_Certificate {
         Pie_Encode_Config config = new Pie_Encode_Config();
         String password = getRandomSpecialChars();
 
-        File cert = Pie_Utils.file_concat(folder,UUID.randomUUID().toString()+".pie");
+        File cert = Pie_Utils.file_concat(folder, UUID.randomUUID() +".pie");
 
         Pie_Encoder_Config_Builder builder = new Pie_Encoder_Config_Builder()
                 .add_Log_Level(Level.INFO)

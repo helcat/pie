@@ -81,7 +81,7 @@ public class Pie_Output {
      * @param file File
      * @return boolean
      */
-    private boolean isFile(File file) {
+    public boolean isFile(File file) {
         return (file != null && file.exists() && file.isFile());
     }
     public String getFilename() {

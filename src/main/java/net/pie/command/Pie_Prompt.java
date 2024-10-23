@@ -9,11 +9,10 @@ import net.pie.encoding.Pie_Encode_Config;
 import net.pie.encoding.Pie_Encoder_Config_Builder;
 import net.pie.enums.*;
 import net.pie.utils.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -36,6 +35,9 @@ public class Pie_Prompt {
     private String encryption_phrase = null;
     private Pie_PreFix prefix = null;
     private Pie_Base64 pie_base64 = null;
+
+    private Pie_Run_Type run_type = Pie_Run_Type.COMMAND_LINE;
+    private Pie_Command_Map mapping = null;
 
     /** **************************************************<br>
      * Process Parameters : <br>
@@ -88,66 +90,97 @@ public class Pie_Prompt {
     /** ***************************************************************************<br>
      * Configure parameters
      * @param args String[]
-     * @param runtype Pie_Run_Type
+     * @param run_type Pie_Run_Type
      */
-    public Pie_Prompt(String[] args, Pie_Run_Type runtype) {
-        if (args == null || args.length == 0)
+    public Pie_Prompt(String[] args, Pie_Run_Type run_type) {
+        if (run_type == null || args == null || args.length == 0)
             System.exit(0);
 
-        Pie_Command_Map mapping = new Pie_Command_Map(args, runtype);
-        if (mapping.getCommand_map().isEmpty())
+        setRun_type(run_type);
+        setMapping(new Pie_Command_Map(args, getRun_type()));
+        if (getMapping().getCommand_map().isEmpty())
             System.exit(0);
 
-        if (mapping.getError() != null) {
-            if  (mapping.getError() instanceof String)
+        if (getMapping().getError() != null) {
+            if  (getMapping().getError() instanceof String)
                 System.out.println((String) mapping.getError());
             else
                 System.out.println(Pie_Word.translate((Pie_Word) mapping.getError()));
             System.exit(0);
         }
 
-        process(mapping.getCommand_map(), runtype);
-    }
-
-    /** ***************************************************************************<br>
-     * Full encoding runnable Example
-     * java -cp .\pie-x.x.jar Pie -encode -file "C:\tomato.png" -directory "C:\" -shape square -maxmb 200 -encryption "my password" -overwrite -log off
-     */
-    public void process(Map<Pie_Word, Object> map, Pie_Run_Type runtype) {
         validate();
 
-        if (map.containsKey(Pie_Word.ENCODE))
+        if (getMapping().getCommand_map().containsKey(Pie_Word.ENCODE))
             encode();
 
-        else if (map.containsKey(Pie_Word.DECODE))
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.DECODE))
             decode();
 
-        else if (map.containsKey(Pie_Word.MAKE_CERTIFICATE))
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.MAKE_CERTIFICATE))
             createCertificate();
 
-        else if (map.containsKey(Pie_Word.VERIFY_CERTIFICATE))
-            verifyCertificate();
+        // VERIFY CERTIFICATE
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.VERIFY_CERTIFICATE))
+            verify_Certificate();
 
-        else if (map.containsKey(Pie_Word.BASE64_ENCODE))
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.BASE64_ENCODE))
             base64_Encode();
 
-        else if (map.containsKey(Pie_Word.BASE64_DECODE))
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.BASE64_DECODE))
             base64_Decode();
 
     }
 
+    /** **************************************************<br>
+     * Certificate
+     */
+    private void createCertificate() {
+        Pie_Certificate cert = new Pie_Certificate();
+        Object output = getMapping().getCommand_map().get(Pie_Word.OUTPUT);
+
+        if (output instanceof File) {
+            cert.create_Certificate((File) output);
+            return;
+
+        }else if (output instanceof Pie_Base64) {
+            Pie_Base64 bf = (Pie_Base64) output;
+            String base64_output = cert.create_base64_Certificate();
+            if (bf.getFile() != null) {
+                Pie_Utils.write_Bytes_To_File(base64_output.getBytes(StandardCharsets.UTF_8), bf.getFile());
+                return;
+            }
+        }else if (output instanceof Pie_Output_Type) {
+            switch ((Pie_Output_Type) output) {
+                case BASE64:
+                    System.out.println(cert.create_base64_Certificate());
+                    return;
+
+                case BYTE_ARRAY:
+                    System.out.println(cert.create_byte_Certificate());
+                    return;
+
+                case FILE:
+                    cert.create_Certificate(Pie_Utils.getDesktop());
+                    return;
+            }
+        }
+        System.out.println(Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED));
+    }
 
     /** **************************************************<br>
-     * Verify Certificate
+     * Validate Certificate<br>
      */
-    private void verifyCertificate(Map<Pie_Word, Object> map) {
+    private void verify_Certificate() {
         Pie_Certificate cert = new Pie_Certificate();
-        if (map.containsKey(Pie_Word.FILE))
-            cert.verify_Certificate((File) map.get(Pie_Word.FILE));
+        if (getMapping().getCommand_map().containsKey(Pie_Word.FILE))
+            cert.verify_Certificate(getMapping().getCommand_map().get(Pie_Word.FILE));
 
-        if (map.containsKey(Pie_Word.BASE64_FILE))
-            cert.verify_Certificate((Pie_Base64) map.get(Pie_Word.BASE64_FILE));
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.BASE64_FILE))
+            cert.verify_Certificate(getMapping().getCommand_map().get(Pie_Word.BASE64_FILE));
 
+        else if (getMapping().getCommand_map().containsKey(Pie_Word.BASE64))
+            cert.verify_Certificate(getMapping().getCommand_map().get(Pie_Word.BASE64));
     }
 
     /** **************************************************<br>
@@ -223,23 +256,6 @@ public class Pie_Prompt {
 
             else if (getSource() != null && getSource() instanceof Pie_Base64)
                ((Pie_Base64) getSource()).decode_base64_write_to_File(output_file);
-        }
-    }
-
-    /** **************************************************<br>
-     * Certificate
-     */
-    private void createCertificate() {
-        Pie_Certificate cert = new Pie_Certificate();
-        File output_directory = getOut_Put_File();
-        if (output_directory != null && output_directory.isDirectory()) {
-            cert.create_Certificate(output_directory);
-        }else{
-            String output = cert.create_base64_Certificate();
-            if (!Pie_Utils.isEmpty(output))
-                System.out.println(output);
-            else
-                System.out.println(Pie_Word.translate(Pie_Word.CERTIFICATE_NOT_CREATED));
         }
     }
 
@@ -326,14 +342,6 @@ public class Pie_Prompt {
      * validate
      */
     private void validate() {
-        if (!isDecode() && !isEncode() && !isMakeCertificate() &&
-                !isVerifyCertificate() && !isBase64_encode() &&
-                !isBase64_decode())
-            quit(Pie_Word.translate(Pie_Word.ENCODING_FAILED));
-
-        if (!isMakeCertificate() && getSource() == null)
-            quit(Pie_Word.translate(Pie_Word.NO_SOURCE));
-
         if (getShape() == null)
             setShape(Pie_Shape.SHAPE_RECTANGLE);
 
@@ -843,8 +851,6 @@ public class Pie_Prompt {
         this.certificate = certificate;
     }
 
-
-
     public String getFilename() {
         return filename;
     }
@@ -875,5 +881,21 @@ public class Pie_Prompt {
 
     public void setOutput_source(Object output_source) {
         this.output_source = output_source;
+    }
+
+    public Pie_Command_Map getMapping() {
+        return mapping;
+    }
+
+    public void setMapping(Pie_Command_Map mapping) {
+        this.mapping = mapping;
+    }
+
+    public Pie_Run_Type getRun_type() {
+        return run_type;
+    }
+
+    public void setRun_type(Pie_Run_Type run_type) {
+        this.run_type = run_type;
     }
 }

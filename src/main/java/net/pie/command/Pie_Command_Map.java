@@ -15,13 +15,13 @@ import java.util.logging.Level;
 public class Pie_Command_Map {
     private final Map<Pie_Word, Object> command_map = new HashMap<>();
     private Object error = null;
-    private Pie_Run_Type runtype = null;
+    private Pie_Run_Type run_type = null;
 
     /** ***************************************************************************<br>
      * Map from command line, Allows for Language translation, English, French Etc.
      */
     public Pie_Command_Map(String[] args, Pie_Run_Type runtype) {
-        setRuntype(runtype);
+        setRun_type(runtype);
         int count = 0;
         Pie_Word key = null;
         String value;
@@ -129,14 +129,13 @@ public class Pie_Command_Map {
         }
 
         // OUTPUT Command
-        if (!getCommand_map().containsKey(Pie_Word.OUTPUT)) {
-            setError(Pie_Word.OUTPUT_REQUIRED);
-        }else{
-            Pie_Output output = new Pie_Output(getCommand_map().get(Pie_Word.OUTPUT));
-            if (output.getError() != null) {
-                setError(output.getError());
-                return;
-            }
+        if (!getCommand_map().containsKey(Pie_Word.OUTPUT))
+            getCommand_map().put(Pie_Word.OUTPUT, new Pie_Output(Pie_Output_Type.BYTE_ARRAY));
+
+        Pie_Output output = new Pie_Output(getCommand_map().get(Pie_Word.OUTPUT));
+        if (output.getError() != null) {
+            setError(output.getError());
+            return;
         }
 
         // Source
@@ -174,16 +173,15 @@ public class Pie_Command_Map {
             } catch (Exception ignored) {  }
         }
 
-        if (getCommand_map().containsKey(Pie_Word.BASE64_FILE)) {
+        else if (getCommand_map().containsKey(Pie_Word.BASE64_FILE)) {
             try {
                 if (getCommand_map().get(Pie_Word.BASE64_FILE) != null && getCommand_map().get(Pie_Word.BASE64_FILE) instanceof  File) {
                     getCommand_map().put(Pie_Word.BASE64_FILE, new Pie_Base64((File) getCommand_map().get(Pie_Word.BASE64_FILE), Pie_Source_Type.BASE64_FILE));
-                    return;
+
                 } else if (getCommand_map().get(Pie_Word.BASE64_FILE) != null && getCommand_map().get(Pie_Word.BASE64_FILE) instanceof  String) {
                     File source_file = new File((String) getCommand_map().get(Pie_Word.BASE64_FILE));
                     if (!source_file.exists() || !source_file.isFile()) {
                         setError(Pie_Word.INVALID_FILE);
-                        return;
                     }else {
                         getCommand_map().put(Pie_Word.BASE64_FILE, new Pie_Base64(source_file, Pie_Source_Type.BASE64_FILE));
                     }
@@ -192,6 +190,18 @@ public class Pie_Command_Map {
                 setError(Pie_Word.INVALID_FILE);
             }
         }
+
+        else if (getCommand_map().containsKey(Pie_Word.BASE64)) {
+            try {
+                if (getCommand_map().get(Pie_Word.BASE64) != null && getCommand_map().get(Pie_Word.BASE64) instanceof  String) {
+                    Pie_Base64 base64 = new Pie_Base64((String) getCommand_map().get(Pie_Word.BASE64), Pie_Source_Type.TEXT);
+                    getCommand_map().put(Pie_Word.BASE64, base64);
+                }
+            } catch (Exception ignored) {
+                setError(Pie_Word.INVALID_FILE);
+            }
+        }
+
     }
 
     /** **************************************************<br>
@@ -325,11 +335,11 @@ public class Pie_Command_Map {
         this.error = error;
     }
 
-    public Pie_Run_Type getRuntype() {
-        return runtype;
+    public Pie_Run_Type getRun_type() {
+        return run_type;
     }
 
-    public void setRuntype(Pie_Run_Type runtype) {
-        this.runtype = runtype;
+    public void setRun_type(Pie_Run_Type run_type) {
+        this.run_type = run_type;
     }
 }
